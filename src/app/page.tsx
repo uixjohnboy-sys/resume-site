@@ -2,18 +2,16 @@
 
 import { useState } from "react";
 import Sidebar, { PanelKey } from "@/components/Sidebar";
-import OverviewPanel from "@/components/panels/OverviewPanel";
 import AboutPanel from "@/components/panels/AboutPanel";
 import ProjectsPanel from "@/components/panels/ProjectsPanel";
 
 const crumbs: Record<PanelKey, string> = {
-  overview: "Overview",
   about: "About me",
   projects: "Projects",
 };
 
 export default function Home() {
-  const [active, setActive] = useState<PanelKey>("overview");
+  const [active, setActive] = useState<PanelKey>("about");
 
   return (
     <div className="flex h-screen w-screen" style={{ background: "var(--bg-page, #1A1917)" }}>
@@ -25,7 +23,6 @@ export default function Home() {
           </p>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
-          {active === "overview" && <OverviewPanel onNavigate={setActive} />}
           {active === "about" && <AboutPanel />}
           {active === "projects" && <ProjectsPanel />}
         </div>

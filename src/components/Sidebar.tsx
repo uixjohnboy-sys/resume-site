@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import {
-  IconLayoutDashboard,
   IconUser,
   IconApps,
   IconArticle,
@@ -13,10 +12,9 @@ import {
   IconSparkles,
 } from "@tabler/icons-react";
 
-export type PanelKey = "overview" | "about" | "projects";
+export type PanelKey = "about" | "projects";
 
 const navItems: { key: PanelKey; label: string; icon: React.ReactNode }[] = [
-  { key: "overview", label: "Overview", icon: <IconLayoutDashboard size={16} /> },
   { key: "about", label: "About me", icon: <IconUser size={16} /> },
   { key: "projects", label: "Projects", icon: <IconApps size={16} /> },
 ];
