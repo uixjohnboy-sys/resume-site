@@ -39,3 +39,40 @@ body {
 .animate-flicker {
   animation: flicker 2.6s ease-in-out infinite;
 }
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3a382f transparent;
+}
+
+.thin-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.thin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: #3a382f;
+  border-radius: 4px;
+}
