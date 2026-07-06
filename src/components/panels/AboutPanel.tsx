@@ -25,9 +25,17 @@ const tools = [
   { name: "Notion", icon: IconBrandNotion, description: "Planning projects and keeping notes organized." },
 ];
 
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function Card({
+  children,
+  className = "",
+  style = {},
+}: {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
   return (
-    <div className={`rounded-xl p-4 ${className}`} style={{ background: "var(--bg-card, #211F1B)" }}>
+    <div className={`rounded-xl p-4 ${className}`} style={{ background: "var(--bg-card, #211F1B)", ...style }}>
       {children}
     </div>
   );
@@ -44,10 +52,10 @@ function Tag({ label }: { label: string }) {
   );
 }
 
-function PlaceholderCard({ className = "" }: { className?: string }) {
+function PlaceholderCard() {
   return (
     <div
-      className={`flex h-32 flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-center ${className}`}
+      className="flex flex-1 flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-center"
       style={{ borderColor: "#3A382F", color: "#5A584F" }}
     >
       <IconLayoutGrid size={18} />
@@ -58,10 +66,10 @@ function PlaceholderCard({ className = "" }: { className?: string }) {
 
 export default function AboutPanel() {
   return (
-    <div className="grid grid-cols-[6fr_4fr] items-start gap-3">
+    <div className="flex h-full gap-3">
       {/* Left column, ~60% */}
-      <div className="flex min-w-0 flex-col gap-3">
-        <div className="flex h-64 gap-3">
+      <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "6 1 0%" }}>
+        <div className="flex min-h-0 gap-3" style={{ flex: "1 1 0%", minHeight: 150 }}>
           <div className="relative h-full w-[220px] flex-none overflow-hidden rounded-xl">
             <Image src="/johnboy.png" alt="John Boy" fill className="object-cover" sizes="220px" priority />
           </div>
@@ -80,7 +88,7 @@ export default function AboutPanel() {
           </Card>
         </div>
 
-        <div className="grid h-[170px] grid-cols-[1fr_1fr_1.6fr] gap-3">
+        <div className="grid flex-none grid-cols-[1fr_1fr_1.6fr] gap-3" style={{ height: 150 }}>
           <Card className="flex h-full flex-col justify-center">
             <p className="mb-1 text-[11px]" style={{ color: "#6B6960" }}>
               Apps built
@@ -132,71 +140,80 @@ export default function AboutPanel() {
           </div>
         </div>
 
-        <Card>
-          <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
-            Experience
-          </p>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-            {experience.map((item) => (
-              <div key={item.role} className="border-l-2 pl-3" style={{ borderColor: "#2A2822" }}>
-                <p className="mb-0.5 text-xs" style={{ color: "#F2F1EE" }}>
-                  {item.role}
-                </p>
-                <p className="text-[11px]" style={{ color: "#6B6960" }}>
-                  {item.period}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="min-h-[280px]">
-          <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
-            Tools I use
-          </p>
-          <div className="thin-scroll max-h-[320px] overflow-y-auto pr-1">
-            {tools.map((tool, i) => {
-              const Icon = tool.icon;
-              return (
-                <div
-                  key={tool.name}
-                  className="flex items-start gap-3"
-                  style={{ marginBottom: i === tools.length - 1 ? 0 : 16 }}
-                >
+        {/* Experience + Hobbies stacked on the left, Tools I use spanning the full height on the right */}
+        <div className="flex min-h-0 gap-3" style={{ flex: "2 1 0%" }}>
+          <div className="flex min-h-0 flex-col gap-3" style={{ flex: "3 1 0%" }}>
+            <Card className="flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
+              <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
+                Experience
+              </p>
+              <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
+                {experience.map((item, i) => (
                   <div
-                    className="flex h-9 w-9 flex-none items-center justify-center rounded-lg"
-                    style={{ background: "var(--bg-card-alt, #2A2822)", color: "#EF9F27" }}
+                    key={item.role}
+                    className="border-l-2 pl-3"
+                    style={{ borderColor: "#2A2822", marginBottom: i === experience.length - 1 ? 0 : 14 }}
                   >
-                    <Icon size={18} />
-                  </div>
-                  <div className="min-w-0 pt-0.5">
-                    <p className="text-xs" style={{ color: "#F2F1EE" }}>
-                      {tool.name}
+                    <p className="mb-0.5 text-xs" style={{ color: "#F2F1EE" }}>
+                      {item.role}
                     </p>
-                    <p className="text-[11px] leading-relaxed" style={{ color: "#6B6960" }}>
-                      {tool.description}
+                    <p className="text-[11px]" style={{ color: "#6B6960" }}>
+                      {item.period}
                     </p>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+                ))}
+              </div>
+            </Card>
 
-        <Card>
-          <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
-            Hobbies
-          </p>
-          <div>
-            {hobbies.map((h) => (
-              <Tag key={h} label={h} />
-            ))}
+            <Card className="flex-none">
+              <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
+                Hobbies
+              </p>
+              <div>
+                {hobbies.map((h) => (
+                  <Tag key={h} label={h} />
+                ))}
+              </div>
+            </Card>
           </div>
-        </Card>
+
+          <Card className="flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
+            <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
+              Tools I use
+            </p>
+            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
+              {tools.map((tool, i) => {
+                const Icon = tool.icon;
+                return (
+                  <div
+                    key={tool.name}
+                    className="flex items-start gap-3"
+                    style={{ marginBottom: i === tools.length - 1 ? 0 : 14 }}
+                  >
+                    <div
+                      className="flex h-9 w-9 flex-none items-center justify-center rounded-lg"
+                      style={{ background: "var(--bg-card-alt, #2A2822)", color: "#EF9F27" }}
+                    >
+                      <Icon size={18} />
+                    </div>
+                    <div className="min-w-0 pt-0.5">
+                      <p className="text-xs" style={{ color: "#F2F1EE" }}>
+                        {tool.name}
+                      </p>
+                      <p className="text-[11px] leading-relaxed" style={{ color: "#6B6960" }}>
+                        {tool.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
       </div>
 
       {/* Right column, ~40%, reserved for future content */}
-      <div className="sticky top-0 flex min-w-0 flex-col gap-3">
+      <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "4 1 0%" }}>
         <PlaceholderCard />
         <PlaceholderCard />
         <PlaceholderCard />
