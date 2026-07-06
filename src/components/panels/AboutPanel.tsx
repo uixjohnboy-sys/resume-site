@@ -1,7 +1,13 @@
 import Image from "next/image";
-import { IconLayoutGrid } from "@tabler/icons-react";
+import {
+  IconLayoutGrid,
+  IconBrandFigma,
+  IconBrandFramer,
+  IconRobot,
+  IconBrandReact,
+  IconBrandNotion,
+} from "@tabler/icons-react";
 
-const tools = ["Figma", "Framer", "Claude Code", "React", "Notion"];
 const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
 
 const experience = [
@@ -11,17 +17,17 @@ const experience = [
   { role: "Design intern", period: "2017 to 2018" },
 ];
 
-function Card({
-  children,
-  className = "",
-  style = {},
-}: {
-  children: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
+const tools = [
+  { name: "Figma", icon: IconBrandFigma, description: "High-fidelity UI design and prototyping." },
+  { name: "Framer", icon: IconBrandFramer, description: "Building and publishing interactive sites fast." },
+  { name: "Claude Code", icon: IconRobot, description: "Pairing on code, from prototype to production." },
+  { name: "React", icon: IconBrandReact, description: "Building the actual product interfaces." },
+  { name: "Notion", icon: IconBrandNotion, description: "Planning projects and keeping notes organized." },
+];
+
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl p-4 ${className}`} style={{ background: "var(--bg-card, #211F1B)", ...style }}>
+    <div className={`rounded-xl p-4 ${className}`} style={{ background: "var(--bg-card, #211F1B)" }}>
       {children}
     </div>
   );
@@ -41,7 +47,7 @@ function Tag({ label }: { label: string }) {
 function PlaceholderCard({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`flex flex-1 flex-col items-center justify-center gap-2 rounded-xl border border-dashed p-6 text-center ${className}`}
+      className={`flex h-32 flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-center ${className}`}
       style={{ borderColor: "#3A382F", color: "#5A584F" }}
     >
       <IconLayoutGrid size={18} />
@@ -52,14 +58,14 @@ function PlaceholderCard({ className = "" }: { className?: string }) {
 
 export default function AboutPanel() {
   return (
-    <div className="flex h-full gap-3">
+    <div className="grid grid-cols-[6fr_4fr] items-start gap-3">
       {/* Left column, ~60% */}
-      <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "6 1 0%" }}>
-        <div className="flex min-h-0 gap-3" style={{ flex: "2 1 0%" }}>
+      <div className="flex min-w-0 flex-col gap-3">
+        <div className="flex h-64 gap-3">
           <div className="relative h-full w-[220px] flex-none overflow-hidden rounded-xl">
             <Image src="/johnboy.png" alt="John Boy" fill className="object-cover" sizes="220px" priority />
           </div>
-          <Card className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <Card className="min-h-0 flex-1 overflow-y-auto">
             <p className="mb-2 text-[11px]" style={{ color: "#6B6960" }}>
               johnboy / about.md
             </p>
@@ -74,7 +80,7 @@ export default function AboutPanel() {
           </Card>
         </div>
 
-        <div className="grid flex-none grid-cols-[1fr_1fr_1.6fr] gap-3" style={{ height: 170 }}>
+        <div className="grid h-[170px] grid-cols-[1fr_1fr_1.6fr] gap-3">
           <Card className="flex h-full flex-col justify-center">
             <p className="mb-1 text-[11px]" style={{ color: "#6B6960" }}>
               Apps built
@@ -126,17 +132,13 @@ export default function AboutPanel() {
           </div>
         </div>
 
-        <Card className="flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
-          <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
+        <Card>
+          <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
             Experience
           </p>
-          <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
-            {experience.map((item, i) => (
-              <div
-                key={item.role}
-                className="border-l-2 pl-3"
-                style={{ borderColor: "#2A2822", marginBottom: i === experience.length - 1 ? 0 : 14 }}
-              >
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            {experience.map((item) => (
+              <div key={item.role} className="border-l-2 pl-3" style={{ borderColor: "#2A2822" }}>
                 <p className="mb-0.5 text-xs" style={{ color: "#F2F1EE" }}>
                   {item.role}
                 </p>
@@ -148,32 +150,53 @@ export default function AboutPanel() {
           </div>
         </Card>
 
-        <div className="grid flex-none grid-cols-2 gap-3">
-          <Card>
-            <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
-              Hobbies
-            </p>
-            <div>
-              {hobbies.map((h) => (
-                <Tag key={h} label={h} />
-              ))}
-            </div>
-          </Card>
-          <Card>
-            <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
-              Tools I use
-            </p>
-            <div>
-              {tools.map((t) => (
-                <Tag key={t} label={t} />
-              ))}
-            </div>
-          </Card>
-        </div>
+        <Card className="min-h-[280px]">
+          <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
+            Tools I use
+          </p>
+          <div className="thin-scroll max-h-[320px] overflow-y-auto pr-1">
+            {tools.map((tool, i) => {
+              const Icon = tool.icon;
+              return (
+                <div
+                  key={tool.name}
+                  className="flex items-start gap-3"
+                  style={{ marginBottom: i === tools.length - 1 ? 0 : 16 }}
+                >
+                  <div
+                    className="flex h-9 w-9 flex-none items-center justify-center rounded-lg"
+                    style={{ background: "var(--bg-card-alt, #2A2822)", color: "#EF9F27" }}
+                  >
+                    <Icon size={18} />
+                  </div>
+                  <div className="min-w-0 pt-0.5">
+                    <p className="text-xs" style={{ color: "#F2F1EE" }}>
+                      {tool.name}
+                    </p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: "#6B6960" }}>
+                      {tool.description}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        <Card>
+          <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
+            Hobbies
+          </p>
+          <div>
+            {hobbies.map((h) => (
+              <Tag key={h} label={h} />
+            ))}
+          </div>
+        </Card>
       </div>
 
       {/* Right column, ~40%, reserved for future content */}
-      <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "4 1 0%" }}>
+      <div className="sticky top-0 flex min-w-0 flex-col gap-3">
         <PlaceholderCard />
         <PlaceholderCard />
         <PlaceholderCard />
