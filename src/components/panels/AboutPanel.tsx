@@ -5,6 +5,10 @@ import {
   IconRobot,
   IconBrandReact,
   IconBrandNotion,
+  IconBrandVscode,
+  IconBrandGithub,
+  IconBrandVercel,
+  IconBrandSlack,
   IconPlayerPlayFilled,
 } from "@tabler/icons-react";
 
@@ -50,11 +54,60 @@ const experience = [
 ];
 
 const tools = [
-  { name: "Figma", icon: IconBrandFigma, description: "High-fidelity UI design and prototyping." },
-  { name: "Framer", icon: IconBrandFramer, description: "Building and publishing interactive sites fast." },
-  { name: "Claude Code", icon: IconRobot, description: "Pairing on code, from prototype to production." },
-  { name: "React", icon: IconBrandReact, description: "Building the actual product interfaces." },
-  { name: "Notion", icon: IconBrandNotion, description: "Planning projects and keeping notes organized." },
+  {
+    name: "Figma",
+    icon: IconBrandFigma,
+    description:
+      "My main tool for high-fidelity UI design and prototyping. I build out full screens and interactive flows here before anything gets built in code.",
+  },
+  {
+    name: "Framer",
+    icon: IconBrandFramer,
+    description:
+      "For quickly building and publishing marketing sites and landing pages without waiting on a full development cycle.",
+  },
+  {
+    name: "Claude Code",
+    icon: IconRobot,
+    description:
+      "My pair programmer for turning designs into working apps, from first prototype all the way through to production code.",
+  },
+  {
+    name: "React",
+    icon: IconBrandReact,
+    description:
+      "The framework behind the actual product interfaces I ship, usually paired with Next.js for anything that needs routing.",
+  },
+  {
+    name: "Notion",
+    icon: IconBrandNotion,
+    description:
+      "Where I plan projects, keep client notes organized, and track the roadmap for everything I'm currently building.",
+  },
+  {
+    name: "VS Code",
+    icon: IconBrandVscode,
+    description:
+      "My day-to-day editor for anything that isn't AI-paired, plus reviewing and cleaning up code that Claude Code generates.",
+  },
+  {
+    name: "GitHub",
+    icon: IconBrandGithub,
+    description:
+      "Where every project lives, gets version controlled, and gets reviewed before it ships anywhere else.",
+  },
+  {
+    name: "Vercel",
+    icon: IconBrandVercel,
+    description:
+      "My default host for shipping projects fast, connected straight to GitHub so every push goes live automatically.",
+  },
+  {
+    name: "Slack",
+    icon: IconBrandSlack,
+    description:
+      "Where client and team communication happens day to day, from quick questions to sharing work in progress.",
+  },
 ];
 
 function Card({
@@ -119,17 +172,31 @@ export default function AboutPanel() {
               </span>
             </span>
           </div>
-          <Card className="min-h-0 flex-1 overflow-y-auto">
+          <Card className="thin-scroll min-h-0 flex-1 overflow-y-auto">
             <p className="mb-2 text-[11px]" style={{ color: "#6B6960" }}>
               johnboy / about.md
             </p>
             <p className="mb-2" style={{ color: "#F2F1EE" }}>
               Howdy
             </p>
-            <p className="text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
               I&apos;m a product designer and builder based in Manila. I turn rough ideas into working apps, with a
               focus on dashboards and workflow tools that remove friction from a process. Currently building{" "}
               <span style={{ color: "#EF9F27" }}>Pathwise</span>.
+            </p>
+            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+              My background is in product design, but over the last few years I&apos;ve leaned hard into shipping
+              the actual product myself instead of only handing off mockups. I like projects where the interface has
+              real state to manage, not just static screens, dashboards, editors, and tools people use every day.
+            </p>
+            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+              Most of my recent work has been split between client projects on GoHighLevel and building my own
+              products, like Pathwise, from scratch. I care a lot about the small details of an interface, spacing,
+              motion, the way a state change feels, more than most people notice consciously but everyone feels.
+            </p>
+            <p className="text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+              Outside of client work, I&apos;m usually deep in a personal project, testing out a new tool, or
+              rebuilding something I already shipped because I found a cleaner way to do it.
             </p>
           </Card>
         </div>
