@@ -42,7 +42,7 @@ export default function Sidebar({
               alt="John Boy"
               fill
               className="object-cover"
-              style={{ objectPosition: "center 15%" }}
+              style={{ objectPosition: "center top", transform: "scale(1.2)", transformOrigin: "top center" }}
               sizes="230px"
               priority
             />
