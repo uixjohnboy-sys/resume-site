@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const tools = ["Figma", "Framer", "Claude Code", "React", "Notion"];
 const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
 
@@ -21,11 +23,8 @@ export default function AboutPanel() {
   return (
     <div>
       <div className="mb-3 grid grid-cols-[180px_1fr] gap-3">
-        <div
-          className="flex aspect-square items-center justify-center overflow-hidden rounded-xl p-2 text-center text-xs"
-          style={{ background: "linear-gradient(135deg, #3a2a1a, #141311)", color: "#5A584F" }}
-        >
-          your photo here
+        <div className="relative aspect-square overflow-hidden rounded-xl">
+          <Image src="/johnboy.png" alt="John Boy" fill className="object-cover" sizes="180px" priority />
         </div>
         <div className="rounded-xl p-4" style={{ background: "var(--bg-card, #211F1B)" }}>
           <p className="mb-2 text-[11px]" style={{ color: "#6B6960" }}>

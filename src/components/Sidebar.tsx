@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   IconLayoutDashboard,
   IconUser,
@@ -49,14 +50,15 @@ export default function Sidebar({
                 "radial-gradient(ellipse 50% 100% at 50% 100%, rgba(255,201,138,0.85) 0%, rgba(239,159,39,0.4) 35%, rgba(239,159,39,0) 72%)",
             }}
           />
-          <div
-            className="flex h-[118px] items-center justify-center rounded-t-2xl text-[11px]"
-            style={{
-              background: "linear-gradient(160deg, #3a2a1a, #1D1B18 70%)",
-              color: "#5A584F",
-            }}
-          >
-            your photo here
+          <div className="relative h-[118px] w-full overflow-hidden rounded-t-2xl">
+            <Image
+              src="/johnboy.png"
+              alt="John Boy"
+              fill
+              className="object-cover"
+              sizes="230px"
+              priority
+            />
           </div>
           <div className="rounded-b-2xl p-3" style={{ background: "var(--bg-card, #211F1B)" }}>
             <div className="mb-1 flex items-center gap-1.5">
