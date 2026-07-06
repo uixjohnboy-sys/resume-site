@@ -33,29 +33,16 @@ export default function Sidebar({
       className="flex w-[230px] flex-none flex-col overflow-visible pt-10 px-3.5 pb-5"
       style={{ background: "var(--bg-sidebar, #141311)" }}
     >
-      {/* Profile card with flowing glow */}
-      <div className="relative mb-4 overflow-visible">
-        <div
-          className="animate-flicker pointer-events-none absolute bottom-full left-1/2 h-12 w-[3px] -translate-x-1/2 blur-[1px]"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(239,159,39,0) 0%, rgba(239,159,39,0.6) 55%, #FFC98A 100%)",
-          }}
-        />
-        <div className="relative overflow-visible rounded-2xl border border-[rgba(239,159,39,0.45)]">
-          <div
-            className="pointer-events-none absolute left-1/2 top-[-14px] z-10 h-[30px] w-[190%] -translate-x-1/2 blur-[9px]"
-            style={{
-              background:
-                "radial-gradient(ellipse 50% 100% at 50% 100%, rgba(255,201,138,0.85) 0%, rgba(239,159,39,0.4) 35%, rgba(239,159,39,0) 72%)",
-            }}
-          />
-          <div className="relative h-[118px] w-full overflow-hidden rounded-t-2xl">
+      {/* Profile card */}
+      <div className="relative mb-4">
+        <div className="relative overflow-hidden rounded-2xl border border-[rgba(239,159,39,0.45)]">
+          <div className="relative h-[150px] w-full overflow-hidden rounded-t-2xl">
             <Image
               src="/johnboy.png"
               alt="John Boy"
               fill
               className="object-cover"
+              style={{ objectPosition: "center 15%" }}
               sizes="230px"
               priority
             />
