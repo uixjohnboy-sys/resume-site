@@ -1,4 +1,3 @@
-import Image from "next/image";
 import {
   IconLayoutGrid,
   IconBrandFigma,
@@ -6,6 +5,7 @@ import {
   IconRobot,
   IconBrandReact,
   IconBrandNotion,
+  IconPlayerPlayFilled,
 } from "@tabler/icons-react";
 
 const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
@@ -70,8 +70,22 @@ export default function AboutPanel() {
       {/* Left column, ~60% */}
       <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "6 1 0%" }}>
         <div className="flex min-h-0 gap-3" style={{ flex: "1 1 0%", minHeight: 150 }}>
-          <div className="relative h-full w-[220px] flex-none overflow-hidden rounded-xl">
-            <Image src="/johnboy.png" alt="John Boy" fill className="object-cover" sizes="220px" priority />
+          <div
+            className="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-xl"
+            style={{ background: "linear-gradient(160deg, #3a2a1a, #1D1B18 70%)" }}
+          >
+            <span className="relative flex h-14 w-14 items-center justify-center">
+              <span
+                className="pulse-ring absolute inline-flex h-full w-full rounded-full"
+                style={{ background: "#EF9F27" }}
+              />
+              <span
+                className="relative flex h-14 w-14 items-center justify-center rounded-full"
+                style={{ background: "#EF9F27", boxShadow: "0 0 20px 4px rgba(239,159,39,0.5)" }}
+              >
+                <IconPlayerPlayFilled size={22} style={{ color: "#2C1400" }} />
+              </span>
+            </span>
           </div>
           <Card className="min-h-0 flex-1 overflow-y-auto">
             <p className="mb-2 text-[11px]" style={{ color: "#6B6960" }}>
