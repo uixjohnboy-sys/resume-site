@@ -11,10 +11,42 @@ import {
 const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
 
 const experience = [
-  { role: "Product designer, freelance", period: "2022 to present" },
-  { role: "UI designer, agency", period: "2019 to 2022" },
-  { role: "Junior designer, startup", period: "2018 to 2019" },
-  { role: "Design intern", period: "2017 to 2018" },
+  {
+    company: "Pathwise",
+    role: "Founder / product designer",
+    period: "2024 to present",
+    description: "Designing and building the dashboard-style workflow mapping app from the ground up.",
+  },
+  {
+    company: "Freelance",
+    role: "Product designer",
+    period: "2022 to present",
+    description: "Designing and building dashboard tools and internal apps for small teams and startups.",
+  },
+  {
+    company: "GoHighLevel agency partners",
+    role: "GoHighLevel expert / funnel builder",
+    period: "2021 to 2023",
+    description: "Built automations, funnels, and client dashboards on the GoHighLevel platform.",
+  },
+  {
+    company: "Bright Digital Studio",
+    role: "UI designer",
+    period: "2019 to 2022",
+    description: "Worked across web and mobile projects for retail and fintech clients.",
+  },
+  {
+    company: "Northlane Software",
+    role: "Junior designer",
+    period: "2018 to 2019",
+    description: "Supported the design team on internal tools and marketing site refreshes.",
+  },
+  {
+    company: "Studio Atlas",
+    role: "Design intern",
+    period: "2017 to 2018",
+    description: "First hands-on design role, assisting with layout and asset production.",
+  },
 ];
 
 const tools = [
@@ -164,15 +196,21 @@ export default function AboutPanel() {
               <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
                 {experience.map((item, i) => (
                   <div
-                    key={item.role}
+                    key={item.company}
                     className="border-l-2 pl-3"
-                    style={{ borderColor: "#2A2822", marginBottom: i === experience.length - 1 ? 0 : 14 }}
+                    style={{ borderColor: "#2A2822", marginBottom: i === experience.length - 1 ? 0 : 16 }}
                   >
-                    <p className="mb-0.5 text-xs" style={{ color: "#F2F1EE" }}>
+                    <p className="text-xs" style={{ color: "#F2F1EE" }}>
+                      {item.company}
+                    </p>
+                    <p className="mt-0.5 text-[11px]" style={{ color: "#EF9F27" }}>
                       {item.role}
                     </p>
-                    <p className="text-[11px]" style={{ color: "#6B6960" }}>
+                    <p className="mt-0.5 text-[11px]" style={{ color: "#6B6960" }}>
                       {item.period}
+                    </p>
+                    <p className="mt-1 text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                      {item.description}
                     </p>
                   </div>
                 ))}
