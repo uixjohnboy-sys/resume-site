@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   IconUser,
@@ -7,8 +8,6 @@ import {
   IconArticle,
   IconMessageCircle,
   IconRosetteDiscountCheckFilled,
-  IconUsers,
-  IconPlus,
   IconSparkles,
 } from "@tabler/icons-react";
 
@@ -26,6 +25,23 @@ export default function Sidebar({
   active: PanelKey;
   onSelect: (key: PanelKey) => void;
 }) {
+  const [time, setTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    const update = () =>
+      setTime(
+        new Date().toLocaleTimeString("en-US", {
+          timeZone: "Asia/Manila",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })
+      );
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div
       className="flex w-[230px] flex-none flex-col overflow-visible pt-10 px-3.5 pb-5"
@@ -56,18 +72,12 @@ export default function Sidebar({
               Product designer. Helping brands build with sleek dashboards.
             </p>
             <div className="flex items-center justify-between">
-              <div className="flex gap-2.5">
-                <span className="flex items-center gap-1 text-[11px]" style={{ color: "#9A978C" }}>
-                  <IconUsers size={12} /> 45k
-                </span>
-                <span className="flex items-center gap-1 text-[11px]" style={{ color: "#9A978C" }}>
-                  <IconApps size={12} /> 3
-                </span>
-              </div>
-              <button className="flex items-center gap-1 rounded-full bg-[#F2F1EE] px-3 py-1 text-[11px] font-medium text-[#141311] hover:brightness-95">
-                Hire me
-                <IconPlus size={11} />
-              </button>
+              <span className="text-[13px] tabular-nums" style={{ color: "#F2F1EE" }}>
+                {time ?? "--:--:--"}
+              </span>
+              <span className="text-[11px]" style={{ color: "#6B6960" }}>
+                Philippine Time
+              </span>
             </div>
           </div>
         </div>
