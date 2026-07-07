@@ -1,14 +1,17 @@
 import {
   IconLayoutGrid,
   IconBrandFigma,
-  IconBrandFramer,
   IconRobot,
-  IconBrandReact,
-  IconBrandNotion,
-  IconBrandVscode,
   IconBrandGithub,
   IconBrandVercel,
   IconBrandSlack,
+  IconBrandZapier,
+  IconSitemap,
+  IconBrandAdobePhotoshop,
+  IconBrandAdobeIllustrator,
+  IconBrandAdobePremiere,
+  IconMovie,
+  IconLayoutKanban,
   IconPlayerPlayFilled,
   IconArrowDown,
 } from "@tabler/icons-react";
@@ -78,40 +81,28 @@ const experience = [
 
 const tools = [
   {
+    name: "Claude",
+    icon: IconRobot,
+    description:
+      "My AI pair for building automations, writing code, and thinking through client workflows before anything gets built.",
+  },
+  {
+    name: "n8n",
+    icon: IconSitemap,
+    description:
+      "For building the automation flows that connect GoHighLevel to everything else a client's business runs on.",
+  },
+  {
+    name: "Zapier",
+    icon: IconBrandZapier,
+    description:
+      "The quick-connect tool I reach for when a client's stack needs two apps talking to each other fast.",
+  },
+  {
     name: "Figma",
     icon: IconBrandFigma,
     description:
-      "My main tool for high-fidelity UI design and prototyping. I build out full screens and interactive flows here before anything gets built in code.",
-  },
-  {
-    name: "Framer",
-    icon: IconBrandFramer,
-    description:
-      "For quickly building and publishing marketing sites and landing pages without waiting on a full development cycle.",
-  },
-  {
-    name: "Claude Code",
-    icon: IconRobot,
-    description:
-      "My pair programmer for turning designs into working apps, from first prototype all the way through to production code.",
-  },
-  {
-    name: "React",
-    icon: IconBrandReact,
-    description:
-      "The framework behind the actual product interfaces I ship, usually paired with Next.js for anything that needs routing.",
-  },
-  {
-    name: "Notion",
-    icon: IconBrandNotion,
-    description:
-      "Where I plan projects, keep client notes organized, and track the roadmap for everything I'm currently building.",
-  },
-  {
-    name: "VS Code",
-    icon: IconBrandVscode,
-    description:
-      "My day-to-day editor for anything that isn't AI-paired, plus reviewing and cleaning up code that Claude Code generates.",
+      "For designing funnel pages, landing pages, and UI before they go live in GoHighLevel or on the web.",
   },
   {
     name: "GitHub",
@@ -126,10 +117,35 @@ const tools = [
       "My default host for shipping projects fast, connected straight to GitHub so every push goes live automatically.",
   },
   {
+    name: "Photoshop",
+    icon: IconBrandAdobePhotoshop,
+    description: "For photo editing and graphics, mostly ad creative and social assets for client campaigns.",
+  },
+  {
+    name: "Illustrator",
+    icon: IconBrandAdobeIllustrator,
+    description: "For logos, icons, and vector graphics that need to stay clean at any size.",
+  },
+  {
+    name: "Adobe Premiere Pro",
+    icon: IconBrandAdobePremiere,
+    description: "For longer-form video editing, mainly VSLs and client campaign videos.",
+  },
+  {
+    name: "CapCut",
+    icon: IconMovie,
+    description: "My go-to for quick social media edits and short-form video content.",
+  },
+  {
     name: "Slack",
     icon: IconBrandSlack,
     description:
       "Where client and team communication happens day to day, from quick questions to sharing work in progress.",
+  },
+  {
+    name: "ClickUp",
+    icon: IconLayoutKanban,
+    description: "Where I plan projects, track tasks, and keep every client engagement organized.",
   },
 ];
 
