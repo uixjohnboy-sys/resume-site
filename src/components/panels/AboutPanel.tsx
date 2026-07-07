@@ -125,7 +125,7 @@ function Tag({ label }: { label: string }) {
 function PlaceholderCard() {
   return (
     <div
-      className="flex flex-1 flex-col items-center justify-center gap-2 rounded-[20px] border border-dashed text-center"
+      className="flex flex-1 flex-col items-center justify-center gap-2 rounded-[24px] border border-dashed text-center"
       style={{ borderColor: "#3A382F", color: "#5A584F" }}
     >
       <IconLayoutGrid size={18} />
@@ -141,11 +141,11 @@ export default function AboutPanel() {
       <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "6 1 0%" }}>
         <div className="flex min-h-0 gap-3" style={{ flex: "1 1 0%", minHeight: 150 }}>
           <div
-            className="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-[20px] border"
+            className="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-[24px]"
             style={{
-              background: "linear-gradient(160deg, #3a2a1a, #1D1B18 70%)",
-              borderColor: "rgba(255,255,255,0.06)",
-              boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.05), 0 10px 28px -10px rgba(0,0,0,0.6)",
+              background: "#1C1A17",
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
             }}
           >
             <span className="relative flex h-14 w-14 items-center justify-center">
@@ -208,8 +208,11 @@ export default function AboutPanel() {
             </p>
           </Card>
           <div
-            className="relative h-full overflow-hidden rounded-[20px] border"
-            style={{ borderColor: "rgba(255,255,255,0.06)", boxShadow: "0 10px 28px -10px rgba(0,0,0,0.6)" }}
+            className="relative h-full overflow-hidden rounded-[24px]"
+            style={{
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+            }}
           >
             <iframe
               title="Manila map"

@@ -12,11 +12,11 @@ export default function Card({
   return (
     <div
       onClick={onClick}
-      className={`rounded-[20px] border p-4 ${className}`}
+      className={`rounded-[24px] p-4 ${className}`}
       style={{
-        background: "linear-gradient(180deg, #242220 0%, #1B1917 100%)",
-        borderColor: "rgba(255,255,255,0.06)",
-        boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.05), 0 10px 28px -10px rgba(0,0,0,0.6)",
+        background: "#1C1A17",
+        boxShadow:
+          "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
         ...style,
       }}
     >

@@ -61,10 +61,7 @@ export default function Sidebar({
               priority
             />
           </div>
-          <div
-            className="rounded-b-2xl p-3"
-            style={{ background: "linear-gradient(180deg, #242220 0%, #1B1917 100%)" }}
-          >
+          <div className="rounded-b-2xl p-3" style={{ background: "#1C1A17" }}>
             <div className="mb-1 flex items-center gap-1.5">
               <p className="text-[13px] font-medium" style={{ color: "var(--text-primary, #F5F4F0)" }}>
                 John Boy
@@ -126,11 +123,11 @@ export default function Sidebar({
       <div className="flex-1" />
 
       <div
-        className="rounded-[18px] border p-3"
+        className="rounded-[20px] p-3"
         style={{
-          background: "linear-gradient(180deg, #242220 0%, #1B1917 100%)",
-          borderColor: "rgba(255,255,255,0.06)",
-          boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.05), 0 10px 28px -10px rgba(0,0,0,0.6)",
+          background: "#1C1A17",
+          boxShadow:
+            "8px 8px 18px rgba(0,0,0,0.55), -6px -6px 16px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
         }}
       >
         <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "#F2F1EE" }}>
