@@ -69,7 +69,7 @@ export default function Sidebar({
               <IconRosetteDiscountCheckFilled size={13} style={{ color: "var(--accent-1, #EF9F27)" }} />
             </div>
             <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "#9A978C" }}>
-              Product designer. Helping brands build with sleek dashboards.
+              GoHighLevel specialist. Automating businesses with Claude, n8n, and Zapier.
             </p>
             <div className="flex items-center justify-between">
               <span className="text-[13px] tabular-nums" style={{ color: "#F2F1EE" }}>
@@ -135,7 +135,7 @@ export default function Sidebar({
           Available for work
         </p>
         <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "#7A7870" }}>
-          Freelance product design and app builds, one project at a time.
+          Freelance GoHighLevel and automation builds, one project at a time.
         </p>
         <button
           className="w-full rounded-lg px-2 py-2 text-xs font-medium hover:brightness-110"

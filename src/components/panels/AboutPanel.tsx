@@ -185,23 +185,29 @@ export default function AboutPanel() {
                 Howdy
               </p>
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
-              I&apos;m a product designer and builder based in Manila. I turn rough ideas into working apps, with a
-              focus on dashboards and workflow tools that remove friction from a process. Currently building{" "}
-              <span style={{ color: "#EF9F27" }}>Pathwise</span>.
+              I&apos;m a GoHighLevel specialist based in Manila, focused on automation. I help businesses replace
+              manual, repetitive work with systems that run themselves, built with tools like{" "}
+              <span style={{ color: "#EF9F27" }}>Claude</span>,{" "}
+              <span style={{ color: "#EF9F27" }}>n8n</span>, and{" "}
+              <span style={{ color: "#EF9F27" }}>Zapier</span>.
             </p>
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
-              My background is in product design, but over the last few years I&apos;ve leaned hard into shipping
-              the actual product myself instead of only handing off mockups. I like projects where the interface has
-              real state to manage, not just static screens, dashboards, editors, and tools people use every day.
+              Most of my client work lives inside GoHighLevel: building funnels, CRM pipelines, and dashboards, then
+              wiring them up to automations that handle follow-ups, lead routing, and reporting without anyone
+              touching a spreadsheet.
             </p>
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
-              Most of my recent work has been split between client projects on GoHighLevel and building my own
-              products, like Pathwise, from scratch. I care a lot about the small details of an interface, spacing,
-              motion, the way a state change feels, more than most people notice consciously but everyone feels.
+              Outside of GoHighLevel, I use Claude Code to build the tools I can&apos;t find off the shelf, and n8n
+              or Zapier to connect everything else, forms, calendars, payment tools, into one system that just runs
+              in the background.
+            </p>
+            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+              Currently building <span style={{ color: "#EF9F27" }}>Pathwise</span>, a dashboard-style app for
+              mapping out workflows visually, on top of taking on client automation projects one at a time.
             </p>
             <p className="text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
-              Outside of client work, I&apos;m usually deep in a personal project, testing out a new tool, or
-              rebuilding something I already shipped because I found a cleaner way to do it.
+              I care less about which tool gets used and more about the outcome: fewer manual steps, faster response
+              times, and systems a non-technical team can actually run without me in the loop.
             </p>
             </Card>
             <ScrollHint />
