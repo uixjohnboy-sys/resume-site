@@ -305,10 +305,21 @@ export default function AboutPanel() {
                     style={{ marginBottom: i === tools.length - 1 ? 0 : 14 }}
                   >
                     <div
-                      className="flex h-9 w-9 flex-none items-center justify-center rounded-lg"
-                      style={{ background: "var(--bg-card-alt, #2A2822)", color: "#EF9F27" }}
+                      className="flex h-10 w-10 flex-none items-center justify-center rounded-[14px]"
+                      style={{
+                        background: "#141311",
+                        boxShadow:
+                          "3px 3px 7px rgba(0,0,0,0.6), -2px -2px 6px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.03)",
+                      }}
                     >
-                      <Icon size={18} />
+                      <Icon
+                        size={19}
+                        style={{
+                          color: "#E6DFCE",
+                          filter:
+                            "drop-shadow(0 1px 0 rgba(0,0,0,0.7)) drop-shadow(0 -0.5px 0 rgba(255,255,255,0.12))",
+                        }}
+                      />
                     </div>
                     <div className="min-w-0 pt-0.5">
                       <p className="text-xs" style={{ color: "#F2F1EE" }}>
