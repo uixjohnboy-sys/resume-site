@@ -18,40 +18,61 @@ const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
 
 const experience = [
   {
-    company: "Pathwise",
-    role: "Founder / product designer",
-    period: "2024 to present",
-    description: "Designing and building the dashboard-style workflow mapping app from the ground up.",
+    company: "Jessica Conner Business Consulting",
+    role: "GoHighLevel Specialist — Automation (n8n, Zapier, Claude)",
+    period: "April 2026 to present · Australian timezone client",
+    bullets: [
+      "Handling automation for an Australian-timezone client, building workflows on GoHighLevel using n8n, Zapier, and Claude.",
+    ],
   },
   {
-    company: "Freelance",
-    role: "Product designer",
-    period: "2022 to present",
-    description: "Designing and building dashboard tools and internal apps for small teams and startups.",
+    company: "Chaos to Closing",
+    role: "GoHighLevel Systems Builder",
+    period: "March 2026 to present · CST timezone client",
+    bullets: [
+      "Built the client's entire business inside GoHighLevel from scratch, focused on social media lead capture and nurture through ManyChat.",
+    ],
   },
   {
-    company: "GoHighLevel agency partners",
-    role: "GoHighLevel expert / funnel builder",
-    period: "2021 to 2023",
-    description: "Built automations, funnels, and client dashboards on the GoHighLevel platform.",
+    company: "Wrldinvsn",
+    role: "Lead Flow & Funnel Operations Specialist",
+    period: "Dec 2025 to Feb 2026 · Project-based",
+    bullets: [
+      "Built end-to-end lead tracking from click to close so no opportunity is missed.",
+      "Designed high-converting landing pages and VSLs optimized for lead capture.",
+      "Engineered an automated booking system with calendar sync, reminders, and cancellation handling.",
+    ],
   },
   {
-    company: "Bright Digital Studio",
-    role: "UI designer",
-    period: "2019 to 2022",
-    description: "Worked across web and mobile projects for retail and fintech clients.",
+    company: "K Australia Design",
+    role: "Lead GHL Automation Architect",
+    period: "Sept 2024 to Oct 2025",
+    bullets: [
+      "Engineered scalable GoHighLevel infrastructure so agencies could onboard unlimited clients with zero technical friction.",
+      "Built always-on multi-channel nurture automations across SMS, email, and voicemail drop.",
+      "Managed A2P 10DLC registration and messaging logic to protect inbox deliverability.",
+      "Integrated one-click booking and CRM triggers that turn inquiries into confirmed appointments automatically.",
+    ],
   },
   {
-    company: "Northlane Software",
-    role: "Junior designer",
-    period: "2018 to 2019",
-    description: "Supported the design team on internal tools and marketing site refreshes.",
+    company: "Freelance CRM & Automation Consultant",
+    role: "GoHighLevel Expert · Sales Funnels · Web Design",
+    period: "Jan 2024 to present · 13+ projects completed",
+    bullets: [
+      "Built high-performing GHL systems for MedSpas, real estate, coaches, and chiropractors.",
+      "Architected multi-channel automation (email, SMS, voicemail drop) to cut manual work and speed up response times.",
+      "Specialized in full GHL migrations, snapshot creation, and SaaS mode setup for scaling agencies.",
+    ],
   },
   {
-    company: "Studio Atlas",
-    role: "Design intern",
-    period: "2017 to 2018",
-    description: "First hands-on design role, assisting with layout and asset production.",
+    company: "Masterpiece Las Vegas",
+    role: "Senior Design & Systems Strategist",
+    period: "Feb 2021 to June 2023",
+    bullets: [
+      "Developed conversion-focused UI/UX strategies that build trust and turn visitors into customers.",
+      "Connected lead-capture forms to automated CRM workflows so no lead was lost.",
+      "Optimized marketing funnels by pairing visual design with data logic to lower lead costs.",
+    ],
   },
 ];
 
@@ -315,9 +336,13 @@ export default function AboutPanel() {
                     <p className="mt-0.5 text-[11px]" style={{ color: "#6B6960" }}>
                       {item.period}
                     </p>
-                    <p className="mt-1 text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
-                      {item.description}
-                    </p>
+                    <ul className="mt-1.5 list-disc space-y-1 pl-4">
+                      {item.bullets.map((bullet) => (
+                        <li key={bullet} className="text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                          {bullet}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
               </div>
