@@ -2,16 +2,13 @@
 
 import { useState } from "react";
 import { IconRoute, IconChevronRight } from "@tabler/icons-react";
+import Card from "@/components/ui/Card";
 
 export default function ProjectsPanel() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className="cursor-pointer rounded-xl p-4"
-      style={{ background: "var(--bg-card, #211F1B)" }}
-      onClick={() => setOpen((v) => !v)}
-    >
+    <Card className="cursor-pointer" onClick={() => setOpen((v) => !v)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
@@ -46,6 +43,6 @@ export default function ProjectsPanel() {
           </ul>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

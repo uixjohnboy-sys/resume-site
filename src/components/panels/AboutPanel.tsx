@@ -11,6 +11,7 @@ import {
   IconBrandSlack,
   IconPlayerPlayFilled,
 } from "@tabler/icons-react";
+import Card from "@/components/ui/Card";
 
 const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
 
@@ -110,22 +111,6 @@ const tools = [
   },
 ];
 
-function Card({
-  children,
-  className = "",
-  style = {},
-}: {
-  children: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <div className={`rounded-xl p-4 ${className}`} style={{ background: "var(--bg-card, #211F1B)", ...style }}>
-      {children}
-    </div>
-  );
-}
-
 function Tag({ label }: { label: string }) {
   return (
     <span
@@ -140,7 +125,7 @@ function Tag({ label }: { label: string }) {
 function PlaceholderCard() {
   return (
     <div
-      className="flex flex-1 flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-center"
+      className="flex flex-1 flex-col items-center justify-center gap-2 rounded-[20px] border border-dashed text-center"
       style={{ borderColor: "#3A382F", color: "#5A584F" }}
     >
       <IconLayoutGrid size={18} />
@@ -156,8 +141,12 @@ export default function AboutPanel() {
       <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "6 1 0%" }}>
         <div className="flex min-h-0 gap-3" style={{ flex: "1 1 0%", minHeight: 150 }}>
           <div
-            className="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-xl"
-            style={{ background: "linear-gradient(160deg, #3a2a1a, #1D1B18 70%)" }}
+            className="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-[20px] border"
+            style={{
+              background: "linear-gradient(160deg, #3a2a1a, #1D1B18 70%)",
+              borderColor: "rgba(255,255,255,0.06)",
+              boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.05), 0 10px 28px -10px rgba(0,0,0,0.6)",
+            }}
           >
             <span className="relative flex h-14 w-14 items-center justify-center">
               <span
@@ -218,7 +207,10 @@ export default function AboutPanel() {
               5
             </p>
           </Card>
-          <div className="relative h-full overflow-hidden rounded-xl">
+          <div
+            className="relative h-full overflow-hidden rounded-[20px] border"
+            style={{ borderColor: "rgba(255,255,255,0.06)", boxShadow: "0 10px 28px -10px rgba(0,0,0,0.6)" }}
+          >
             <iframe
               title="Manila map"
               src="https://www.google.com/maps?q=Manila,Philippines&z=11&output=embed"
