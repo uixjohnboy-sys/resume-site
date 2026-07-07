@@ -190,23 +190,43 @@ export default function AboutPanel() {
           </Card>
         </div>
 
-        <div className="grid flex-none grid-cols-[1fr_1fr_1.6fr] gap-3" style={{ height: 150 }}>
-          <Card className="flex h-full flex-col justify-center">
-            <p className="mb-1 text-[11px]" style={{ color: "#6B6960" }}>
-              Apps built
-            </p>
-            <p className="text-xl" style={{ color: "#F2F1EE" }}>
+        <div
+          className="grid flex-none gap-3"
+          style={{ height: 150, gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,2.4fr)" }}
+        >
+          <Card className="flex h-full flex-col items-center justify-center text-center">
+            <p
+              className="text-4xl font-medium"
+              style={{
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
               3
             </p>
-          </Card>
-          <Card className="flex h-full flex-col justify-center">
-            <p className="mb-1 text-[11px]" style={{ color: "#6B6960" }}>
-              Years experience
+            <p className="mt-1 text-[11px]" style={{ color: "#6B6960" }}>
+              Apps built
             </p>
-            <p className="text-xl" style={{ color: "#F2F1EE" }}>
+          </Card>
+          <Card className="flex h-full flex-col items-center justify-center text-center">
+            <p
+              className="text-4xl font-medium"
+              style={{
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
               5
             </p>
+            <p className="mt-1 text-[11px]" style={{ color: "#6B6960" }}>
+              Years experience
+            </p>
           </Card>
+          <PlaceholderCard />
           <div
             className="relative h-full overflow-hidden rounded-[24px]"
             style={{
