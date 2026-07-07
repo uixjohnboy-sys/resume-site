@@ -10,6 +10,7 @@ import {
   IconBrandVercel,
   IconBrandSlack,
   IconPlayerPlayFilled,
+  IconArrowDown,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
@@ -122,6 +123,20 @@ function Tag({ label }: { label: string }) {
   );
 }
 
+function ScrollHint() {
+  return (
+    <div className="pointer-events-none absolute bottom-3 right-3 flex flex-col items-center gap-1">
+      <span
+        className="text-[9px] tracking-wider"
+        style={{ color: "#5A584F", writingMode: "vertical-rl", textOrientation: "mixed" }}
+      >
+        Scroll down
+      </span>
+      <IconArrowDown size={11} style={{ color: "#5A584F" }} />
+    </div>
+  );
+}
+
 function PlaceholderCard() {
   return (
     <div
@@ -161,13 +176,14 @@ export default function AboutPanel() {
               </span>
             </span>
           </div>
-          <Card className="thin-scroll min-h-0 flex-1 overflow-y-auto">
-            <p className="mb-2 text-[11px]" style={{ color: "#6B6960" }}>
-              johnboy / about.md
-            </p>
-            <p className="mb-2" style={{ color: "#F2F1EE" }}>
-              Howdy
-            </p>
+          <div className="relative min-h-0 flex-1">
+            <Card className="thin-scroll h-full overflow-y-auto">
+              <p className="mb-2 text-[11px]" style={{ color: "#6B6960" }}>
+                johnboy / about.md
+              </p>
+              <p className="mb-2" style={{ color: "#F2F1EE" }}>
+                Howdy
+              </p>
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
               I&apos;m a product designer and builder based in Manila. I turn rough ideas into working apps, with a
               focus on dashboards and workflow tools that remove friction from a process. Currently building{" "}
@@ -187,7 +203,9 @@ export default function AboutPanel() {
               Outside of client work, I&apos;m usually deep in a personal project, testing out a new tool, or
               rebuilding something I already shipped because I found a cleaner way to do it.
             </p>
-          </Card>
+            </Card>
+            <ScrollHint />
+          </div>
         </div>
 
         <div
@@ -271,7 +289,7 @@ export default function AboutPanel() {
         {/* Experience + Hobbies stacked on the left, Tools I use spanning the full height on the right */}
         <div className="flex min-h-0 gap-3" style={{ flex: "2 1 0%" }}>
           <div className="flex min-h-0 flex-col gap-3" style={{ flex: "3 1 0%" }}>
-            <Card className="flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
+            <Card className="relative flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
               <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
                 Experience
               </p>
@@ -297,6 +315,7 @@ export default function AboutPanel() {
                   </div>
                 ))}
               </div>
+              <ScrollHint />
             </Card>
 
             <Card className="flex-none">
@@ -311,7 +330,7 @@ export default function AboutPanel() {
             </Card>
           </div>
 
-          <Card className="flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
+          <Card className="relative flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
             <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
               Tools I use
             </p>
@@ -353,6 +372,7 @@ export default function AboutPanel() {
                 );
               })}
             </div>
+            <ScrollHint />
           </Card>
         </div>
       </div>
