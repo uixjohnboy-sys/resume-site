@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   IconLayoutGrid,
   IconBrandFigma,
@@ -17,7 +18,6 @@ import {
   IconLayoutKanban,
   IconPlayerPlayFilled,
   IconArrowDown,
-  IconAward,
   IconX,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
@@ -27,22 +27,22 @@ const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
 const badges = [
   {
     name: "Funnel Building Expert",
-    color: "#3B82F6",
+    image: "/badge-funnel-building-expert.png",
     description: "Completed GoHighLevel Champs and certified in building high-converting funnels.",
   },
   {
     name: "Workflow & Automation Expert",
-    color: "#EF9F27",
+    image: "/badge-workflow-automation-expert.png",
     description: "Certified in building multi-step workflows and automations that run without manual input.",
   },
   {
     name: "Course & Community Creation Expert",
-    color: "#8BC34A",
+    image: "/badge-course-community-expert.png",
     description: "Certified in building and launching courses and community spaces inside GoHighLevel.",
   },
   {
     name: "AI Employee Specialist",
-    color: "#A855F7",
+    image: "/badge-ai-employee-specialist.png",
     description: "Certified in building AI-powered employees and assistants inside GoHighLevel.",
   },
 ];
@@ -510,15 +510,8 @@ export default function AboutPanel() {
             <div className="grid grid-cols-4 gap-4">
               {badges.map((badge) => (
                 <div key={badge.name} className="flex flex-col items-center text-center">
-                  <div
-                    className="mb-3 flex h-20 w-20 items-center justify-center rounded-full"
-                    style={{
-                      border: `2px solid ${badge.color}`,
-                      background: "#141311",
-                      boxShadow: `0 0 16px 0 ${badge.color}55`,
-                    }}
-                  >
-                    <IconAward size={30} style={{ color: badge.color }} />
+                  <div className="relative mb-3 h-24 w-24 flex-none">
+                    <Image src={badge.image} alt={badge.name} fill className="object-contain" sizes="96px" />
                   </div>
                   <p className="mb-1.5 text-xs font-medium" style={{ color: "#F2F1EE" }}>
                     {badge.name}
