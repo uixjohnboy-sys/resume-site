@@ -21,10 +21,22 @@ import {
   IconX,
   IconArrowUpRight,
   IconRoute,
+  IconBrandLinkedin,
+  IconBrandInstagram,
+  IconBrandFacebook,
+  IconBrandWhatsapp,
+  IconCash,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
 const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
+
+const socials = [
+  { name: "LinkedIn", icon: IconBrandLinkedin, color: "#0A66C2", url: "#" },
+  { name: "Instagram", icon: IconBrandInstagram, color: "#E1306C", url: "#" },
+  { name: "Facebook", icon: IconBrandFacebook, color: "#1877F2", url: "#" },
+  { name: "WhatsApp", icon: IconBrandWhatsapp, color: "#25D366", url: "#" },
+];
 
 const badges = [
   {
@@ -231,6 +243,15 @@ function ScrollHint() {
   );
 }
 
+function BottomFade() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-x-0 bottom-0 h-9 rounded-b-[24px]"
+      style={{ background: "linear-gradient(to top, #1C1A17, rgba(28,26,23,0))" }}
+    />
+  );
+}
+
 function PlaceholderCard() {
   return (
     <div
@@ -247,6 +268,8 @@ export default function AboutPanel() {
   const [awardsOpen, setAwardsOpen] = useState(false);
   const [experienceOpen, setExperienceOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
+  const [connectOpen, setConnectOpen] = useState(false);
+  const [ratesOpen, setRatesOpen] = useState(false);
 
   return (
     <div className="flex h-full gap-3">
@@ -308,6 +331,7 @@ export default function AboutPanel() {
               times, and systems a non-technical team can actually run without me in the loop.
             </p>
             </Card>
+            <BottomFade />
             <ScrollHint />
           </div>
         </div>
@@ -450,19 +474,66 @@ export default function AboutPanel() {
                   </div>
                 ))}
               </div>
+              <BottomFade />
               <ScrollHint />
             </Card>
 
-            <Card className="flex-none">
-              <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
-                Hobbies
-              </p>
-              <div>
-                {hobbies.map((h) => (
-                  <Tag key={h} label={h} />
-                ))}
-              </div>
-            </Card>
+            <div className="grid flex-none grid-cols-3 gap-3">
+              <Card>
+                <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
+                  Hobbies
+                </p>
+                <div>
+                  {hobbies.map((h) => (
+                    <Tag key={h} label={h} />
+                  ))}
+                </div>
+              </Card>
+
+              <Card
+                className="relative flex cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+                onClick={() => setConnectOpen(true)}
+              >
+                <div className="mb-2 flex items-center justify-center">
+                  {socials.map((social, i) => {
+                    const Icon = social.icon;
+                    return (
+                      <div
+                        key={social.name}
+                        className="flex h-8 w-8 items-center justify-center rounded-full"
+                        style={{
+                          background: "#141311",
+                          marginLeft: i === 0 ? 0 : -10,
+                          zIndex: socials.length - i,
+                          border: "2px solid #1C1A17",
+                          color: social.color,
+                        }}
+                      >
+                        <Icon size={15} />
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px]" style={{ color: "#6B6960" }}>
+                  Connect with me
+                </p>
+              </Card>
+
+              <Card
+                className="relative flex cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+                onClick={() => setRatesOpen(true)}
+              >
+                <div
+                  className="mb-2 flex h-8 w-8 items-center justify-center rounded-full"
+                  style={{ background: "#141311", color: "#EF9F27" }}
+                >
+                  <IconCash size={16} />
+                </div>
+                <p className="text-[11px]" style={{ color: "#6B6960" }}>
+                  My Rates
+                </p>
+              </Card>
+            </div>
           </div>
 
           <Card className="relative flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
@@ -507,6 +578,7 @@ export default function AboutPanel() {
                 );
               })}
             </div>
+            <BottomFade />
             <ScrollHint />
           </Card>
         </div>
@@ -683,6 +755,167 @@ export default function AboutPanel() {
                   <p className="text-[11px] leading-relaxed">More apps coming soon</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {connectOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setConnectOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-[24px] p-6"
+            style={{
+              background: "#1C1A17",
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+                Connect with me
+              </p>
+              <button
+                onClick={() => setConnectOpen(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 items-center justify-center rounded-full"
+                style={{ background: "#141311", color: "#8A887F" }}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+            <div className="flex flex-col gap-3">
+              {socials.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <div key={social.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-9 w-9 items-center justify-center rounded-full"
+                        style={{ background: "#141311", color: social.color }}
+                      >
+                        <Icon size={17} />
+                      </div>
+                      <p className="text-xs" style={{ color: "#F2F1EE" }}>
+                        {social.name}
+                      </p>
+                    </div>
+                    <a
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full px-3 py-1.5 text-[11px] font-medium hover:brightness-110"
+                      style={{
+                        background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                        color: "#2C1400",
+                      }}
+                    >
+                      Visit Profile
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {ratesOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setRatesOpen(false)}
+        >
+          <div
+            className="flex max-h-[80vh] w-full max-w-xl flex-col rounded-[24px] p-6"
+            style={{
+              background: "#1C1A17",
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex flex-none items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+                My rates
+              </p>
+              <button
+                onClick={() => setRatesOpen(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
+                style={{ background: "#141311", color: "#8A887F" }}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
+              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+                I charge{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  $8 to $10 per hour
+                </span>
+                , depending on project scope. You can hire me on an{" "}
+                <span style={{ color: "#F2F1EE" }}>hourly</span> or{" "}
+                <span style={{ color: "#F2F1EE" }}>monthly</span> basis, monthly clients are billed{" "}
+                <span style={{ color: "#F2F1EE" }}>fortnightly</span> rather than all at once.
+              </p>
+              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+                Payment goes through{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  Wise
+                </span>
+                , it&apos;s the easiest way for clients anywhere to send payment directly.
+              </p>
+              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+                Why this rate? Because the work doesn&apos;t stop once something is built. I set up a proper{" "}
+                <span style={{ color: "#F2F1EE" }}>client handover</span>, stay on for{" "}
+                <span style={{ color: "#F2F1EE" }}>ongoing support</span>, and make sure you fully understand
+                what was built for you. You won&apos;t be left with a system you don&apos;t know how to run.
+              </p>
+              <p className="mb-4 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+                I&apos;m also not a typical Virtual Assistant. I work as a{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  strategist
+                </span>
+                , someone who can look at your business and help figure out what should actually get built, not
+                just execute a list of tasks.
+              </p>
+              <a
+                href="#"
+                className="block w-full rounded-lg px-3 py-2.5 text-center text-xs font-medium hover:brightness-110"
+                style={{
+                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                  boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+                  color: "#2C1400",
+                }}
+              >
+                Book 15 mins Discovery Call
+              </a>
             </div>
           </div>
         </div>

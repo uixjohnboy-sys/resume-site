@@ -10,7 +10,6 @@ import {
   IconRosetteDiscountCheckFilled,
   IconSparkles,
 } from "@tabler/icons-react";
-import Logo from "@/components/Logo";
 
 export type PanelKey = "about" | "projects";
 
@@ -48,10 +47,6 @@ export default function Sidebar({
       className="flex w-[230px] flex-none flex-col overflow-visible pt-5 px-3.5 pb-5"
       style={{ background: "var(--bg-sidebar, #141311)" }}
     >
-      <div className="mb-5 px-0.5">
-        <Logo />
-      </div>
-
       {/* Profile card */}
       <div className="relative mb-4">
         <div className="relative overflow-hidden rounded-2xl border border-[rgba(239,159,39,0.45)]">
