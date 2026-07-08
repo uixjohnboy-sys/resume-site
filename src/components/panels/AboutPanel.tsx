@@ -19,6 +19,8 @@ import {
   IconPlayerPlayFilled,
   IconArrowDown,
   IconX,
+  IconArrowUpRight,
+  IconRoute,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
@@ -54,6 +56,25 @@ const journey = [
   "They've since built AI into the platform too, which makes it even more powerful.",
   "That's why I spend most of my time mastering GoHighLevel and staying current with it, so I can help businesses build a full client-generating system, not just a typical website, but a polished backend that lets the frontend actually perform.",
 ];
+
+const apps = [
+  {
+    name: "Pathwise",
+    description:
+      "A dashboard-style workflow mapping app that helps plan a journey from goal to milestone, with visual node maps and hotspots.",
+  },
+];
+
+function ClickHint() {
+  return (
+    <div
+      className="pointer-events-none absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full"
+      style={{ background: "#141311", color: "#6B6960" }}
+    >
+      <IconArrowUpRight size={11} />
+    </div>
+  );
+}
 
 const experience = [
   {
@@ -225,6 +246,7 @@ function PlaceholderCard() {
 export default function AboutPanel() {
   const [awardsOpen, setAwardsOpen] = useState(false);
   const [experienceOpen, setExperienceOpen] = useState(false);
+  const [appsOpen, setAppsOpen] = useState(false);
 
   return (
     <div className="flex h-full gap-3">
@@ -294,7 +316,11 @@ export default function AboutPanel() {
           className="grid flex-none gap-3"
           style={{ height: 150, gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,2.4fr)" }}
         >
-          <Card className="flex h-full flex-col items-center justify-center text-center">
+          <Card
+            className="relative flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+            onClick={() => setAppsOpen(true)}
+          >
+            <ClickHint />
             <p
               className="text-4xl font-medium"
               style={{
@@ -311,9 +337,10 @@ export default function AboutPanel() {
             </p>
           </Card>
           <Card
-            className="flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+            className="relative flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
             onClick={() => setExperienceOpen(true)}
           >
+            <ClickHint />
             <p
               className="text-4xl font-medium"
               style={{
@@ -330,9 +357,10 @@ export default function AboutPanel() {
             </p>
           </Card>
           <Card
-            className="flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+            className="relative flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
             onClick={() => setAwardsOpen(true)}
           >
+            <ClickHint />
             <p
               className="text-4xl font-medium"
               style={{
@@ -580,7 +608,7 @@ export default function AboutPanel() {
                   Right now
                 </p>
                 <p className="mt-1 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
-                  I&apos;m focused on{" "}
+                  Now that I&apos;ve sharpened my GoHighLevel skills, I&apos;ve paired it with{" "}
                   <span
                     style={{
                       background: "linear-gradient(135deg, #EF9F27, #D85A30)",
@@ -590,10 +618,71 @@ export default function AboutPanel() {
                     }}
                   >
                     AI and automation
-                  </span>
-                  , so I can keep up with what businesses actually need right now and help them move at that pace.
+                  </span>{" "}
+                  to make the platform even more powerful, finding ways to push GHL further and work around the
+                  limitations it has.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {appsOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setAppsOpen(false)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-[24px] p-6"
+            style={{
+              background: "#1C1A17",
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+                Apps built
+              </p>
+              <button
+                onClick={() => setAppsOpen(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 items-center justify-center rounded-full"
+                style={{ background: "#141311", color: "#8A887F" }}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              {apps.map((app) => (
+                <div key={app.name} className="flex flex-col items-center text-center">
+                  <div
+                    className="mb-3 flex h-16 w-16 items-center justify-center rounded-[16px]"
+                    style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "#2C1400" }}
+                  >
+                    <IconRoute size={26} />
+                  </div>
+                  <p className="mb-1.5 text-xs font-medium" style={{ color: "#F2F1EE" }}>
+                    {app.name}
+                  </p>
+                  <p className="text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                    {app.description}
+                  </p>
+                </div>
+              ))}
+              {Array.from({ length: 3 - apps.length }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col items-center justify-center gap-2 rounded-[16px] border border-dashed p-4 text-center"
+                  style={{ borderColor: "#3A382F", color: "#5A584F" }}
+                >
+                  <IconLayoutGrid size={20} />
+                  <p className="text-[11px] leading-relaxed">More apps coming soon</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
