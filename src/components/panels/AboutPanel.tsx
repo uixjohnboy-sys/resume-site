@@ -25,17 +25,49 @@ import {
   IconBrandInstagram,
   IconBrandFacebook,
   IconBrandWhatsapp,
-  IconCash,
+  IconBrandGmail,
+  IconCurrencyDollar,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
 const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
 
 const socials = [
-  { name: "LinkedIn", icon: IconBrandLinkedin, color: "#0A66C2", url: "#" },
-  { name: "Instagram", icon: IconBrandInstagram, color: "#E1306C", url: "#" },
-  { name: "Facebook", icon: IconBrandFacebook, color: "#1877F2", url: "#" },
-  { name: "WhatsApp", icon: IconBrandWhatsapp, color: "#25D366", url: "#" },
+  {
+    name: "LinkedIn",
+    icon: IconBrandLinkedin,
+    color: "#0A66C2",
+    url: "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist",
+    buttonText: "Visit Profile",
+  },
+  {
+    name: "Instagram",
+    icon: IconBrandInstagram,
+    color: "#E1306C",
+    url: "https://www.instagram.com/uix.johnboy/",
+    buttonText: "Visit Profile",
+  },
+  {
+    name: "Facebook",
+    icon: IconBrandFacebook,
+    color: "#1877F2",
+    url: "https://www.facebook.com/uix.johnboy",
+    buttonText: "Visit Profile",
+  },
+  {
+    name: "WhatsApp",
+    icon: IconBrandWhatsapp,
+    color: "#25D366",
+    url: "#", // TODO: replace with https://wa.me/<countrycode+number> once provided
+    buttonText: "Quick Chat",
+  },
+  {
+    name: "Gmail",
+    icon: IconBrandGmail,
+    color: "#EA4335",
+    url: "https://mail.google.com/mail/?view=cm&fs=1&to=uix.johnboy@gmail.com",
+    buttonText: "Send Email",
+  },
 ];
 
 const badges = [
@@ -527,7 +559,7 @@ export default function AboutPanel() {
                   className="mb-2 flex h-8 w-8 items-center justify-center rounded-full"
                   style={{ background: "#141311", color: "#EF9F27" }}
                 >
-                  <IconCash size={16} />
+                  <IconCurrencyDollar size={16} />
                 </div>
                 <p className="text-[11px]" style={{ color: "#6B6960" }}>
                   My Rates
@@ -814,7 +846,7 @@ export default function AboutPanel() {
                         color: "#2C1400",
                       }}
                     >
-                      Visit Profile
+                      {social.buttonText}
                     </a>
                   </div>
                 );
