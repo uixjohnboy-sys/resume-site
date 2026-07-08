@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   IconLayoutGrid,
   IconBrandFigma,
@@ -14,10 +17,35 @@ import {
   IconLayoutKanban,
   IconPlayerPlayFilled,
   IconArrowDown,
+  IconAward,
+  IconX,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
 const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
+
+const badges = [
+  {
+    name: "Funnel Building Expert",
+    color: "#3B82F6",
+    description: "Completed GoHighLevel Champs and certified in building high-converting funnels.",
+  },
+  {
+    name: "Workflow & Automation Expert",
+    color: "#EF9F27",
+    description: "Certified in building multi-step workflows and automations that run without manual input.",
+  },
+  {
+    name: "Course & Community Creation Expert",
+    color: "#8BC34A",
+    description: "Certified in building and launching courses and community spaces inside GoHighLevel.",
+  },
+  {
+    name: "AI Employee Specialist",
+    color: "#A855F7",
+    description: "Certified in building AI-powered employees and assistants inside GoHighLevel.",
+  },
+];
 
 const experience = [
   {
@@ -187,6 +215,8 @@ function PlaceholderCard() {
 }
 
 export default function AboutPanel() {
+  const [awardsOpen, setAwardsOpen] = useState(false);
+
   return (
     <div className="flex h-full gap-3">
       {/* Left column, ~60% */}
@@ -287,7 +317,25 @@ export default function AboutPanel() {
               Years experience
             </p>
           </Card>
-          <PlaceholderCard />
+          <Card
+            className="flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+            onClick={() => setAwardsOpen(true)}
+          >
+            <p
+              className="text-4xl font-medium"
+              style={{
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              4
+            </p>
+            <p className="mt-1 text-[11px]" style={{ color: "#6B6960" }}>
+              Awards
+            </p>
+          </Card>
           <div
             className="relative h-full overflow-hidden rounded-[24px]"
             style={{
@@ -430,6 +478,60 @@ export default function AboutPanel() {
         <PlaceholderCard />
         <PlaceholderCard />
       </div>
+
+      {awardsOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setAwardsOpen(false)}
+        >
+          <div
+            className="w-full max-w-3xl rounded-[24px] p-6"
+            style={{
+              background: "#1C1A17",
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+                GoHighLevel Champs · Awards
+              </p>
+              <button
+                onClick={() => setAwardsOpen(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 items-center justify-center rounded-full"
+                style={{ background: "#141311", color: "#8A887F" }}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              {badges.map((badge) => (
+                <div key={badge.name} className="flex flex-col items-center text-center">
+                  <div
+                    className="mb-3 flex h-20 w-20 items-center justify-center rounded-full"
+                    style={{
+                      border: `2px solid ${badge.color}`,
+                      background: "#141311",
+                      boxShadow: `0 0 16px 0 ${badge.color}55`,
+                    }}
+                  >
+                    <IconAward size={30} style={{ color: badge.color }} />
+                  </div>
+                  <p className="mb-1.5 text-xs font-medium" style={{ color: "#F2F1EE" }}>
+                    {badge.name}
+                  </p>
+                  <p className="text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                    {badge.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
