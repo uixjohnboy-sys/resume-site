@@ -58,7 +58,7 @@ const socials = [
     name: "WhatsApp",
     icon: IconBrandWhatsapp,
     color: "#25D366",
-    url: "#", // TODO: replace with https://wa.me/<countrycode+number> once provided
+    url: "https://wa.me/639773659548",
     buttonText: "Quick Chat",
   },
   {
@@ -184,68 +184,80 @@ const tools = [
   {
     name: "Claude",
     icon: IconRobot,
+    color: "#DA7756",
     description:
       "My AI pair for building automations, writing code, and thinking through client workflows before anything gets built.",
   },
   {
     name: "n8n",
     icon: IconSitemap,
+    color: "#FF6D5A",
     description:
       "For building the automation flows that connect GoHighLevel to everything else a client's business runs on.",
   },
   {
     name: "Zapier",
     icon: IconBrandZapier,
+    color: "#FF4A00",
     description:
       "The quick-connect tool I reach for when a client's stack needs two apps talking to each other fast.",
   },
   {
     name: "Figma",
     icon: IconBrandFigma,
+    color: "#F24E1E",
     description:
       "For designing funnel pages, landing pages, and UI before they go live in GoHighLevel or on the web.",
   },
   {
     name: "GitHub",
     icon: IconBrandGithub,
+    color: "#E6DFCE",
     description:
       "Where every project lives, gets version controlled, and gets reviewed before it ships anywhere else.",
   },
   {
     name: "Vercel",
     icon: IconBrandVercel,
+    color: "#E6DFCE",
     description:
       "My default host for shipping projects fast, connected straight to GitHub so every push goes live automatically.",
   },
   {
     name: "Photoshop",
     icon: IconBrandAdobePhotoshop,
+    color: "#31A8FF",
     description: "For photo editing and graphics, mostly ad creative and social assets for client campaigns.",
   },
   {
     name: "Illustrator",
     icon: IconBrandAdobeIllustrator,
+    color: "#FF9A00",
     description: "For logos, icons, and vector graphics that need to stay clean at any size.",
   },
   {
     name: "Adobe Premiere Pro",
     icon: IconBrandAdobePremiere,
+    color: "#9999FF",
     description: "For longer-form video editing, mainly VSLs and client campaign videos.",
   },
   {
     name: "CapCut",
     icon: IconMovie,
+    color: "#E6DFCE",
     description: "My go-to for quick social media edits and short-form video content.",
   },
   {
     name: "Slack",
     icon: IconBrandSlack,
+    color: "#ECB22E",
     description:
       "Where client and team communication happens day to day, from quick questions to sharing work in progress.",
   },
   {
     name: "ClickUp",
     icon: IconLayoutKanban,
+    color: "#7B68EE",
     description: "Where I plan projects, track tasks, and keep every client engagement organized.",
   },
 ];
@@ -331,12 +343,6 @@ export default function AboutPanel() {
           </div>
           <div className="relative min-h-0 flex-1">
             <Card className="thin-scroll h-full overflow-y-auto">
-              <p className="mb-2 text-[11px]" style={{ color: "#6B6960" }}>
-                johnboy / about.md
-              </p>
-              <p className="mb-2" style={{ color: "#F2F1EE" }}>
-                Howdy
-              </p>
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
               I&apos;m a GoHighLevel specialist based in Manila, focused on automation. I help businesses replace
               manual, repetitive work with systems that run themselves, built with tools like{" "}
@@ -592,7 +598,7 @@ export default function AboutPanel() {
                       <Icon
                         size={19}
                         style={{
-                          color: "#E6DFCE",
+                          color: tool.color,
                           filter:
                             "drop-shadow(0 1px 0 rgba(0,0,0,0.7)) drop-shadow(0 -0.5px 0 rgba(255,255,255,0.12))",
                         }}
