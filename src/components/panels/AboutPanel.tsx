@@ -47,6 +47,14 @@ const badges = [
   },
 ];
 
+const journey = [
+  "I started out freelancing in graphic design, then moved into web design and development. After building websites for a while, I got curious about what more I could offer beyond just the design.",
+  "That's when I found GoHighLevel. It wasn't as big back then as it is now, but I could tell it was the next generation of business growth tools.",
+  "With GoHighLevel, you can build an entire business system: agency setup, client sub-accounts, automated onboarding, powerful workflows and automations, and even reputation management, which is huge for service-based businesses running on a Google Business Profile.",
+  "They've since built AI into the platform too, which makes it even more powerful.",
+  "That's why I spend most of my time mastering GoHighLevel and staying current with it, so I can help businesses build a full client-generating system, not just a typical website, but a polished backend that lets the frontend actually perform.",
+];
+
 const experience = [
   {
     company: "Jessica Conner Business Consulting",
@@ -216,6 +224,7 @@ function PlaceholderCard() {
 
 export default function AboutPanel() {
   const [awardsOpen, setAwardsOpen] = useState(false);
+  const [experienceOpen, setExperienceOpen] = useState(false);
 
   return (
     <div className="flex h-full gap-3">
@@ -301,7 +310,10 @@ export default function AboutPanel() {
               Apps built
             </p>
           </Card>
-          <Card className="flex h-full flex-col items-center justify-center text-center">
+          <Card
+            className="flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+            onClick={() => setExperienceOpen(true)}
+          >
             <p
               className="text-4xl font-medium"
               style={{
@@ -521,6 +533,67 @@ export default function AboutPanel() {
                   </p>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {experienceOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setExperienceOpen(false)}
+        >
+          <div
+            className="flex max-h-[80vh] w-full max-w-xl flex-col rounded-[24px] p-6"
+            style={{
+              background: "#1C1A17",
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex flex-none items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+                5 years in the making
+              </p>
+              <button
+                onClick={() => setExperienceOpen(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
+                style={{ background: "#141311", color: "#8A887F" }}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
+              {journey.map((paragraph) => (
+                <p key={paragraph} className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+                  {paragraph}
+                </p>
+              ))}
+              <div
+                className="mt-4 rounded-[16px] p-4"
+                style={{ background: "#141311" }}
+              >
+                <p className="text-[11px] uppercase tracking-wide" style={{ color: "#6B6960" }}>
+                  Right now
+                </p>
+                <p className="mt-1 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+                  I&apos;m focused on{" "}
+                  <span
+                    style={{
+                      background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      color: "transparent",
+                    }}
+                  >
+                    AI and automation
+                  </span>
+                  , so I can keep up with what businesses actually need right now and help them move at that pace.
+                </p>
+              </div>
             </div>
           </div>
         </div>
