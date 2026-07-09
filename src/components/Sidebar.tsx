@@ -44,7 +44,7 @@ export default function Sidebar({
 
   return (
     <div
-      className="flex w-[230px] flex-none flex-col overflow-visible pt-5 px-3.5 pb-5"
+      className="flex w-full flex-none flex-col overflow-visible px-3.5 pt-5 pb-4 lg:w-[230px] lg:pb-5"
       style={{ background: "var(--bg-sidebar, #141311)" }}
     >
       {/* Profile card */}
@@ -84,12 +84,12 @@ export default function Sidebar({
       </div>
 
       {/* Main nav */}
-      <nav className="flex flex-col gap-0.5">
+      <nav className="flex flex-row gap-1.5 lg:flex-col lg:gap-0.5">
         {navItems.map((item) => (
           <button
             key={item.key}
             onClick={() => onSelect(item.key)}
-            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-normal transition-colors"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-normal transition-colors lg:flex-none lg:justify-start lg:py-1.5"
             style={
               active === item.key
                 ? {
@@ -106,10 +106,10 @@ export default function Sidebar({
         ))}
       </nav>
 
-      <p className="mb-1.5 mt-4.5 pl-2.5 text-[10px] font-normal tracking-wide" style={{ color: "#4E4C44" }}>
+      <p className="mb-1.5 mt-4.5 hidden pl-2.5 text-[10px] font-normal tracking-wide lg:block" style={{ color: "#4E4C44" }}>
         OTHER
       </p>
-      <nav className="flex flex-col gap-0.5">
+      <nav className="hidden flex-col gap-0.5 lg:flex">
         <button disabled className="flex w-full cursor-default items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs opacity-40" style={{ color: "#8A887F" }}>
           <IconArticle size={16} />
           Blog
@@ -120,10 +120,10 @@ export default function Sidebar({
         </button>
       </nav>
 
-      <div className="flex-1" />
+      <div className="hidden flex-1 lg:block" />
 
       <div
-        className="rounded-[20px] p-3"
+        className="mt-4 rounded-[20px] p-3 lg:mt-0"
         style={{
           background: "#1C1A17",
           boxShadow:

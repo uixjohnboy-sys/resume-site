@@ -316,12 +316,12 @@ export default function AboutPanel() {
   const [ratesOpen, setRatesOpen] = useState(false);
 
   return (
-    <div className="flex h-full gap-3">
+    <div className="flex flex-col gap-3 lg:h-full lg:flex-row">
       {/* Left column, ~60% */}
-      <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "6 1 0%" }}>
-        <div className="flex min-h-0 gap-3" style={{ flex: "1 1 0%", minHeight: 150 }}>
+      <div className="flex min-w-0 flex-col gap-3 lg:h-full lg:[flex:6_1_0%]">
+        <div className="flex min-h-0 flex-col gap-3 lg:flex-row lg:min-h-[150px] lg:[flex:1_1_0%]">
           <div
-            className="relative flex h-full flex-1 items-center justify-center overflow-hidden rounded-[24px]"
+            className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-[24px] lg:h-full lg:w-auto lg:flex-1"
             style={{
               background: "#1C1A17",
               boxShadow:
@@ -341,7 +341,7 @@ export default function AboutPanel() {
               </span>
             </span>
           </div>
-          <div className="relative min-h-0 flex-1">
+          <div className="relative h-64 lg:h-auto lg:min-h-0 lg:flex-1">
             <Card className="thin-scroll h-full overflow-y-auto">
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
               I&apos;m a GoHighLevel specialist based in Manila, focused on automation. I help businesses replace
@@ -374,12 +374,9 @@ export default function AboutPanel() {
           </div>
         </div>
 
-        <div
-          className="grid flex-none gap-3"
-          style={{ height: 150, gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,2.4fr)" }}
-        >
+        <div className="grid flex-none grid-cols-3 gap-3 lg:h-[150px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,2.4fr)]">
           <Card
-            className="relative flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+            className="relative flex h-28 cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] lg:h-full"
             onClick={() => setAppsOpen(true)}
           >
             <ClickHint />
@@ -399,7 +396,7 @@ export default function AboutPanel() {
             </p>
           </Card>
           <Card
-            className="relative flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+            className="relative flex h-28 cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] lg:h-full"
             onClick={() => setExperienceOpen(true)}
           >
             <ClickHint />
@@ -419,7 +416,7 @@ export default function AboutPanel() {
             </p>
           </Card>
           <Card
-            className="relative flex h-full cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
+            className="relative flex h-28 cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] lg:h-full"
             onClick={() => setAwardsOpen(true)}
           >
             <ClickHint />
@@ -439,7 +436,7 @@ export default function AboutPanel() {
             </p>
           </Card>
           <div
-            className="relative h-full overflow-hidden rounded-[24px]"
+            className="relative col-span-3 h-40 overflow-hidden rounded-[24px] lg:col-span-1 lg:h-full"
             style={{
               boxShadow:
                 "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
@@ -480,9 +477,9 @@ export default function AboutPanel() {
         </div>
 
         {/* Experience + Hobbies stacked on the left, Tools I use spanning the full height on the right */}
-        <div className="flex min-h-0 gap-3" style={{ flex: "2 1 0%" }}>
-          <div className="flex min-h-0 flex-col gap-3" style={{ flex: "3 1 0%" }}>
-            <Card className="relative flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
+        <div className="flex flex-col gap-3 lg:flex-row lg:min-h-0 lg:[flex:2_1_0%]">
+          <div className="flex flex-col gap-3 lg:min-h-0 lg:[flex:3_1_0%]">
+            <Card className="relative flex h-96 flex-col lg:h-auto lg:min-h-0 lg:[flex:2_1_0%]">
               <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
                 Experience
               </p>
@@ -516,8 +513,8 @@ export default function AboutPanel() {
               <ScrollHint />
             </Card>
 
-            <div className="grid flex-none grid-cols-3 gap-3">
-              <Card>
+            <div className="grid flex-none grid-cols-2 gap-3 lg:grid-cols-3">
+              <Card className="col-span-2 lg:col-span-1">
                 <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
                   Hobbies
                 </p>
@@ -574,7 +571,7 @@ export default function AboutPanel() {
             </div>
           </div>
 
-          <Card className="relative flex min-h-0 flex-col" style={{ flex: "2 1 0%" }}>
+          <Card className="relative flex h-96 flex-col lg:h-auto lg:min-h-0 lg:[flex:2_1_0%]">
             <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
               Tools I use
             </p>
@@ -622,8 +619,8 @@ export default function AboutPanel() {
         </div>
       </div>
 
-      {/* Right column, ~40%, reserved for future content */}
-      <div className="flex h-full min-w-0 flex-col gap-3" style={{ flex: "4 1 0%" }}>
+      {/* Right column, ~40%, reserved for future content — desktop only, no value on mobile yet */}
+      <div className="hidden min-w-0 flex-col gap-3 lg:flex lg:h-full lg:[flex:4_1_0%]">
         <PlaceholderCard />
         <PlaceholderCard />
         <PlaceholderCard />
@@ -631,12 +628,12 @@ export default function AboutPanel() {
 
       {awardsOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setAwardsOpen(false)}
         >
           <div
-            className="w-full max-w-3xl rounded-[24px] p-6"
+            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-[24px] p-5 lg:p-6"
             style={{
               background: "#1C1A17",
               boxShadow:
@@ -657,7 +654,7 @@ export default function AboutPanel() {
                 <IconX size={16} />
               </button>
             </div>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               {badges.map((badge) => (
                 <div key={badge.name} className="flex flex-col items-center text-center">
                   <div className="relative mb-3 h-24 w-24 flex-none">
@@ -678,12 +675,12 @@ export default function AboutPanel() {
 
       {experienceOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setExperienceOpen(false)}
         >
           <div
-            className="flex max-h-[80vh] w-full max-w-xl flex-col rounded-[24px] p-6"
+            className="flex max-h-[85vh] w-full max-w-xl flex-col rounded-[24px] p-5 lg:p-6"
             style={{
               background: "#1C1A17",
               boxShadow:
@@ -740,12 +737,12 @@ export default function AboutPanel() {
 
       {appsOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setAppsOpen(false)}
         >
           <div
-            className="w-full max-w-2xl rounded-[24px] p-6"
+            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-[24px] p-5 lg:p-6"
             style={{
               background: "#1C1A17",
               boxShadow:
@@ -766,7 +763,7 @@ export default function AboutPanel() {
                 <IconX size={16} />
               </button>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
               {apps.map((app) => (
                 <div key={app.name} className="flex flex-col items-center text-center">
                   <div
@@ -800,12 +797,12 @@ export default function AboutPanel() {
 
       {connectOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setConnectOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-[24px] p-6"
+            className="w-full max-w-sm rounded-[24px] p-5 lg:p-6"
             style={{
               background: "#1C1A17",
               boxShadow:
@@ -864,12 +861,12 @@ export default function AboutPanel() {
 
       {ratesOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setRatesOpen(false)}
         >
           <div
-            className="flex max-h-[80vh] w-full max-w-xl flex-col rounded-[24px] p-6"
+            className="flex max-h-[85vh] w-full max-w-xl flex-col rounded-[24px] p-5 lg:p-6"
             style={{
               background: "#1C1A17",
               boxShadow:
