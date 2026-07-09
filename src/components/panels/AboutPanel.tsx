@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   IconLayoutGrid,
@@ -315,6 +315,15 @@ export default function AboutPanel() {
   const [connectOpen, setConnectOpen] = useState(false);
   const [ratesOpen, setRatesOpen] = useState(false);
 
+  const anyModalOpen = awardsOpen || experienceOpen || appsOpen || connectOpen || ratesOpen;
+
+  useEffect(() => {
+    document.body.style.overflow = anyModalOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [anyModalOpen]);
+
   return (
     <div className="flex flex-col gap-3 lg:h-full lg:flex-row">
       {/* Left column, ~60% */}
@@ -628,12 +637,12 @@ export default function AboutPanel() {
 
       {awardsOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setAwardsOpen(false)}
         >
           <div
-            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-[24px] p-5 lg:p-6"
+            className="max-h-[85vh] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-[24px] p-5 lg:p-6"
             style={{
               background: "#1C1A17",
               boxShadow:
@@ -675,7 +684,7 @@ export default function AboutPanel() {
 
       {experienceOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setExperienceOpen(false)}
         >
@@ -701,7 +710,7 @@ export default function AboutPanel() {
                 <IconX size={16} />
               </button>
             </div>
-            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
               {journey.map((paragraph) => (
                 <p key={paragraph} className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
                   {paragraph}
@@ -737,12 +746,12 @@ export default function AboutPanel() {
 
       {appsOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setAppsOpen(false)}
         >
           <div
-            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-[24px] p-5 lg:p-6"
+            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-[24px] p-5 lg:p-6"
             style={{
               background: "#1C1A17",
               boxShadow:
@@ -797,7 +806,7 @@ export default function AboutPanel() {
 
       {connectOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setConnectOpen(false)}
         >
@@ -861,7 +870,7 @@ export default function AboutPanel() {
 
       {ratesOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
           style={{ background: "rgba(0,0,0,0.65)" }}
           onClick={() => setRatesOpen(false)}
         >
@@ -887,7 +896,7 @@ export default function AboutPanel() {
                 <IconX size={16} />
               </button>
             </div>
-            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
               <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
                 I charge{" "}
                 <span

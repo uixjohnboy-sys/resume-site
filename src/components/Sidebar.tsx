@@ -50,12 +50,12 @@ export default function Sidebar({
       {/* Profile card */}
       <div className="relative mb-4">
         <div className="relative overflow-hidden rounded-2xl border border-[rgba(239,159,39,0.45)]">
-          <div className="relative h-[150px] w-full overflow-hidden rounded-t-2xl">
+          <div className="relative h-64 w-full overflow-hidden rounded-t-2xl lg:h-[150px]">
             <Image
               src="/johnboy.png"
               alt="John Boy"
               fill
-              className="object-cover"
+              className="profile-photo-img object-cover"
               style={{ objectPosition: "center top", transform: "scale(1.2)", transformOrigin: "top center" }}
               sizes="230px"
               priority
@@ -123,8 +123,9 @@ export default function Sidebar({
       <div className="hidden flex-1 lg:block" />
 
       <div
-        className="mt-4 rounded-[20px] p-3 lg:mt-0"
+        className="mobile-cta-bar fixed inset-x-0 bottom-0 z-40 px-4 pt-4 lg:static lg:z-auto lg:mt-0 lg:rounded-[20px] lg:p-3"
         style={{
+          paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
           background: "#1C1A17",
           boxShadow:
             "8px 8px 18px rgba(0,0,0,0.55), -6px -6px 16px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
