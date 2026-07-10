@@ -679,9 +679,9 @@ export default function AboutPanel() {
         </div>
       </div>
 
-      {/* Right column, ~40%, split into two halves — desktop only for now */}
-      <div className="hidden min-w-0 flex-col gap-3 lg:flex lg:h-full lg:[flex:4_1_0%]">
-        <Card className="relative flex min-h-0 flex-1 flex-col">
+      {/* Right column, ~40% on desktop; stacks below on mobile */}
+      <div className="flex min-w-0 flex-col gap-3 lg:h-full lg:[flex:4_1_0%]">
+        <Card className="relative flex h-80 flex-col lg:h-auto lg:min-h-0 lg:flex-1">
           <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
             Projects
           </p>
@@ -691,7 +691,9 @@ export default function AboutPanel() {
           <BottomFade />
           <ScrollHint />
         </Card>
-        <PlaceholderCard />
+        <div className="hidden lg:flex lg:flex-1">
+          <PlaceholderCard />
+        </div>
       </div>
 
       {awardsOpen && (
