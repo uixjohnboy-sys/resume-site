@@ -310,10 +310,11 @@ function BottomFade() {
 const projects = [
   { name: "Chaos to Closing", image: "/project-chaos-to-closing.png" },
   { name: "Mindset Coaching", image: "/project-mindset-coaching.png" },
-  { name: "Words Like Alice", image: "/project-words-like-alice.png" },
+  { name: "Words Like Alice", image: "/project-words-like-alice.jpg" },
   { name: "Melbourne Chiropractic", image: "/project-melbourne-chiropractic.png" },
   { name: "Dental Clinic", image: "/project-dental-clinic.png" },
   { name: "Landscaping", image: "/project-landscaping.png" },
+  { name: "Digital Products", image: "/project-digital-products.jpg" },
 ];
 
 function ProjectsGrid({ onSelect }: { onSelect: (index: number) => void }) {
