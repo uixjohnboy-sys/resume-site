@@ -30,7 +30,14 @@ import {
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
-const hobbies = ["Basketball", "Photography", "Gaming", "Sci-fi"];
+const clientAvatars = [
+  "https://randomuser.me/api/portraits/men/32.jpg",
+  "https://randomuser.me/api/portraits/women/44.jpg",
+  "https://randomuser.me/api/portraits/men/65.jpg",
+  "https://randomuser.me/api/portraits/women/68.jpg",
+  "https://randomuser.me/api/portraits/men/12.jpg",
+  "https://randomuser.me/api/portraits/women/21.jpg",
+];
 
 const socials = [
   {
@@ -581,14 +588,23 @@ export default function AboutPanel() {
 
             <div className="grid flex-none grid-cols-2 gap-3 lg:grid-cols-3">
               <Card className="col-span-2 lg:col-span-1">
-                <p className="mb-2.5 text-[13px]" style={{ color: "var(--text-primary)" }}>
-                  Hobbies
+                <p className="mb-1.5 text-[13px]" style={{ color: "var(--text-primary)" }}>
+                  Client Testimonials
                 </p>
-                <div>
-                  {hobbies.map((h) => (
-                    <Tag key={h} label={h} />
+                <p className="mb-2 text-[10px] leading-snug" style={{ color: "var(--text-muted)" }}>
+                  Trusted by founders and teams across GoHighLevel builds.
+                </p>
+                <div className="mb-2 grid grid-cols-3 gap-1.5">
+                  {clientAvatars.map((src) => (
+                    <img key={src} src={src} alt="Client" className="aspect-square w-full rounded-[6px] object-cover" />
                   ))}
                 </div>
+                <p className="text-[20px] font-medium leading-none" style={{ color: "#EF9F27" }}>
+                  23
+                </p>
+                <p className="mt-1 text-[10px] leading-snug" style={{ color: "var(--text-muted)" }}>
+                  Client projects completed
+                </p>
               </Card>
 
               <Card
