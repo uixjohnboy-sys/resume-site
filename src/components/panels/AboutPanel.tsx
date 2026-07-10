@@ -27,11 +27,6 @@ import {
   IconBrandWhatsapp,
   IconBrandGmail,
   IconCurrencyDollar,
-  IconLayoutDashboard,
-  IconFilter,
-  IconChartHistogram,
-  IconPhotoPlus,
-  IconArrowRight,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
@@ -301,122 +296,53 @@ function BottomFade() {
   );
 }
 
-const showcaseSlides = [
-  {
-    label: "Dashboards",
-    image: "/showcase-dashboards.png",
-    imagePosition: "top",
-    icon: IconLayoutDashboard,
-    heading: "You describe it, I build it.",
-    subtext: "Client dashboards that turn raw data into decisions, built inside GoHighLevel or from scratch.",
-    cta: "View examples",
-  },
-  {
-    label: "Funnels",
-    image: "/showcase-funnels.png",
-    imagePosition: "top",
-    icon: IconFilter,
-    heading: "Funnels built to convert.",
-    subtext: "Landing pages and multi-step funnels designed around how your leads actually decide.",
-    cta: "View examples",
-  },
-  {
-    label: "Automations",
-    image: "/showcase-automations.png",
-    imagePosition: "top",
-    icon: IconChartHistogram,
-    heading: "Systems that run themselves.",
-    subtext: "Workflows connecting GoHighLevel, n8n, and Zapier so nothing falls through the cracks.",
-    cta: "View examples",
-  },
+const projects = [
+  { name: "Chaos to Closing", image: "/project-chaos-to-closing.png" },
+  { name: "Mindset Coaching", image: "/project-mindset-coaching.png" },
+  { name: "Words Like Alice", image: "/project-words-like-alice.png" },
+  { name: "Melbourne Chiropractic", image: "/project-melbourne-chiropractic.png" },
+  { name: "Dental Clinic", image: "/project-dental-clinic.png" },
+  { name: "Landscaping", image: "/project-landscaping.png" },
 ];
 
-function ShowcaseCarousel() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setIndex((i) => (i + 1) % showcaseSlides.length), 4000);
-    return () => clearInterval(id);
-  }, []);
-
-  const slide = showcaseSlides[index];
-  const Icon = slide.icon;
-
+function ProjectsGrid({ onSelect }: { onSelect: (index: number) => void }) {
   return (
-    <Card className="flex h-full flex-col overflow-hidden">
-      <div key={index} className="carousel-fade flex flex-1 flex-col">
-        <div
-          className="relative mb-4 flex flex-1 items-center justify-center overflow-hidden rounded-[16px]"
-          style={{ background: "linear-gradient(150deg, #3a2a1a 0%, #141311 65%)" }}
-        >
-          {slide.image ? (
-            <Image
-              src={slide.image}
-              alt={slide.label}
-              fill
-              className="object-cover"
-              style={{ objectPosition: `center ${slide.imagePosition}` }}
-              sizes="(min-width: 1024px) 30vw, 100vw"
-            />
-          ) : (
-            <div className="flex flex-col items-center gap-2 text-center">
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-full"
-                style={{ background: "rgba(239,159,39,0.12)", color: "#EF9F27" }}
-              >
-                <Icon size={22} />
-              </div>
-              <p className="text-lg font-medium" style={{ color: "#F2F1EE" }}>
-                {slide.label}
-              </p>
-              <p className="flex items-center gap-1 text-[10px]" style={{ color: "#6B6960" }}>
-                <IconPhotoPlus size={12} /> screenshot coming soon
-              </p>
-            </div>
-          )}
-          <div
-            className="pointer-events-none absolute bottom-0 left-0 right-0 flex items-center gap-1.5 px-3 py-2"
-            style={{ background: "linear-gradient(to top, rgba(10,10,9,0.85), transparent)" }}
-          >
-            <Icon size={13} style={{ color: "#EF9F27" }} />
-            <p className="text-[11px] font-medium" style={{ color: "#F2F1EE" }}>
-              {slide.label}
-            </p>
-          </div>
-        </div>
-        <p className="mb-1.5 text-sm font-medium" style={{ color: "#F2F1EE" }}>
-          {slide.heading}
-        </p>
-        <p className="mb-4 text-[12px] leading-relaxed" style={{ color: "#8A887F" }}>
-          {slide.subtext}
-        </p>
+    <div className="grid h-full grid-cols-2 gap-3">
+      {projects.map((project, i) => (
         <button
-          className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium hover:brightness-110"
+          key={project.name}
+          onClick={() => onSelect(i)}
+          className="group relative overflow-hidden rounded-[16px] text-left transition-transform hover:scale-[1.02]"
           style={{
-            background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-            boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
-            color: "#2C1400",
+            background: "#141311",
+            boxShadow:
+              "6px 6px 14px rgba(0,0,0,0.55), -4px -4px 10px rgba(255,255,255,0.02), inset 0 1px 0 rgba(255,255,255,0.02)",
           }}
         >
-          {slide.cta}
-          <IconArrowRight size={13} />
-        </button>
-      </div>
-      <div className="mt-4 flex flex-none items-center justify-center gap-1.5">
-        {showcaseSlides.map((s, i) => (
-          <button
-            key={s.label}
-            aria-label={`Show ${s.label}`}
-            onClick={() => setIndex(i)}
-            className="h-1.5 rounded-full transition-all"
-            style={{
-              width: i === index ? 16 : 6,
-              background: i === index ? "#EF9F27" : "#3A382F",
-            }}
+          <Image
+            src={project.image}
+            alt={project.name}
+            fill
+            className="object-cover object-top"
+            sizes="(min-width: 1024px) 15vw, 50vw"
           />
-        ))}
-      </div>
-    </Card>
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 py-2"
+            style={{ background: "linear-gradient(to top, rgba(10,10,9,0.9), transparent)" }}
+          >
+            <p className="text-[10px] font-medium leading-tight" style={{ color: "#F2F1EE" }}>
+              {project.name}
+            </p>
+          </div>
+          <div
+            className="pointer-events-none absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
+            style={{ background: "rgba(20,19,17,0.85)", color: "#EF9F27" }}
+          >
+            <IconArrowUpRight size={13} />
+          </div>
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -426,8 +352,9 @@ export default function AboutPanel() {
   const [appsOpen, setAppsOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
   const [ratesOpen, setRatesOpen] = useState(false);
+  const [projectOpen, setProjectOpen] = useState<number | null>(null);
 
-  const anyModalOpen = awardsOpen || experienceOpen || appsOpen || connectOpen || ratesOpen;
+  const anyModalOpen = awardsOpen || experienceOpen || appsOpen || connectOpen || ratesOpen || projectOpen !== null;
 
   useEffect(() => {
     document.body.style.overflow = anyModalOpen ? "hidden" : "";
@@ -740,9 +667,9 @@ export default function AboutPanel() {
         </div>
       </div>
 
-      {/* Right column, ~40%, animated showcase of sample builds — desktop only for now */}
+      {/* Right column, ~40%, clickable preview grid of sample builds — desktop only for now */}
       <div className="hidden min-w-0 flex-col gap-3 lg:flex lg:h-full lg:[flex:4_1_0%]">
-        <ShowcaseCarousel />
+        <ProjectsGrid onSelect={setProjectOpen} />
       </div>
 
       {awardsOpen && (
@@ -1071,6 +998,49 @@ export default function AboutPanel() {
                 Book 15 mins Discovery Call
               </a>
             </div>
+          </div>
+        </div>
+      )}
+
+      {projectOpen !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setProjectOpen(null)}
+        >
+          <div
+            className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-[24px] p-5 lg:p-6"
+            style={{
+              background: "#1C1A17",
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex flex-none items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+                {projects[projectOpen].name}
+              </p>
+              <button
+                onClick={() => setProjectOpen(null)}
+                aria-label="Close"
+                className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
+                style={{ background: "#141311", color: "#8A887F" }}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[16px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={projects[projectOpen].image}
+                alt={projects[projectOpen].name}
+                className="w-full"
+              />
+            </div>
+            <p className="mt-3 flex-none text-center text-[11px]" style={{ color: "#6B6960" }}>
+              Full live preview coming soon
+            </p>
           </div>
         </div>
       )}

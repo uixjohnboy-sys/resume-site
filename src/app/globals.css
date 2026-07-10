@@ -75,21 +75,6 @@ body {
   height: 0;
 }
 
-@keyframes carouselFade {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.carousel-fade {
-  animation: carouselFade 0.5s ease;
-}
-
 @media (max-width: 1023px) {
   .profile-photo-img {
     object-position: center 18% !important;
