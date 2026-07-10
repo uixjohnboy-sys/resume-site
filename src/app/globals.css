@@ -28,31 +28,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-[data-theme="light"] {
-  --background: #eceae6;
-  --foreground: #232220;
-
-  --bg-page: #eceae6;
-  --bg-sidebar: rgba(255, 255, 255, 0.3);
-  --bg-surface: rgba(255, 255, 255, 0.45);
-  --bg-surface-2: rgba(255, 255, 255, 0.6);
-  --border-surface: rgba(255, 255, 255, 0.6);
-  --border-surface-2: rgba(255, 255, 255, 0.75);
-
-  --text-primary: #232220;
-  --text-secondary: #5c5a54;
-  --text-tertiary: #78766f;
-  --text-muted: #8a887f;
-  --text-faint: #9c9a92;
-
-  --btn-text-on-gradient: #3a2000;
-
-  --surface-blur: blur(24px);
-  --surface-shadow: 0 8px 32px rgba(60, 55, 40, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  --surface-shadow-sm: 0 4px 16px rgba(60, 55, 40, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  --surface-shadow-xs: 0 2px 8px rgba(60, 55, 40, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -63,14 +38,6 @@
 html,
 body {
   height: 100%;
-}
-
-[data-theme="light"] body {
-  background-image: radial-gradient(circle at 12% 8%, rgba(239, 159, 39, 0.16), transparent 40%),
-    radial-gradient(circle at 88% 18%, rgba(216, 90, 48, 0.12), transparent 38%),
-    radial-gradient(circle at 30% 90%, rgba(120, 150, 255, 0.1), transparent 42%);
-  background-attachment: fixed;
-  transition: background-color 0.3s ease;
 }
 
 @media (min-width: 1024px) {

@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { IconUser, IconApps, IconSparkles, IconQuoteFilled, IconSun, IconMoon } from "@tabler/icons-react";
-import { useTheme } from "@/components/ThemeProvider";
+import { IconUser, IconApps, IconSparkles, IconQuoteFilled } from "@tabler/icons-react";
 
 export type PanelKey = "about" | "projects";
 
@@ -20,7 +19,6 @@ export default function Sidebar({
   onSelect: (key: PanelKey) => void;
 }) {
   const [time, setTime] = useState<string | null>(null);
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const update = () =>
@@ -111,50 +109,34 @@ export default function Sidebar({
       </div>
 
       {/* Main nav */}
-      <div className="flex flex-row items-center gap-1.5 lg:gap-1.5">
-        <nav className="flex flex-1 flex-row gap-1.5 lg:flex-col lg:gap-0.5">
-          {navItems.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => onSelect(item.key)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-normal transition-colors lg:flex-none lg:justify-start lg:py-1.5"
-              style={
-                active === item.key
-                  ? {
-                      background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                      color: "var(--btn-text-on-gradient)",
-                      boxShadow: "0 2px 16px 0 rgba(216,90,48,0.45)",
-                    }
-                  : { color: "var(--text-tertiary)" }
-              }
-            >
-              {item.icon}
-              {item.label}
-            </button>
-          ))}
-        </nav>
-        <button
-          onClick={toggleTheme}
-          aria-label="Toggle theme"
-          className="flex h-8 w-8 flex-none items-center justify-center rounded-full transition-colors lg:h-7 lg:w-7"
-          style={{
-            background: "var(--bg-surface-2)",
-            backdropFilter: "var(--surface-blur)",
-            WebkitBackdropFilter: "var(--surface-blur)",
-            boxShadow: "var(--surface-shadow-xs)",
-            color: "var(--text-tertiary)",
-          }}
-        >
-          {theme === "dark" ? <IconSun size={14} /> : <IconMoon size={14} />}
-        </button>
-      </div>
+      <nav className="flex flex-row gap-1.5 lg:flex-col lg:gap-0.5">
+        {navItems.map((item) => (
+          <button
+            key={item.key}
+            onClick={() => onSelect(item.key)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-normal transition-colors lg:flex-none lg:justify-start lg:py-1.5"
+            style={
+              active === item.key
+                ? {
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    color: "var(--btn-text-on-gradient)",
+                    boxShadow: "0 2px 16px 0 rgba(216,90,48,0.45)",
+                  }
+                : { color: "var(--text-tertiary)" }
+            }
+          >
+            {item.icon}
+            {item.label}
+          </button>
+        ))}
+      </nav>
 
       <p className="mb-1.5 mt-4.5 hidden pl-2.5 text-[10px] font-normal tracking-wide lg:block" style={{ color: "var(--text-faint)" }}>
         TESTIMONIAL
       </p>
       <div
-        className="hidden overflow-hidden rounded-[20px] lg:block"
-        style={{ background: "#F7F5F1", boxShadow: "0 10px 24px rgba(0,0,0,0.28)" }}
+        className="hidden overflow-hidden rounded-[20px] border lg:block"
+        style={{ background: "#F7F5F1", borderColor: "var(--border-surface)", boxShadow: "0 10px 24px rgba(0,0,0,0.28)" }}
       >
         <div className="relative h-[120px] w-full">
           <img
@@ -164,15 +146,15 @@ export default function Sidebar({
           />
           <div
             className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, rgba(247,245,241,0) 45%, #F7F5F1 100%)" }}
+            style={{ background: "linear-gradient(to bottom, rgba(247,245,241,0) 78%, #F7F5F1 100%)" }}
           />
         </div>
-        <div className="px-4 pb-4 pt-1">
-          <IconQuoteFilled size={22} style={{ color: "#D85A30" }} />
-          <p className="mt-1.5 text-[12px] leading-relaxed" style={{ color: "#2C2A25" }}>
+        <div className="px-4 pb-3.5 pt-1">
+          <IconQuoteFilled size={18} style={{ color: "#D85A30" }} />
+          <p className="mt-1 text-[11px] leading-snug" style={{ color: "#2C2A25" }}>
             Impressed by the Professionalism and attention to details in UI design. Highly Recommended!
           </p>
-          <p className="mt-2 text-[11px] font-medium" style={{ color: "var(--text-muted)" }}>
+          <p className="mt-1 text-[10px] font-medium" style={{ color: "#8A887F" }}>
             — Martha, Unicell
           </p>
         </div>
