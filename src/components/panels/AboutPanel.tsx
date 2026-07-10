@@ -109,6 +109,17 @@ const apps = [
   },
 ];
 
+const automationsTarget = 5;
+
+const automations = [
+  {
+    name: "Instagram — Keyword: CHAOS",
+    description:
+      "GoHighLevel workflow that replies to Instagram DMs when a keyword is detected, then routes the contact through a branching follow-up sequence.",
+    image: "/automation-instagram-chaos.jpg",
+  },
+];
+
 function ClickHint() {
   return (
     <div
@@ -296,18 +307,6 @@ function BottomFade() {
   );
 }
 
-function PlaceholderCard() {
-  return (
-    <div
-      className="flex flex-1 flex-col items-center justify-center gap-2 rounded-[24px] border border-dashed text-center"
-      style={{ borderColor: "#3A382F", color: "#5A584F" }}
-    >
-      <IconLayoutGrid size={18} />
-      <p className="text-[11px] leading-relaxed">Reserved</p>
-    </div>
-  );
-}
-
 const projects = [
   { name: "Chaos to Closing", image: "/project-chaos-to-closing.png" },
   { name: "Mindset Coaching", image: "/project-mindset-coaching.png" },
@@ -365,8 +364,10 @@ export default function AboutPanel() {
   const [connectOpen, setConnectOpen] = useState(false);
   const [ratesOpen, setRatesOpen] = useState(false);
   const [projectOpen, setProjectOpen] = useState<number | null>(null);
+  const [automationsOpen, setAutomationsOpen] = useState(false);
 
-  const anyModalOpen = awardsOpen || experienceOpen || appsOpen || connectOpen || ratesOpen || projectOpen !== null;
+  const anyModalOpen =
+    awardsOpen || experienceOpen || appsOpen || connectOpen || ratesOpen || projectOpen !== null || automationsOpen;
 
   useEffect(() => {
     document.body.style.overflow = anyModalOpen ? "hidden" : "";
@@ -691,9 +692,26 @@ export default function AboutPanel() {
           <BottomFade />
           <ScrollHint />
         </Card>
-        <div className="hidden lg:flex lg:flex-1">
-          <PlaceholderCard />
-        </div>
+        <Card
+          className="relative flex h-32 cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] lg:h-auto lg:flex-1"
+          onClick={() => setAutomationsOpen(true)}
+        >
+          <ClickHint />
+          <p
+            className="text-4xl font-medium"
+            style={{
+              background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            {automationsTarget}
+          </p>
+          <p className="mt-1 text-[11px]" style={{ color: "#6B6960" }}>
+            Automations Built
+          </p>
+        </Card>
       </div>
 
       {awardsOpen && (
@@ -1065,6 +1083,65 @@ export default function AboutPanel() {
             <p className="mt-3 flex-none text-center text-[11px]" style={{ color: "#6B6960" }}>
               Full live preview coming soon
             </p>
+          </div>
+        </div>
+      )}
+
+      {automationsOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setAutomationsOpen(false)}
+        >
+          <div
+            className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-[24px] p-5 lg:p-6"
+            style={{
+              background: "#1C1A17",
+              boxShadow:
+                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-5 flex flex-none items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+                Automations Built
+              </p>
+              <button
+                onClick={() => setAutomationsOpen(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
+                style={{ background: "#141311", color: "#8A887F" }}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+              {automations.map((automation) => (
+                <div key={automation.name} className="mb-4 overflow-hidden rounded-[16px]" style={{ background: "#141311" }}>
+                  <img src={automation.image} alt={automation.name} className="w-full" />
+                  <div className="p-3">
+                    <p className="mb-1 text-xs font-medium" style={{ color: "#F2F1EE" }}>
+                      {automation.name}
+                    </p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                      {automation.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <div className="grid grid-cols-2 gap-3">
+                {Array.from({ length: Math.max(automationsTarget - automations.length, 0) }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col items-center justify-center gap-2 rounded-[16px] border border-dashed p-6 text-center"
+                    style={{ borderColor: "#3A382F", color: "#5A584F" }}
+                  >
+                    <IconLayoutGrid size={20} />
+                    <p className="text-[11px] leading-relaxed">More automations coming soon</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
