@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { IconUser, IconApps, IconSparkles, IconQuoteFilled } from "@tabler/icons-react";
+import { IconUser, IconApps, IconSparkles, IconQuoteFilled, IconSun, IconMoon } from "@tabler/icons-react";
+import { useTheme } from "@/components/ThemeProvider";
 
 export type PanelKey = "about" | "projects";
 
@@ -19,6 +20,7 @@ export default function Sidebar({
   onSelect: (key: PanelKey) => void;
 }) {
   const [time, setTime] = useState<string | null>(null);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const update = () =>
@@ -38,7 +40,7 @@ export default function Sidebar({
   return (
     <div
       className="flex w-full flex-none flex-col overflow-visible px-3.5 pt-5 pb-4 lg:w-[230px] lg:pb-5"
-      style={{ background: "var(--bg-sidebar, #141311)" }}
+      style={{ background: "var(--bg-sidebar)" }}
     >
       {/* Profile card */}
       <div className="relative mb-4">
@@ -54,36 +56,43 @@ export default function Sidebar({
               priority
             />
           </div>
-          <div className="rounded-b-2xl p-4" style={{ background: "#1C1A17" }}>
+          <div
+            className="rounded-b-2xl p-4"
+            style={{
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
+            }}
+          >
             <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
               Johnboy
             </p>
             <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
               Roxas
             </p>
-            <p className="mt-1.5 text-[12px]" style={{ color: "#6B6960" }}>
+            <p className="mt-1.5 text-[12px]" style={{ color: "var(--text-muted)" }}>
               @uix.johnboy
             </p>
 
-            <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "#9A978C" }}>
+            <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               GoHighLevel specialist. Automating businesses with Claude, n8n, and Zapier.
             </p>
 
             <div className="mt-3 flex items-center justify-between">
-              <span className="text-[13px] tabular-nums" style={{ color: "#F2F1EE" }}>
+              <span className="text-[13px] tabular-nums" style={{ color: "var(--text-primary)" }}>
                 {time ?? "--:--:--"}
               </span>
-              <span className="text-[11px]" style={{ color: "#6B6960" }}>
+              <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                 Philippine Time
               </span>
             </div>
 
-            <div className="mt-4 border-t pt-3" style={{ borderColor: "#2A2822" }}>
-              <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "#F2F1EE" }}>
+            <div className="mt-4 border-t pt-3" style={{ borderColor: "var(--border-surface)" }}>
+              <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
                 Available for work
               </p>
-              <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "#7A7870" }}>
+              <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
                 Freelance GoHighLevel and automation builds, one project at a time.
               </p>
               <button
@@ -91,7 +100,7 @@ export default function Sidebar({
                 style={{
                   background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                   boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
-                  color: "#2C1400",
+                  color: "var(--btn-text-on-gradient)",
                 }}
               >
                 Book a call
@@ -102,29 +111,45 @@ export default function Sidebar({
       </div>
 
       {/* Main nav */}
-      <nav className="flex flex-row gap-1.5 lg:flex-col lg:gap-0.5">
-        {navItems.map((item) => (
-          <button
-            key={item.key}
-            onClick={() => onSelect(item.key)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-normal transition-colors lg:flex-none lg:justify-start lg:py-1.5"
-            style={
-              active === item.key
-                ? {
-                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                    color: "#2C1400",
-                    boxShadow: "0 2px 16px 0 rgba(216,90,48,0.45)",
-                  }
-                : { color: "#8A887F" }
-            }
-          >
-            {item.icon}
-            {item.label}
-          </button>
-        ))}
-      </nav>
+      <div className="flex flex-row items-center gap-1.5 lg:gap-1.5">
+        <nav className="flex flex-1 flex-row gap-1.5 lg:flex-col lg:gap-0.5">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => onSelect(item.key)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-normal transition-colors lg:flex-none lg:justify-start lg:py-1.5"
+              style={
+                active === item.key
+                  ? {
+                      background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                      color: "var(--btn-text-on-gradient)",
+                      boxShadow: "0 2px 16px 0 rgba(216,90,48,0.45)",
+                    }
+                  : { color: "var(--text-tertiary)" }
+              }
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <button
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          className="flex h-8 w-8 flex-none items-center justify-center rounded-full transition-colors lg:h-7 lg:w-7"
+          style={{
+            background: "var(--bg-surface-2)",
+            backdropFilter: "var(--surface-blur)",
+            WebkitBackdropFilter: "var(--surface-blur)",
+            boxShadow: "var(--surface-shadow-xs)",
+            color: "var(--text-tertiary)",
+          }}
+        >
+          {theme === "dark" ? <IconSun size={14} /> : <IconMoon size={14} />}
+        </button>
+      </div>
 
-      <p className="mb-1.5 mt-4.5 hidden pl-2.5 text-[10px] font-normal tracking-wide lg:block" style={{ color: "#4E4C44" }}>
+      <p className="mb-1.5 mt-4.5 hidden pl-2.5 text-[10px] font-normal tracking-wide lg:block" style={{ color: "var(--text-faint)" }}>
         TESTIMONIAL
       </p>
       <div
@@ -147,7 +172,7 @@ export default function Sidebar({
           <p className="mt-1.5 text-[12px] leading-relaxed" style={{ color: "#2C2A25" }}>
             Impressed by the Professionalism and attention to details in UI design. Highly Recommended!
           </p>
-          <p className="mt-2 text-[11px] font-medium" style={{ color: "#6B6960" }}>
+          <p className="mt-2 text-[11px] font-medium" style={{ color: "var(--text-muted)" }}>
             — Martha, Unicell
           </p>
         </div>

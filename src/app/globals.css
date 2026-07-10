@@ -3,6 +3,54 @@
 :root {
   --background: #1a1917;
   --foreground: #f2f1ee;
+
+  --bg-page: #1a1917;
+  --bg-sidebar: #141311;
+  --bg-surface: #1c1a17;
+  --bg-surface-2: #141311;
+  --border-surface: #2a2822;
+  --border-surface-2: #3a382f;
+
+  --text-primary: #f2f1ee;
+  --text-secondary: #b0aea4;
+  --text-tertiary: #8a887f;
+  --text-muted: #6b6960;
+  --text-faint: #5a584f;
+
+  --btn-text-on-gradient: #2c1400;
+
+  --surface-blur: none;
+  --surface-shadow: 10px 10px 22px rgba(0, 0, 0, 0.55), -8px -8px 20px rgba(255, 255, 255, 0.025),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  --surface-shadow-sm: 6px 6px 14px rgba(0, 0, 0, 0.55), -4px -4px 10px rgba(255, 255, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  --surface-shadow-xs: 3px 3px 7px rgba(0, 0, 0, 0.6), -2px -2px 6px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="light"] {
+  --background: #eceae6;
+  --foreground: #232220;
+
+  --bg-page: #eceae6;
+  --bg-sidebar: rgba(255, 255, 255, 0.3);
+  --bg-surface: rgba(255, 255, 255, 0.45);
+  --bg-surface-2: rgba(255, 255, 255, 0.6);
+  --border-surface: rgba(255, 255, 255, 0.6);
+  --border-surface-2: rgba(255, 255, 255, 0.75);
+
+  --text-primary: #232220;
+  --text-secondary: #5c5a54;
+  --text-tertiary: #78766f;
+  --text-muted: #8a887f;
+  --text-faint: #9c9a92;
+
+  --btn-text-on-gradient: #3a2000;
+
+  --surface-blur: blur(24px);
+  --surface-shadow: 0 8px 32px rgba(60, 55, 40, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --surface-shadow-sm: 0 4px 16px rgba(60, 55, 40, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --surface-shadow-xs: 0 2px 8px rgba(60, 55, 40, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 @theme inline {
@@ -15,6 +63,14 @@
 html,
 body {
   height: 100%;
+}
+
+[data-theme="light"] body {
+  background-image: radial-gradient(circle at 12% 8%, rgba(239, 159, 39, 0.16), transparent 40%),
+    radial-gradient(circle at 88% 18%, rgba(216, 90, 48, 0.12), transparent 38%),
+    radial-gradient(circle at 30% 90%, rgba(120, 150, 255, 0.1), transparent 42%);
+  background-attachment: fixed;
+  transition: background-color 0.3s ease;
 }
 
 @media (min-width: 1024px) {

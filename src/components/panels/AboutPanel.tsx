@@ -124,7 +124,7 @@ function ClickHint() {
   return (
     <div
       className="pointer-events-none absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full"
-      style={{ background: "#141311", color: "#6B6960" }}
+      style={{ background: "var(--bg-surface-2)", color: "var(--text-muted)" }}
     >
       <IconArrowUpRight size={11} />
     </div>
@@ -223,14 +223,14 @@ const tools = [
   {
     name: "GitHub",
     icon: IconBrandGithub,
-    color: "#E6DFCE",
+    color: "var(--text-primary)",
     description:
       "Where every project lives, gets version controlled, and gets reviewed before it ships anywhere else.",
   },
   {
     name: "Vercel",
     icon: IconBrandVercel,
-    color: "#E6DFCE",
+    color: "var(--text-primary)",
     description:
       "My default host for shipping projects fast, connected straight to GitHub so every push goes live automatically.",
   },
@@ -255,7 +255,7 @@ const tools = [
   {
     name: "CapCut",
     icon: IconMovie,
-    color: "#E6DFCE",
+    color: "var(--text-primary)",
     description: "My go-to for quick social media edits and short-form video content.",
   },
   {
@@ -277,7 +277,7 @@ function Tag({ label }: { label: string }) {
   return (
     <span
       className="mb-1.5 mr-1.5 inline-block rounded-lg px-2.5 py-1 text-[11px]"
-      style={{ background: "var(--bg-card-alt, #2A2822)", color: "#B0AEA4" }}
+      style={{ background: "var(--bg-card-alt, var(--border-surface))", color: "var(--text-secondary)" }}
     >
       {label}
     </span>
@@ -289,11 +289,11 @@ function ScrollHint() {
     <div className="pointer-events-none absolute bottom-3 right-3 flex flex-col items-center gap-1">
       <span
         className="text-[9px] tracking-wider"
-        style={{ color: "#5A584F", writingMode: "vertical-rl", textOrientation: "mixed" }}
+        style={{ color: "var(--text-faint)", writingMode: "vertical-rl", textOrientation: "mixed" }}
       >
         Scroll down
       </span>
-      <IconArrowDown size={11} style={{ color: "#5A584F" }} />
+      <IconArrowDown size={11} style={{ color: "var(--text-faint)" }} />
     </div>
   );
 }
@@ -302,7 +302,7 @@ function BottomFade() {
   return (
     <div
       className="pointer-events-none absolute inset-x-0 bottom-0 h-9 rounded-b-[24px]"
-      style={{ background: "linear-gradient(to top, #1C1A17, rgba(28,26,23,0))" }}
+      style={{ background: "linear-gradient(to top, var(--bg-surface), rgba(28,26,23,0))" }}
     />
   );
 }
@@ -326,9 +326,11 @@ function ProjectsGrid({ onSelect }: { onSelect: (index: number) => void }) {
           onClick={() => onSelect(i)}
           className="group relative aspect-[4/3] overflow-hidden rounded-[16px] text-left transition-transform hover:scale-[1.02]"
           style={{
-            background: "#141311",
+            background: "var(--bg-surface-2)",
+            backdropFilter: "var(--surface-blur)",
+            WebkitBackdropFilter: "var(--surface-blur)",
             boxShadow:
-              "6px 6px 14px rgba(0,0,0,0.55), -4px -4px 10px rgba(255,255,255,0.02), inset 0 1px 0 rgba(255,255,255,0.02)",
+              "var(--surface-shadow-sm)",
           }}
         >
           <Image
@@ -342,7 +344,7 @@ function ProjectsGrid({ onSelect }: { onSelect: (index: number) => void }) {
             className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 py-2"
             style={{ background: "linear-gradient(to top, rgba(10,10,9,0.9), transparent)" }}
           >
-            <p className="text-[10px] font-medium leading-tight" style={{ color: "#F2F1EE" }}>
+            <p className="text-[10px] font-medium leading-tight" style={{ color: "var(--text-primary)" }}>
               {project.name}
             </p>
           </div>
@@ -385,9 +387,11 @@ export default function AboutPanel() {
           <div
             className="relative flex h-44 w-full items-center justify-center overflow-hidden rounded-[24px] lg:h-full lg:w-auto lg:flex-1"
             style={{
-              background: "#1C1A17",
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
           >
             <span className="relative flex h-14 w-14 items-center justify-center">
@@ -399,34 +403,34 @@ export default function AboutPanel() {
                 className="relative flex h-14 w-14 items-center justify-center rounded-full"
                 style={{ background: "#EF9F27", boxShadow: "0 0 20px 4px rgba(239,159,39,0.5)" }}
               >
-                <IconPlayerPlayFilled size={22} style={{ color: "#2C1400" }} />
+                <IconPlayerPlayFilled size={22} style={{ color: "var(--btn-text-on-gradient)" }} />
               </span>
             </span>
           </div>
           <div className="relative h-64 lg:h-auto lg:min-h-0 lg:flex-1">
             <Card className="thin-scroll h-full overflow-y-auto">
-            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               I&apos;m a GoHighLevel specialist based in Manila, focused on automation. I help businesses replace
               manual, repetitive work with systems that run themselves, built with tools like{" "}
               <span style={{ color: "#EF9F27" }}>Claude</span>,{" "}
               <span style={{ color: "#EF9F27" }}>n8n</span>, and{" "}
               <span style={{ color: "#EF9F27" }}>Zapier</span>.
             </p>
-            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               Most of my client work lives inside GoHighLevel: building funnels, CRM pipelines, and dashboards, then
               wiring them up to automations that handle follow-ups, lead routing, and reporting without anyone
               touching a spreadsheet.
             </p>
-            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               Outside of GoHighLevel, I use Claude Code to build the tools I can&apos;t find off the shelf, and n8n
               or Zapier to connect everything else, forms, calendars, payment tools, into one system that just runs
               in the background.
             </p>
-            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               Currently building <span style={{ color: "#EF9F27" }}>Pathwise</span>, a dashboard-style app for
               mapping out workflows visually, on top of taking on client automation projects one at a time.
             </p>
-            <p className="text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+            <p className="text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               I care less about which tool gets used and more about the outcome: fewer manual steps, faster response
               times, and systems a non-technical team can actually run without me in the loop.
             </p>
@@ -453,7 +457,7 @@ export default function AboutPanel() {
             >
               3
             </p>
-            <p className="mt-1 text-[11px]" style={{ color: "#6B6960" }}>
+            <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
               Apps built
             </p>
           </Card>
@@ -473,7 +477,7 @@ export default function AboutPanel() {
             >
               5
             </p>
-            <p className="mt-1 text-[11px]" style={{ color: "#6B6960" }}>
+            <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
               Years experience
             </p>
           </Card>
@@ -493,7 +497,7 @@ export default function AboutPanel() {
             >
               4
             </p>
-            <p className="mt-1 text-[11px]" style={{ color: "#6B6960" }}>
+            <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
               Awards
             </p>
           </Card>
@@ -501,7 +505,7 @@ export default function AboutPanel() {
             className="relative col-span-3 h-40 overflow-hidden rounded-[24px] lg:col-span-1 lg:h-full"
             style={{
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
           >
             <iframe
@@ -528,10 +532,10 @@ export default function AboutPanel() {
               className="pointer-events-none absolute inset-x-0 bottom-0 p-3"
               style={{ background: "linear-gradient(to top, rgba(10,10,9,0.85), transparent)" }}
             >
-              <p className="text-[11px]" style={{ color: "#D5D3CB" }}>
+              <p className="text-[11px]" style={{ color: "var(--text-secondary)" }}>
                 Based in
               </p>
-              <p className="text-sm" style={{ color: "#F2F1EE" }}>
+              <p className="text-sm" style={{ color: "var(--text-primary)" }}>
                 Manila, Philippines
               </p>
             </div>
@@ -542,7 +546,7 @@ export default function AboutPanel() {
         <div className="flex flex-col gap-3 lg:flex-row lg:min-h-0 lg:[flex:2_1_0%]">
           <div className="flex flex-col gap-3 lg:min-h-0 lg:[flex:3_1_0%]">
             <Card className="relative flex h-96 flex-col lg:h-auto lg:min-h-0 lg:[flex:2_1_0%]">
-              <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
+              <p className="mb-2.5 flex-none text-[13px]" style={{ color: "var(--text-primary)" }}>
                 Experience
               </p>
               <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
@@ -550,20 +554,20 @@ export default function AboutPanel() {
                   <div
                     key={item.company}
                     className="border-l-2 pl-3"
-                    style={{ borderColor: "#2A2822", marginBottom: i === experience.length - 1 ? 0 : 16 }}
+                    style={{ borderColor: "var(--border-surface)", marginBottom: i === experience.length - 1 ? 0 : 16 }}
                   >
-                    <p className="text-xs" style={{ color: "#F2F1EE" }}>
+                    <p className="text-xs" style={{ color: "var(--text-primary)" }}>
                       {item.company}
                     </p>
                     <p className="mt-0.5 text-[11px]" style={{ color: "#EF9F27" }}>
                       {item.role}
                     </p>
-                    <p className="mt-0.5 text-[11px]" style={{ color: "#6B6960" }}>
+                    <p className="mt-0.5 text-[11px]" style={{ color: "var(--text-muted)" }}>
                       {item.period}
                     </p>
                     <ul className="mt-1.5 list-disc space-y-1 pl-4">
                       {item.bullets.map((bullet) => (
-                        <li key={bullet} className="text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                        <li key={bullet} className="text-[11px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
                           {bullet}
                         </li>
                       ))}
@@ -577,7 +581,7 @@ export default function AboutPanel() {
 
             <div className="grid flex-none grid-cols-2 gap-3 lg:grid-cols-3">
               <Card className="col-span-2 lg:col-span-1">
-                <p className="mb-2.5 text-[13px]" style={{ color: "#F2F1EE" }}>
+                <p className="mb-2.5 text-[13px]" style={{ color: "var(--text-primary)" }}>
                   Hobbies
                 </p>
                 <div>
@@ -599,10 +603,10 @@ export default function AboutPanel() {
                         key={social.name}
                         className="flex h-8 w-8 items-center justify-center rounded-full"
                         style={{
-                          background: "#141311",
+                          background: "var(--bg-surface-2)",
                           marginLeft: i === 0 ? 0 : -10,
                           zIndex: socials.length - i,
-                          border: "2px solid #1C1A17",
+                          border: "2px solid var(--bg-surface)",
                           color: social.color,
                         }}
                       >
@@ -611,7 +615,7 @@ export default function AboutPanel() {
                     );
                   })}
                 </div>
-                <p className="text-[11px]" style={{ color: "#6B6960" }}>
+                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                   Connect with me
                 </p>
               </Card>
@@ -622,11 +626,11 @@ export default function AboutPanel() {
               >
                 <div
                   className="mb-2 flex h-8 w-8 items-center justify-center rounded-full"
-                  style={{ background: "#141311", color: "#EF9F27" }}
+                  style={{ background: "var(--bg-surface-2)", color: "#EF9F27" }}
                 >
                   <IconCurrencyDollar size={16} />
                 </div>
-                <p className="text-[11px]" style={{ color: "#6B6960" }}>
+                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                   My Rates
                 </p>
               </Card>
@@ -634,7 +638,7 @@ export default function AboutPanel() {
           </div>
 
           <Card className="relative flex h-96 flex-col lg:h-auto lg:min-h-0 lg:[flex:2_1_0%]">
-            <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
+            <p className="mb-2.5 flex-none text-[13px]" style={{ color: "var(--text-primary)" }}>
               Tools I use
             </p>
             <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
@@ -649,9 +653,11 @@ export default function AboutPanel() {
                     <div
                       className="flex h-10 w-10 flex-none items-center justify-center rounded-[14px]"
                       style={{
-                        background: "#141311",
+                        background: "var(--bg-surface-2)",
+                        backdropFilter: "var(--surface-blur)",
+                        WebkitBackdropFilter: "var(--surface-blur)",
                         boxShadow:
-                          "3px 3px 7px rgba(0,0,0,0.6), -2px -2px 6px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.03)",
+                          "var(--surface-shadow-xs)",
                       }}
                     >
                       <Icon
@@ -664,10 +670,10 @@ export default function AboutPanel() {
                       />
                     </div>
                     <div className="min-w-0 pt-0.5">
-                      <p className="text-xs" style={{ color: "#F2F1EE" }}>
+                      <p className="text-xs" style={{ color: "var(--text-primary)" }}>
                         {tool.name}
                       </p>
-                      <p className="text-[11px] leading-relaxed" style={{ color: "#6B6960" }}>
+                      <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
                         {tool.description}
                       </p>
                     </div>
@@ -684,7 +690,7 @@ export default function AboutPanel() {
       {/* Right column, ~40% on desktop; stacks below on mobile */}
       <div className="flex min-w-0 flex-col gap-3 lg:h-full lg:[flex:4_1_0%]">
         <Card className="relative flex h-80 flex-col lg:h-auto lg:min-h-0 lg:flex-1">
-          <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
+          <p className="mb-2.5 flex-none text-[13px]" style={{ color: "var(--text-primary)" }}>
             Projects
           </p>
           <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
@@ -709,7 +715,7 @@ export default function AboutPanel() {
           >
             {automationsTarget}
           </p>
-          <p className="mt-1 text-[11px]" style={{ color: "#6B6960" }}>
+          <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
             Automations Built
           </p>
         </Card>
@@ -724,21 +730,23 @@ export default function AboutPanel() {
           <div
             className="max-h-[85vh] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-[24px] p-5 lg:p-6"
             style={{
-              background: "#1C1A17",
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 flex items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 GoHighLevel Champs · Awards
               </p>
               <button
                 onClick={() => setAwardsOpen(false)}
                 aria-label="Close"
                 className="flex h-8 w-8 items-center justify-center rounded-full"
-                style={{ background: "#141311", color: "#8A887F" }}
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
               >
                 <IconX size={16} />
               </button>
@@ -749,10 +757,10 @@ export default function AboutPanel() {
                   <div className="relative mb-3 h-24 w-24 flex-none">
                     <Image src={badge.image} alt={badge.name} fill className="object-contain" sizes="96px" />
                   </div>
-                  <p className="mb-1.5 text-xs font-medium" style={{ color: "#F2F1EE" }}>
+                  <p className="mb-1.5 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                     {badge.name}
                   </p>
-                  <p className="text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                  <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
                     {badge.description}
                   </p>
                 </div>
@@ -771,39 +779,41 @@ export default function AboutPanel() {
           <div
             className="flex max-h-[85vh] w-full max-w-xl flex-col rounded-[24px] p-5 lg:p-6"
             style={{
-              background: "#1C1A17",
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex flex-none items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 5 years in the making
               </p>
               <button
                 onClick={() => setExperienceOpen(false)}
                 aria-label="Close"
                 className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
-                style={{ background: "#141311", color: "#8A887F" }}
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
               >
                 <IconX size={16} />
               </button>
             </div>
             <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
               {journey.map((paragraph) => (
-                <p key={paragraph} className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+                <p key={paragraph} className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   {paragraph}
                 </p>
               ))}
               <div
                 className="mt-4 rounded-[16px] p-4"
-                style={{ background: "#141311" }}
+                style={{ background: "var(--bg-surface-2)" }}
               >
-                <p className="text-[11px] uppercase tracking-wide" style={{ color: "#6B6960" }}>
+                <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
                   Right now
                 </p>
-                <p className="mt-1 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+                <p className="mt-1 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   Now that I&apos;ve sharpened my GoHighLevel skills, I&apos;ve paired it with{" "}
                   <span
                     style={{
@@ -833,21 +843,23 @@ export default function AboutPanel() {
           <div
             className="max-h-[85vh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-[24px] p-5 lg:p-6"
             style={{
-              background: "#1C1A17",
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 flex items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 Apps built
               </p>
               <button
                 onClick={() => setAppsOpen(false)}
                 aria-label="Close"
                 className="flex h-8 w-8 items-center justify-center rounded-full"
-                style={{ background: "#141311", color: "#8A887F" }}
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
               >
                 <IconX size={16} />
               </button>
@@ -857,14 +869,14 @@ export default function AboutPanel() {
                 <div key={app.name} className="flex flex-col items-center text-center">
                   <div
                     className="mb-3 flex h-16 w-16 items-center justify-center rounded-[16px]"
-                    style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "#2C1400" }}
+                    style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
                   >
                     <IconRoute size={26} />
                   </div>
-                  <p className="mb-1.5 text-xs font-medium" style={{ color: "#F2F1EE" }}>
+                  <p className="mb-1.5 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                     {app.name}
                   </p>
-                  <p className="text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                  <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
                     {app.description}
                   </p>
                 </div>
@@ -873,7 +885,7 @@ export default function AboutPanel() {
                 <div
                   key={i}
                   className="flex flex-col items-center justify-center gap-2 rounded-[16px] border border-dashed p-4 text-center"
-                  style={{ borderColor: "#3A382F", color: "#5A584F" }}
+                  style={{ borderColor: "var(--border-surface-2)", color: "var(--text-faint)" }}
                 >
                   <IconLayoutGrid size={20} />
                   <p className="text-[11px] leading-relaxed">More apps coming soon</p>
@@ -893,21 +905,23 @@ export default function AboutPanel() {
           <div
             className="w-full max-w-sm rounded-[24px] p-5 lg:p-6"
             style={{
-              background: "#1C1A17",
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 flex items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 Connect with me
               </p>
               <button
                 onClick={() => setConnectOpen(false)}
                 aria-label="Close"
                 className="flex h-8 w-8 items-center justify-center rounded-full"
-                style={{ background: "#141311", color: "#8A887F" }}
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
               >
                 <IconX size={16} />
               </button>
@@ -920,11 +934,11 @@ export default function AboutPanel() {
                     <div className="flex items-center gap-3">
                       <div
                         className="flex h-9 w-9 items-center justify-center rounded-full"
-                        style={{ background: "#141311", color: social.color }}
+                        style={{ background: "var(--bg-surface-2)", color: social.color }}
                       >
                         <Icon size={17} />
                       </div>
-                      <p className="text-xs" style={{ color: "#F2F1EE" }}>
+                      <p className="text-xs" style={{ color: "var(--text-primary)" }}>
                         {social.name}
                       </p>
                     </div>
@@ -935,7 +949,7 @@ export default function AboutPanel() {
                       className="rounded-full px-3 py-1.5 text-[11px] font-medium hover:brightness-110"
                       style={{
                         background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                        color: "#2C1400",
+                        color: "var(--btn-text-on-gradient)",
                       }}
                     >
                       {social.buttonText}
@@ -957,27 +971,29 @@ export default function AboutPanel() {
           <div
             className="flex max-h-[85vh] w-full max-w-xl flex-col rounded-[24px] p-5 lg:p-6"
             style={{
-              background: "#1C1A17",
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex flex-none items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 My rates
               </p>
               <button
                 onClick={() => setRatesOpen(false)}
                 aria-label="Close"
                 className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
-                style={{ background: "#141311", color: "#8A887F" }}
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
               >
                 <IconX size={16} />
               </button>
             </div>
             <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
-              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                 I charge{" "}
                 <span
                   style={{
@@ -990,11 +1006,11 @@ export default function AboutPanel() {
                   $8 to $10 per hour
                 </span>
                 , depending on project scope. You can hire me on an{" "}
-                <span style={{ color: "#F2F1EE" }}>hourly</span> or{" "}
-                <span style={{ color: "#F2F1EE" }}>monthly</span> basis, monthly clients are billed{" "}
-                <span style={{ color: "#F2F1EE" }}>fortnightly</span> rather than all at once.
+                <span style={{ color: "var(--text-primary)" }}>hourly</span> or{" "}
+                <span style={{ color: "var(--text-primary)" }}>monthly</span> basis, monthly clients are billed{" "}
+                <span style={{ color: "var(--text-primary)" }}>fortnightly</span> rather than all at once.
               </p>
-              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                 Payment goes through{" "}
                 <span
                   style={{
@@ -1008,13 +1024,13 @@ export default function AboutPanel() {
                 </span>
                 , it&apos;s the easiest way for clients anywhere to send payment directly.
               </p>
-              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                 Why this rate? Because the work doesn&apos;t stop once something is built. I set up a proper{" "}
-                <span style={{ color: "#F2F1EE" }}>client handover</span>, stay on for{" "}
-                <span style={{ color: "#F2F1EE" }}>ongoing support</span>, and make sure you fully understand
+                <span style={{ color: "var(--text-primary)" }}>client handover</span>, stay on for{" "}
+                <span style={{ color: "var(--text-primary)" }}>ongoing support</span>, and make sure you fully understand
                 what was built for you. You won&apos;t be left with a system you don&apos;t know how to run.
               </p>
-              <p className="mb-4 text-[13px] leading-relaxed" style={{ color: "#B0AEA4" }}>
+              <p className="mb-4 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                 I&apos;m also not a typical Virtual Assistant. I work as a{" "}
                 <span
                   style={{
@@ -1035,7 +1051,7 @@ export default function AboutPanel() {
                 style={{
                   background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                   boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
-                  color: "#2C1400",
+                  color: "var(--btn-text-on-gradient)",
                 }}
               >
                 Book 15 mins Discovery Call
@@ -1054,21 +1070,23 @@ export default function AboutPanel() {
           <div
             className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-[24px] p-5 lg:p-6"
             style={{
-              background: "#1C1A17",
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex flex-none items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 {projects[projectOpen].name}
               </p>
               <button
                 onClick={() => setProjectOpen(null)}
                 aria-label="Close"
                 className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
-                style={{ background: "#141311", color: "#8A887F" }}
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
               >
                 <IconX size={16} />
               </button>
@@ -1081,7 +1099,7 @@ export default function AboutPanel() {
                 className="w-full"
               />
             </div>
-            <p className="mt-3 flex-none text-center text-[11px]" style={{ color: "#6B6960" }}>
+            <p className="mt-3 flex-none text-center text-[11px]" style={{ color: "var(--text-muted)" }}>
               Full live preview coming soon
             </p>
           </div>
@@ -1097,34 +1115,36 @@ export default function AboutPanel() {
           <div
             className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-[24px] p-5 lg:p-6"
             style={{
-              background: "#1C1A17",
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
               boxShadow:
-                "10px 10px 22px rgba(0,0,0,0.55), -8px -8px 20px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
+                "var(--surface-shadow)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 flex flex-none items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: "#F2F1EE" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 Automations Built
               </p>
               <button
                 onClick={() => setAutomationsOpen(false)}
                 aria-label="Close"
                 className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
-                style={{ background: "#141311", color: "#8A887F" }}
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
               >
                 <IconX size={16} />
               </button>
             </div>
             <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
               {automations.map((automation) => (
-                <div key={automation.name} className="mb-4 overflow-hidden rounded-[16px]" style={{ background: "#141311" }}>
+                <div key={automation.name} className="mb-4 overflow-hidden rounded-[16px]" style={{ background: "var(--bg-surface-2)" }}>
                   <img src={automation.image} alt={automation.name} className="w-full" />
                   <div className="p-3">
-                    <p className="mb-1 text-xs font-medium" style={{ color: "#F2F1EE" }}>
+                    <p className="mb-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                       {automation.name}
                     </p>
-                    <p className="text-[11px] leading-relaxed" style={{ color: "#8A887F" }}>
+                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
                       {automation.description}
                     </p>
                   </div>
@@ -1135,7 +1155,7 @@ export default function AboutPanel() {
                   <div
                     key={i}
                     className="flex flex-col items-center justify-center gap-2 rounded-[16px] border border-dashed p-6 text-center"
-                    style={{ borderColor: "#3A382F", color: "#5A584F" }}
+                    style={{ borderColor: "var(--border-surface-2)", color: "var(--text-faint)" }}
                   >
                     <IconLayoutGrid size={20} />
                     <p className="text-[11px] leading-relaxed">More automations coming soon</p>
