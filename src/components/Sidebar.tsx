@@ -76,6 +76,25 @@ export default function Sidebar({
               GoHighLevel specialist. Automating businesses with Claude, n8n, and Zapier.
             </p>
 
+            <div
+              className="relative mt-2.5 overflow-hidden rounded-[14px] p-3"
+              style={{
+                background: "linear-gradient(135deg, rgba(239,159,39,0.16), rgba(216,90,48,0.07))",
+                border: "1px solid rgba(239,159,39,0.28)",
+              }}
+            >
+              <div
+                className="pointer-events-none absolute -right-5 -top-5 h-16 w-16 rounded-full"
+                style={{ background: "radial-gradient(circle, rgba(239,159,39,0.5), transparent 70%)", filter: "blur(6px)" }}
+              />
+              <p className="relative flex items-center gap-1 text-[12px] font-semibold" style={{ color: "var(--text-primary)" }}>
+                GHL Pro <span>🚀</span>
+              </p>
+              <p className="relative mt-0.5 text-[10px] leading-snug" style={{ color: "var(--text-secondary)" }}>
+                Certified GoHighLevel Professional — trusted to build funnels and automations that actually run themselves.
+              </p>
+            </div>
+
             <div className="mt-3 flex items-center justify-between">
               <span className="text-[13px] tabular-nums" style={{ color: "var(--text-primary)" }}>
                 {time ?? "--:--:--"}
@@ -135,10 +154,10 @@ export default function Sidebar({
         TESTIMONIAL
       </p>
       <div
-        className="hidden overflow-hidden rounded-[20px] border lg:block"
-        style={{ background: "#F7F5F1", borderColor: "var(--border-surface)", boxShadow: "0 10px 24px rgba(0,0,0,0.28)" }}
+        className="hidden overflow-hidden rounded-[20px] lg:block"
+        style={{ background: "#F7F5F1", border: "3px solid var(--border-surface)", boxShadow: "0 10px 24px rgba(0,0,0,0.28)" }}
       >
-        <div className="relative h-[120px] w-full">
+        <div className="relative h-[95px] w-full">
           <img
             src="https://randomuser.me/api/portraits/women/68.jpg"
             alt="Martha"
@@ -149,12 +168,12 @@ export default function Sidebar({
             style={{ background: "linear-gradient(to bottom, rgba(247,245,241,0) 78%, #F7F5F1 100%)" }}
           />
         </div>
-        <div className="px-4 pb-3.5 pt-1">
-          <IconQuoteFilled size={18} style={{ color: "#D85A30" }} />
-          <p className="mt-1 text-[11px] leading-snug" style={{ color: "#2C2A25" }}>
+        <div className="px-3.5 pb-3 pt-1">
+          <IconQuoteFilled size={16} style={{ color: "#D85A30" }} />
+          <p className="mt-1 text-[10px] leading-snug" style={{ color: "#2C2A25" }}>
             Impressed by the Professionalism and attention to details in UI design. Highly Recommended!
           </p>
-          <p className="mt-1 text-[10px] font-medium" style={{ color: "#8A887F" }}>
+          <p className="mt-1 text-[9px] font-medium" style={{ color: "#8A887F" }}>
             — Martha, Unicell
           </p>
         </div>
