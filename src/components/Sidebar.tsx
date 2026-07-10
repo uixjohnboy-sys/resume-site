@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { IconUser, IconApps, IconArticle, IconMessageCircle, IconSparkles } from "@tabler/icons-react";
+import { IconUser, IconApps, IconSparkles, IconQuoteFilled } from "@tabler/icons-react";
 
 export type PanelKey = "about" | "projects";
 
@@ -125,18 +125,33 @@ export default function Sidebar({
       </nav>
 
       <p className="mb-1.5 mt-4.5 hidden pl-2.5 text-[10px] font-normal tracking-wide lg:block" style={{ color: "#4E4C44" }}>
-        OTHER
+        TESTIMONIAL
       </p>
-      <nav className="hidden flex-col gap-0.5 lg:flex">
-        <button disabled className="flex w-full cursor-default items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs opacity-40" style={{ color: "#8A887F" }}>
-          <IconArticle size={16} />
-          Blog
-        </button>
-        <button disabled className="flex w-full cursor-default items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs opacity-40" style={{ color: "#8A887F" }}>
-          <IconMessageCircle size={16} />
-          Testimonials
-        </button>
-      </nav>
+      <div
+        className="hidden overflow-hidden rounded-[20px] lg:block"
+        style={{ background: "#F7F5F1", boxShadow: "0 10px 24px rgba(0,0,0,0.28)" }}
+      >
+        <div className="relative h-[120px] w-full">
+          <img
+            src="https://randomuser.me/api/portraits/women/68.jpg"
+            alt="Martha"
+            className="h-full w-full object-cover"
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to bottom, rgba(247,245,241,0) 45%, #F7F5F1 100%)" }}
+          />
+        </div>
+        <div className="px-4 pb-4 pt-1">
+          <IconQuoteFilled size={22} style={{ color: "#D85A30" }} />
+          <p className="mt-1.5 text-[12px] leading-relaxed" style={{ color: "#2C2A25" }}>
+            Impressed by the Professionalism and attention to details in UI design. Highly Recommended!
+          </p>
+          <p className="mt-2 text-[11px] font-medium" style={{ color: "#6B6960" }}>
+            — Martha, Unicell
+          </p>
+        </div>
+      </div>
 
     </div>
   );
