@@ -296,6 +296,18 @@ function BottomFade() {
   );
 }
 
+function PlaceholderCard() {
+  return (
+    <div
+      className="flex flex-1 flex-col items-center justify-center gap-2 rounded-[24px] border border-dashed text-center"
+      style={{ borderColor: "#3A382F", color: "#5A584F" }}
+    >
+      <IconLayoutGrid size={18} />
+      <p className="text-[11px] leading-relaxed">Reserved</p>
+    </div>
+  );
+}
+
 const projects = [
   { name: "Chaos to Closing", image: "/project-chaos-to-closing.png" },
   { name: "Mindset Coaching", image: "/project-mindset-coaching.png" },
@@ -307,12 +319,12 @@ const projects = [
 
 function ProjectsGrid({ onSelect }: { onSelect: (index: number) => void }) {
   return (
-    <div className="grid h-full grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-3">
       {projects.map((project, i) => (
         <button
           key={project.name}
           onClick={() => onSelect(i)}
-          className="group relative overflow-hidden rounded-[16px] text-left transition-transform hover:scale-[1.02]"
+          className="group relative aspect-[4/3] overflow-hidden rounded-[16px] text-left transition-transform hover:scale-[1.02]"
           style={{
             background: "#141311",
             boxShadow:
@@ -667,9 +679,19 @@ export default function AboutPanel() {
         </div>
       </div>
 
-      {/* Right column, ~40%, clickable preview grid of sample builds — desktop only for now */}
+      {/* Right column, ~40%, split into two halves — desktop only for now */}
       <div className="hidden min-w-0 flex-col gap-3 lg:flex lg:h-full lg:[flex:4_1_0%]">
-        <ProjectsGrid onSelect={setProjectOpen} />
+        <Card className="relative flex min-h-0 flex-1 flex-col">
+          <p className="mb-2.5 flex-none text-[13px]" style={{ color: "#F2F1EE" }}>
+            Projects
+          </p>
+          <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+            <ProjectsGrid onSelect={setProjectOpen} />
+          </div>
+          <BottomFade />
+          <ScrollHint />
+        </Card>
+        <PlaceholderCard />
       </div>
 
       {awardsOpen && (
