@@ -308,7 +308,7 @@ function BottomFade() {
 }
 
 const projects = [
-  { name: "Chaos to Closing", image: "/project-chaos-to-closing.png" },
+  { name: "Chaos to Closing", image: "/project-chaos-to-closing.jpg" },
   { name: "Mindset Coaching", image: "/project-mindset-coaching.png" },
   { name: "Words Like Alice", image: "/project-words-like-alice.jpg" },
   { name: "Melbourne Chiropractic", image: "/project-melbourne-chiropractic.png" },
