@@ -304,6 +304,8 @@ function BottomFade() {
 const showcaseSlides = [
   {
     label: "Dashboards",
+    image: "/showcase-dashboards.png",
+    imagePosition: "top",
     icon: IconLayoutDashboard,
     heading: "You describe it, I build it.",
     subtext: "Client dashboards that turn raw data into decisions, built inside GoHighLevel or from scratch.",
@@ -311,6 +313,8 @@ const showcaseSlides = [
   },
   {
     label: "Funnels",
+    image: "/showcase-funnels.png",
+    imagePosition: "top",
     icon: IconFilter,
     heading: "Funnels built to convert.",
     subtext: "Landing pages and multi-step funnels designed around how your leads actually decide.",
@@ -318,6 +322,8 @@ const showcaseSlides = [
   },
   {
     label: "Automations",
+    image: "/showcase-automations.png",
+    imagePosition: "top",
     icon: IconChartHistogram,
     heading: "Systems that run themselves.",
     subtext: "Workflows connecting GoHighLevel, n8n, and Zapier so nothing falls through the cracks.",
@@ -343,21 +349,38 @@ function ShowcaseCarousel() {
           className="relative mb-4 flex flex-1 items-center justify-center overflow-hidden rounded-[16px]"
           style={{ background: "linear-gradient(150deg, #3a2a1a 0%, #141311 65%)" }}
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-full"
-              style={{ background: "rgba(239,159,39,0.12)", color: "#EF9F27" }}
-            >
-              <Icon size={22} />
+          {slide.image ? (
+            <Image
+              src={slide.image}
+              alt={slide.label}
+              fill
+              className="object-cover"
+              style={{ objectPosition: `center ${slide.imagePosition}` }}
+              sizes="(min-width: 1024px) 30vw, 100vw"
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-center">
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-full"
+                style={{ background: "rgba(239,159,39,0.12)", color: "#EF9F27" }}
+              >
+                <Icon size={22} />
+              </div>
+              <p className="text-lg font-medium" style={{ color: "#F2F1EE" }}>
+                {slide.label}
+              </p>
+              <p className="flex items-center gap-1 text-[10px]" style={{ color: "#6B6960" }}>
+                <IconPhotoPlus size={12} /> screenshot coming soon
+              </p>
             </div>
-            <p className="text-lg font-medium" style={{ color: "#F2F1EE" }}>
+          )}
+          <div
+            className="pointer-events-none absolute bottom-0 left-0 right-0 flex items-center gap-1.5 px-3 py-2"
+            style={{ background: "linear-gradient(to top, rgba(10,10,9,0.85), transparent)" }}
+          >
+            <Icon size={13} style={{ color: "#EF9F27" }} />
+            <p className="text-[11px] font-medium" style={{ color: "#F2F1EE" }}>
               {slide.label}
-            </p>
-            <p
-              className="flex items-center gap-1 text-[10px]"
-              style={{ color: "#6B6960" }}
-            >
-              <IconPhotoPlus size={12} /> screenshot coming soon
             </p>
           </div>
         </div>
