@@ -27,6 +27,11 @@ import {
   IconBrandWhatsapp,
   IconBrandGmail,
   IconCurrencyDollar,
+  IconLayoutDashboard,
+  IconFilter,
+  IconChartHistogram,
+  IconPhotoPlus,
+  IconArrowRight,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
@@ -296,15 +301,99 @@ function BottomFade() {
   );
 }
 
-function PlaceholderCard() {
+const showcaseSlides = [
+  {
+    label: "Dashboards",
+    icon: IconLayoutDashboard,
+    heading: "You describe it, I build it.",
+    subtext: "Client dashboards that turn raw data into decisions, built inside GoHighLevel or from scratch.",
+    cta: "View examples",
+  },
+  {
+    label: "Funnels",
+    icon: IconFilter,
+    heading: "Funnels built to convert.",
+    subtext: "Landing pages and multi-step funnels designed around how your leads actually decide.",
+    cta: "View examples",
+  },
+  {
+    label: "Automations",
+    icon: IconChartHistogram,
+    heading: "Systems that run themselves.",
+    subtext: "Workflows connecting GoHighLevel, n8n, and Zapier so nothing falls through the cracks.",
+    cta: "View examples",
+  },
+];
+
+function ShowcaseCarousel() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % showcaseSlides.length), 4000);
+    return () => clearInterval(id);
+  }, []);
+
+  const slide = showcaseSlides[index];
+  const Icon = slide.icon;
+
   return (
-    <div
-      className="flex flex-1 flex-col items-center justify-center gap-2 rounded-[24px] border border-dashed text-center"
-      style={{ borderColor: "#3A382F", color: "#5A584F" }}
-    >
-      <IconLayoutGrid size={18} />
-      <p className="text-[11px] leading-relaxed">Reserved</p>
-    </div>
+    <Card className="flex h-full flex-col overflow-hidden">
+      <div key={index} className="carousel-fade flex flex-1 flex-col">
+        <div
+          className="relative mb-4 flex flex-1 items-center justify-center overflow-hidden rounded-[16px]"
+          style={{ background: "linear-gradient(150deg, #3a2a1a 0%, #141311 65%)" }}
+        >
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-full"
+              style={{ background: "rgba(239,159,39,0.12)", color: "#EF9F27" }}
+            >
+              <Icon size={22} />
+            </div>
+            <p className="text-lg font-medium" style={{ color: "#F2F1EE" }}>
+              {slide.label}
+            </p>
+            <p
+              className="flex items-center gap-1 text-[10px]"
+              style={{ color: "#6B6960" }}
+            >
+              <IconPhotoPlus size={12} /> screenshot coming soon
+            </p>
+          </div>
+        </div>
+        <p className="mb-1.5 text-sm font-medium" style={{ color: "#F2F1EE" }}>
+          {slide.heading}
+        </p>
+        <p className="mb-4 text-[12px] leading-relaxed" style={{ color: "#8A887F" }}>
+          {slide.subtext}
+        </p>
+        <button
+          className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium hover:brightness-110"
+          style={{
+            background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+            boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+            color: "#2C1400",
+          }}
+        >
+          {slide.cta}
+          <IconArrowRight size={13} />
+        </button>
+      </div>
+      <div className="mt-4 flex flex-none items-center justify-center gap-1.5">
+        {showcaseSlides.map((s, i) => (
+          <button
+            key={s.label}
+            aria-label={`Show ${s.label}`}
+            onClick={() => setIndex(i)}
+            className="h-1.5 rounded-full transition-all"
+            style={{
+              width: i === index ? 16 : 6,
+              background: i === index ? "#EF9F27" : "#3A382F",
+            }}
+          />
+        ))}
+      </div>
+    </Card>
   );
 }
 
@@ -628,11 +717,9 @@ export default function AboutPanel() {
         </div>
       </div>
 
-      {/* Right column, ~40%, reserved for future content — desktop only, no value on mobile yet */}
+      {/* Right column, ~40%, animated showcase of sample builds — desktop only for now */}
       <div className="hidden min-w-0 flex-col gap-3 lg:flex lg:h-full lg:[flex:4_1_0%]">
-        <PlaceholderCard />
-        <PlaceholderCard />
-        <PlaceholderCard />
+        <ShowcaseCarousel />
       </div>
 
       {awardsOpen && (
