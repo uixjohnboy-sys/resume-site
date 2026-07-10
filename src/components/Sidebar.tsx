@@ -2,14 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import {
-  IconUser,
-  IconApps,
-  IconArticle,
-  IconMessageCircle,
-  IconRosetteDiscountCheckFilled,
-  IconSparkles,
-} from "@tabler/icons-react";
+import { IconUser, IconApps, IconArticle, IconMessageCircle, IconSparkles } from "@tabler/icons-react";
 
 export type PanelKey = "about" | "projects";
 
@@ -61,23 +54,48 @@ export default function Sidebar({
               priority
             />
           </div>
-          <div className="rounded-b-2xl p-3" style={{ background: "#1C1A17" }}>
-            <div className="mb-1 flex items-center gap-1.5">
-              <p className="text-[13px] font-medium" style={{ color: "var(--text-primary, #F5F4F0)" }}>
-                John Boy
-              </p>
-              <IconRosetteDiscountCheckFilled size={13} style={{ color: "var(--accent-1, #EF9F27)" }} />
-            </div>
-            <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "#9A978C" }}>
+          <div className="rounded-b-2xl p-4" style={{ background: "#1C1A17" }}>
+            <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
+              Johnboy
+            </p>
+            <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
+              Roxas
+            </p>
+            <p className="mt-1.5 text-[12px]" style={{ color: "#6B6960" }}>
+              @uix.johnboy
+            </p>
+
+            <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "#9A978C" }}>
               GoHighLevel specialist. Automating businesses with Claude, n8n, and Zapier.
             </p>
-            <div className="flex items-center justify-between">
+
+            <div className="mt-3 flex items-center justify-between">
               <span className="text-[13px] tabular-nums" style={{ color: "#F2F1EE" }}>
                 {time ?? "--:--:--"}
               </span>
               <span className="text-[11px]" style={{ color: "#6B6960" }}>
                 Philippine Time
               </span>
+            </div>
+
+            <div className="mt-4 border-t pt-3" style={{ borderColor: "#2A2822" }}>
+              <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "#F2F1EE" }}>
+                <IconSparkles size={12} style={{ color: "#EF9F27" }} />
+                Available for work
+              </p>
+              <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "#7A7870" }}>
+                Freelance GoHighLevel and automation builds, one project at a time.
+              </p>
+              <button
+                className="w-full rounded-lg px-2 py-2 text-xs font-medium hover:brightness-110"
+                style={{
+                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                  boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+                  color: "#2C1400",
+                }}
+              >
+                Book a call
+              </button>
             </div>
           </div>
         </div>
@@ -120,35 +138,6 @@ export default function Sidebar({
         </button>
       </nav>
 
-      <div className="hidden flex-1 lg:block" />
-
-      <div
-        className="mobile-cta-bar fixed inset-x-0 bottom-0 z-40 px-4 pt-4 lg:static lg:z-auto lg:mt-0 lg:rounded-[20px] lg:p-3"
-        style={{
-          paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
-          background: "#1C1A17",
-          boxShadow:
-            "8px 8px 18px rgba(0,0,0,0.55), -6px -6px 16px rgba(255,255,255,0.025), inset 0 1px 0 rgba(255,255,255,0.02)",
-        }}
-      >
-        <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "#F2F1EE" }}>
-          <IconSparkles size={12} style={{ color: "#EF9F27" }} />
-          Available for work
-        </p>
-        <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "#7A7870" }}>
-          Freelance GoHighLevel and automation builds, one project at a time.
-        </p>
-        <button
-          className="w-full rounded-lg px-2 py-2 text-xs font-medium hover:brightness-110"
-          style={{
-            background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-            boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
-            color: "#2C1400",
-          }}
-        >
-          Book a call
-        </button>
-      </div>
     </div>
   );
 }

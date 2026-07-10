@@ -80,8 +80,4 @@ body {
     object-position: center 8% !important;
     transform: scale(1) !important;
   }
-
-  .mobile-cta-bar {
-    box-shadow: 0 -8px 20px -4px rgba(0, 0, 0, 0.55) !important;
-  }
 }
