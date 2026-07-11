@@ -6,14 +6,18 @@ import { IconRoute, IconCompass, IconCommand, IconClock, IconX } from "@tabler/i
 const apps = [
   {
     name: "Pathwise",
-    tagline: "Workflow and progress-mapping app",
+    tagline: "A visual workspace for planning automations before you build them",
     status: "Live",
     icon: IconRoute,
-    description: "Helps users plan a journey from goal to milestone, with visual node maps and hotspots.",
+    description:
+      "A canvas-based planning tool for mapping out GoHighLevel and n8n automations before touching a single workflow builder. Instead of jumping straight into production tools and hoping the logic holds together, Pathwise lets you sketch the entire flow first — triggers, conditions, waits, branches — on an infinite drag-and-drop canvas.",
     highlights: [
-      "Interactive canvas with draggable nodes and edges",
-      "Page map view with clickable hotspots",
-      "Google account restricted access for the owner",
+      "Page Map node: pin interactive hotspots onto a real page screenshot and wire them together with animated, glowing connection lines, so clients see exactly where on their actual page an automation trigger lives",
+      "Built with React, React Flow, and Firebase (Firestore + Storage + Auth)",
+      "Real-time comments, full version history, and one-click client share links with reviewer-only access",
+      "Presentation mode for walking a client through the plan live",
+      "Fully responsive — drops into a clean view-only mode on mobile",
+      "Engineered end-to-end: client-side image compression, mirrored Firestore/Storage security rules, and a browser-cache strategy that keeps repeat views nearly bandwidth-free",
     ],
   },
   {
