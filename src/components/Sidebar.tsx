@@ -43,7 +43,10 @@ export default function Sidebar({
       {/* Profile card */}
       <div className="relative mb-4">
         <div className="relative overflow-hidden rounded-2xl border border-[rgba(239,159,39,0.45)]">
-          <div className="relative h-64 w-full overflow-hidden rounded-t-2xl lg:h-[150px]">
+          <div
+            className="relative h-64 w-full overflow-hidden rounded-t-2xl lg:h-[150px]"
+            style={{ background: "var(--bg-surface)" }}
+          >
             <Image
               src="/johnboy.png"
               alt="John Boy"
