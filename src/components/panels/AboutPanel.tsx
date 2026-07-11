@@ -316,6 +316,8 @@ function BottomFade() {
 
 const projects = [
   { name: "Chaos to Closing", image: "/project-chaos-to-closing.jpg" },
+  { name: "Chaos to Closing Sales Page", image: "/project-chaos-sales-page.jpg" },
+  { name: "Chaos to Closing AI Funnel", image: "/project-chaos-ai-funnel.jpg" },
   { name: "Mindset Coaching", image: "/project-mindset-coaching.jpg" },
   { name: "Words Like Alice", image: "/project-words-like-alice.jpg" },
   { name: "Melbourne Chiropractic", image: "/project-melbourne-chiropractic.png" },
@@ -716,12 +718,26 @@ export default function AboutPanel() {
           <ScrollHint />
         </Card>
         <Card
-          className="relative flex h-32 cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] lg:h-auto lg:flex-1"
+          className="relative flex h-32 cursor-pointer flex-col items-center justify-center overflow-hidden text-center transition-transform hover:scale-[1.02] lg:h-auto lg:flex-1"
           onClick={() => setAutomationsOpen(true)}
         >
+          <Image
+            src="/automation-instagram-chaos.jpg"
+            alt=""
+            fill
+            className="object-cover opacity-[0.12]"
+            sizes="300px"
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(circle at center, var(--bg-surface) 0%, rgba(28,26,23,0.4) 60%, var(--bg-surface) 100%)",
+            }}
+          />
           <ClickHint />
           <p
-            className="text-4xl font-medium"
+            className="relative text-4xl font-medium"
             style={{
               background: "linear-gradient(135deg, #EF9F27, #D85A30)",
               WebkitBackgroundClip: "text",
@@ -731,7 +747,7 @@ export default function AboutPanel() {
           >
             {automationsTarget}
           </p>
-          <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
+          <p className="relative mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
             Automations Built
           </p>
         </Card>
