@@ -102,7 +102,7 @@ body {
   .profile-photo-img {
     top: 14% !important;
     height: 86% !important;
-    object-fit: contain !important;
+    object-fit: cover !important;
     object-position: center top !important;
     transform: scale(1) !important;
   }
