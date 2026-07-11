@@ -6,7 +6,10 @@ import { IconArrowLeft } from "@tabler/icons-react";
 
 export default function BookPage() {
   return (
-    <div className="min-h-screen w-full px-4 py-6 lg:px-10 lg:py-10" style={{ background: "var(--bg-page, #1A1917)" }}>
+    <div
+      className="min-h-screen w-full overflow-y-auto px-4 py-6 lg:h-screen lg:px-10 lg:py-10"
+      style={{ background: "var(--bg-page, #1A1917)" }}
+    >
       <div className="mx-auto flex max-w-3xl flex-col gap-5">
         <Link
           href="/"
@@ -29,16 +32,13 @@ export default function BookPage() {
         <div
           className="overflow-hidden rounded-[24px] p-2 lg:p-3"
           style={{
-            background: "var(--bg-surface)",
-            backdropFilter: "var(--surface-blur)",
-            WebkitBackdropFilter: "var(--surface-blur)",
-            boxShadow: "var(--surface-shadow)",
-            border: "1px solid var(--border-surface)",
+            background: "linear-gradient(160deg, #FFC15E 0%, #EF9F27 28%, #D85A30 58%, #8A1F0C 100%)",
+            boxShadow: "0 0 50px rgba(216,90,48,0.45), 0 20px 40px rgba(0,0,0,0.4)",
           }}
         >
           <iframe
             src="https://link.funnelgenie.io/widget/booking/LOYqIv9mae8XbBhBarr5"
-            style={{ width: "100%", border: "none", overflow: "hidden", minHeight: "760px", borderRadius: "18px" }}
+            style={{ width: "100%", border: "none", overflow: "hidden", minHeight: "950px", borderRadius: "18px" }}
             scrolling="no"
             id="LOYqIv9mae8XbBhBarr5_1"
           />

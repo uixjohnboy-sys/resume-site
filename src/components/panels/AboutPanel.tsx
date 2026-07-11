@@ -727,17 +727,17 @@ export default function AboutPanel() {
           onClick={() => setAutomationsOpen(true)}
         >
           <Image
-            src="/automation-instagram-chaos.jpg"
+            src="/automation-bg-pathwise.jpg"
             alt=""
             fill
-            className="object-cover opacity-[0.12]"
+            className="object-cover opacity-40"
+            style={{ filter: "blur(6px)" }}
             sizes="300px"
           />
           <div
             className="pointer-events-none absolute inset-0"
             style={{
-              background:
-                "radial-gradient(circle at center, var(--bg-surface) 0%, rgba(28,26,23,0.4) 60%, var(--bg-surface) 100%)",
+              background: "radial-gradient(circle at center, rgba(216,90,48,0.35) 0%, rgba(28,26,23,0.55) 65%, rgba(20,19,17,0.75) 100%)",
             }}
           />
           <ClickHint />
