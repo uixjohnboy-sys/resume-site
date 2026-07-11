@@ -100,8 +100,8 @@ body {
 
 @media (max-width: 1023px) {
   .profile-photo-img {
-    top: 14% !important;
-    height: 86% !important;
+    top: 10% !important;
+    height: 90% !important;
     object-fit: cover !important;
     object-position: center top !important;
     transform: scale(1) !important;
