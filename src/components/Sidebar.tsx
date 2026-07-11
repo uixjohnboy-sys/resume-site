@@ -132,7 +132,7 @@ export default function Sidebar({
       </nav>
 
       <div
-        className="relative mt-3 hidden overflow-hidden rounded-[12px] px-3 py-2 lg:block"
+        className="relative mt-3 overflow-hidden rounded-[12px] px-3 py-2 lg:mt-auto"
         style={{
           background: "linear-gradient(135deg, rgba(239,159,39,0.16), rgba(216,90,48,0.07))",
           border: "1px solid rgba(239,159,39,0.28)",

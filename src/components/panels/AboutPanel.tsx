@@ -403,18 +403,23 @@ export default function AboutPanel() {
                 "var(--surface-shadow)",
             }}
           >
-            <span className="relative flex h-14 w-14 items-center justify-center">
-              <span
-                className="pulse-ring absolute inline-flex h-full w-full rounded-full"
-                style={{ background: "#EF9F27" }}
-              />
-              <span
-                className="relative flex h-14 w-14 items-center justify-center rounded-full"
-                style={{ background: "#EF9F27", boxShadow: "0 0 20px 4px rgba(239,159,39,0.5)" }}
-              >
-                <IconPlayerPlayFilled size={22} style={{ color: "var(--btn-text-on-gradient)" }} />
+            <div className="flex flex-col items-center gap-2.5">
+              <span className="relative flex h-14 w-14 items-center justify-center">
+                <span
+                  className="pulse-ring absolute inline-flex h-full w-full rounded-full"
+                  style={{ background: "#EF9F27" }}
+                />
+                <span
+                  className="relative flex h-14 w-14 items-center justify-center rounded-full"
+                  style={{ background: "#EF9F27", boxShadow: "0 0 20px 4px rgba(239,159,39,0.5)" }}
+                >
+                  <IconPlayerPlayFilled size={22} style={{ color: "var(--btn-text-on-gradient)" }} />
+                </span>
               </span>
-            </span>
+              <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                Video upload soon
+              </p>
+            </div>
           </div>
           <div className="relative h-64 lg:h-auto lg:min-h-0 lg:flex-1">
             <Card className="thin-scroll h-full overflow-y-auto">
@@ -748,7 +753,7 @@ export default function AboutPanel() {
             {automationsTarget}
           </p>
           <p className="relative mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Automations Built
+            Complex Automation Built
           </p>
         </Card>
       </div>
@@ -1157,7 +1162,7 @@ export default function AboutPanel() {
           >
             <div className="mb-5 flex flex-none items-center justify-between">
               <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                Automations Built
+                Complex Automation Built
               </p>
               <button
                 onClick={() => setAutomationsOpen(false)}
