@@ -15,7 +15,7 @@ export default function Home() {
     >
       <Sidebar active={active} onSelect={setActive} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 px-4 py-4 lg:overflow-y-auto lg:px-6 lg:py-6">
+        <div className="min-h-0 flex-1 px-4 py-4 pb-20 lg:overflow-y-auto lg:px-6 lg:py-6 lg:pb-6">
           {active === "about" && <AboutPanel />}
           {active === "projects" && <ProjectsPanel />}
         </div>

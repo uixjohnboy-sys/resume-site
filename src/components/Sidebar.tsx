@@ -85,7 +85,7 @@ export default function Sidebar({
               </span>
             </div>
 
-            <div className="mt-4 border-t pt-3" style={{ borderColor: "var(--border-surface)" }}>
+            <div className="mt-4 hidden border-t pt-3 lg:block" style={{ borderColor: "var(--border-surface)" }}>
               <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
                 Available for work
@@ -106,6 +106,38 @@ export default function Sidebar({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Sticky mobile CTA bar */}
+      <div
+        className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 px-4 py-3 lg:hidden"
+        style={{
+          background: "var(--bg-surface)",
+          backdropFilter: "var(--surface-blur)",
+          WebkitBackdropFilter: "var(--surface-blur)",
+          borderTop: "1px solid var(--border-surface)",
+          boxShadow: "0 -8px 24px rgba(0,0,0,0.35)",
+        }}
+      >
+        <div className="min-w-0">
+          <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
+            <IconSparkles size={12} style={{ color: "#EF9F27" }} />
+            Available for work
+          </p>
+          <p className="truncate text-[10px]" style={{ color: "var(--text-muted)" }}>
+            Freelance GoHighLevel and automation builds.
+          </p>
+        </div>
+        <button
+          className="flex-none rounded-lg px-4 py-2 text-xs font-medium"
+          style={{
+            background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+            boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+            color: "var(--btn-text-on-gradient)",
+          }}
+        >
+          Book a call
+        </button>
       </div>
 
       {/* Main nav */}
