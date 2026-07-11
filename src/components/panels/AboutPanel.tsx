@@ -1083,7 +1083,7 @@ export default function AboutPanel() {
                 just execute a list of tasks.
               </p>
               <a
-                href="#"
+                href="/book"
                 className="block w-full rounded-lg px-3 py-2.5 text-center text-xs font-medium hover:brightness-110"
                 style={{
                   background: "linear-gradient(135deg, #EF9F27, #D85A30)",

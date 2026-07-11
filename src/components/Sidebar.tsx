@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { IconUser, IconApps, IconSparkles } from "@tabler/icons-react";
 
 export type PanelKey = "about" | "projects";
@@ -96,8 +97,9 @@ export default function Sidebar({
               <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
                 Freelance GoHighLevel and automation builds, one project at a time.
               </p>
-              <button
-                className="w-full rounded-lg px-2 py-2 text-xs font-medium hover:brightness-110"
+              <Link
+                href="/book"
+                className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
                 style={{
                   background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                   boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
@@ -105,7 +107,7 @@ export default function Sidebar({
                 }}
               >
                 Book a call
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -131,7 +133,8 @@ export default function Sidebar({
             Freelance GoHighLevel and automation builds.
           </p>
         </div>
-        <button
+        <Link
+          href="/book"
           className="flex-none rounded-lg px-4 py-2 text-xs font-medium"
           style={{
             background: "linear-gradient(135deg, #EF9F27, #D85A30)",
@@ -140,7 +143,7 @@ export default function Sidebar({
           }}
         >
           Book a call
-        </button>
+        </Link>
       </div>
 
       {/* Main nav */}
