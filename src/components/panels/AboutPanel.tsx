@@ -21,6 +21,8 @@ import {
   IconX,
   IconArrowUpRight,
   IconRoute,
+  IconCompass,
+  IconCommand,
   IconBrandLinkedin,
   IconBrandInstagram,
   IconBrandFacebook,
@@ -113,6 +115,17 @@ const apps = [
     name: "Pathwise",
     description:
       "A dashboard-style workflow mapping app that helps plan a journey from goal to milestone, with visual node maps and hotspots.",
+    icon: IconRoute,
+  },
+  {
+    name: "Compass",
+    description: "A dashboard for tracking client engagements end to end, from first call to delivered system.",
+    icon: IconCompass,
+  },
+  {
+    name: "Command",
+    description: "A central place to monitor and manage automations running across client accounts.",
+    icon: IconCommand,
   },
 ];
 
@@ -469,7 +482,7 @@ export default function AboutPanel() {
                 color: "transparent",
               }}
             >
-              3
+              {apps.length}
             </p>
             <p className="mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
               Apps built
@@ -730,31 +743,40 @@ export default function AboutPanel() {
             src="/automation-bg-pathwise.jpg"
             alt=""
             fill
-            className="object-cover opacity-40"
-            style={{ filter: "blur(6px)" }}
+            className="object-cover opacity-70"
+            style={{ filter: "blur(1px)" }}
             sizes="300px"
           />
           <div
             className="pointer-events-none absolute inset-0"
             style={{
-              background: "radial-gradient(circle at center, rgba(216,90,48,0.35) 0%, rgba(28,26,23,0.55) 65%, rgba(20,19,17,0.75) 100%)",
+              background: "radial-gradient(circle at center, rgba(216,90,48,0.2) 0%, rgba(28,26,23,0.35) 65%, rgba(20,19,17,0.55) 100%)",
             }}
           />
           <ClickHint />
-          <p
-            className="relative text-4xl font-medium"
+          <div
+            className="relative flex flex-col items-center rounded-[18px] px-6 py-3"
             style={{
-              background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
+              background: "rgba(20,19,17,0.55)",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
             }}
           >
-            {automationsTarget}
-          </p>
-          <p className="relative mt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Complex Automation Built
-          </p>
+            <p
+              className="text-4xl font-medium"
+              style={{
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              {automationsTarget}
+            </p>
+            <p className="mt-1 text-[11px]" style={{ color: "var(--text-primary)" }}>
+              Complex Automation Built
+            </p>
+          </div>
         </Card>
       </div>
 
@@ -902,23 +924,26 @@ export default function AboutPanel() {
               </button>
             </div>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-              {apps.map((app) => (
-                <div key={app.name} className="flex flex-col items-center text-center">
-                  <div
-                    className="mb-3 flex h-16 w-16 items-center justify-center rounded-[16px]"
-                    style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
-                  >
-                    <IconRoute size={26} />
+              {apps.map((app) => {
+                const AppIcon = app.icon;
+                return (
+                  <div key={app.name} className="flex flex-col items-center text-center">
+                    <div
+                      className="mb-3 flex h-16 w-16 items-center justify-center rounded-[16px]"
+                      style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
+                    >
+                      <AppIcon size={26} />
+                    </div>
+                    <p className="mb-1.5 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
+                      {app.name}
+                    </p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
+                      {app.description}
+                    </p>
                   </div>
-                  <p className="mb-1.5 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
-                    {app.name}
-                  </p>
-                  <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
-                    {app.description}
-                  </p>
-                </div>
-              ))}
-              {Array.from({ length: 3 - apps.length }).map((_, i) => (
+                );
+              })}
+              {Array.from({ length: Math.max(0, 3 - apps.length) }).map((_, i) => (
                 <div
                   key={i}
                   className="flex flex-col items-center justify-center gap-2 rounded-[16px] border border-dashed p-4 text-center"
