@@ -129,7 +129,7 @@ const apps = [
   },
 ];
 
-const automationsTarget = 5;
+const automationsTarget = 15;
 
 const automations = [
   {
@@ -744,7 +744,7 @@ export default function AboutPanel() {
             alt=""
             fill
             className="object-cover opacity-70"
-            style={{ filter: "blur(1px)" }}
+            style={{ filter: "blur(0.3px)" }}
             sizes="300px"
           />
           <div
