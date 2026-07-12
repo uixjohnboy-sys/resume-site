@@ -744,7 +744,7 @@ export default function AboutPanel() {
             alt=""
             fill
             className="object-cover opacity-70"
-            style={{ filter: "blur(0.3px)" }}
+            style={{ filter: "blur(0.15px)" }}
             sizes="300px"
           />
           <div
