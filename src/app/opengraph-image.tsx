@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 
 export const runtime = "nodejs";
-export const alt = "Johnboy Roxas — GoHighLevel Specialist";
+export const alt = "Johnboy Roxas — GoHighLevel Specialist & AI Automation Expert";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -61,7 +61,7 @@ export default function OpengraphImage() {
             <div
               style={{
                 display: "flex",
-                fontSize: 32,
+                fontSize: 30,
                 fontWeight: 600,
                 marginTop: 16,
                 backgroundImage: "linear-gradient(135deg, #EF9F27, #D85A30)",
@@ -69,7 +69,7 @@ export default function OpengraphImage() {
                 color: "transparent",
               }}
             >
-              GoHighLevel Specialist
+              GoHighLevel Specialist & AI Automation Expert
             </div>
             <div style={{ display: "flex", fontSize: 26, color: "#B0AEA4", marginTop: 20, maxWidth: 620 }}>
               Automating businesses with Claude, n8n, and Zapier.
