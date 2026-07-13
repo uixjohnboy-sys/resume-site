@@ -13,8 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "John Boy — Product Designer",
-  description: "Dashboard-style portfolio and resume for John Boy",
+  metadataBase: new URL("https://www.johnboydesign.com"),
+  title: "Johnboy Roxas — GoHighLevel Specialist",
+  description: "Automating businesses with Claude, n8n, and Zapier. Dashboard-style portfolio and resume for Johnboy Roxas.",
+  openGraph: {
+    title: "Johnboy Roxas — GoHighLevel Specialist",
+    description: "Automating businesses with Claude, n8n, and Zapier.",
+    url: "https://www.johnboydesign.com",
+    siteName: "Johnboy Roxas",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Johnboy Roxas — GoHighLevel Specialist",
+    description: "Automating businesses with Claude, n8n, and Zapier.",
+  },
 };
 
 export default function RootLayout({
