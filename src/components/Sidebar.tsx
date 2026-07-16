@@ -106,7 +106,7 @@ export default function Sidebar({
                   color: "var(--btn-text-on-gradient)",
                 }}
               >
-                Book a call
+                Work With Me
               </Link>
             </div>
           </div>
@@ -142,7 +142,7 @@ export default function Sidebar({
             color: "var(--btn-text-on-gradient)",
           }}
         >
-          Book a call
+          Work With Me
         </Link>
       </div>
 

@@ -1116,7 +1116,7 @@ export default function AboutPanel() {
                   color: "var(--btn-text-on-gradient)",
                 }}
               >
-                Book 15 mins Discovery Call
+                Work With Me
               </a>
             </div>
           </div>
