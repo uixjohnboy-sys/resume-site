@@ -1116,7 +1116,7 @@ export default function AboutPanel() {
                   color: "var(--btn-text-on-gradient)",
                 }}
               >
-                Work With Me
+                Client Intake
               </a>
             </div>
           </div>

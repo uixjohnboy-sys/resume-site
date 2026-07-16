@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconUser, IconApps, IconSparkles } from "@tabler/icons-react";
+import { useAvailability } from "@/lib/useAvailability";
+import NotifyForm from "@/components/NotifyForm";
 
 export type PanelKey = "about" | "projects";
 
@@ -20,6 +22,7 @@ export default function Sidebar({
   onSelect: (key: PanelKey) => void;
 }) {
   const [time, setTime] = useState<string | null>(null);
+  const available = useAvailability();
 
   useEffect(() => {
     const update = () =>
@@ -92,22 +95,28 @@ export default function Sidebar({
             <div className="mt-4 hidden border-t pt-3 lg:block" style={{ borderColor: "var(--border-surface)" }}>
               <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
-                Available for work
+                {available === false ? "Not available for work" : "Available for work"}
               </p>
               <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                Freelance GoHighLevel and automation builds, one project at a time.
+                {available === false
+                  ? "Fully loaded with client projects at the moment. Leave your email and I'll notify you once I'm available."
+                  : "Freelance GoHighLevel and automation builds, one project at a time."}
               </p>
-              <Link
-                href="/book"
-                className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
-                style={{
-                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                  boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
-                  color: "var(--btn-text-on-gradient)",
-                }}
-              >
-                Work With Me
-              </Link>
+              {available === false ? (
+                <NotifyForm />
+              ) : (
+                <Link
+                  href="/book"
+                  className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+                    color: "var(--btn-text-on-gradient)",
+                  }}
+                >
+                  Client Intake
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -124,26 +133,45 @@ export default function Sidebar({
           boxShadow: "0 -8px 24px rgba(0,0,0,0.35)",
         }}
       >
-        <div className="min-w-0">
-          <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
-            <IconSparkles size={12} style={{ color: "#EF9F27" }} />
-            Available for work
-          </p>
-          <p className="truncate text-[10px]" style={{ color: "var(--text-muted)" }}>
-            Freelance GoHighLevel and automation builds.
-          </p>
-        </div>
-        <Link
-          href="/book"
-          className="flex-none rounded-lg px-4 py-2 text-xs font-medium"
-          style={{
-            background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-            boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
-            color: "var(--btn-text-on-gradient)",
-          }}
-        >
-          Work With Me
-        </Link>
+        {available === false ? (
+          <>
+            <div className="min-w-0">
+              <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
+                <IconSparkles size={12} style={{ color: "#EF9F27" }} />
+                Not available
+              </p>
+              <p className="truncate text-[10px]" style={{ color: "var(--text-muted)" }}>
+                Fully loaded right now.
+              </p>
+            </div>
+            <div className="flex-none">
+              <NotifyForm compact />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="min-w-0">
+              <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
+                <IconSparkles size={12} style={{ color: "#EF9F27" }} />
+                Available for work
+              </p>
+              <p className="truncate text-[10px]" style={{ color: "var(--text-muted)" }}>
+                Freelance GoHighLevel and automation builds.
+              </p>
+            </div>
+            <Link
+              href="/book"
+              className="flex-none rounded-lg px-4 py-2 text-xs font-medium"
+              style={{
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+                color: "var(--btn-text-on-gradient)",
+              }}
+            >
+              Client Intake
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Main nav */}

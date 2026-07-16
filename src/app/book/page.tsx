@@ -36,7 +36,7 @@ export default function BookPage() {
 
         <div>
           <h1 className="text-2xl font-medium lg:text-3xl" style={{ color: "var(--text-primary)" }}>
-            Work With Me
+            Client Intake
           </h1>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
             A quick intro, the essentials clients usually ask about, and a calendar to lock in a call — all in one place.
