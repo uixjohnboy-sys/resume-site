@@ -1,11 +1,11 @@
 <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="jbGrad" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#1A1A1A"/>
-      <stop offset="1" stop-color="#000000"/>
+      <stop offset="0" stop-color="#EF9F27"/>
+      <stop offset="1" stop-color="#D85A30"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="16" fill="#FAF9F5"/>
+  <rect width="64" height="64" rx="16" fill="#141311"/>
   <text
     x="32"
     y="43.5"

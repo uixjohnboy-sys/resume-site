@@ -43,7 +43,7 @@ export default function Sidebar({
     >
       {/* Profile card */}
       <div className="relative mb-4">
-        <div className="relative overflow-hidden rounded-2xl border border-[rgba(26,26,26,0.45)]">
+        <div className="relative overflow-hidden rounded-2xl border border-[rgba(239,159,39,0.45)]">
           <div
             className="relative h-64 w-full overflow-hidden rounded-t-2xl lg:h-[150px]"
             style={{ background: "var(--bg-surface)" }}
@@ -66,10 +66,10 @@ export default function Sidebar({
               WebkitBackdropFilter: "var(--surface-blur)",
             }}
           >
-            <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, var(--text-primary))" }}>
+            <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
               Johnboy
             </p>
-            <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, var(--text-primary))" }}>
+            <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
               Roxas
             </p>
             <p className="mt-1.5 text-[12px]" style={{ color: "var(--text-muted)" }}>
@@ -91,7 +91,7 @@ export default function Sidebar({
 
             <div className="mt-4 hidden border-t pt-3 lg:block" style={{ borderColor: "var(--border-surface)" }}>
               <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
-                <IconSparkles size={12} style={{ color: "var(--accent)" }} />
+                <IconSparkles size={12} style={{ color: "#EF9F27" }} />
                 Available for work
               </p>
               <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
@@ -101,8 +101,8 @@ export default function Sidebar({
                 href="/book"
                 className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
                 style={{
-                  background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
-                  boxShadow: "0 0 16px 0 rgba(0,0,0,0.4)",
+                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                  boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
                   color: "var(--btn-text-on-gradient)",
                 }}
               >
@@ -126,7 +126,7 @@ export default function Sidebar({
       >
         <div className="min-w-0">
           <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
-            <IconSparkles size={12} style={{ color: "var(--accent)" }} />
+            <IconSparkles size={12} style={{ color: "#EF9F27" }} />
             Available for work
           </p>
           <p className="truncate text-[10px]" style={{ color: "var(--text-muted)" }}>
@@ -137,8 +137,8 @@ export default function Sidebar({
           href="/book"
           className="flex-none rounded-lg px-4 py-2 text-xs font-medium"
           style={{
-            background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
-            boxShadow: "0 0 16px 0 rgba(0,0,0,0.4)",
+            background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+            boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
             color: "var(--btn-text-on-gradient)",
           }}
         >
@@ -156,9 +156,9 @@ export default function Sidebar({
             style={
               active === item.key
                 ? {
-                    background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                     color: "var(--btn-text-on-gradient)",
-                    boxShadow: "0 2px 16px 0 rgba(0,0,0,0.45)",
+                    boxShadow: "0 2px 16px 0 rgba(216,90,48,0.45)",
                   }
                 : { color: "var(--text-tertiary)" }
             }
@@ -172,13 +172,13 @@ export default function Sidebar({
       <div
         className="relative mt-3 overflow-hidden rounded-[12px] px-3 py-2 lg:mt-auto"
         style={{
-          background: "linear-gradient(135deg, rgba(26,26,26,0.16), rgba(0,0,0,0.07))",
-          border: "1px solid rgba(26,26,26,0.28)",
+          background: "linear-gradient(135deg, rgba(239,159,39,0.16), rgba(216,90,48,0.07))",
+          border: "1px solid rgba(239,159,39,0.28)",
         }}
       >
         <div
           className="pointer-events-none absolute -right-5 -top-5 h-16 w-16 rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(26,26,26,0.5), transparent 70%)", filter: "blur(6px)" }}
+          style={{ background: "radial-gradient(circle, rgba(239,159,39,0.5), transparent 70%)", filter: "blur(6px)" }}
         />
         <p className="relative flex items-center gap-1 text-[12px] font-semibold" style={{ color: "var(--text-primary)" }}>
           GHL Pro <span>🚀</span>

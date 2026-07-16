@@ -45,35 +45,35 @@ const socials = [
   {
     name: "LinkedIn",
     icon: IconBrandLinkedin,
-    color: "var(--text-secondary)",
+    color: "#0A66C2",
     url: "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist",
     buttonText: "Visit Profile",
   },
   {
     name: "Instagram",
     icon: IconBrandInstagram,
-    color: "var(--text-secondary)",
+    color: "#E1306C",
     url: "https://www.instagram.com/uix.johnboy/",
     buttonText: "Visit Profile",
   },
   {
     name: "Facebook",
     icon: IconBrandFacebook,
-    color: "var(--text-secondary)",
+    color: "#1877F2",
     url: "https://www.facebook.com/uix.johnboy",
     buttonText: "Visit Profile",
   },
   {
     name: "WhatsApp",
     icon: IconBrandWhatsapp,
-    color: "var(--text-secondary)",
+    color: "#25D366",
     url: "https://wa.me/639773659548",
     buttonText: "Quick Chat",
   },
   {
     name: "Gmail",
     icon: IconBrandGmail,
-    color: "var(--text-secondary)",
+    color: "#EA4335",
     url: "https://mail.google.com/mail/?view=cm&fs=1&to=uix.johnboy@gmail.com",
     buttonText: "Send Email",
   },
@@ -215,28 +215,28 @@ const tools = [
   {
     name: "Claude",
     icon: IconRobot,
-    color: "var(--text-secondary)",
+    color: "#DA7756",
     description:
       "My AI pair for building automations, writing code, and thinking through client workflows before anything gets built.",
   },
   {
     name: "n8n",
     icon: IconSitemap,
-    color: "var(--text-secondary)",
+    color: "#FF6D5A",
     description:
       "For building the automation flows that connect GoHighLevel to everything else a client's business runs on.",
   },
   {
     name: "Zapier",
     icon: IconBrandZapier,
-    color: "var(--text-secondary)",
+    color: "#FF4A00",
     description:
       "The quick-connect tool I reach for when a client's stack needs two apps talking to each other fast.",
   },
   {
     name: "Figma",
     icon: IconBrandFigma,
-    color: "var(--text-secondary)",
+    color: "#F24E1E",
     description:
       "For designing funnel pages, landing pages, and UI before they go live in GoHighLevel or on the web.",
   },
@@ -257,19 +257,19 @@ const tools = [
   {
     name: "Photoshop",
     icon: IconBrandAdobePhotoshop,
-    color: "var(--text-secondary)",
+    color: "#31A8FF",
     description: "For photo editing and graphics, mostly ad creative and social assets for client campaigns.",
   },
   {
     name: "Illustrator",
     icon: IconBrandAdobeIllustrator,
-    color: "var(--text-secondary)",
+    color: "#FF9A00",
     description: "For logos, icons, and vector graphics that need to stay clean at any size.",
   },
   {
     name: "Adobe Premiere Pro",
     icon: IconBrandAdobePremiere,
-    color: "var(--text-secondary)",
+    color: "#9999FF",
     description: "For longer-form video editing, mainly VSLs and client campaign videos.",
   },
   {
@@ -281,14 +281,14 @@ const tools = [
   {
     name: "Slack",
     icon: IconBrandSlack,
-    color: "var(--text-secondary)",
+    color: "#ECB22E",
     description:
       "Where client and team communication happens day to day, from quick questions to sharing work in progress.",
   },
   {
     name: "ClickUp",
     icon: IconLayoutKanban,
-    color: "var(--text-secondary)",
+    color: "#7B68EE",
     description: "Where I plan projects, track tasks, and keep every client engagement organized.",
   },
 ];
@@ -372,7 +372,7 @@ function ProjectsGrid({ onSelect }: { onSelect: (index: number) => void }) {
           </div>
           <div
             className="pointer-events-none absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-            style={{ background: "rgba(20,19,17,0.85)", color: "var(--accent)" }}
+            style={{ background: "rgba(20,19,17,0.85)", color: "#EF9F27" }}
           >
             <IconArrowUpRight size={13} />
           </div>
@@ -420,11 +420,11 @@ export default function AboutPanel() {
               <span className="relative flex h-14 w-14 items-center justify-center">
                 <span
                   className="pulse-ring absolute inline-flex h-full w-full rounded-full"
-                  style={{ background: "var(--accent)" }}
+                  style={{ background: "#EF9F27" }}
                 />
                 <span
                   className="relative flex h-14 w-14 items-center justify-center rounded-full"
-                  style={{ background: "var(--accent)", boxShadow: "0 0 20px 4px rgba(26,26,26,0.5)" }}
+                  style={{ background: "#EF9F27", boxShadow: "0 0 20px 4px rgba(239,159,39,0.5)" }}
                 >
                   <IconPlayerPlayFilled size={22} style={{ color: "var(--btn-text-on-gradient)" }} />
                 </span>
@@ -439,9 +439,9 @@ export default function AboutPanel() {
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               I&apos;m a GoHighLevel specialist based in Manila, focused on automation. I help businesses replace
               manual, repetitive work with systems that run themselves, built with tools like{" "}
-              <span style={{ color: "var(--accent)" }}>Claude</span>,{" "}
-              <span style={{ color: "var(--accent)" }}>n8n</span>, and{" "}
-              <span style={{ color: "var(--accent)" }}>Zapier</span>.
+              <span style={{ color: "#EF9F27" }}>Claude</span>,{" "}
+              <span style={{ color: "#EF9F27" }}>n8n</span>, and{" "}
+              <span style={{ color: "#EF9F27" }}>Zapier</span>.
             </p>
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               Most of my client work lives inside GoHighLevel: building funnels, CRM pipelines, and dashboards, then
@@ -454,7 +454,7 @@ export default function AboutPanel() {
               in the background.
             </p>
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              Currently building <span style={{ color: "var(--accent)" }}>Pathwise</span>, a dashboard-style app for
+              Currently building <span style={{ color: "#EF9F27" }}>Pathwise</span>, a dashboard-style app for
               mapping out workflows visually, on top of taking on client automation projects one at a time.
             </p>
             <p className="text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
@@ -476,7 +476,7 @@ export default function AboutPanel() {
             <p
               className="text-4xl font-medium"
               style={{
-                background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
@@ -496,7 +496,7 @@ export default function AboutPanel() {
             <p
               className="text-4xl font-medium"
               style={{
-                background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
@@ -516,7 +516,7 @@ export default function AboutPanel() {
             <p
               className="text-4xl font-medium"
               style={{
-                background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
@@ -548,10 +548,10 @@ export default function AboutPanel() {
             />
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <span className="relative flex h-3 w-3">
-                <span className="pulse-ring absolute inline-flex h-full w-full rounded-full" style={{ background: "var(--accent)" }} />
+                <span className="pulse-ring absolute inline-flex h-full w-full rounded-full" style={{ background: "#EF9F27" }} />
                 <span
                   className="relative inline-flex h-3 w-3 rounded-full"
-                  style={{ background: "var(--accent)", boxShadow: "0 0 10px 3px rgba(26,26,26,0.8)" }}
+                  style={{ background: "#EF9F27", boxShadow: "0 0 10px 3px rgba(239,159,39,0.8)" }}
                 />
               </span>
             </div>
@@ -586,7 +586,7 @@ export default function AboutPanel() {
                     <p className="text-xs" style={{ color: "var(--text-primary)" }}>
                       {item.company}
                     </p>
-                    <p className="mt-0.5 text-[11px]" style={{ color: "var(--accent)" }}>
+                    <p className="mt-0.5 text-[11px]" style={{ color: "#EF9F27" }}>
                       {item.role}
                     </p>
                     <p className="mt-0.5 text-[11px]" style={{ color: "var(--text-muted)" }}>
@@ -619,7 +619,7 @@ export default function AboutPanel() {
                     <img key={src} src={src} alt="Client" className="aspect-square w-full rounded-[6px] object-cover" />
                   ))}
                 </div>
-                <p className="text-[20px] font-medium leading-none" style={{ color: "var(--accent)" }}>
+                <p className="text-[20px] font-medium leading-none" style={{ color: "#EF9F27" }}>
                   23
                 </p>
                 <p className="mt-1 text-[10px] leading-snug" style={{ color: "var(--text-muted)" }}>
@@ -662,7 +662,7 @@ export default function AboutPanel() {
               >
                 <div
                   className="mb-2 flex h-8 w-8 items-center justify-center rounded-full"
-                  style={{ background: "var(--bg-surface-2)", color: "var(--accent)" }}
+                  style={{ background: "var(--bg-surface-2)", color: "#EF9F27" }}
                 >
                   <IconCurrencyDollar size={16} />
                 </div>
@@ -750,7 +750,7 @@ export default function AboutPanel() {
           <div
             className="pointer-events-none absolute inset-0"
             style={{
-              background: "radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(28,26,23,0.35) 65%, rgba(20,19,17,0.55) 100%)",
+              background: "radial-gradient(circle at center, rgba(216,90,48,0.2) 0%, rgba(28,26,23,0.35) 65%, rgba(20,19,17,0.55) 100%)",
             }}
           />
           <ClickHint />
@@ -765,7 +765,7 @@ export default function AboutPanel() {
             <p
               className="text-4xl font-medium"
               style={{
-                background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
@@ -876,7 +876,7 @@ export default function AboutPanel() {
                   Now that I&apos;ve sharpened my GoHighLevel skills, I&apos;ve paired it with{" "}
                   <span
                     style={{
-                      background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                      background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                       WebkitBackgroundClip: "text",
                       backgroundClip: "text",
                       color: "transparent",
@@ -930,7 +930,7 @@ export default function AboutPanel() {
                   <div key={app.name} className="flex flex-col items-center text-center">
                     <div
                       className="mb-3 flex h-16 w-16 items-center justify-center rounded-[16px]"
-                      style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-deep))", color: "var(--btn-text-on-gradient)" }}
+                      style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
                     >
                       <AppIcon size={26} />
                     </div>
@@ -1010,7 +1010,7 @@ export default function AboutPanel() {
                       rel="noopener noreferrer"
                       className="rounded-full px-3 py-1.5 text-[11px] font-medium hover:brightness-110"
                       style={{
-                        background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                        background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                         color: "var(--btn-text-on-gradient)",
                       }}
                     >
@@ -1059,7 +1059,7 @@ export default function AboutPanel() {
                 I charge{" "}
                 <span
                   style={{
-                    background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                     WebkitBackgroundClip: "text",
                     backgroundClip: "text",
                     color: "transparent",
@@ -1076,7 +1076,7 @@ export default function AboutPanel() {
                 Payment goes through{" "}
                 <span
                   style={{
-                    background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                     WebkitBackgroundClip: "text",
                     backgroundClip: "text",
                     color: "transparent",
@@ -1096,7 +1096,7 @@ export default function AboutPanel() {
                 I&apos;m also not a typical Virtual Assistant. I work as a{" "}
                 <span
                   style={{
-                    background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                     WebkitBackgroundClip: "text",
                     backgroundClip: "text",
                     color: "transparent",
@@ -1111,8 +1111,8 @@ export default function AboutPanel() {
                 href="/book"
                 className="block w-full rounded-lg px-3 py-2.5 text-center text-xs font-medium hover:brightness-110"
                 style={{
-                  background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
-                  boxShadow: "0 0 16px 0 rgba(0,0,0,0.4)",
+                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                  boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
                   color: "var(--btn-text-on-gradient)",
                 }}
               >
