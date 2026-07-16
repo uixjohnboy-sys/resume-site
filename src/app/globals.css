@@ -1,31 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #1a1917;
-  --foreground: #f2f1ee;
+  --background: #faf9f5;
+  --foreground: #1f1d19;
 
-  --bg-page: #1a1917;
-  --bg-sidebar: #141311;
-  --bg-surface: #1c1a17;
-  --bg-surface-2: #141311;
-  --border-surface: #2a2822;
-  --border-surface-2: #3a382f;
+  --bg-page: #faf9f5;
+  --bg-sidebar: #f4f3ef;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f4f3ef;
+  --border-surface: #e4e2db;
+  --border-surface-2: #c9c6bd;
 
-  --text-primary: #f2f1ee;
-  --text-secondary: #b0aea4;
-  --text-tertiary: #8a887f;
-  --text-muted: #6b6960;
-  --text-faint: #5a584f;
+  --text-primary: #1f1d19;
+  --text-secondary: #4a473f;
+  --text-tertiary: #6e6a5e;
+  --text-muted: #8a8578;
+  --text-faint: #c9c6bd;
 
-  --btn-text-on-gradient: #2c1400;
+  --accent: #1a1a1a;
+  --accent-deep: #000000;
+  --btn-text-on-gradient: #faf9f5;
 
   --surface-blur: none;
-  --surface-shadow: 10px 10px 22px rgba(0, 0, 0, 0.55), -8px -8px 20px rgba(255, 255, 255, 0.025),
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
-  --surface-shadow-sm: 6px 6px 14px rgba(0, 0, 0, 0.55), -4px -4px 10px rgba(255, 255, 255, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
-  --surface-shadow-xs: 3px 3px 7px rgba(0, 0, 0, 0.6), -2px -2px 6px rgba(255, 255, 255, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --surface-shadow: 0 10px 26px rgba(31, 29, 25, 0.08), 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --surface-shadow-sm: 0 6px 16px rgba(31, 29, 25, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --surface-shadow-xs: 0 3px 9px rgba(31, 29, 25, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 @theme inline {

@@ -8,7 +8,7 @@ export default function BookPage() {
   return (
     <div
       className="min-h-screen w-full overflow-y-auto px-4 py-6 lg:h-screen lg:px-10 lg:py-10"
-      style={{ background: "var(--bg-page, #1A1917)" }}
+      style={{ background: "var(--bg-page)" }}
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-5">
         <Link
@@ -32,8 +32,8 @@ export default function BookPage() {
         <div
           className="overflow-hidden rounded-[24px] p-2 lg:p-3"
           style={{
-            background: "linear-gradient(160deg, #FFC15E 0%, #EF9F27 28%, #D85A30 58%, #8A1F0C 100%)",
-            boxShadow: "0 0 50px rgba(216,90,48,0.45), 0 20px 40px rgba(0,0,0,0.4)",
+            background: "linear-gradient(90deg, var(--accent), var(--accent-deep))",
+            boxShadow: "0 20px 50px rgba(31,29,25,0.18), 0 8px 20px rgba(31,29,25,0.12)",
           }}
         >
           <iframe

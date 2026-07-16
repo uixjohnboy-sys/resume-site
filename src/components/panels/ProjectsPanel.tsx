@@ -64,14 +64,22 @@ export default function ProjectsPanel() {
             >
               <div
                 className="flex h-11 w-11 items-center justify-center rounded-[12px]"
-                style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
+                style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-deep))", color: "var(--btn-text-on-gradient)" }}
               >
                 <Icon size={20} />
               </div>
               <p className="text-[12px]" style={{ color: "var(--text-primary)" }}>
                 {app.name}
               </p>
-              <p className="text-[9px]" style={{ color: "#EF9F27" }}>
+              <p className="flex items-center gap-1 text-[9px]" style={{ color: "var(--text-secondary)" }}>
+                <span
+                  className="inline-block h-1.5 w-1.5 rounded-full"
+                  style={
+                    app.status === "Live"
+                      ? { background: "var(--accent-deep)" }
+                      : { background: "transparent", border: "1px solid var(--border-surface-2)" }
+                  }
+                />
                 {app.status}
               </p>
             </button>
@@ -117,7 +125,7 @@ export default function ProjectsPanel() {
               <div className="flex items-center gap-3">
                 <div
                   className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px]"
-                  style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
+                  style={{ background: "linear-gradient(90deg, var(--accent), var(--accent-deep))", color: "var(--btn-text-on-gradient)" }}
                 >
                   <openApp.icon size={18} />
                 </div>

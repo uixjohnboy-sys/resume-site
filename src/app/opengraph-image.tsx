@@ -19,7 +19,7 @@ export default function OpengraphImage() {
           height: "100%",
           display: "flex",
           alignItems: "center",
-          background: "#141311",
+          background: "#FAF9F5",
           position: "relative",
         }}
       >
@@ -31,7 +31,7 @@ export default function OpengraphImage() {
             width: 480,
             height: 480,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(239,159,39,0.35), transparent 70%)",
+            background: "radial-gradient(circle, rgba(31,29,25,0.06), transparent 70%)",
             display: "flex",
           }}
         />
@@ -51,11 +51,11 @@ export default function OpengraphImage() {
             style={{
               borderRadius: 32,
               objectFit: "cover",
-              border: "4px solid rgba(239,159,39,0.45)",
+              border: "4px solid #C9C6BD",
             }}
           />
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", fontSize: 68, fontWeight: 700, color: "#F2F1EE", lineHeight: 1.05 }}>
+            <div style={{ display: "flex", fontSize: 68, fontWeight: 700, color: "#1F1D19", lineHeight: 1.05 }}>
               Johnboy Roxas
             </div>
             <div
@@ -64,17 +64,17 @@ export default function OpengraphImage() {
                 fontSize: 30,
                 fontWeight: 600,
                 marginTop: 16,
-                backgroundImage: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                backgroundImage: "linear-gradient(90deg, #1A1A1A, #000000)",
                 backgroundClip: "text",
                 color: "transparent",
               }}
             >
               GoHighLevel Specialist & AI Automation Expert
             </div>
-            <div style={{ display: "flex", fontSize: 26, color: "#B0AEA4", marginTop: 20, maxWidth: 620 }}>
+            <div style={{ display: "flex", fontSize: 26, color: "#4A473F", marginTop: 20, maxWidth: 620 }}>
               Automating businesses with Claude, n8n, and Zapier.
             </div>
-            <div style={{ display: "flex", fontSize: 22, color: "#6B6960", marginTop: 40 }}>
+            <div style={{ display: "flex", fontSize: 22, color: "#8A8578", marginTop: 40 }}>
               johnboydesign.com
             </div>
           </div>

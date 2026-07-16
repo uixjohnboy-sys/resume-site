@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div
       className="flex min-h-screen w-full flex-col lg:h-screen lg:flex-row"
-      style={{ background: "var(--bg-page, #1A1917)" }}
+      style={{ background: "var(--bg-page)" }}
     >
       <Sidebar active={active} onSelect={setActive} />
       <div className="flex min-w-0 flex-1 flex-col">
