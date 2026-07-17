@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IconUser, IconApps, IconSparkles } from "@tabler/icons-react";
+import { IconUser, IconApps, IconSparkles, IconBrandWhatsapp } from "@tabler/icons-react";
 import { useAvailability } from "@/lib/useAvailability";
 
 export type PanelKey = "about" | "projects";
@@ -98,21 +98,39 @@ export default function Sidebar({
               </p>
               <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
                 {available === false
-                  ? "Fully loaded with client projects at the moment. Leave your email and I'll notify you once I'm available."
+                  ? "Fully loaded with client projects at the moment. Leave your details and I'll notify you once I'm available."
                   : "Freelance GoHighLevel and automation builds, one project at a time."}
               </p>
               {available === false ? (
-                <Link
-                  href="/notify"
-                  className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
-                  style={{
-                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                    boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
-                    color: "var(--btn-text-on-gradient)",
-                  }}
-                >
-                  Notify Me
-                </Link>
+                <>
+                  <Link
+                    href="/notify"
+                    className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
+                    style={{
+                      background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                      boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+                      color: "var(--btn-text-on-gradient)",
+                    }}
+                  >
+                    Notify Me
+                  </Link>
+                  <p className="mb-1.5 mt-2.5 text-center text-[10px]" style={{ color: "var(--text-muted)" }}>
+                    or let&apos;s have a quick chat
+                  </p>
+                  <a
+                    href="https://wa.me/639773659548"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
+                    style={{
+                      background: "linear-gradient(135deg, #25D366, #128C7E)",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    <IconBrandWhatsapp size={14} />
+                    WhatsApp
+                  </a>
+                </>
               ) : (
                 <Link
                   href="/book"
@@ -133,7 +151,7 @@ export default function Sidebar({
 
       {/* Sticky mobile CTA bar */}
       <div
-        className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 px-4 py-3 lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 px-4 py-3 lg:hidden"
         style={{
           background: "var(--bg-surface)",
           backdropFilter: "var(--surface-blur)",
@@ -143,8 +161,8 @@ export default function Sidebar({
         }}
       >
         {available === false ? (
-          <>
-            <div className="min-w-0">
+          <div className="flex w-full items-center gap-2">
+            <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
                 Not available
@@ -155,7 +173,7 @@ export default function Sidebar({
             </div>
             <Link
               href="/notify"
-              className="flex-none rounded-lg px-4 py-2 text-xs font-medium"
+              className="flex-none rounded-lg px-3 py-2 text-xs font-medium"
               style={{
                 background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                 boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
@@ -164,9 +182,19 @@ export default function Sidebar({
             >
               Notify Me
             </Link>
-          </>
+            <a
+              href="https://wa.me/639773659548"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-none items-center justify-center rounded-lg p-2"
+              style={{ background: "linear-gradient(135deg, #25D366, #128C7E)", color: "#FFFFFF" }}
+              aria-label="Chat on WhatsApp"
+            >
+              <IconBrandWhatsapp size={16} />
+            </a>
+          </div>
         ) : (
-          <>
+          <div className="flex w-full items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
@@ -187,7 +215,7 @@ export default function Sidebar({
             >
               Client Intake
             </Link>
-          </>
+          </div>
         )}
       </div>
 

@@ -93,7 +93,7 @@ export default function BookPage() {
                   Part-time — 4 hours/day
                 </p>
                 <p className="mt-0.5 text-[11px]" style={{ color: "var(--text-tertiary)" }}>
-                  Flexible schedule to match your timezone
+                  Starts at 8 AM in your timezone — US or Australia
                 </p>
               </div>
             </div>
@@ -120,6 +120,67 @@ export default function BookPage() {
                 </p>
               </div>
             </div>
+          </div>
+
+          <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
+            I keep my hours flexible and adjust often, especially around launch dates, live events, or anything urgent — if you need me outside the usual window, just let me know.
+          </p>
+
+          <div className="mt-4 rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
+            <p className="mb-2.5 text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+              Why This Rate
+            </p>
+            <p className="mb-2.5 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              I charge{" "}
+              <span
+                style={{
+                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                $10 per hour
+              </span>
+              , depending on project scope. You can hire me on an <span style={{ color: "var(--text-primary)" }}>hourly</span>{" "}
+              or <span style={{ color: "var(--text-primary)" }}>monthly</span> basis, monthly clients are billed{" "}
+              <span style={{ color: "var(--text-primary)" }}>fortnightly</span> rather than all at once.
+            </p>
+            <p className="mb-2.5 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              Payment goes through{" "}
+              <span
+                style={{
+                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                Wise
+              </span>
+              , it&apos;s the easiest way for clients anywhere to send payment directly.
+            </p>
+            <p className="mb-2.5 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              Why this rate? Because the work doesn&apos;t stop once something is built. I set up a proper{" "}
+              <span style={{ color: "var(--text-primary)" }}>client handover</span>, stay on for{" "}
+              <span style={{ color: "var(--text-primary)" }}>ongoing support</span>, and make sure you fully understand
+              what was built for you. You won&apos;t be left with a system you don&apos;t know how to run.
+            </p>
+            <p className="text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              I&apos;m also not a typical Virtual Assistant. I work as a{" "}
+              <span
+                style={{
+                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                strategist
+              </span>
+              , someone who can look at your business and help figure out what should actually get built, not just
+              execute a list of tasks.
+            </p>
           </div>
 
           <div className="mt-4 rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
@@ -152,8 +213,8 @@ export default function BookPage() {
         >
           <iframe
             src="https://link.funnelgenie.io/widget/booking/LOYqIv9mae8XbBhBarr5"
-            style={{ width: "100%", border: "none", overflow: "hidden", minHeight: "950px", borderRadius: "18px" }}
-            scrolling="no"
+            style={{ width: "100%", border: "none", overflow: "auto", minHeight: "1200px", borderRadius: "18px" }}
+            scrolling="yes"
             id="LOYqIv9mae8XbBhBarr5_1"
           />
         </div>

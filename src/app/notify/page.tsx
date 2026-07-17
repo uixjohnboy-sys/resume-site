@@ -10,7 +10,7 @@ export default function NotifyPage() {
       className="min-h-screen w-full overflow-y-auto px-4 py-6 lg:h-screen lg:px-10 lg:py-10"
       style={{ background: "var(--bg-page, #1A1917)" }}
     >
-      <div className="mx-auto flex max-w-3xl flex-col gap-5">
+      <div className="mx-auto flex max-w-lg flex-col gap-5">
         <Link
           href="/"
           className="inline-flex w-fit items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
@@ -38,7 +38,8 @@ export default function NotifyPage() {
         >
           <iframe
             src="https://link.funnelgenie.io/widget/form/ysww0QPa32S2Kp4BtlLI"
-            style={{ width: "100%", border: "none", overflow: "hidden", minHeight: "700px", borderRadius: "18px" }}
+            style={{ width: "100%", border: "none", overflow: "auto", minHeight: "620px", borderRadius: "18px" }}
+            scrolling="yes"
             id="ysww0QPa32S2Kp4BtlLI"
           />
         </div>

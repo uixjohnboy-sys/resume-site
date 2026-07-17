@@ -32,14 +32,51 @@ import {
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
 
-const clientAvatars = [
+const clientAvatarPool = [
   "https://randomuser.me/api/portraits/men/32.jpg",
   "https://randomuser.me/api/portraits/women/44.jpg",
   "https://randomuser.me/api/portraits/men/65.jpg",
   "https://randomuser.me/api/portraits/women/68.jpg",
   "https://randomuser.me/api/portraits/men/12.jpg",
   "https://randomuser.me/api/portraits/women/21.jpg",
+  "https://randomuser.me/api/portraits/men/48.jpg",
+  "https://randomuser.me/api/portraits/women/33.jpg",
+  "https://randomuser.me/api/portraits/men/76.jpg",
+  "https://randomuser.me/api/portraits/women/12.jpg",
+  "https://randomuser.me/api/portraits/men/22.jpg",
+  "https://randomuser.me/api/portraits/women/56.jpg",
+  "https://randomuser.me/api/portraits/men/5.jpg",
+  "https://randomuser.me/api/portraits/women/90.jpg",
+  "https://randomuser.me/api/portraits/men/41.jpg",
+  "https://randomuser.me/api/portraits/women/8.jpg",
+  "https://randomuser.me/api/portraits/men/60.jpg",
+  "https://randomuser.me/api/portraits/women/25.jpg",
 ];
+
+function RotatingAvatar({ startIndex, intervalMs }: { startIndex: number; intervalMs: number }) {
+  const [index, setIndex] = useState(startIndex);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % clientAvatarPool.length);
+        setVisible(true);
+      }, 350);
+    }, intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+
+  return (
+    <img
+      src={clientAvatarPool[index]}
+      alt="Client"
+      className="aspect-square w-full rounded-[6px] object-cover transition-opacity duration-[350ms] ease-in-out"
+      style={{ opacity: visible ? 1 : 0 }}
+    />
+  );
+}
 
 const socials = [
   {
@@ -615,8 +652,8 @@ export default function AboutPanel() {
                   Trusted by founders and teams across GoHighLevel builds.
                 </p>
                 <div className="mb-2 grid grid-cols-3 gap-1.5">
-                  {clientAvatars.map((src) => (
-                    <img key={src} src={src} alt="Client" className="aspect-square w-full rounded-[6px] object-cover" />
+                  {[0, 3, 6, 9, 12, 15].map((startIndex, i) => (
+                    <RotatingAvatar key={i} startIndex={startIndex} intervalMs={2800 + i * 650} />
                   ))}
                 </div>
                 <p className="text-[20px] font-medium leading-none" style={{ color: "#EF9F27" }}>
@@ -744,7 +781,7 @@ export default function AboutPanel() {
             alt=""
             fill
             className="object-cover opacity-70"
-            style={{ filter: "blur(0.15px)" }}
+            style={{ filter: "blur(0px)" }}
             sizes="300px"
           />
           <div
@@ -1055,57 +1092,8 @@ export default function AboutPanel() {
               </button>
             </div>
             <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
-              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                I charge{" "}
-                <span
-                  style={{
-                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  $8 to $10 per hour
-                </span>
-                , depending on project scope. You can hire me on an{" "}
-                <span style={{ color: "var(--text-primary)" }}>hourly</span> or{" "}
-                <span style={{ color: "var(--text-primary)" }}>monthly</span> basis, monthly clients are billed{" "}
-                <span style={{ color: "var(--text-primary)" }}>fortnightly</span> rather than all at once.
-              </p>
-              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                Payment goes through{" "}
-                <span
-                  style={{
-                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  Wise
-                </span>
-                , it&apos;s the easiest way for clients anywhere to send payment directly.
-              </p>
-              <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                Why this rate? Because the work doesn&apos;t stop once something is built. I set up a proper{" "}
-                <span style={{ color: "var(--text-primary)" }}>client handover</span>, stay on for{" "}
-                <span style={{ color: "var(--text-primary)" }}>ongoing support</span>, and make sure you fully understand
-                what was built for you. You won&apos;t be left with a system you don&apos;t know how to run.
-              </p>
-              <p className="mb-4 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                I&apos;m also not a typical Virtual Assistant. I work as a{" "}
-                <span
-                  style={{
-                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  strategist
-                </span>
-                , someone who can look at your business and help figure out what should actually get built, not
-                just execute a list of tasks.
+              <p className="mb-4 text-[13px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                More content coming soon.
               </p>
               <a
                 href="/book"
