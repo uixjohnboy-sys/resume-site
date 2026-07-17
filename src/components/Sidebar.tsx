@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { IconUser, IconApps, IconSparkles } from "@tabler/icons-react";
 import { useAvailability } from "@/lib/useAvailability";
-import NotifyForm from "@/components/NotifyForm";
 
 export type PanelKey = "about" | "projects";
 
@@ -103,7 +102,17 @@ export default function Sidebar({
                   : "Freelance GoHighLevel and automation builds, one project at a time."}
               </p>
               {available === false ? (
-                <NotifyForm />
+                <Link
+                  href="/notify"
+                  className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+                    color: "var(--btn-text-on-gradient)",
+                  }}
+                >
+                  Notify Me
+                </Link>
               ) : (
                 <Link
                   href="/book"
@@ -144,9 +153,17 @@ export default function Sidebar({
                 Fully loaded right now.
               </p>
             </div>
-            <div className="flex-none">
-              <NotifyForm compact />
-            </div>
+            <Link
+              href="/notify"
+              className="flex-none rounded-lg px-4 py-2 text-xs font-medium"
+              style={{
+                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+                color: "var(--btn-text-on-gradient)",
+              }}
+            >
+              Notify Me
+            </Link>
           </>
         ) : (
           <>
