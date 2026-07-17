@@ -683,7 +683,7 @@ export default function AboutPanel() {
                 </p>
                 <ClientAvatarGrid />
                 <p className="text-[20px] font-medium leading-none" style={{ color: "#EF9F27" }}>
-                  23
+                  58
                 </p>
                 <p className="mt-1 text-[10px] leading-snug" style={{ color: "var(--text-muted)" }}>
                   Client projects completed
