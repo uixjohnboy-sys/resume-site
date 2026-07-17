@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconUser, IconApps, IconSparkles, IconBrandWhatsapp } from "@tabler/icons-react";
-import { useAvailability } from "@/lib/useAvailability";
 
 export type PanelKey = "about" | "projects";
 
@@ -16,12 +15,13 @@ const navItems: { key: PanelKey; label: string; icon: React.ReactNode }[] = [
 export default function Sidebar({
   active,
   onSelect,
+  available,
 }: {
   active: PanelKey;
   onSelect: (key: PanelKey) => void;
+  available: boolean | null;
 }) {
   const [time, setTime] = useState<string | null>(null);
-  const available = useAvailability();
 
   useEffect(() => {
     const update = () =>
@@ -161,19 +161,19 @@ export default function Sidebar({
         }}
       >
         {available === false ? (
-          <div className="flex w-full items-center gap-2">
-            <div className="min-w-0 flex-1">
+          <div className="flex w-full flex-col gap-2.5 py-1">
+            <div>
               <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
-                Not available
+                Not Available for Work
               </p>
-              <p className="truncate text-[10px]" style={{ color: "var(--text-muted)" }}>
-                Fully loaded right now.
+              <p className="mt-0.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                Fully loaded with client projects right now. Tap Notify Me and I&apos;ll reach out the moment a slot opens up.
               </p>
             </div>
             <Link
               href="/notify"
-              className="flex-none rounded-lg px-3 py-2 text-xs font-medium"
+              className="block w-full rounded-lg px-3 py-2.5 text-center text-xs font-medium"
               style={{
                 background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                 boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
@@ -186,11 +186,11 @@ export default function Sidebar({
               href="https://wa.me/639773659548"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-none items-center justify-center rounded-lg p-2"
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-center text-xs font-medium"
               style={{ background: "linear-gradient(135deg, #25D366, #128C7E)", color: "#FFFFFF" }}
-              aria-label="Chat on WhatsApp"
             >
-              <IconBrandWhatsapp size={16} />
+              <IconBrandWhatsapp size={14} />
+              WhatsApp
             </a>
           </div>
         ) : (

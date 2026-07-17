@@ -720,14 +720,8 @@ export default function AboutPanel() {
               </Card>
 
               <Card className="relative flex cursor-default flex-col items-center justify-center text-center">
-                <div
-                  className="mb-2 flex h-8 w-8 items-center justify-center rounded-full"
-                  style={{ background: "var(--bg-surface-2)", color: "#EF9F27" }}
-                >
-                  <IconCurrencyDollar size={16} />
-                </div>
                 <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  My Rates
+                  More content soon
                 </p>
               </Card>
             </div>
