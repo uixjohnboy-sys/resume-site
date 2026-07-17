@@ -8,7 +8,11 @@ import {
   IconClock,
   IconCurrencyDollar,
   IconChecklist,
+  IconListNumbers,
+  IconHelpCircle,
+  IconFlame,
 } from "@tabler/icons-react";
+import { useAvailability } from "@/lib/useAvailability";
 
 const complexBuilds = [
   "Scalable GoHighLevel infrastructure that lets agencies onboard unlimited clients with zero technical friction.",
@@ -18,7 +22,34 @@ const complexBuilds = [
   "Full GHL account migrations and SaaS-mode/snapshot setup for scaling agencies.",
 ];
 
+const nextSteps = [
+  { title: "Discovery Call", description: "We talk through what you need, your current setup, and whether it's a good fit." },
+  { title: "Proposal", description: "You get a clear scope, timeline, and rate for the work, no surprises." },
+  { title: "Kickoff", description: "We start building, with regular updates so you always know where things stand." },
+];
+
+const faqs = [
+  {
+    q: "What if I'm not sure GoHighLevel is the right fit for my business?",
+    a: "That's exactly what the discovery call is for. We'll walk through your current setup together and I'll tell you honestly if GHL is the right tool, no pressure either way.",
+  },
+  {
+    q: "Do you sign NDAs or confidentiality agreements?",
+    a: "Yes, happy to sign an NDA before we dive into any specifics about your business.",
+  },
+  {
+    q: "What if the project takes longer than expected?",
+    a: "I always scope the work upfront and flag early if timelines shift, so there are no surprises on your end.",
+  },
+  {
+    q: "Can I hire you for a one-off task instead of an ongoing engagement?",
+    a: "Yes, hourly work is available for smaller, one-off builds. Monthly retainers are for clients who want ongoing support.",
+  },
+];
+
 export default function BookPage() {
+  const available = useAvailability();
+
   return (
     <div
       className="min-h-screen w-full overflow-y-auto px-4 py-6 lg:h-screen lg:px-10 lg:py-10"
@@ -224,8 +255,85 @@ export default function BookPage() {
                 ))}
               </ul>
             </div>
+
+            <div className="rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
+              <div className="mb-3 flex items-center gap-2">
+                <div
+                  className="flex h-9 w-9 flex-none items-center justify-center rounded-[10px]"
+                  style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
+                >
+                  <IconListNumbers size={16} />
+                </div>
+                <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+                  What Happens After You Book
+                </p>
+              </div>
+              <div className="flex flex-col gap-3">
+                {nextSteps.map((step, i) => (
+                  <div key={step.title} className="flex items-start gap-3">
+                    <div
+                      className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-[11px] font-medium"
+                      style={{
+                        background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                        color: "var(--btn-text-on-gradient)",
+                      }}
+                    >
+                      {i + 1}
+                    </div>
+                    <div>
+                      <p className="text-[12px] font-medium" style={{ color: "var(--text-primary)" }}>
+                        {step.title}
+                      </p>
+                      <p className="mt-0.5 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                        {step.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
+              <div className="mb-3 flex items-center gap-2">
+                <div
+                  className="flex h-9 w-9 flex-none items-center justify-center rounded-[10px]"
+                  style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
+                >
+                  <IconHelpCircle size={16} />
+                </div>
+                <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+                  Common Questions
+                </p>
+              </div>
+              <div className="flex flex-col gap-3">
+                {faqs.map((item) => (
+                  <div key={item.q}>
+                    <p className="text-[12px] font-medium" style={{ color: "var(--text-primary)" }}>
+                      {item.q}
+                    </p>
+                    <p className="mt-0.5 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                      {item.a}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
+
+        {available === true && (
+          <div
+            className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-center text-xs font-medium"
+            style={{
+              background: "linear-gradient(135deg, rgba(239,159,39,0.16), rgba(216,90,48,0.07))",
+              border: "1px solid rgba(239,159,39,0.28)",
+              color: "var(--text-primary)",
+            }}
+          >
+            <IconFlame size={14} style={{ color: "#EF9F27" }} />
+            Currently accepting 1 new client this month
+          </div>
+        )}
 
         {/* Booking calendar */}
         <div
