@@ -200,7 +200,7 @@ const automationsTarget = 34;
 
 const automations = [
   {
-    name: "Instagram — Keyword: CHAOS",
+    name: "Instagram, Keyword: CHAOS",
     description:
       "GoHighLevel workflow that replies to Instagram DMs when a keyword is detected, then routes the contact through a branching follow-up sequence.",
     image: "/automation-instagram-chaos.jpg",
@@ -221,7 +221,7 @@ function ClickHint() {
 const experience = [
   {
     company: "Jessica Conner Business Consulting",
-    role: "GoHighLevel Specialist — Automation (n8n, Zapier, Claude)",
+    role: "GoHighLevel Specialist, Automation (n8n, Zapier, Claude)",
     period: "April 2026 to present · Australian timezone client",
     bullets: [
       "Handling automation for an Australian-timezone client, building workflows on GoHighLevel using n8n, Zapier, and Claude.",

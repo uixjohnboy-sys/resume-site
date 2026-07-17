@@ -20,12 +20,9 @@
   --btn-text-on-gradient: #2c1400;
 
   --surface-blur: none;
-  --surface-shadow: 10px 10px 22px rgba(0, 0, 0, 0.55), -8px -8px 20px rgba(255, 255, 255, 0.025),
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
-  --surface-shadow-sm: 6px 6px 14px rgba(0, 0, 0, 0.55), -4px -4px 10px rgba(255, 255, 255, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
-  --surface-shadow-xs: 3px 3px 7px rgba(0, 0, 0, 0.6), -2px -2px 6px rgba(255, 255, 255, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --surface-shadow: 10px 10px 22px rgba(0, 0, 0, 0.55);
+  --surface-shadow-sm: 6px 6px 14px rgba(0, 0, 0, 0.55);
+  --surface-shadow-xs: 3px 3px 7px rgba(0, 0, 0, 0.6);
 }
 
 @theme inline {

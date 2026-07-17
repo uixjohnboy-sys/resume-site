@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteTitle = "Johnboy Roxas — GoHighLevel Specialist & AI Automation Expert";
+const siteTitle = "Johnboy Roxas: GoHighLevel Specialist & AI Automation Expert";
 const siteDescription =
   "Johnboy Roxas is a GoHighLevel Specialist and AI Automation Expert based in Manila, Philippines, building funnels, CRM systems, and automations with GoHighLevel, n8n, Zapier, and Claude.";
 

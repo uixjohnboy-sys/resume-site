@@ -39,7 +39,7 @@ export default function BookPage() {
             Client Intake
           </h1>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-            A quick intro, the essentials clients usually ask about, and a calendar to lock in a call — all in one place.
+            A quick intro, the essentials clients usually ask about, and a calendar to lock in a call, all in one place.
           </p>
         </div>
 
@@ -71,60 +71,89 @@ export default function BookPage() {
           style={{ background: "var(--bg-surface)", boxShadow: "var(--surface-shadow)" }}
         >
           <p className="mb-4 text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-            Before We Talk — the Quick Answers
+            Before We Talk: the Quick Answers
           </p>
 
-          <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
-            <div
-              className="rounded-[16px] p-4"
-              style={{ background: "var(--bg-surface-2)" }}
-            >
-              <div className="flex items-start gap-3">
+          <div className="flex flex-col gap-3">
+            <div className="rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
+              <div className="mb-2.5 flex items-center gap-2">
                 <div
                   className="flex h-9 w-9 flex-none items-center justify-center rounded-[10px]"
                   style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
                 >
                   <IconClock size={16} />
                 </div>
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
-                    Availability
-                  </p>
-                  <p className="mt-0.5 text-[13px]" style={{ color: "var(--text-primary)" }}>
-                    Part-time — 4 hours/day
-                  </p>
-                  <p className="mt-0.5 text-[11px]" style={{ color: "var(--text-tertiary)" }}>
-                    Starts at 8 AM in your timezone — US or Australia
-                  </p>
-                </div>
+                <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+                  Availability
+                </p>
               </div>
-              <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
-                I keep my hours flexible and adjust often, especially around launch dates, live events, or anything
-                urgent — if you need me outside the usual window, just let me know.
+              <p className="text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                <span style={{ color: "var(--text-primary)" }}>Part-time, 4 hours a day</span>, starting at 8 AM in
+                your timezone, whether you&apos;re working with me from the US or Australia.
+              </p>
+              <p className="mt-2.5 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                I keep my schedule{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  flexible
+                </span>{" "}
+                and adjust it regularly to match what a project actually needs, whether that means shifting hours
+                around a{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  launch date
+                </span>
+                , a{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  live event
+                </span>
+                , or an{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    color: "transparent",
+                  }}
+                >
+                  urgent request
+                </span>
+                . If you need me outside my usual window, just let me know and I&apos;ll make it work.
               </p>
             </div>
 
-            <div
-              className="rounded-[16px] p-4"
-              style={{ background: "var(--bg-surface-2)" }}
-            >
-              <div className="flex items-start gap-3">
+            <div className="rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
+              <div className="mb-2.5 flex items-center gap-2">
                 <div
                   className="flex h-9 w-9 flex-none items-center justify-center rounded-[10px]"
                   style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
                 >
                   <IconCurrencyDollar size={16} />
                 </div>
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
-                    Proposed Rate
-                  </p>
-                  <p className="mt-0.5 text-[13px]" style={{ color: "var(--text-primary)" }}>
-                    $10 / hour
-                  </p>
-                </div>
+                <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+                  Proposed Rate
+                </p>
               </div>
-              <p className="mt-3 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              <p className="text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                 I charge{" "}
                 <span
                   style={{
@@ -176,25 +205,25 @@ export default function BookPage() {
                 execute a list of tasks.
               </p>
             </div>
-          </div>
 
-          <div className="mt-4 rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
-            <div className="mb-2.5 flex items-center gap-2">
-              <div
-                className="flex h-9 w-9 flex-none items-center justify-center rounded-[10px]"
-                style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
-              >
-                <IconChecklist size={16} />
+            <div className="rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
+              <div className="mb-2.5 flex items-center gap-2">
+                <div
+                  className="flex h-9 w-9 flex-none items-center justify-center rounded-[10px]"
+                  style={{ background: "linear-gradient(135deg, #EF9F27, #D85A30)", color: "var(--btn-text-on-gradient)" }}
+                >
+                  <IconChecklist size={16} />
+                </div>
+                <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+                  Most Complex Systems Built
+                </p>
               </div>
-              <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
-                Most Complex Systems Built
-              </p>
+              <ul className="list-disc space-y-1.5 pl-8 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                {complexBuilds.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </div>
-            <ul className="list-disc space-y-1.5 pl-8 text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              {complexBuilds.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
           </div>
         </div>
 
