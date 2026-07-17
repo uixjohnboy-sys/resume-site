@@ -19,7 +19,7 @@ export default function Home() {
       <div className="flex min-w-0 flex-1 flex-col">
         <div
           className={`min-h-0 flex-1 px-4 py-4 lg:overflow-y-auto lg:px-6 lg:py-6 lg:pb-6 ${
-            available === false ? "pb-52" : "pb-20"
+            available === false ? "pb-28" : "pb-20"
           }`}
         >
           {active === "about" && <AboutPanel />}

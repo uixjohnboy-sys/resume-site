@@ -161,8 +161,8 @@ export default function Sidebar({
         }}
       >
         {available === false ? (
-          <div className="flex w-full flex-col gap-2.5 py-1">
-            <div>
+          <div className="flex w-full items-center gap-3 py-1">
+            <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
                 Not Available for Work
@@ -171,27 +171,29 @@ export default function Sidebar({
                 Fully loaded with client projects right now. Tap Notify Me and I&apos;ll reach out the moment a slot opens up.
               </p>
             </div>
-            <Link
-              href="/notify"
-              className="block w-full rounded-lg px-3 py-2.5 text-center text-xs font-medium"
-              style={{
-                background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
-                color: "var(--btn-text-on-gradient)",
-              }}
-            >
-              Notify Me
-            </Link>
-            <a
-              href="https://wa.me/639773659548"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-center text-xs font-medium"
-              style={{ background: "linear-gradient(135deg, #25D366, #128C7E)", color: "#FFFFFF" }}
-            >
-              <IconBrandWhatsapp size={14} />
-              WhatsApp
-            </a>
+            <div className="flex flex-none flex-col gap-1.5">
+              <Link
+                href="/notify"
+                className="rounded-lg px-3 py-2 text-center text-xs font-medium"
+                style={{
+                  background: "linear-gradient(135deg, #EF9F27, #D85A30)",
+                  boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
+                  color: "var(--btn-text-on-gradient)",
+                }}
+              >
+                Notify Me
+              </Link>
+              <a
+                href="https://wa.me/639773659548"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-center text-xs font-medium"
+                style={{ background: "linear-gradient(135deg, #25D366, #128C7E)", color: "#FFFFFF" }}
+              >
+                <IconBrandWhatsapp size={14} />
+                WhatsApp
+              </a>
+            </div>
           </div>
         ) : (
           <div className="flex w-full items-center justify-between gap-3">

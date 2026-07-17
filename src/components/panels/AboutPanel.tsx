@@ -783,7 +783,7 @@ export default function AboutPanel() {
           <p className="mb-2.5 flex-none text-[13px]" style={{ color: "var(--text-primary)" }}>
             Projects
           </p>
-          <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+          <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
             <ProjectsGrid onSelect={setProjectOpen} />
           </div>
           <BottomFade />
