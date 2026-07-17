@@ -81,6 +81,10 @@ export default function Sidebar({
             <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               GoHighLevel specialist. Automating businesses with Claude, n8n, and Zapier.
             </p>
+            <p className="mt-2 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
+              Best fit for <span style={{ color: "#EF9F27" }}>coaches, consultants, and service-based agencies</span>{" "}
+              who want a system that runs on its own.
+            </p>
 
             <div className="mt-3 flex items-center justify-between">
               <span className="text-[13px] tabular-nums" style={{ color: "var(--text-primary)" }}>
@@ -99,7 +103,7 @@ export default function Sidebar({
               <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
                 {available === false
                   ? "Fully loaded with client projects at the moment. Leave your details and I'll notify you once I'm available."
-                  : "Freelance GoHighLevel and automation builds, one project at a time."}
+                  : "Freelance GoHighLevel and automation builds, one project at a time. Curious about my rate, availability, or how I work? Client Intake has the answers."}
               </p>
               {available === false ? (
                 <>

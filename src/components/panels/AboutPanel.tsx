@@ -511,11 +511,6 @@ export default function AboutPanel() {
               <span style={{ color: "#EF9F27" }}>Zapier</span>.
             </p>
             <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              I work best with{" "}
-              <span style={{ color: "#EF9F27" }}>coaches, consultants, and service-based agencies</span> who want a
-              system that runs on its own, not just another tool to manage.
-            </p>
-            <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               Most of my client work lives inside GoHighLevel: building funnels, CRM pipelines, and dashboards, then
               wiring them up to automations that handle follow-ups, lead routing, and reporting without anyone
               touching a spreadsheet.
