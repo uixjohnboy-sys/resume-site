@@ -33,48 +33,78 @@ import {
 import Card from "@/components/ui/Card";
 
 const clientAvatarPool = [
-  "https://randomuser.me/api/portraits/men/32.jpg",
-  "https://randomuser.me/api/portraits/women/44.jpg",
-  "https://randomuser.me/api/portraits/men/65.jpg",
-  "https://randomuser.me/api/portraits/women/68.jpg",
-  "https://randomuser.me/api/portraits/men/12.jpg",
-  "https://randomuser.me/api/portraits/women/21.jpg",
-  "https://randomuser.me/api/portraits/men/48.jpg",
-  "https://randomuser.me/api/portraits/women/33.jpg",
-  "https://randomuser.me/api/portraits/men/76.jpg",
-  "https://randomuser.me/api/portraits/women/12.jpg",
-  "https://randomuser.me/api/portraits/men/22.jpg",
-  "https://randomuser.me/api/portraits/women/56.jpg",
-  "https://randomuser.me/api/portraits/men/5.jpg",
-  "https://randomuser.me/api/portraits/women/90.jpg",
-  "https://randomuser.me/api/portraits/men/41.jpg",
-  "https://randomuser.me/api/portraits/women/8.jpg",
-  "https://randomuser.me/api/portraits/men/60.jpg",
-  "https://randomuser.me/api/portraits/women/25.jpg",
+  ...Array.from({ length: 30 }, (_, i) => `https://randomuser.me/api/portraits/men/${i + 1}.jpg`),
+  ...Array.from({ length: 30 }, (_, i) => `https://randomuser.me/api/portraits/women/${i + 1}.jpg`),
 ];
 
-function RotatingAvatar({ startIndex, intervalMs }: { startIndex: number; intervalMs: number }) {
-  const [index, setIndex] = useState(startIndex);
-  const [visible, setVisible] = useState(true);
+const AVATAR_SLOTS = 6;
+
+function pickDistinctIndices(count: number, poolSize: number) {
+  const picked: number[] = [];
+  while (picked.length < count) {
+    const candidate = Math.floor(Math.random() * poolSize);
+    if (!picked.includes(candidate)) picked.push(candidate);
+  }
+  return picked;
+}
+
+function ClientAvatarGrid() {
+  const [indices, setIndices] = useState<number[]>(() => pickDistinctIndices(AVATAR_SLOTS, clientAvatarPool.length));
+  const [fading, setFading] = useState<boolean[]>(() => Array(AVATAR_SLOTS).fill(false));
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setVisible(false);
-      setTimeout(() => {
-        setIndex((i) => (i + 1) % clientAvatarPool.length);
-        setVisible(true);
-      }, 350);
-    }, intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs]);
+    const nextChangeAt = Array.from({ length: AVATAR_SLOTS }, () => Date.now() + 2500 + Math.random() * 2500);
+
+    const timer = setInterval(() => {
+      const now = Date.now();
+      nextChangeAt.forEach((t, i) => {
+        if (now < t) return;
+        nextChangeAt[i] = now + 2500 + Math.random() * 2500;
+
+        setFading((prev) => {
+          const next = [...prev];
+          next[i] = true;
+          return next;
+        });
+
+        setTimeout(() => {
+          setIndices((prev) => {
+            const used = new Set(prev);
+            used.delete(prev[i]);
+            let candidate = Math.floor(Math.random() * clientAvatarPool.length);
+            let attempts = 0;
+            while (used.has(candidate) && attempts < 30) {
+              candidate = Math.floor(Math.random() * clientAvatarPool.length);
+              attempts++;
+            }
+            const next = [...prev];
+            next[i] = candidate;
+            return next;
+          });
+          setFading((prev) => {
+            const next = [...prev];
+            next[i] = false;
+            return next;
+          });
+        }, 350);
+      });
+    }, 300);
+
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <img
-      src={clientAvatarPool[index]}
-      alt="Client"
-      className="aspect-square w-full rounded-[6px] object-cover transition-opacity duration-[350ms] ease-in-out"
-      style={{ opacity: visible ? 1 : 0 }}
-    />
+    <div className="mb-2 grid grid-cols-3 gap-1.5">
+      {indices.map((poolIndex, slot) => (
+        <img
+          key={slot}
+          src={clientAvatarPool[poolIndex]}
+          alt="Client"
+          className="aspect-square w-full rounded-[6px] object-cover transition-opacity duration-[350ms] ease-in-out"
+          style={{ opacity: fading[slot] ? 0 : 1 }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -166,7 +196,7 @@ const apps = [
   },
 ];
 
-const automationsTarget = 15;
+const automationsTarget = 34;
 
 const automations = [
   {
@@ -651,11 +681,7 @@ export default function AboutPanel() {
                 <p className="mb-2 text-[10px] leading-snug" style={{ color: "var(--text-muted)" }}>
                   Trusted by founders and teams across GoHighLevel builds.
                 </p>
-                <div className="mb-2 grid grid-cols-3 gap-1.5">
-                  {[0, 3, 6, 9, 12, 15].map((startIndex, i) => (
-                    <RotatingAvatar key={i} startIndex={startIndex} intervalMs={2800 + i * 650} />
-                  ))}
-                </div>
+                <ClientAvatarGrid />
                 <p className="text-[20px] font-medium leading-none" style={{ color: "#EF9F27" }}>
                   23
                 </p>
@@ -693,10 +719,7 @@ export default function AboutPanel() {
                 </p>
               </Card>
 
-              <Card
-                className="relative flex cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
-                onClick={() => setRatesOpen(true)}
-              >
+              <Card className="relative flex cursor-default flex-col items-center justify-center text-center">
                 <div
                   className="mb-2 flex h-8 w-8 items-center justify-center rounded-full"
                   style={{ background: "var(--bg-surface-2)", color: "#EF9F27" }}
