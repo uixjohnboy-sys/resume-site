@@ -395,15 +395,60 @@ function BottomFade() {
 }
 
 const projects = [
-  { name: "Chaos to Closing", image: "/project-chaos-to-closing.jpg" },
-  { name: "Chaos to Closing Sales Page", image: "/project-chaos-sales-page.jpg" },
-  { name: "Chaos to Closing AI Funnel", image: "/project-chaos-ai-funnel.jpg" },
-  { name: "Mindset Coaching", image: "/project-mindset-coaching.jpg" },
-  { name: "Words Like Alice", image: "/project-words-like-alice.jpg" },
-  { name: "Melbourne Chiropractic", image: "/project-melbourne-chiropractic.png" },
-  { name: "Dental Clinic", image: "/project-dental-clinic.jpg" },
-  { name: "Landscaping", image: "/project-landscaping.png" },
-  { name: "Digital Products", image: "/project-digital-products.jpg" },
+  {
+    name: "Chaos to Closing",
+    image: "/project-chaos-to-closing.jpg",
+    context:
+      "The flagship home base for a real estate coaching academy, built to guide agents from a free lead-flow workshop into paid PRO Coaching membership, with tiered pricing, live event promotion, and a full training library, all wired to convert browsing agents into paying students.",
+  },
+  {
+    name: "Chaos to Closing Sales Page",
+    image: "/project-chaos-sales-page.jpg",
+    context:
+      "A direct-response sales page engineered to fill the founder's discovery call calendar. It leads with the exact pain point the audience feels, then backs it with real trust stats before asking for the call, no soft sell.",
+  },
+  {
+    name: "Chaos to Closing AI Funnel",
+    image: "/project-chaos-ai-funnel.jpg",
+    context:
+      "A lead magnet funnel trading a free AI deal-prompt template for contact details, positioned to pull in agents already looking to modernize their marketing, then hand them straight into the coaching pipeline.",
+  },
+  {
+    name: "Mindset Coaching",
+    image: "/project-mindset-coaching.jpg",
+    context:
+      "A coaching funnel built around one job: turn a cold visitor into a booked discovery call. Clear positioning, a simple offer, and a direct path to the calendar, no distractions along the way.",
+  },
+  {
+    name: "Words Like Alice",
+    image: "/project-words-like-alice.jpg",
+    context:
+      "A brand landing page designed to build immediate trust and move visitors toward one clear action, built with a strong above-the-fold hook and a funnel that respects how little attention a first-time visitor gives a page.",
+  },
+  {
+    name: "Melbourne Chiropractic",
+    image: "/project-melbourne-chiropractic.png",
+    context:
+      "A local-service landing page built to turn map searches into booked appointments, structured around the trust signals a first-time patient looks for before picking up the phone.",
+  },
+  {
+    name: "Dental Clinic",
+    image: "/project-dental-clinic.jpg",
+    context:
+      "A conversion-focused site for a local dental practice, built to move new-patient traffic straight into a booked appointment instead of losing them to a generic contact form.",
+  },
+  {
+    name: "Landscaping",
+    image: "/project-landscaping.png",
+    context:
+      "A local-service site built for lead capture first: a clear service breakdown, a fast quote request, and a design that reads as established and trustworthy to homeowners comparing contractors.",
+  },
+  {
+    name: "Digital Products",
+    image: "/project-digital-products.jpg",
+    context:
+      "A digital product storefront built to convert cold traffic into a purchase in as few steps as possible, with a funnel structure that keeps the buyer's attention on the offer, not the exit.",
+  },
 ];
 
 function ProjectsGrid({ onSelect }: { onSelect: (index: number) => void }) {
@@ -1145,7 +1190,7 @@ export default function AboutPanel() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex flex-none items-center justify-between">
+            <div className="mb-3 flex flex-none items-center justify-between">
               <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                 {projects[projectOpen].name}
               </p>
@@ -1158,6 +1203,9 @@ export default function AboutPanel() {
                 <IconX size={16} />
               </button>
             </div>
+            <p className="mb-3 flex-none text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              {projects[projectOpen].context}
+            </p>
             <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[16px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
