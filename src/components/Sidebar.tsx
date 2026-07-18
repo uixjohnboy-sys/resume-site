@@ -160,10 +160,16 @@ export default function Sidebar({
           background: "var(--bg-surface)",
           backdropFilter: "var(--surface-blur)",
           WebkitBackdropFilter: "var(--surface-blur)",
-          borderTop: "1px solid var(--border-surface)",
           boxShadow: "0 -8px 24px rgba(0,0,0,0.35)",
         }}
       >
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(239,159,39,0.9), transparent)",
+            boxShadow: "0 0 12px 1px rgba(239,159,39,0.6)",
+          }}
+        />
         {available === false ? (
           <div className="flex w-full items-center gap-3 py-1">
             <div className="min-w-0 flex-1">

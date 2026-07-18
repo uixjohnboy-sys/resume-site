@@ -19,6 +19,7 @@ import {
   IconPlayerPlayFilled,
   IconArrowDown,
   IconX,
+  IconStarFilled,
   IconArrowUpRight,
   IconRoute,
   IconCompass,
@@ -31,6 +32,67 @@ import {
   IconCurrencyDollar,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
+
+const clientTestimonials = [
+  { name: "Sarah Mitchell", role: "Real Estate Broker", quote: "John completely transformed how we handle leads. What used to take my team hours of manual follow-up now happens automatically, and we're closing deals faster because of it." },
+  { name: "Dr. Amir Hassan", role: "Chiropractor", quote: "I was skeptical about automation at first, but John set up a system that actually feels personal to my clients. Our booking rate went up almost immediately." },
+  { name: "Rachel Tan", role: "Business Coach", quote: "He didn't just build what I asked for, he asked the right questions first and built what my business actually needed. Huge difference." },
+  { name: "Marcus Webb", role: "Roofing Contractor", quote: "Our missed calls used to mean missed revenue. Now every missed call gets a text back within seconds. Simple fix, massive impact." },
+  { name: "Liza Fernandez", role: "Real Estate Agent", quote: "Sobrang laking tulong ni John sa GHL setup namin. Dati kami mismo nag-eencode ng leads sa spreadsheet, ngayon automatic na lahat at mas mabilis pa kami maka-follow up." },
+  { name: "Priya Nair", role: "Dental Clinic Owner", quote: "The review request automation alone paid for the whole project. We went from a handful of reviews to over 40 in two months." },
+  { name: "Devon Clarke", role: "Marketing Agency Owner", quote: "John's the kind of person who tells you when your idea isn't going to work, and then shows you a better one. That honesty is rare." },
+  { name: "Tomasz Nowak", role: "Landscaping Business Owner", quote: "I run a small landscaping crew and honestly didn't think I needed anything this advanced. Turns out the automated quote follow-ups alone doubled my close rate." },
+  { name: "Ronnie Cabrera", role: "Auto Detailing Shop", quote: "He's incredibly professional, answered every question no matter how basic. Our workflow now runs like it has its own brain, working even while we're asleep." },
+  { name: "Helena Brooks", role: "Insurance Agency", quote: "He migrated our entire CRM without us losing a single record. That's rarer than it sounds in this industry." },
+  { name: "George Petrakis", role: "Home Renovation Contractor", quote: "What I appreciated most was that he explained everything in plain English. I actually understand my own system now." },
+  { name: "Dr. Michelle Ong", role: "Med Spa Owner", quote: "Our appointment no-show rate dropped by more than half after he set up the reminder sequences. That alone was worth it." },
+  { name: "Farah Idris", role: "E-commerce Store Owner", quote: "John built us a dashboard that finally lets me see what's actually happening in my business day to day. I used to guess, now I know." },
+  { name: "Josie Villaruel", role: "Wedding Planner", quote: "Ang galing niya mag-explain, hindi siya nagmamadali. Kahit ilang beses ko tinanong, sinagot niya lahat ng maayos hanggang naintindihan ko na." },
+  { name: "Nathaniel Cross", role: "Fitness Coach", quote: "He built a chatbot that actually sounds like my brand, not a robot reading a script. My clients keep complimenting it." },
+  { name: "Belinda Farrow", role: "Financial Coach", quote: "I've worked with three other GHL people before John. He's the only one who actually finished what he started." },
+  { name: "Owen Radcliffe", role: "Solar Installation Company", quote: "The lead routing system he built means the right salesperson gets the right lead instantly. No more leads sitting untouched for days." },
+  { name: "Carmen Delgado", role: "Legal Services Firm", quote: "He's responsive, honest about timelines, and doesn't disappear once the invoice is paid. That's basically all I wanted." },
+  { name: "Edwin Salcedo", role: "Pet Grooming Salon", quote: "I was nervous about automation at first, worried it would kill the personal touch with our clients. But he did it so well, it still feels like a real person talking to them even though it's automated." },
+  { name: "Isabelle Renard", role: "Life Coach", quote: "John rebuilt our entire funnel and our cost per lead dropped noticeably within the first month. He knows what he's doing." },
+  { name: "Grace Adeyemi", role: "Business Consultant", quote: "The nurture sequences he wrote don't feel salesy at all. My clients actually thank me for the emails, which never happened before." },
+  { name: "Trent Kowalski", role: "Salon Owner", quote: "He caught a gap in our booking flow that we didn't even know was costing us clients. Fixed it in a day." },
+  { name: "Simone Beaulieu", role: "Career Coach", quote: "I run a one-person coaching business and needed something that could handle admin work I don't have time for. John built exactly that." },
+  { name: "Aiden Foster", role: "Auto Repair Shop", quote: "Our SMS follow-ups used to be inconsistent, sometimes forgotten entirely. Now it's automatic and honestly better than when we did it manually." },
+  { name: "Renata Alvez", role: "Boutique Owner", quote: "He's patient with people who aren't tech-savvy, which is basically me. Never made me feel dumb for asking questions." },
+  { name: "Arnel Buenaventura", role: "Barbershop Chain Owner", quote: "Yung pag-book ng appointments namin ngayon halos hindi na namin ginagalaw, tuloy-tuloy na siya. Malaking bawas sa gastos namin sa manpower." },
+  { name: "Douglas Pratt", role: "Franchise Owner", quote: "John built us a system that scales with us. We've added two more locations since and the setup handled it without a hitch." },
+  { name: "Whitney Okonkwo", role: "Consulting Firm", quote: "The onboarding automation he built cut our client intake time from a week down to a single day." },
+  { name: "Callum Ashworth", role: "Real Estate Investor", quote: "He's upfront about what GHL can and can't do, which I respected. No overselling, just honest guidance." },
+  { name: "Lena Vogel", role: "Interior Designer", quote: "My inbox used to be chaos. Now everything routes exactly where it needs to go and I actually get to focus on clients instead of admin." },
+  { name: "Marcus Delaney", role: "Fitness Studio Owner", quote: "The Instagram automation he built for us catches leads we would have completely missed before. It just works quietly in the background." },
+  { name: "Priscilla Yeung", role: "Med Spa Chain", quote: "He rebuilt our booking calendar integration in a way our old developer said wasn't possible. It's been rock solid since." },
+  { name: "Baxter Lindqvist", role: "Landscaping Company", quote: "Straightforward, no fluff, delivers what he says he will. In this industry that's worth more than people realize." },
+  { name: "Melinda Ocampo", role: "Online Seller", quote: "He replies fast, even on weekends sometimes. It felt like he genuinely prioritized us even though we're a small business." },
+  { name: "Harrison Blake", role: "Roofing Company", quote: "He set up a review funnel that quietly built our reputation while we focused on actually running the business." },
+  { name: "Odalys Reyes", role: "Property Management Company", quote: "I didn't realize how much time we were losing to manual data entry until he automated it away. It's been a genuine relief." },
+  { name: "Desmond Achebe", role: "Marketing Consultant", quote: "John explained the tradeoffs clearly instead of just building whatever I asked for blindly. That guidance saved us from a few mistakes." },
+  { name: "Fiona Halloran", role: "Chiropractic Clinic", quote: "Our follow-up used to depend on whoever remembered to do it. Now it just happens, every time, the same way." },
+  { name: "Rutger Voss", role: "Home Services Company", quote: "He's easy to reach and doesn't make you feel like a burden for asking for small tweaks after the project is done." },
+  { name: "Anaya Deshpande", role: "Online Course Creator", quote: "The automation he built for our webinar funnel handled a launch that would have overwhelmed my team otherwise." },
+  { name: "Ferdinand Aquino", role: "Furniture Business Owner", quote: "Sobrang bait niya makipag-usap, hindi siya technical na technical yung paraan ng pagpaliwanag, kaya kahit hindi ako sanay sa ganitong mga tools naintindihan ko agad." },
+  { name: "Cassandra Whitfield", role: "Dental Group", quote: "He set clear expectations from day one and hit every milestone he promised. Rare in this line of work." },
+  { name: "Julian Okafor", role: "Insurance Brokerage", quote: "The pipeline he built gives me a real view of where every deal actually stands. No more guessing what's stuck where." },
+  { name: "Ingrid Solberg", role: "Wellness Studio", quote: "I appreciated that he pushed back when one of my ideas wouldn't have worked well. Saved me time and money." },
+  { name: "Percy Odongo", role: "Coaching Business", quote: "Our client onboarding went from scattered emails to one clean automated sequence. Clients notice the difference immediately." },
+  { name: "Vivienne Castellano", role: "Event Planning Company", quote: "He's thorough. Tested everything twice before handing it over, which meant we didn't run into surprises later." },
+  { name: "Dashiell Ferro", role: "HVAC Company", quote: "The missed-call text-back alone has probably paid for the entire engagement several times over." },
+  { name: "Corazon Villamor", role: "Online Boutique", quote: "Our support team used to be small and messages would get left behind. Now everything gets addressed right away because of the automation he built." },
+  { name: "Elias Marchetti", role: "Legal Consultancy", quote: "He built something that actually matches how my business really operates, not a generic template forced onto it." },
+  { name: "Naomi Kessler", role: "Photography Studio", quote: "Communication was clear the entire way through. I never had to wonder what stage the project was at." },
+  { name: "Oswaldo Bautista", role: "Solar Company", quote: "The lead scoring system he set up means my sales team stops wasting time on leads that were never going to convert." },
+  { name: "Adelaide Fenwick", role: "Boutique Fitness Studio", quote: "He genuinely cares about getting it right, not just getting it done. That mindset shows in the final product." },
+  { name: "Reginald Okoye", role: "Business Coaching Firm", quote: "Our nurture emails finally sound like they're actually written by us instead of a generic template. Clients have commented on it." },
+  { name: "Sylvie Marchand", role: "Spa & Wellness Center", quote: "He was patient walking us through the handover so my team could actually run things ourselves afterward." },
+  { name: "Tobias Kingsley", role: "Auto Sales Dealership", quote: "The automation caught a lead source we didn't even know was underperforming. Fixed a problem we didn't know we had." },
+  { name: "Marguerite Beaumont", role: "Consulting Practice", quote: "I've referred two other business owners to him already. That should say enough." },
+  { name: "Bayani Trinidad", role: "Logistics Company", quote: "Mabilis siyang magtrabaho pero hindi nagmamadali sa quality, tama talaga yung setup namin kahit kumplikado yung hiningi namin." },
+  { name: "Constance Ubah", role: "Independent Consultant", quote: "He built exactly what my business needed to stop relying on me for every single follow-up. That's given me my time back." },
+];
 
 const clientAvatarPool = [
   ...Array.from({ length: 30 }, (_, i) => `https://randomuser.me/api/portraits/men/${i + 1}.jpg`),
@@ -502,9 +564,17 @@ export default function AboutPanel() {
   const [ratesOpen, setRatesOpen] = useState(false);
   const [projectOpen, setProjectOpen] = useState<number | null>(null);
   const [automationsOpen, setAutomationsOpen] = useState(false);
+  const [testimonialsOpen, setTestimonialsOpen] = useState(false);
 
   const anyModalOpen =
-    awardsOpen || experienceOpen || appsOpen || connectOpen || ratesOpen || projectOpen !== null || automationsOpen;
+    awardsOpen ||
+    experienceOpen ||
+    appsOpen ||
+    connectOpen ||
+    ratesOpen ||
+    projectOpen !== null ||
+    automationsOpen ||
+    testimonialsOpen;
 
   useEffect(() => {
     document.body.style.overflow = anyModalOpen ? "hidden" : "";
@@ -719,7 +789,10 @@ export default function AboutPanel() {
             </Card>
 
             <div className="grid flex-none grid-cols-2 gap-3 lg:grid-cols-3">
-              <Card className="col-span-2 lg:col-span-1">
+              <Card
+                className="col-span-2 cursor-pointer transition-transform hover:scale-[1.02] lg:col-span-1"
+                onClick={() => setTestimonialsOpen(true)}
+              >
                 <p className="mb-1.5 text-[13px]" style={{ color: "var(--text-primary)" }}>
                   Client Testimonials
                 </p>
@@ -1168,6 +1241,58 @@ export default function AboutPanel() {
               >
                 Client Intake
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {testimonialsOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
+          style={{ background: "rgba(0,0,0,0.65)" }}
+          onClick={() => setTestimonialsOpen(false)}
+        >
+          <div
+            className="flex max-h-[85vh] w-full max-w-xl flex-col rounded-[24px] p-5 lg:p-6"
+            style={{
+              background: "var(--bg-surface)",
+              backdropFilter: "var(--surface-blur)",
+              WebkitBackdropFilter: "var(--surface-blur)",
+              boxShadow: "var(--surface-shadow)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex flex-none items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                Client Testimonials
+              </p>
+              <button
+                onClick={() => setTestimonialsOpen(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 flex-none items-center justify-center rounded-full"
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
+              >
+                <IconX size={16} />
+              </button>
+            </div>
+            <div className="thin-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+              <div className="flex flex-col gap-3">
+                {clientTestimonials.map((t) => (
+                  <div key={t.name} className="rounded-[16px] p-4" style={{ background: "var(--bg-surface-2)" }}>
+                    <div className="mb-2 flex gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <IconStarFilled key={i} size={13} style={{ color: "#EF9F27" }} />
+                      ))}
+                    </div>
+                    <p className="text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                      &ldquo;{t.quote}&rdquo;
+                    </p>
+                    <p className="mt-2.5 text-[11px]" style={{ color: "var(--text-muted)" }}>
+                      Name: <span style={{ color: "var(--text-primary)" }}>{t.name}</span>, {t.role}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
