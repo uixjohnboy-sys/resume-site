@@ -200,14 +200,15 @@ export default function Sidebar({
             </div>
           </div>
         ) : (
-          <div className="flex w-full items-center justify-between gap-3">
-            <div className="min-w-0">
+          <div className="flex w-full items-center gap-3 py-1">
+            <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
                 Available for work
               </p>
-              <p className="truncate text-[10px]" style={{ color: "var(--text-muted)" }}>
-                Freelance GoHighLevel and automation builds.
+              <p className="mt-0.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                Freelance GoHighLevel and automation builds, one project at a time. Curious about my rate,
+                availability, or how I work? Client Intake has the answers.
               </p>
             </div>
             <Link
