@@ -24,11 +24,6 @@ import {
   IconRoute,
   IconCompass,
   IconCommand,
-  IconBrandLinkedin,
-  IconBrandInstagram,
-  IconBrandFacebook,
-  IconBrandWhatsapp,
-  IconBrandGmail,
   IconCurrencyDollar,
 } from "@tabler/icons-react";
 import Card from "@/components/ui/Card";
@@ -169,44 +164,6 @@ function ClientAvatarGrid() {
     </div>
   );
 }
-
-const socials = [
-  {
-    name: "LinkedIn",
-    icon: IconBrandLinkedin,
-    color: "#0A66C2",
-    url: "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist",
-    buttonText: "Visit Profile",
-  },
-  {
-    name: "Instagram",
-    icon: IconBrandInstagram,
-    color: "#E1306C",
-    url: "https://www.instagram.com/uix.johnboy/",
-    buttonText: "Visit Profile",
-  },
-  {
-    name: "Facebook",
-    icon: IconBrandFacebook,
-    color: "#1877F2",
-    url: "https://www.facebook.com/uix.johnboy",
-    buttonText: "Visit Profile",
-  },
-  {
-    name: "WhatsApp",
-    icon: IconBrandWhatsapp,
-    color: "#25D366",
-    url: "https://wa.me/639773659548",
-    buttonText: "Quick Chat",
-  },
-  {
-    name: "Gmail",
-    icon: IconBrandGmail,
-    color: "#EA4335",
-    url: "https://mail.google.com/mail/?view=cm&fs=1&to=uix.johnboy@gmail.com",
-    buttonText: "Send Email",
-  },
-];
 
 const badges = [
   {
@@ -560,7 +517,6 @@ export default function AboutPanel() {
   const [awardsOpen, setAwardsOpen] = useState(false);
   const [experienceOpen, setExperienceOpen] = useState(false);
   const [appsOpen, setAppsOpen] = useState(false);
-  const [connectOpen, setConnectOpen] = useState(false);
   const [ratesOpen, setRatesOpen] = useState(false);
   const [projectOpen, setProjectOpen] = useState<number | null>(null);
   const [automationsOpen, setAutomationsOpen] = useState(false);
@@ -570,7 +526,6 @@ export default function AboutPanel() {
     awardsOpen ||
     experienceOpen ||
     appsOpen ||
-    connectOpen ||
     ratesOpen ||
     projectOpen !== null ||
     automationsOpen ||
@@ -808,36 +763,13 @@ export default function AboutPanel() {
                 </p>
               </Card>
 
-              <Card
-                className="relative flex cursor-pointer flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
-                onClick={() => setConnectOpen(true)}
-              >
-                <div className="mb-2 flex items-center justify-center">
-                  {socials.map((social, i) => {
-                    const Icon = social.icon;
-                    return (
-                      <div
-                        key={social.name}
-                        className="flex h-8 w-8 items-center justify-center rounded-full"
-                        style={{
-                          background: "var(--bg-surface-2)",
-                          marginLeft: i === 0 ? 0 : -10,
-                          zIndex: socials.length - i,
-                          border: "2px solid var(--bg-surface)",
-                          color: social.color,
-                        }}
-                      >
-                        <Icon size={15} />
-                      </div>
-                    );
-                  })}
-                </div>
+              <Card className="relative hidden cursor-default flex-col items-center justify-center text-center lg:flex">
                 <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  Connect with me
+                  More content soon
                 </p>
               </Card>
 
-              <Card className="relative flex cursor-default flex-col items-center justify-center text-center">
+              <Card className="relative hidden cursor-default flex-col items-center justify-center text-center lg:flex">
                 <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
                   More content soon
                 </p>
@@ -1125,72 +1057,6 @@ export default function AboutPanel() {
                   <p className="text-[11px] leading-relaxed">More apps coming soon</p>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {connectOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center overscroll-contain p-4 lg:p-6"
-          style={{ background: "rgba(0,0,0,0.65)" }}
-          onClick={() => setConnectOpen(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded-[24px] p-5 lg:p-6"
-            style={{
-              background: "var(--bg-surface)",
-              backdropFilter: "var(--surface-blur)",
-              WebkitBackdropFilter: "var(--surface-blur)",
-              boxShadow:
-                "var(--surface-shadow)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-5 flex items-center justify-between">
-              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                Connect with me
-              </p>
-              <button
-                onClick={() => setConnectOpen(false)}
-                aria-label="Close"
-                className="flex h-8 w-8 items-center justify-center rounded-full"
-                style={{ background: "var(--bg-surface-2)", color: "var(--text-tertiary)" }}
-              >
-                <IconX size={16} />
-              </button>
-            </div>
-            <div className="flex flex-col gap-3">
-              {socials.map((social) => {
-                const Icon = social.icon;
-                return (
-                  <div key={social.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-9 w-9 items-center justify-center rounded-full"
-                        style={{ background: "var(--bg-surface-2)", color: social.color }}
-                      >
-                        <Icon size={17} />
-                      </div>
-                      <p className="text-xs" style={{ color: "var(--text-primary)" }}>
-                        {social.name}
-                      </p>
-                    </div>
-                    <a
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-full px-3 py-1.5 text-[11px] font-medium hover:brightness-110"
-                      style={{
-                        background: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                        color: "var(--btn-text-on-gradient)",
-                      }}
-                    >
-                      {social.buttonText}
-                    </a>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>

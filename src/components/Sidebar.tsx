@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IconUser, IconApps, IconSparkles, IconBrandWhatsapp } from "@tabler/icons-react";
+import { IconUser, IconApps, IconSparkles, IconBrandWhatsapp, IconArrowUpRight, IconDownload } from "@tabler/icons-react";
+import { socials } from "@/lib/socials";
 
 export type PanelKey = "about" | "projects";
 
@@ -254,6 +255,49 @@ export default function Sidebar({
           </button>
         ))}
       </nav>
+
+      <div className="mt-4 hidden flex-col gap-0.5 lg:flex">
+        <p className="mb-1 pl-2.5 text-[10px] font-normal tracking-wide" style={{ color: "var(--text-faint)" }}>
+          CONNECT
+        </p>
+        {socials.map((social) => {
+          const Icon = social.icon;
+          return (
+            <a
+              key={social.name}
+              href={social.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors hover:brightness-110"
+              style={{ color: "var(--text-tertiary)" }}
+            >
+              <span className="flex items-center gap-2">
+                <Icon size={14} style={{ color: social.color }} />
+                {social.name}
+              </span>
+              <span
+                className="flex h-5 w-5 items-center justify-center rounded-full"
+                style={{ background: "var(--bg-surface-2)", color: "var(--text-muted)" }}
+              >
+                <IconArrowUpRight size={11} />
+              </span>
+            </a>
+          );
+        })}
+        <a
+          href="/Johnboy-Roxas-CV.pdf"
+          download
+          className="mt-2 flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors hover:brightness-110"
+          style={{
+            background: "var(--bg-surface-2)",
+            color: "var(--text-primary)",
+            border: "1px solid var(--border-surface)",
+          }}
+        >
+          <IconDownload size={14} />
+          Download CV
+        </a>
+      </div>
 
       <div
         className="relative mt-3 overflow-hidden rounded-[12px] px-3 py-2 lg:mt-auto"
