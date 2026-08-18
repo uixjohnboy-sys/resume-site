@@ -3,8 +3,39 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IconUser, IconApps, IconSparkles, IconBrandWhatsapp, IconArrowUpRight, IconDownload } from "@tabler/icons-react";
+import {
+  IconUser,
+  IconApps,
+  IconSparkles,
+  IconBrandWhatsapp,
+  IconArrowUpRight,
+  IconDownload,
+  IconArrowDown,
+} from "@tabler/icons-react";
 import { socials } from "@/lib/socials";
+
+function SidebarScrollHint() {
+  return (
+    <div className="pointer-events-none absolute bottom-1 right-2 z-10 hidden flex-col items-center gap-1 lg:flex">
+      <span
+        className="text-[9px] tracking-wider"
+        style={{ color: "var(--text-faint)", writingMode: "vertical-rl", textOrientation: "mixed" }}
+      >
+        Scroll down
+      </span>
+      <IconArrowDown size={11} style={{ color: "var(--text-faint)" }} />
+    </div>
+  );
+}
+
+function SidebarBottomFade() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-9 lg:block"
+      style={{ background: "linear-gradient(to top, var(--bg-sidebar), rgba(20,19,17,0))" }}
+    />
+  );
+}
 
 export type PanelKey = "about" | "projects";
 
@@ -41,9 +72,10 @@ export default function Sidebar({
 
   return (
     <div
-      className="thin-scroll flex w-full flex-none flex-col overflow-visible px-3.5 pt-5 pb-4 lg:w-[230px] lg:overflow-y-auto lg:pb-5"
+      className="relative flex w-full flex-none flex-col px-3.5 pt-5 pb-4 lg:w-[230px] lg:pb-5"
       style={{ background: "var(--bg-sidebar)" }}
     >
+      <div className="thin-scroll flex min-h-0 flex-col overflow-visible lg:flex-1 lg:overflow-y-auto">
       {/* Profile card */}
       <div className="relative mb-4">
         <div className="relative overflow-hidden rounded-2xl border border-[rgba(239,159,39,0.45)]">
@@ -317,6 +349,9 @@ export default function Sidebar({
           Certified GoHighLevel Professional. Trusted to build full client-generating business systems.
         </p>
       </div>
+      </div>
+      <SidebarBottomFade />
+      <SidebarScrollHint />
     </div>
   );
 }
