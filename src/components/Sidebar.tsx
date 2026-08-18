@@ -41,7 +41,7 @@ export default function Sidebar({
 
   return (
     <div
-      className="flex w-full flex-none flex-col overflow-visible px-3.5 pt-5 pb-4 lg:w-[230px] lg:pb-5"
+      className="thin-scroll flex w-full flex-none flex-col overflow-visible px-3.5 pt-5 pb-4 lg:w-[230px] lg:overflow-y-auto lg:pb-5"
       style={{ background: "var(--bg-sidebar)" }}
     >
       {/* Profile card */}
