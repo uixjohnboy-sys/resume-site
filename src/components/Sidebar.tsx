@@ -8,34 +8,9 @@ import {
   IconApps,
   IconSparkles,
   IconBrandWhatsapp,
-  IconArrowUpRight,
   IconDownload,
-  IconArrowDown,
 } from "@tabler/icons-react";
 import { socials } from "@/lib/socials";
-
-function SidebarScrollHint() {
-  return (
-    <div className="pointer-events-none absolute bottom-1 right-2 z-10 hidden flex-col items-center gap-1 lg:flex">
-      <span
-        className="text-[9px] tracking-wider"
-        style={{ color: "var(--text-faint)", writingMode: "vertical-rl", textOrientation: "mixed" }}
-      >
-        Scroll down
-      </span>
-      <IconArrowDown size={11} style={{ color: "var(--text-faint)" }} />
-    </div>
-  );
-}
-
-function SidebarBottomFade() {
-  return (
-    <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-9 lg:block"
-      style={{ background: "linear-gradient(to top, var(--bg-sidebar), rgba(20,19,17,0))" }}
-    />
-  );
-}
 
 export type PanelKey = "about" | "projects";
 
@@ -72,15 +47,14 @@ export default function Sidebar({
 
   return (
     <div
-      className="relative flex w-full flex-none flex-col px-3.5 pt-5 pb-4 lg:w-[230px] lg:pb-5"
+      className="thin-scroll flex w-full flex-none flex-col overflow-y-auto px-3.5 pt-5 pb-4 lg:w-[230px] lg:pb-4"
       style={{ background: "var(--bg-sidebar)" }}
     >
-      <div className="thin-scroll flex min-h-0 flex-col overflow-visible lg:flex-1 lg:overflow-y-auto">
       {/* Profile card */}
-      <div className="relative mb-4">
+      <div className="relative mb-4 lg:mb-2">
         <div className="relative overflow-hidden rounded-2xl border border-[rgba(239,159,39,0.45)]">
           <div
-            className="relative h-64 w-full overflow-hidden rounded-t-2xl lg:h-[150px]"
+            className="relative h-64 w-full overflow-hidden rounded-t-2xl lg:h-[76px]"
             style={{ background: "var(--bg-surface)" }}
           >
             <Image
@@ -94,33 +68,31 @@ export default function Sidebar({
             />
           </div>
           <div
-            className="rounded-b-2xl p-4"
+            className="rounded-b-2xl p-4 lg:p-3"
             style={{
               background: "var(--bg-surface)",
               backdropFilter: "var(--surface-blur)",
               WebkitBackdropFilter: "var(--surface-blur)",
             }}
           >
-            <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
+            <p className="text-[26px] font-medium leading-[1.1] lg:text-[19px]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
               Johnboy
             </p>
-            <p className="text-[26px] font-medium leading-[1.1]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
+            <p className="text-[26px] font-medium leading-[1.1] lg:text-[19px]" style={{ color: "var(--text-primary, #F5F4F0)" }}>
               Roxas
             </p>
-            <p className="mt-1.5 text-[12px]" style={{ color: "var(--text-muted)" }}>
+            <p className="mt-1.5 text-[12px] lg:mt-1 lg:text-[11px]" style={{ color: "var(--text-muted)" }}>
               @uix.johnboy
             </p>
 
-            <p className="mt-3 text-[11px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              GoHighLevel specialist. Automating businesses with Claude, n8n, and Zapier.
-            </p>
-            <p className="mt-2 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              Best fit for <span style={{ color: "#EF9F27" }}>coaches, consultants, and service-based agencies</span>{" "}
-              who want a system that runs on its own.
+            <p className="mt-3 text-[11px] leading-relaxed lg:mt-1.5 lg:leading-snug" style={{ color: "var(--text-secondary)" }}>
+              GoHighLevel specialist. Automating businesses with{" "}
+              <span style={{ color: "#EF9F27" }}>Claude, n8n, and Zapier</span>. Best fit for{" "}
+              <span style={{ color: "#EF9F27" }}>coaches, consultants, and service-based agencies</span>.
             </p>
 
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-[13px] tabular-nums" style={{ color: "var(--text-primary)" }}>
+            <div className="mt-3 flex items-center justify-between lg:mt-1.5">
+              <span className="text-[13px] tabular-nums lg:text-[12px]" style={{ color: "var(--text-primary)" }}>
                 {time ?? "--:--:--"}
               </span>
               <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
@@ -128,12 +100,12 @@ export default function Sidebar({
               </span>
             </div>
 
-            <div className="mt-4 hidden border-t pt-3 lg:block" style={{ borderColor: "var(--border-surface)" }}>
-              <p className="mb-1 flex items-center gap-1 text-xs font-medium" style={{ color: "var(--text-primary)" }}>
+            <div className="mt-4 hidden border-t pt-3 lg:mt-1.5 lg:block lg:pt-1.5" style={{ borderColor: "var(--border-surface)" }}>
+              <p className="mb-1 flex items-center gap-1 text-xs font-medium lg:mb-0.5" style={{ color: "var(--text-primary)" }}>
                 <IconSparkles size={12} style={{ color: "#EF9F27" }} />
                 {available === false ? "Not available for work" : "Available for work"}
               </p>
-              <p className="mb-2.5 text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
+              <p className="mb-2.5 text-[11px] leading-relaxed lg:mb-1.5 lg:leading-snug" style={{ color: "var(--text-muted)" }}>
                 {available === false
                   ? "Fully loaded with client projects at the moment. Leave your details and I'll notify you once I'm available."
                   : "Freelance GoHighLevel and automation builds, one project at a time. Curious about my rate, availability, or how I work? Client Intake has the answers."}
@@ -142,7 +114,7 @@ export default function Sidebar({
                 <>
                   <Link
                     href="/notify"
-                    className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
+                    className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110 lg:py-1.5"
                     style={{
                       background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                       boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
@@ -151,14 +123,14 @@ export default function Sidebar({
                   >
                     Notify Me
                   </Link>
-                  <p className="mb-1.5 mt-2.5 text-center text-[10px]" style={{ color: "var(--text-muted)" }}>
+                  <p className="mb-1.5 mt-2.5 text-center text-[10px] lg:mt-1.5" style={{ color: "var(--text-muted)" }}>
                     or let&apos;s have a quick chat
                   </p>
                   <a
                     href="https://wa.me/639773659548"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110 lg:py-1.5"
                     style={{
                       background: "linear-gradient(135deg, #25D366, #128C7E)",
                       color: "#FFFFFF",
@@ -171,7 +143,7 @@ export default function Sidebar({
               ) : (
                 <Link
                   href="/book"
-                  className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110"
+                  className="block w-full rounded-lg px-2 py-2 text-center text-xs font-medium hover:brightness-110 lg:py-1.5"
                   style={{
                     background: "linear-gradient(135deg, #EF9F27, #D85A30)",
                     boxShadow: "0 0 16px 0 rgba(216,90,48,0.4)",
@@ -266,12 +238,12 @@ export default function Sidebar({
       </div>
 
       {/* Main nav */}
-      <nav className="flex flex-row gap-1.5 lg:flex-col lg:gap-0.5">
+      <nav className="flex flex-none flex-row gap-1.5 lg:flex-col lg:gap-0.5">
         {navItems.map((item) => (
           <button
             key={item.key}
             onClick={() => onSelect(item.key)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-normal transition-colors lg:flex-none lg:justify-start lg:py-1.5"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-normal transition-colors lg:flex-none lg:justify-start lg:py-1"
             style={
               active === item.key
                 ? {
@@ -288,38 +260,33 @@ export default function Sidebar({
         ))}
       </nav>
 
-      <div className="mt-4 hidden flex-col gap-0.5 lg:flex">
-        <p className="mb-1 pl-2.5 text-[10px] font-normal tracking-wide" style={{ color: "var(--text-faint)" }}>
+      <div className="mt-2 hidden flex-none flex-col lg:flex">
+        <p className="mb-1 pl-0.5 text-[9px] font-normal tracking-wide" style={{ color: "var(--text-faint)" }}>
           CONNECT
         </p>
-        {socials.map((social) => {
-          const Icon = social.icon;
-          return (
-            <a
-              key={social.name}
-              href={social.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors hover:brightness-110"
-              style={{ color: "var(--text-tertiary)" }}
-            >
-              <span className="flex items-center gap-2">
-                <Icon size={14} style={{ color: social.color }} />
-                {social.name}
-              </span>
-              <span
-                className="flex h-5 w-5 items-center justify-center rounded-full"
-                style={{ background: "var(--bg-surface-2)", color: "var(--text-muted)" }}
+        <div className="flex items-center gap-1.5">
+          {socials.map((social) => {
+            const Icon = social.icon;
+            return (
+              <a
+                key={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={social.name}
+                aria-label={social.name}
+                className="flex h-7 w-7 flex-1 items-center justify-center rounded-[8px] transition-colors hover:brightness-110"
+                style={{ background: "var(--bg-surface-2)" }}
               >
-                <IconArrowUpRight size={11} />
-              </span>
-            </a>
-          );
-        })}
+                <Icon size={14} style={{ color: social.color }} />
+              </a>
+            );
+          })}
+        </div>
         <a
           href="/Johnboy-Roxas-CV.pdf"
           download
-          className="mt-2 flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors hover:brightness-110"
+          className="mt-1.5 flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors hover:brightness-110"
           style={{
             background: "var(--bg-surface-2)",
             color: "var(--text-primary)",
@@ -332,7 +299,7 @@ export default function Sidebar({
       </div>
 
       <div
-        className="relative mt-3 overflow-hidden rounded-[12px] px-3 py-2 lg:mt-auto"
+        className="relative mt-3 flex-none overflow-hidden rounded-[12px] px-3 py-2 lg:mt-auto lg:py-1.5"
         style={{
           background: "linear-gradient(135deg, rgba(239,159,39,0.16), rgba(216,90,48,0.07))",
           border: "1px solid rgba(239,159,39,0.28)",
@@ -345,13 +312,13 @@ export default function Sidebar({
         <p className="relative flex items-center gap-1 text-[12px] font-semibold" style={{ color: "var(--text-primary)" }}>
           GHL Pro <span>🚀</span>
         </p>
-        <p className="relative mt-0.5 text-[10px] leading-snug" style={{ color: "var(--text-secondary)" }}>
+        <p className="relative mt-0.5 text-[10px] leading-snug lg:hidden" style={{ color: "var(--text-secondary)" }}>
           Certified GoHighLevel Professional. Trusted to build full client-generating business systems.
         </p>
+        <p className="relative mt-0.5 hidden text-[9.5px] leading-snug lg:block" style={{ color: "var(--text-secondary)" }}>
+          Certified GoHighLevel Professional.
+        </p>
       </div>
-      </div>
-      <SidebarBottomFade />
-      <SidebarScrollHint />
     </div>
   );
 }
