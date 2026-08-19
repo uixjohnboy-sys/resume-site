@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Script from "next/script";
 import {
-  IconArrowLeft,
   IconClock,
   IconDeviceLaptop,
   IconChartHistogram,
@@ -68,14 +66,9 @@ export default function CoachOsWalkthroughPage() {
       style={{ background: "var(--bg-page, #1A1917)" }}
     >
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
-        <Link
-          href="/"
-          className="inline-flex w-fit items-center gap-2 text-sm transition-opacity hover:opacity-70"
-          style={{ color: "var(--text-tertiary)" }}
-        >
-          <IconArrowLeft size={16} />
-          Back
-        </Link>
+        {/* No back link on purpose. Prospects land here cold from a DM and
+            the page has exactly one job; a route back to the portfolio is
+            an exit ramp, not navigation. */}
 
         {/* Header */}
         <header className="flex flex-col gap-4">
