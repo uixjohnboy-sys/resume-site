@@ -16,6 +16,15 @@ import {
 const CALENDAR_ID = "cxCgIJSmtS5KkJDt4D6k";
 const FIT_ASSESSMENT_URL = "https://harper-quinn-coachos.vercel.app/fit-assessment";
 
+// Coach OS brand green. Deliberately NOT the site's amber: this page
+// represents the product, not the portfolio, so it carries the product's
+// own colour. Kept in one place so a brand change is a one-line edit.
+const BRAND = "#D5FE38";
+const BRAND_ON = "#1A2200";
+const BRAND_GRADIENT = "linear-gradient(135deg, #EAFF7A 0%, #D5FE38 45%, #A8CC22 100%)";
+const BRAND_FRAME = "linear-gradient(160deg, #EAFF7A 0%, #D5FE38 28%, #A8CC22 58%, #4A5E0A 100%)";
+const BRAND_GLOW = "0 0 50px rgba(213,254,56,0.30), 0 20px 40px rgba(0,0,0,0.45)";
+
 const title = "Coach OS Walkthrough with John Boy";
 const description =
   "Watch one coaching client's entire first year run inside Coach OS, then see the same system with your own packages in it. 45 minutes, not a sales call.";
@@ -72,7 +81,7 @@ export default function CoachOsWalkthroughPage() {
         <header className="flex flex-col gap-4">
           <span
             className="text-xs font-medium uppercase tracking-[0.18em]"
-            style={{ color: "#EF9F27" }}
+            style={{ color: BRAND }}
           >
             Coach OS
           </span>
@@ -97,7 +106,7 @@ export default function CoachOsWalkthroughPage() {
               color: "var(--text-primary)",
             }}
           >
-            <IconClock size={14} style={{ color: "#EF9F27" }} />
+            <IconClock size={14} style={{ color: BRAND }} />
             45 minutes, and nothing to prepare
           </div>
         </header>
@@ -113,7 +122,7 @@ export default function CoachOsWalkthroughPage() {
                 border: "1px solid var(--border-surface)",
               }}
             >
-              <Icon size={20} className="mt-0.5 shrink-0" style={{ color: "#EF9F27" }} />
+              <Icon size={20} className="mt-0.5 shrink-0" style={{ color: BRAND }} />
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
                   {t}
@@ -131,7 +140,7 @@ export default function CoachOsWalkthroughPage() {
           className="flex flex-col gap-3 rounded-[18px] p-5"
           style={{
             background: "var(--bg-surface)",
-            border: "1px solid #EF9F27",
+            border: `1px solid ${BRAND}`,
           }}
         >
           <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -149,8 +158,8 @@ export default function CoachOsWalkthroughPage() {
             rel="noopener noreferrer"
             className="w-fit rounded-full px-5 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
             style={{
-              background: "linear-gradient(135deg, #FFC15E 0%, #EF9F27 45%, #D85A30 100%)",
-              color: "var(--btn-text-on-gradient)",
+              background: BRAND_GRADIENT,
+              color: BRAND_ON,
             }}
           >
             See your practice inside Coach OS
@@ -162,8 +171,8 @@ export default function CoachOsWalkthroughPage() {
           className="overflow-hidden rounded-[24px] p-2 lg:p-3"
           style={{
             background:
-              "linear-gradient(160deg, #FFC15E 0%, #EF9F27 28%, #D85A30 58%, #8A1F0C 100%)",
-            boxShadow: "0 0 50px rgba(216,90,48,0.45), 0 20px 40px rgba(0,0,0,0.4)",
+              BRAND_FRAME,
+            boxShadow: BRAND_GLOW,
           }}
         >
           <iframe
