@@ -23,6 +23,12 @@ const BRAND_GRADIENT = "linear-gradient(135deg, #EAFF7A 0%, #D5FE38 45%, #A8CC22
 const BRAND_FRAME = "linear-gradient(160deg, #EAFF7A 0%, #D5FE38 28%, #A8CC22 58%, #4A5E0A 100%)";
 const BRAND_GLOW = "0 0 50px rgba(213,254,56,0.30), 0 20px 40px rgba(0,0,0,0.45)";
 
+const INTRO_COLD =
+  "This is not a sales call. It is a walkthrough. In 45 minutes you will watch one coaching client's entire first year happen inside the system, from the moment they land on a lead tool through payment, a signed agreement, and the weekly accountability that runs without you lifting a finger. Then I show you the same thing with your own packages in it.";
+
+const INTRO_ASSESSED =
+  "Your assessment is in and I have already read it. Pick a time below and I will walk you through what it found, then show you one coaching client's entire first year running inside the system, with your own packages in it.";
+
 const title = "Coach OS Walkthrough with John Boy";
 const description =
   "Watch one coaching client's entire first year run inside Coach OS, then see the same system with your own packages in it. 45 minutes, not a sales call.";
@@ -59,7 +65,17 @@ const watchFor = [
   },
 ];
 
-export default function CoachOsWalkthroughPage() {
+export default async function CoachOsWalkthroughPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  // Someone arriving straight from the Fit Assessment has just done the one
+  // thing this page would otherwise tell them to do first. Sending them back
+  // to that instruction reads as a loop, and as a system that was not paying
+  // attention. So the page drops the section and acknowledges them instead.
+  const assessed = (await searchParams).assessed === "1";
+
   return (
     <div
       className="min-h-screen w-full overflow-y-auto px-4 py-6 lg:px-10 lg:py-10"
@@ -85,11 +101,7 @@ export default function CoachOsWalkthroughPage() {
             See your coaching practice running inside Coach OS.
           </h1>
           <p className="text-base leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-            This is not a sales call. It is a walkthrough. In 45 minutes you will watch one
-            coaching client&rsquo;s entire first year happen inside the system, from the moment
-            they land on a lead tool through payment, a signed agreement, and the weekly
-            accountability that runs without you lifting a finger. Then I show you the same
-            thing with your own packages in it.
+            {assessed ? INTRO_ASSESSED : INTRO_COLD}
           </p>
           <div
             className="inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-sm"
@@ -128,7 +140,8 @@ export default function CoachOsWalkthroughPage() {
           ))}
         </section>
 
-        {/* Fit Assessment */}
+        {/* Fit Assessment, hidden for anyone who just came from it */}
+        {!assessed && (
         <section
           className="flex flex-col gap-3 rounded-[18px] p-5"
           style={{
@@ -158,9 +171,11 @@ export default function CoachOsWalkthroughPage() {
             See your practice inside Coach OS
           </a>
         </section>
+        )}
 
         {/* Booking calendar */}
         <div
+          id="book"
           className="overflow-hidden rounded-[24px] p-2 lg:p-3"
           style={{
             background:
