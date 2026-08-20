@@ -12,7 +12,7 @@ import {
 // Vercel project, so the funnel's own copy of this URL could never be
 // reached. Same calendar underneath, embedded the same way /book does it.
 const CALENDAR_ID = "cxCgIJSmtS5KkJDt4D6k";
-const FIT_ASSESSMENT_URL = "https://harper-quinn-coachos.vercel.app/fit-assessment";
+const FIT_ASSESSMENT_URL = "https://coachos.johnboydesign.com/fit-assessment";
 
 // Coach OS brand green. Deliberately NOT the site's amber: this page
 // represents the product, not the portfolio, so it carries the product's
