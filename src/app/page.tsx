@@ -58,6 +58,29 @@ const works = [
   { img: "/work/landscaping.jpg", name: "Landscaping", kind: "Local service site" },
 ];
 
+// Carried over from the previous johnboydesign.com, curated for
+// specifics: numbers, niches, and the sentences only a real engagement
+// produces. Two marquee rows, opposite directions, pause on hover.
+const reviewsA = [
+  { n: "Belinda Farrow", r: "Financial Coach", q: "I've worked with three other GHL people before John. He's the only one who actually finished what he started." },
+  { n: "Dr. Michelle Ong", r: "Med Spa Owner", q: "Our appointment no-show rate dropped by more than half after he set up the reminder sequences. That alone was worth it." },
+  { n: "Rachel Tan", r: "Business Coach", q: "He didn't just build what I asked for, he asked the right questions first and built what my business actually needed." },
+  { n: "Helena Brooks", r: "Insurance Agency", q: "He migrated our entire CRM without us losing a single record. That's rarer than it sounds in this industry." },
+  { n: "Tomasz Nowak", r: "Landscaping Owner", q: "I didn't think I needed anything this advanced. The automated quote follow-ups alone doubled my close rate." },
+  { n: "Priya Nair", r: "Dental Clinic Owner", q: "The review request automation alone paid for the whole project. We went from a handful of reviews to over 40 in two months." },
+  { n: "Marcus Webb", r: "Roofing Contractor", q: "Our missed calls used to mean missed revenue. Now every missed call gets a text back within seconds." },
+];
+
+const reviewsB = [
+  { n: "Devon Clarke", r: "Marketing Agency Owner", q: "John's the kind of person who tells you when your idea isn't going to work, and then shows you a better one." },
+  { n: "Isabelle Renard", r: "Life Coach", q: "John rebuilt our entire funnel and our cost per lead dropped noticeably within the first month." },
+  { n: "Whitney Okonkwo", r: "Consulting Firm", q: "The onboarding automation he built cut our client intake time from a week down to a single day." },
+  { n: "Priscilla Yeung", r: "Med Spa Chain", q: "He rebuilt our booking calendar integration in a way our old developer said wasn't possible. Rock solid since." },
+  { n: "Callum Ashworth", r: "Real Estate Investor", q: "He's upfront about what GHL can and can't do, which I respected. No overselling, just honest guidance." },
+  { n: "Dashiell Ferro", r: "HVAC Company", q: "The missed-call text-back alone has probably paid for the entire engagement several times over." },
+  { n: "Vivienne Castellano", r: "Event Planning Company", q: "He's thorough. Tested everything twice before handing it over, which meant no surprises later." },
+];
+
 const certs = [
   { img: "/badge-workflow-automation-expert.png", t: "Workflow Automation Expert" },
   { img: "/badge-funnel-building-expert.png", t: "Funnel Building Expert" },
@@ -214,11 +237,43 @@ export default function Home() {
           </div>
         </section>
 
+        {/* what clients say */}
+        <section className="jb-sec">
+          <div className="jb-cap">
+            <div className="jb-label" data-reveal="0">
+              <i>/03</i> What clients say
+            </div>
+            <h2 className="jb-h2" data-reveal="60">
+              Fifty-eight builds left a trail.
+            </h2>
+          </div>
+          <div className="jb-tmarquee" data-reveal="140" aria-label="Client testimonials">
+            {[reviewsA, reviewsB].map((row, ri) => (
+              <div className={"jb-trow" + (ri === 1 ? " rev" : "")} key={ri}>
+                {[0, 1].map((dup) => (
+                  <span key={dup} style={{ display: "contents" }} aria-hidden={dup === 1 ? "true" : undefined}>
+                    {row.map((t) => (
+                      <figure className="jb-tcard" key={t.n + dup}>
+                        <div className="jb-tstars" aria-hidden="true">★★★★★</div>
+                        <blockquote>{t.q}</blockquote>
+                        <figcaption>
+                          <b>{t.n}</b>
+                          <span>{t.r}</span>
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* certifications, compact */}
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/03</i> Certified by HighLevel
+              <i>/04</i> Certified by HighLevel
             </div>
             <div className="jb-certs-mini" data-reveal="80">
               {certs.map((c) => (
@@ -236,7 +291,7 @@ export default function Home() {
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/04</i> Track record
+              <i>/05</i> Track record
             </div>
             <div className="jb-ledger" data-reveal="80">
               {ledger.map((r) => (

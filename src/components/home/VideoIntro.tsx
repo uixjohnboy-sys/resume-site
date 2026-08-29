@@ -54,7 +54,7 @@ export default function VideoIntro() {
             <div>
               <div className="jb-video-name">John Boy Roxas</div>
               <div className="jb-video-role">
-                {mode === "missing" ? "Video intro recording soon" : "GoHighLevel Systems Builder"}
+                {mode === "missing" ? "Video intro recording soon" : "Systems and Growth Strategist"}
               </div>
             </div>
             <button className="jb-play" onClick={play} aria-label="Play intro video" type="button">
