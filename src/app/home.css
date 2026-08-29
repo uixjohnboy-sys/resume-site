@@ -1049,6 +1049,68 @@ a.jb-proj:hover {
   }
 }
 
+/* ---------- connect row ---------- */
+
+.jb-connect {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.jb-connect-k {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 14px;
+}
+
+.jb-connect-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.jb-conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-decoration: none;
+  background: var(--ink);
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.jb-conn:hover {
+  color: var(--on-neon);
+  background: var(--neon);
+  border-color: var(--neon);
+  transform: translateY(-2px);
+}
+
+.jb-conn:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 3px;
+}
+
+.jb-conn-i {
+  display: inline-flex;
+  flex: none;
+}
+
+.jb-conn-i svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
 /* ---------- subpage helpers (/coach-os, /book) ---------- */
 
 .jb-back {

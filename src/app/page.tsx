@@ -3,6 +3,7 @@ import VideoIntro from "@/components/home/VideoIntro";
 import Fx from "@/components/home/Fx";
 import SystemLog from "@/components/home/SystemLog";
 import LiveClock from "@/components/home/LiveClock";
+import Connect from "@/components/home/Connect";
 import { archivo, jetmono } from "./fonts";
 import "./home.css";
 
@@ -186,10 +187,8 @@ export default function Home() {
                 <a className="jb-btn jb-btn-primary" href="/book">
                   Book a call
                 </a>
-                <a className="jb-btn jb-btn-ghost" href="mailto:uix.johnboy@gmail.com">
-                  uix.johnboy@gmail.com
-                </a>
               </div>
+              <Connect />
               <div className="jb-links">
                 <a className="jb-link" href="https://coachos.johnboydesign.com/tour" target="_blank" rel="noopener noreferrer">
                   Coach OS live
