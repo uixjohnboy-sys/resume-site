@@ -96,17 +96,18 @@ export default function BookPage() {
 
             {/* rate */}
             <div className="jb-panel" data-reveal="0">
-              <div className="jb-cap-k">Proposed rate</div>
+              <div className="jb-cap-k">Rates and engagement</div>
               <p className="jb-lede" style={{ fontSize: "14px", marginBottom: "12px" }}>
-                <b style={{ color: "var(--neon)" }}>$10 per hour</b>, depending on project scope. Hourly or
-                monthly; monthly clients are billed fortnightly rather than all at once. Payment goes through
-                Wise, the easiest way for clients anywhere to send payment directly.
+                <b style={{ color: "var(--neon)" }}>Scoped on the call</b>, because a two-week integration and a
+                full platform build are not the same job. Hourly or monthly; monthly clients are billed
+                fortnightly rather than all at once. Payment goes through Wise, the easiest way for clients
+                anywhere to send payment directly.
               </p>
               <p className="jb-lede" style={{ fontSize: "14px" }}>
-                Why this rate? Because the work does not stop once something is built. I set up a proper client
-                handover, stay on for ongoing support, and make sure you fully understand what was built for you.
-                I am not a typical VA: I work as a strategist who helps figure out what should actually get built,
-                not just execute a list of tasks.
+                What you are paying for is that the work does not stop once something is built. I set up a proper
+                client handover, stay on for ongoing support, and make sure you fully understand what was built
+                for you. I am not a typical VA: I work as a strategist who helps figure out what should actually
+                get built, not just execute a list of tasks.
               </p>
             </div>
 
