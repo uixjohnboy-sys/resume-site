@@ -34,14 +34,7 @@
 
 html,
 body {
-  height: 100%;
-}
-
-@media (min-width: 1024px) {
-  html,
-  body {
-    overflow: hidden;
-  }
+  min-height: 100%;
 }
 
 body {
