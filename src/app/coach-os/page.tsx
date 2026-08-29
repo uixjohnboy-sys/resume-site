@@ -27,6 +27,39 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
+const shots = [
+  {
+    img: "/coach-os-shots/start.jpg",
+    url: "coachos.johnboydesign.com/start",
+    cap: "The front door. A link-in-bio page that is itself the product, with the AI front desk one tap away.",
+  },
+  {
+    img: "/coach-os-shots/tour-hero.jpg",
+    url: "coachos.johnboydesign.com/tour",
+    cap: "The self-serve tour: a client's whole first year, walked stage by stage on real running screens.",
+  },
+  {
+    img: "/coach-os-shots/mirror-builder.jpg",
+    url: "coachos.johnboydesign.com/mirror",
+    cap: "The Mirror. Type a prospect's details and the whole preview below becomes theirs, name, brand, packages.",
+  },
+  {
+    img: "/coach-os-shots/mirror-flow.jpg",
+    url: "coachos.johnboydesign.com/mirror",
+    cap: "The client's first days in their brand: the diagnostic, the follow-up written in the coach's voice, the checkout.",
+  },
+  {
+    img: "/coach-os-shots/tour-signed.jpg",
+    url: "harperquinn.com/sign",
+    cap: "The agreement that never got signed, signed: in-browser e-signature with a permanent snapshot and audit trail.",
+  },
+  {
+    img: "/coach-os-shots/pricing.jpg",
+    url: "coachos.johnboydesign.com/pricing",
+    cap: "Plain pricing and public terms, because a payment reviewer and a nervous buyer read the same page.",
+  },
+];
+
 const stats = [
   { v: "29,474", count: "29,474", l: "Lines of production code" },
   { v: "24", count: "24", l: "GoHighLevel webhook events" },
@@ -229,11 +262,45 @@ export default function CoachOsCaseStudy() {
           </div>
         </section>
 
+        {/* screens */}
+        <section className="jb-sec">
+          <div className="jb-cap">
+            <div className="jb-label" data-reveal="0">
+              <i>/02</i> The product, in screens
+            </div>
+            <h2 className="jb-h2" data-reveal="60">
+              Real screenshots, not mockups.
+            </h2>
+            <p className="jb-lede" style={{ marginBottom: "34px" }}>
+              Every screen below is the live system, captured as it runs today. Click any door in section /06 and
+              you will land on the same pixels.
+            </p>
+            <div className="jb-shots" data-reveal="140">
+              {shots.map((sh) => (
+                <figure className="jb-shot" key={sh.img}>
+                  <div className="jb-shot-bar">
+                    <span className="jb-shot-dots" aria-hidden="true">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className="jb-shot-url">{sh.url}</span>
+                    <span className="jb-shot-tag">Live</span>
+                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={sh.img} alt={sh.cap} loading="lazy" />
+                  <figcaption className="jb-shot-cap">{sh.cap}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* inside */}
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/02</i> What is inside
+              <i>/03</i> What is inside
             </div>
             <div className="jb-caps" data-reveal="80" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
               {modules.map((m) => (
@@ -255,7 +322,7 @@ export default function CoachOsCaseStudy() {
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/03</i> The parts that were actually hard
+              <i>/04</i> The parts that were actually hard
             </div>
             <h2 className="jb-h2" data-reveal="60">
               Anyone can list features. These are the decisions underneath.
@@ -283,7 +350,7 @@ export default function CoachOsCaseStudy() {
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/04</i> Built with
+              <i>/05</i> Built with
             </div>
             <div className="jb-tags" data-reveal="60">
               {stack.map((s) => (
@@ -299,7 +366,7 @@ export default function CoachOsCaseStudy() {
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/05</i> See it running
+              <i>/06</i> See it running
             </div>
             <h2 className="jb-h2" data-reveal="60">
               All four doors are public. Nothing to sign up for.
