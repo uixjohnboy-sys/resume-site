@@ -2,8 +2,11 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "fs";
 import { join } from "path";
 
+// Social share card, matching the neon design system in home.css:
+// near-black ink, #D5FE38 accent, mono data strip along the bottom.
+
 export const runtime = "nodejs";
-export const alt = "Johnboy Roxas: GoHighLevel Specialist & AI Automation Expert";
+export const alt = "John Boy Roxas · GoHighLevel Systems Builder";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -18,66 +21,106 @@ export default function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          alignItems: "center",
-          background: "#141311",
+          background: "#0C0D0A",
           position: "relative",
+          fontFamily: "sans-serif",
         }}
       >
+        {/* faint blueprint grid */}
         <div
           style={{
             position: "absolute",
-            top: -120,
-            right: -120,
-            width: 480,
-            height: 480,
+            inset: 0,
+            display: "flex",
+            backgroundImage:
+              "linear-gradient(#2C3021 1px, transparent 1px), linear-gradient(90deg, #2C3021 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+            opacity: 0.35,
+          }}
+        />
+        {/* neon glow behind the portrait */}
+        <div
+          style={{
+            position: "absolute",
+            top: -80,
+            right: -60,
+            width: 520,
+            height: 520,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(239,159,39,0.35), transparent 70%)",
+            background: "radial-gradient(circle, rgba(213,254,56,0.22), transparent 70%)",
             display: "flex",
           }}
         />
+
+        {/* left: copy */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            width: "100%",
-            padding: "0 80px",
-            gap: 64,
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: "0 0 0 72px",
+            width: 760,
           }}
         >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              color: "#D5FE38",
+              fontSize: 22,
+              letterSpacing: 4,
+              marginBottom: 26,
+            }}
+          >
+            <div style={{ width: 12, height: 12, borderRadius: 12, background: "#D5FE38", display: "flex" }} />
+            JB·ROXAS
+          </div>
+          <div
+            style={{
+              color: "#F4F2ED",
+              fontSize: 64,
+              fontWeight: 800,
+              lineHeight: 1.05,
+              letterSpacing: -2,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <span>I build the systems</span>
+            <span style={{ color: "#D5FE38" }}>GoHighLevel</span>
+            <span>can&apos;t build alone.</span>
+          </div>
+          <div style={{ display: "flex", gap: 26, marginTop: 40, color: "#8F9482", fontSize: 24 }}>
+            <span style={{ color: "#D5FE38" }}>58 builds</span>
+            <span>·</span>
+            <span style={{ color: "#D5FE38" }}>5 years</span>
+            <span>·</span>
+            <span>GHL + custom code + AI</span>
+          </div>
+        </div>
+
+        {/* right: portrait */}
+        <div
+          style={{
+            position: "absolute",
+            right: 60,
+            bottom: 0,
+            width: 360,
+            height: 520,
+            display: "flex",
+            borderTop: "2px solid #D5FE38",
+            overflow: "hidden",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={photoSrc}
-            width={340}
-            height={340}
-            style={{
-              borderRadius: 32,
-              objectFit: "cover",
-              border: "4px solid rgba(239,159,39,0.45)",
-            }}
+            alt=""
+            width={360}
+            height={520}
+            style={{ objectFit: "cover", objectPosition: "top" }}
           />
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", fontSize: 68, fontWeight: 700, color: "#F2F1EE", lineHeight: 1.05 }}>
-              Johnboy Roxas
-            </div>
-            <div
-              style={{
-                display: "flex",
-                fontSize: 30,
-                fontWeight: 600,
-                marginTop: 16,
-                backgroundImage: "linear-gradient(135deg, #EF9F27, #D85A30)",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              GoHighLevel Specialist & AI Automation Expert
-            </div>
-            <div style={{ display: "flex", fontSize: 26, color: "#B0AEA4", marginTop: 20, maxWidth: 620 }}>
-              Automating businesses with Claude, n8n, and Zapier.
-            </div>
-            <div style={{ display: "flex", fontSize: 22, color: "#6B6960", marginTop: 40 }}>
-              johnboydesign.com
-            </div>
-          </div>
         </div>
       </div>
     ),
