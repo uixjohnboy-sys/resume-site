@@ -4,6 +4,7 @@ import Fx from "@/components/home/Fx";
 import SystemLog from "@/components/home/SystemLog";
 import LiveClock from "@/components/home/LiveClock";
 import Connect from "@/components/home/Connect";
+import BookPill from "@/components/home/BookPill";
 import { archivo, jetmono } from "./fonts";
 import "./home.css";
 
@@ -19,6 +20,42 @@ const stats = [
   { v: "5", count: "5", l: "years building" },
   { v: "29,474", count: "29,474", l: "lines in the flagship" },
   { v: "24", count: "24", l: "GHL webhook events" },
+];
+
+const proofShots = [
+  {
+    img: "/coach-os-shots/app-portal.jpg",
+    url: "the client portal, logged in as a demo client",
+    wide: true,
+  },
+  {
+    img: "/coach-os-shots/app-dash-kanban.jpg",
+    url: "the owner's pipeline, every lead from every tool",
+    wide: false,
+  },
+  {
+    img: "/coach-os-shots/app-diagnostic.jpg",
+    url: "one of four lead-gen tools, in the client's brand",
+    wide: false,
+  },
+];
+
+const hardParts = [
+  "Idempotent webhooks: a retried payment can never double-charge a client.",
+  "Contracts are write-once at the database-rules layer, not by trusting the app.",
+  "Every AI call has a fallback: an outage shows a working page, never an error.",
+];
+
+const works = [
+  { img: "/work/chaos-to-closing.jpg", name: "Chaos to Closing", kind: "Coaching business site · US" },
+  { img: "/work/mindset-coaching.jpg", name: "Mindset Coaching", kind: "Coaching funnel" },
+  { img: "/work/words-like-alice.jpg", name: "Words Like Alice", kind: "Author site" },
+  { img: "/work/chaos-sales-page.jpg", name: "Chaos to Closing", kind: "Sales page" },
+  { img: "/work/dental-clinic.jpg", name: "Dental Clinic", kind: "Clinic site" },
+  { img: "/work/chaos-ai-funnel.jpg", name: "Chaos to Closing", kind: "AI funnel" },
+  { img: "/work/melbourne-chiropractic.jpg", name: "Melbourne Chiropractic", kind: "Clinic site · AU" },
+  { img: "/work/digital-products.jpg", name: "Digital Products", kind: "Storefront funnel" },
+  { img: "/work/landscaping.jpg", name: "Landscaping", kind: "Local service site" },
 ];
 
 const certs = [
@@ -41,6 +78,7 @@ export default function Home() {
   return (
     <div className={`jb ${archivo.variable} ${jetmono.variable}`}>
       <Fx />
+      <div className="jb-grain" aria-hidden="true" />
       <header className="jb-top">
         <div className="jb-cap jb-top-in">
           <a className="jb-mark" href="#top">
@@ -104,19 +142,28 @@ export default function Home() {
               Stripe subscriptions, courses, and the owner{"’"}s dashboard. Click through every page of it before
               you ever message me.
             </p>
-            <figure className="jb-shot" data-reveal="140" style={{ margin: 0 }}>
-              <div className="jb-shot-bar">
-                <span className="jb-shot-dots" aria-hidden="true">
-                  <i />
-                  <i />
-                  <i />
-                </span>
-                <span className="jb-shot-url">the client portal, logged in as a demo client</span>
-                <span className="jb-shot-tag">Live</span>
-              </div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/coach-os-shots/app-portal.jpg" alt="The Coach OS client portal: AI companion chat, commitment strip, courses, and agreements" loading="lazy" />
-            </figure>
+            <div className="jb-shots" data-reveal="140">
+              {proofShots.map((sh) => (
+                <figure className="jb-shot" key={sh.img} style={sh.wide ? { gridColumn: "1 / -1", margin: 0 } : { margin: 0 }}>
+                  <div className="jb-shot-bar">
+                    <span className="jb-shot-dots" aria-hidden="true">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className="jb-shot-url">{sh.url}</span>
+                    <span className="jb-shot-tag">Live</span>
+                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={sh.img} alt={sh.url} loading="lazy" />
+                </figure>
+              ))}
+            </div>
+            <ul className="jb-hardline" data-reveal="0">
+              {hardParts.map((h) => (
+                <li key={h}>{h}</li>
+              ))}
+            </ul>
             <div className="jb-cta-row" data-reveal="0" style={{ marginTop: "22px", marginBottom: 0 }}>
               <Link className="jb-btn jb-btn-primary" href="/coach-os">
                 Read the case study
@@ -128,11 +175,50 @@ export default function Home() {
           </div>
         </section>
 
+        {/* selected work */}
+        <section className="jb-sec">
+          <div className="jb-cap">
+            <div className="jb-label" data-reveal="0">
+              <i>/02</i> Selected work
+            </div>
+            <h2 className="jb-h2" data-reveal="60">
+              Nine builds. Hover one and the page walks itself.
+            </h2>
+            <p className="jb-lede" style={{ marginBottom: "30px" }}>
+              Funnels, client sites, and sales pages shipped inside GoHighLevel and in code, for coaches,
+              clinics, and local businesses in the US and Australia.
+            </p>
+            <div className="jb-works" data-reveal="140">
+              {works.map((w, i) => (
+                <figure className="jb-work" key={w.img}>
+                  <div className="jb-shot-bar">
+                    <span className="jb-shot-dots" aria-hidden="true">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className="jb-shot-url">{w.name.toLowerCase().replace(/s+/g, "")}.com</span>
+                    <span className="jb-shot-tag">{String(i + 1).padStart(2, "0")}</span>
+                  </div>
+                  <div className="jb-work-frame">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={w.img} alt={w.name + ", " + w.kind} loading="lazy" />
+                  </div>
+                  <figcaption className="jb-work-cap">
+                    <b>{w.name}</b>
+                    <span>{w.kind}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* certifications, compact */}
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/02</i> Certified by HighLevel
+              <i>/03</i> Certified by HighLevel
             </div>
             <div className="jb-certs-mini" data-reveal="80">
               {certs.map((c) => (
@@ -150,7 +236,7 @@ export default function Home() {
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/03</i> Track record
+              <i>/04</i> Track record
             </div>
             <div className="jb-ledger" data-reveal="80">
               {ledger.map((r) => (
@@ -207,6 +293,8 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      <BookPill />
 
       <footer className="jb-foot">
         <div className="jb-cap" style={{ display: "flex", flexWrap: "wrap", gap: "8px 18px", justifyContent: "space-between" }}>

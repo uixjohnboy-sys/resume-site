@@ -1111,6 +1111,200 @@ a.jb-proj:hover {
   display: block;
 }
 
+/* ---------- premium pass ---------- */
+
+/* Display type runs on Archivo's width axis: expanded for the poster
+   voice, normal for everything else. One family, two registers. */
+.jb-h1,
+.jb-h2,
+.jb-contact h2 {
+  font-variation-settings: "wdth" 122;
+  letter-spacing: -0.028em;
+}
+
+/* neon text selection, so even a copy-paste feels on-brand */
+.jb ::selection {
+  background: var(--neon);
+  color: var(--on-neon);
+}
+
+/* dark scrollbar with a neon hover, WebKit only, harmless elsewhere */
+.jb ::-webkit-scrollbar {
+  width: 11px;
+}
+.jb ::-webkit-scrollbar-track {
+  background: var(--ink);
+}
+.jb ::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 0;
+  border: 2px solid var(--ink);
+}
+.jb ::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-dim);
+}
+
+/* film grain over the whole page, the cheapest way to kill flatness */
+.jb-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* the three engineering one-liners under the proof shots */
+.jb-hardline {
+  list-style: none;
+  margin: 18px 0 22px;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.jb-hardline li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.jb-hardline li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 7px;
+  height: 7px;
+  background: var(--neon);
+}
+
+/* ---------- selected work gallery ---------- */
+
+.jb-works {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.jb-work {
+  margin: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.jb-work:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 34px rgba(213, 254, 56, 0.1);
+}
+
+/* The frame is a fixed window; the full-page screenshot pans down on
+   hover as if the site is scrolling itself. Long linear glide down,
+   quick ease back up. */
+.jb-work-frame {
+  height: 330px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+}
+
+.jb-work-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: translateY(0);
+  transition: transform 0.9s ease;
+}
+
+.jb-work:hover .jb-work-frame img {
+  transform: translateY(calc(-100% + 330px));
+  transition: transform 9s linear;
+}
+
+.jb-work-cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.jb-work-cap b {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.jb-work-cap span {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* ---------- floating book pill ---------- */
+
+.jb-bookpill {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--neon);
+  color: var(--on-neon);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 24px rgba(213, 254, 56, 0.25);
+  opacity: 0;
+  transform: translateY(84px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+
+.jb-bookpill .jb-dot {
+  background: var(--on-neon);
+  animation: none;
+}
+
+.jb-bookpill.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.jb-bookpill:hover {
+  transform: translateY(-2px);
+}
+
+.jb-bookpill:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+
+@media (min-width: 640px) {
+  .jb-works {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 980px) {
+  .jb-works {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 /* ---------- subpage helpers (/coach-os, /book) ---------- */
 
 .jb-back {
@@ -1735,6 +1929,12 @@ a.jb-proj:hover .jb-proj-more {
   }
   .jb-packet {
     display: none;
+  }
+  .jb-work:hover .jb-work-frame img {
+    transform: none;
+  }
+  .jb-bookpill {
+    transition: none;
   }
   .jb-glow {
     display: none;
