@@ -2,6 +2,7 @@ import Link from "next/link";
 import VideoIntro from "@/components/home/VideoIntro";
 import Fx from "@/components/home/Fx";
 import SystemLog from "@/components/home/SystemLog";
+import LiveClock from "@/components/home/LiveClock";
 import SyncDiagram from "@/components/home/SyncDiagram";
 import { archivo, jetmono } from "./fonts";
 import "./home.css";
@@ -20,6 +21,29 @@ const boardCells = [
   { v: "24", count: "24", suffix: "", l: "GHL webhook events, both directions" },
   { v: "83", count: "83", suffix: "", l: "Automated email templates live" },
   { v: "4", count: "4", suffix: "", l: "Countries served: US, AU, UK, PH" },
+];
+
+const awards = [
+  {
+    img: "/badge-workflow-automation-expert.png",
+    t: "Workflow Automation Expert",
+    d: "Official HighLevel certification for advanced workflow and automation architecture.",
+  },
+  {
+    img: "/badge-funnel-building-expert.png",
+    t: "Funnel Building Expert",
+    d: "Official HighLevel certification for high-converting funnel builds.",
+  },
+  {
+    img: "/badge-ai-employee-specialist.png",
+    t: "AI Employee Specialist",
+    d: "Official HighLevel certification for AI Employee setup and deployment.",
+  },
+  {
+    img: "/badge-course-community-expert.png",
+    t: "Course & Community Expert",
+    d: "Official HighLevel certification for courses, memberships, and community builds.",
+  },
 ];
 
 const capabilities = [
@@ -135,11 +159,11 @@ export default function Home() {
       <header className="jb-top">
         <div className="jb-cap jb-top-in">
           <a className="jb-mark" href="#top">
-            JB<b>·</b>ROXAS
+            Johnboy Roxas
           </a>
           <span className="jb-status">
             <span className="jb-dot" aria-hidden="true" />
-            Available for part-time · PHT
+            Available part-time · <LiveClock /> PHT
           </span>
         </div>
       </header>
@@ -148,51 +172,44 @@ export default function Home() {
         {/* hero */}
         <section className="jb-hero">
           <div className="jb-hero-bg" aria-hidden="true" />
-          <div className="jb-cap jb-hero-in">
-            <div>
-              <span className="jb-avail" data-reveal="0">
-                <span className="jb-dot" aria-hidden="true" />
-                Open to new builds
-              </span>
-              <h1 className="jb-h1" data-reveal="90">
-                I build the systems <em>GoHighLevel</em>{" "}can{"’"}t build alone.
-              </h1>
-              <p className="jb-sub" data-reveal="180">
-                GoHighLevel for the engine. <b>Custom code for everything past its walls</b>: Next.js, Firebase,
-                Stripe, and the Claude API, wired back into the CRM by webhook. 5 years, 58 client builds, and one
-                flagship platform you can click through before you ever message me.
-              </p>
-              <div className="jb-cta-row" data-reveal="260">
-                <a className="jb-btn jb-btn-primary" href="/coach-os">
-                  See the flagship build
-                </a>
-                <a className="jb-btn jb-btn-ghost" href="/book">
-                  Book a call
-                </a>
-              </div>
-
-              {/* status board */}
-              <div className="jb-board" data-reveal="340">
-                <div className="jb-board-head">
-                  <span>System status</span>
-                  <span>Counted, not estimated</span>
-                </div>
-                <div className="jb-board-grid">
-                  {boardCells.map((c) => (
-                    <div className="jb-cell" key={c.l}>
-                      <div className="jb-cell-v" data-count={c.count} data-suffix={c.suffix}>
-                        {c.v}
-                      </div>
-                      <div className="jb-cell-l">{c.l}</div>
-                    </div>
-                  ))}
-                </div>
-                <SystemLog />
-              </div>
+          <div className="jb-cap jb-hero-center">
+            <div className="jb-video-wrap" data-reveal="0">
+              <VideoIntro />
+            </div>
+            <h1 className="jb-h1" data-reveal="120">
+              I build the systems <em>GoHighLevel</em>{" "}can{"’"}t build alone.
+            </h1>
+            <p className="jb-sub" data-reveal="200">
+              GoHighLevel for the engine. <b>Custom code for everything past its walls</b>: Next.js, Firebase,
+              Stripe, and the Claude API, wired back into the CRM by webhook. 5 years, 58 client builds, and one
+              flagship platform you can click through before you ever message me.
+            </p>
+            <div className="jb-cta-row jb-cta-center" data-reveal="280">
+              <a className="jb-btn jb-btn-primary" href="/coach-os">
+                See the flagship build
+              </a>
+              <a className="jb-btn jb-btn-ghost" href="/book">
+                Book a call
+              </a>
             </div>
 
-            <div data-reveal="200">
-              <VideoIntro />
+            {/* status board */}
+            <div className="jb-board jb-board-hero" data-reveal="360">
+              <div className="jb-board-head">
+                <span>System status</span>
+                <span>Counted, not estimated</span>
+              </div>
+              <div className="jb-board-grid">
+                {boardCells.map((c) => (
+                  <div className="jb-cell" key={c.l}>
+                    <div className="jb-cell-v" data-count={c.count} data-suffix={c.suffix}>
+                      {c.v}
+                    </div>
+                    <div className="jb-cell-l">{c.l}</div>
+                  </div>
+                ))}
+              </div>
+              <SystemLog />
             </div>
           </div>
         </section>
@@ -299,11 +316,34 @@ export default function Home() {
           </div>
         </section>
 
+        {/* certifications */}
+        <section className="jb-sec">
+          <div className="jb-cap">
+            <div className="jb-label" data-reveal="0">
+              <i>/03</i> Certifications
+            </div>
+            <h2 className="jb-h2" data-reveal="60">Certified by HighLevel itself.</h2>
+            <p className="jb-lede" style={{ marginBottom: "34px" }}>
+              Four official HighLevel certifications, earned through their own programs, not self-declared.
+            </p>
+            <div className="jb-awards" data-reveal="140">
+              {awards.map((a) => (
+                <div className="jb-award" key={a.t}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={a.img} alt={"HighLevel " + a.t + " certification badge"} />
+                  <div className="jb-award-t">{a.t}</div>
+                  <p className="jb-award-d">{a.d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* track record */}
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/03</i> Track record
+              <i>/04</i> Track record
             </div>
             <h2 className="jb-h2" data-reveal="60">Where this has already worked.</h2>
             <div className="jb-ledger" style={{ marginTop: "30px" }} data-reveal="140">
@@ -325,7 +365,7 @@ export default function Home() {
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/04</i> Own products
+              <i>/05</i> Own products
             </div>
             <h2 className="jb-h2" data-reveal="60">Built for myself, shipped like client work.</h2>
             <p className="jb-lede" style={{ marginBottom: "34px" }}>
@@ -360,7 +400,7 @@ export default function Home() {
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/05</i> Stack
+              <i>/06</i> Stack
             </div>
             {stackGroups.map((g) => (
               <div className="jb-stack-group" key={g.k}>
@@ -381,7 +421,7 @@ export default function Home() {
         <section className="jb-sec">
           <div className="jb-cap">
             <div className="jb-label" data-reveal="0">
-              <i>/06</i> How I work
+              <i>/07</i> How I work
             </div>
             <ul className="jb-promises" data-reveal="80">
               {promises.map((p) => (

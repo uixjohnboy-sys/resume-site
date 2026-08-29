@@ -55,7 +55,7 @@ export default function BookPage() {
       <header className="jb-top">
         <div className="jb-cap jb-top-in">
           <Link className="jb-mark" href="/">
-            JB<b>·</b>ROXAS
+            Johnboy Roxas
           </Link>
           <span className="jb-status">
             <span className="jb-dot" aria-hidden="true" />

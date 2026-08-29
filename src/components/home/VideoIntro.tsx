@@ -66,16 +66,7 @@ export default function VideoIntro() {
         )}
       </div>
 
-      <div className="jb-badges">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/badge-workflow-automation-expert.png" alt="GHL Workflow Automation Expert badge" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/badge-funnel-building-expert.png" alt="GHL Funnel Building Expert badge" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/badge-ai-employee-specialist.png" alt="GHL AI Employee Specialist badge" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/badge-course-community-expert.png" alt="GHL Course and Community Expert badge" />
-      </div>
+
     </div>
   );
 }
