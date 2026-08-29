@@ -29,34 +29,46 @@ export const metadata: Metadata = {
 
 const shots = [
   {
-    img: "/coach-os-shots/start.jpg",
-    url: "coachos.johnboydesign.com/start",
-    cap: "The front door. A link-in-bio page that is itself the product, with the AI front desk one tap away.",
+    img: "/coach-os-shots/app-diagnostic.jpg",
+    url: "harperquinn demo · /diagnostic",
+    cap: "Lead gen tool 1 of 4: the Alignment Diagnostic. A four-minute quiz that scores the visitor, writes the result into the CRM, and books the call from the result page.",
+    wide: false,
   },
   {
-    img: "/coach-os-shots/tour-hero.jpg",
-    url: "coachos.johnboydesign.com/tour",
-    cap: "The self-serve tour: a client's whole first year, walked stage by stage on real running screens.",
+    img: "/coach-os-shots/app-challenge.jpg",
+    url: "harperquinn demo · /challenge",
+    cap: "Lead gen tool 2 of 4: the 3-Day Reset. A three-day challenge with its own intake, daily email drip, and completion tracking.",
+    wide: false,
   },
   {
-    img: "/coach-os-shots/mirror-builder.jpg",
-    url: "coachos.johnboydesign.com/mirror",
-    cap: "The Mirror. Type a prospect's details and the whole preview below becomes theirs, name, brand, packages.",
+    img: "/coach-os-shots/app-blueprint.jpg",
+    url: "harperquinn demo · /blueprint",
+    cap: "Lead gen tool 3 of 4: the 90-Day Blueprint. Five questions in, one AI-personalised plan out, delivered to the lead's inbox.",
+    wide: false,
   },
   {
-    img: "/coach-os-shots/mirror-flow.jpg",
-    url: "coachos.johnboydesign.com/mirror",
-    cap: "The client's first days in their brand: the diagnostic, the follow-up written in the coach's voice, the checkout.",
+    img: "/coach-os-shots/app-frontdesk.jpg",
+    url: "harperquinn demo · /front-desk",
+    cap: "Lead gen tool 4 of 4: the AI Front Desk, answering a real visitor question live. It qualifies the lead and tags the CRM while it talks.",
+    wide: false,
   },
   {
-    img: "/coach-os-shots/tour-signed.jpg",
-    url: "harperquinn.com/sign",
-    cap: "The agreement that never got signed, signed: in-browser e-signature with a permanent snapshot and audit trail.",
+    img: "/coach-os-shots/app-portal.jpg",
+    url: "harperquinn demo · /coach · logged in as a demo client",
+    cap: "The client portal: the AI companion chat, the live commitment strip at the top, daily check-ins, weekly booking, courses, progress, and signed agreements, all behind one passwordless link.",
+    wide: true,
   },
   {
-    img: "/coach-os-shots/pricing.jpg",
-    url: "coachos.johnboydesign.com/pricing",
-    cap: "Plain pricing and public terms, because a payment reviewer and a nervous buyer read the same page.",
+    img: "/coach-os-shots/app-dash-overview.jpg",
+    url: "harperquinn demo · /dashboard · owner only",
+    cap: "The admin dashboard: active clients, recurring MRR, today's calls, and everything needing attention, on one screen.",
+    wide: false,
+  },
+  {
+    img: "/coach-os-shots/app-dash-kanban.jpg",
+    url: "harperquinn demo · /dashboard · unified pipeline",
+    cap: "Every lead from every tool on one board, with at-risk, unsigned, and gone-quiet filters, per-card notes, checkout links, and CSV export.",
+    wide: false,
   },
 ];
 
@@ -272,12 +284,13 @@ export default function CoachOsCaseStudy() {
               Real screenshots, not mockups.
             </h2>
             <p className="jb-lede" style={{ marginBottom: "34px" }}>
-              Every screen below is the live system, captured as it runs today. Click any door in section /06 and
-              you will land on the same pixels.
+              Every screen below is the running Harper Quinn demo practice, captured live: the four lead
+              generation tools, the client portal, and the owner's dashboard. The public ones are one click away
+              in section /06.
             </p>
             <div className="jb-shots" data-reveal="140">
               {shots.map((sh) => (
-                <figure className="jb-shot" key={sh.img}>
+                <figure className="jb-shot" key={sh.img} style={sh.wide ? { gridColumn: "1 / -1" } : undefined}>
                   <div className="jb-shot-bar">
                     <span className="jb-shot-dots" aria-hidden="true">
                       <i />
