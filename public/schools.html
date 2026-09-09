@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Front Door Check</title>
+<meta name="description" content="A sixty second self-check for a martial arts school owner: whether a parent looking for you tonight can actually reach you. Ranked white belt to black.">
+<link rel="canonical" href="https://www.johnboydesign.com/schools">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.johnboydesign.com/schools">
+<meta property="og:title" content="The Front Door Check">
+<meta property="og:description" content="A parent looked for your school last night. Did they get through? Check it yourself in sixty seconds.">
+<meta property="og:site_name" content="John Boy Roxas">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Front Door Check">
+<meta name="twitter:description" content="A parent looked for your school last night. Did they get through?">
+<meta name="robots" content="index, follow">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground:   #F2F1EC;
+    --paper:    #FBFAF8;
+    --ink:      #14202E;
+    --ink-soft: #4A5766;
+    --ink-mute: #78838F;
+    --indigo:   #1F3A5F;
+    --indigo-2: #35597F;
+    --oxide:    #A8432C;
+    --moss:     #46654B;
+    --rule:     #D8D5CC;
+    --rule-2:   #E7E4DC;
+    --shade:    rgba(20,32,46,.06);
+
+    --belt-white:  #FAF8F3;
+    --belt-yellow: #D9A72C;
+    --belt-green:  #3F7048;
+    --belt-brown:  #6B4A2F;
+    --belt-black:  #1B1B1D;
+
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --sans:  "Public Sans", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    --col: 41rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #10171F;
+      --paper:    #17202B;
+      --ink:      #E9E7E1;
+      --ink-soft: #AFB8C2;
+      --ink-mute: #7C8794;
+      --indigo:   #8FB0D6;
+      --indigo-2: #A9C4E4;
+      --oxide:    #E0876C;
+      --moss:     #8DB393;
+      --rule:     #2A3644;
+      --rule-2:   #202B37;
+      --shade:    rgba(0,0,0,.28);
+      --belt-white:  #EDEAE3;
+      --belt-yellow: #E4B845;
+      --belt-green:  #5C9268;
+      --belt-brown:  #8A6543;
+      --belt-black:  #050506;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:   #10171F;
+    --paper:    #17202B;
+    --ink:      #E9E7E1;
+    --ink-soft: #AFB8C2;
+    --ink-mute: #7C8794;
+    --indigo:   #8FB0D6;
+    --indigo-2: #A9C4E4;
+    --oxide:    #E0876C;
+    --moss:     #8DB393;
+    --rule:     #2A3644;
+    --rule-2:   #202B37;
+    --shade:    rgba(0,0,0,.28);
+    --belt-white:  #EDEAE3;
+    --belt-yellow: #E4B845;
+    --belt-green:  #5C9268;
+    --belt-brown:  #8A6543;
+    --belt-black:  #050506;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--col);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  .wide { max-width: 49rem; }
+
+  /* ---------- masthead ---------- */
+
+  header.top {
+    border-bottom: 1px solid var(--rule);
+    padding: 3.5rem 0 2.75rem;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--indigo);
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    margin-bottom: 1.6rem;
+  }
+  .eyebrow::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(2.1rem, 6.4vw, 3.15rem);
+    line-height: 1.08;
+    letter-spacing: -.015em;
+    text-wrap: balance;
+    margin: 0 0 1.1rem;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--indigo);
+  }
+  .standfirst {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    margin: 0 0 1.9rem;
+    max-width: 34rem;
+  }
+  .byline {
+    font-family: var(--mono);
+    font-size: .8rem;
+    line-height: 1.75;
+    color: var(--ink-mute);
+    border-left: 2px solid var(--rule);
+    padding-left: .95rem;
+  }
+  .byline b { color: var(--ink-soft); font-weight: 500; }
+
+  /* ---------- sections ---------- */
+
+  section { padding: 3.25rem 0; border-bottom: 1px solid var(--rule-2); }
+  section:last-of-type { border-bottom: 0; }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.65rem;
+    line-height: 1.2;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+    margin: 0 0 .7rem;
+  }
+  .lede { color: var(--ink-soft); margin: 0 0 2rem; max-width: 33rem; }
+  p { margin: 0 0 1.05rem; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ---------- the check ---------- */
+
+  .tally {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--ground);
+    border-bottom: 1px solid var(--rule);
+    padding: .8rem 0;
+    margin-bottom: 2rem;
+  }
+  .tally-in {
+    display: flex;
+    align-items: baseline;
+    gap: .75rem;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: .82rem;
+    color: var(--ink-mute);
+  }
+  .tally-n {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .tally-n.hit { color: var(--oxide); }
+  .tally-note { color: var(--ink-soft); }
+
+  ol.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.4rem; }
+
+  .check {
+    display: grid;
+    grid-template-columns: 2.9rem 1fr;
+    gap: 0 1.15rem;
+    align-items: start;
+    background: var(--paper);
+    border: 1px solid var(--rule-2);
+    border-left: 0;
+    padding: 1.2rem 1.35rem 1.2rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .belt {
+    grid-row: 1 / span 4;
+    align-self: stretch;
+    width: 2.9rem;
+    margin: -1.2rem 0;
+    position: relative;
+    border-right: 1px solid var(--rule-2);
+  }
+  .belt i {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+  .belt span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%) rotate(180deg);
+    writing-mode: vertical-rl;
+    font-family: var(--mono);
+    font-size: .62rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .b-white  i { background: var(--belt-white); }
+  .b-white  span { color: #5B5B55; }
+  .b-yellow i { background: var(--belt-yellow); }
+  .b-yellow span { color: #3A2C05; }
+  .b-green  i { background: var(--belt-green); }
+  .b-green  span { color: #EAF2EB; }
+  .b-brown  i { background: var(--belt-brown); }
+  .b-brown  span { color: #F2E6DA; }
+  .b-black  i { background: var(--belt-black); }
+  .b-black  span { color: #C9C9CE; }
+
+  .check h3 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 1.02rem;
+    line-height: 1.35;
+    margin: 0 0 .45rem;
+    text-wrap: balance;
+  }
+  .do {
+    font-family: var(--mono);
+    font-size: .84rem;
+    line-height: 1.6;
+    color: var(--indigo);
+    margin: 0 0 .5rem;
+  }
+  .look { color: var(--ink-soft); font-size: .97rem; margin: 0 0 .9rem; }
+  .look b { color: var(--ink); font-weight: 500; }
+
+  .verdict { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .verdict button {
+    font-family: var(--mono);
+    font-size: .74rem;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    padding: .42rem .8rem;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-mute);
+    cursor: pointer;
+    transition: background .13s, color .13s, border-color .13s;
+  }
+  .verdict button:hover { border-color: var(--ink-mute); color: var(--ink-soft); }
+  .verdict button:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+  .check[data-state="ok"]  .v-ok  { background: var(--moss);  border-color: var(--moss);  color: var(--paper); }
+  .check[data-state="bad"] .v-bad { background: var(--oxide); border-color: var(--oxide); color: var(--paper); }
+  .check[data-state="bad"] { border-color: var(--oxide); }
+
+  /* ---------- found ---------- */
+
+  .found { list-style: none; margin: 0 0 1.4rem; padding: 0; }
+  .found li {
+    display: grid;
+    grid-template-columns: 3.1rem 1fr;
+    gap: 1rem;
+    padding: .72rem 0;
+    border-top: 1px solid var(--rule-2);
+    align-items: baseline;
+  }
+  .found li:last-child { border-bottom: 1px solid var(--rule-2); }
+  .found .n {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--oxide);
+    text-align: right;
+  }
+  .found .t { color: var(--ink-soft); font-size: .97rem; }
+
+  /* ---------- price ---------- */
+
+  .price { list-style: none; margin: 0 0 1.5rem; padding: 0; }
+  .price li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: .8rem 0;
+    border-top: 1px solid var(--rule-2);
+  }
+  .price li:last-child { border-bottom: 1px solid var(--rule-2); }
+  .price .what { font-weight: 500; }
+  .price .what small { display: block; font-weight: 400; color: var(--ink-mute); font-size: .87rem; line-height: 1.45; }
+  .price .amt {
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    color: var(--indigo);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .price .amt small { color: var(--ink-mute); font-size: .78rem; }
+
+  .note {
+    border-left: 2px solid var(--indigo);
+    padding: .1rem 0 .1rem 1.05rem;
+    color: var(--ink-soft);
+    font-size: .97rem;
+  }
+  .note.proof { margin-top: 2rem; }
+
+  /* ---------- stages ---------- */
+
+  .stages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+    gap: 1.6rem 2.2rem;
+  }
+  .stage ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .48rem; }
+  .stage li {
+    color: var(--ink-soft);
+    font-size: .95rem;
+    line-height: 1.5;
+    padding-left: 1rem;
+    position: relative;
+  }
+  .stage li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: .62em;
+    width: .34rem;
+    height: .34rem;
+    background: var(--indigo);
+    opacity: .55;
+  }
+  .st-head {
+    font-family: var(--mono);
+    font-size: .74rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin: 0 0 .8rem;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .st-n { color: var(--oxide); }
+
+  /* ---------- close ---------- */
+
+  footer.end { padding: 3.25rem 0 4.5rem; }
+  .sig {
+    font-family: var(--mono);
+    font-size: .84rem;
+    line-height: 1.8;
+    color: var(--ink-mute);
+    margin-top: 2rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--rule-2);
+  }
+  .sig b { color: var(--ink); font-weight: 500; }
+  a { color: var(--indigo); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+
+  @media (max-width: 34rem) {
+    .check { grid-template-columns: 2.1rem 1fr; gap: 0 .95rem; padding-right: 1rem; }
+    .belt { width: 2.1rem; }
+    h1 { font-size: 2rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">The Front Door Check</p>
+    <h1>A parent looked for your school last night. <em>Did they get through?</em></h1>
+    <p class="standfirst">Not whether your website loads. Whether a message actually reaches a person, and whether the buttons a parent taps on a phone still work.</p>
+    <p class="byline">
+      <b>John Boy Roxas</b><br>
+      Websites, booking and automation for small businesses<br>
+      Manila, Philippines. Thirty martial arts schools checked by hand
+    </p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Check it yourself in sixty seconds</h2>
+    <p class="lede">You do not need me for this part. Pick up your phone, not your laptop, because a parent looking for a school at nine at night is on a phone. Work down the belts. They get harder as you go.</p>
+  </div>
+
+  <div class="tally">
+    <div class="wrap">
+      <div class="tally-in">
+        <span class="tally-n" id="tallyN">0</span>
+        <span id="tallyLabel">nothing marked yet</span>
+        <span class="tally-note" id="tallyNote"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap wide">
+    <ol class="checks" id="checks">
+
+      <li class="check b-white" data-state="">
+        <div class="belt"><i></i><span>White</span></div>
+        <h3>Search your own school name on your phone</h3>
+        <p class="do">Google &rsaquo; type your school name &rsaquo; look at the panel on the right</p>
+        <p class="look">Does it say <b>open</b>, and is there a <b>Directions</b> button and a list of hours? One school I checked was showing a red "Temporarily closed" banner to every parent in its city. It was open, five days a week.</p>
+        <div class="verdict">
+          <button class="v-ok" type="button">Fine</button>
+          <button class="v-bad" type="button">Not fine</button>
+        </div>
+      </li>
+
+      <li class="check b-yellow" data-state="">
+        <div class="belt"><i></i><span>Yellow</span></div>
+        <h3>Tap your own phone number on your website</h3>
+        <p class="do">Your site &rsaquo; tap the number &rsaquo; does the dialler open with the right digits</p>
+        <p class="look">Tap it, do not read it. The printed number is usually right. <b>The link behind it often is not.</b> Nine of the thirty schools I checked had a call link written so that some phones will not dial it, and one was still carrying the demo number its website template shipped with.</p>
+        <div class="verdict">
+          <button class="v-ok" type="button">Fine</button>
+          <button class="v-bad" type="button">Not fine</button>
+        </div>
+      </li>
+
+      <li class="check b-green" data-state="">
+        <div class="belt"><i></i><span>Green</span></div>
+        <h3>Tap every social icon on your site</h3>
+        <p class="do">Your site &rsaquo; footer &rsaquo; tap each icon in turn</p>
+        <p class="look">Each one should land on <b>your</b> page, not a login wall, not an error, not somebody else. Three of the thirty had an icon that went nowhere. One pointed at an address that was never a web address at all, so it simply failed.</p>
+        <div class="verdict">
+          <button class="v-ok" type="button">Fine</button>
+          <button class="v-bad" type="button">Not fine</button>
+        </div>
+      </li>
+
+      <li class="check b-brown" data-state="">
+        <div class="belt"><i></i><span>Brown</span></div>
+        <h3>Search yourself in Google Maps and count the pins</h3>
+        <p class="do">Google Maps &rsaquo; your school name &rsaquo; count how many results are you</p>
+        <p class="look">There should be <b>one</b>. Two schools I checked had two listings each, and their reviews were split between them. One had a single review on one pin and seventeen on the other. Google could not tell which was real, so it showed neither in the panel.</p>
+        <div class="verdict">
+          <button class="v-ok" type="button">Fine</button>
+          <button class="v-bad" type="button">Not fine</button>
+        </div>
+      </li>
+
+      <li class="check b-black" data-state="">
+        <div class="belt"><i></i><span>Black</span></div>
+        <h3>Have a stranger send you an enquiry, and time it</h3>
+        <p class="do">Ask a friend your staff do not know &rsaquo; your own contact form &rsaquo; Saturday night &rsaquo; start the clock</p>
+        <p class="look">This is the one that decides the others. Ask them to use a real question a parent would ask, and then wait. <b>Most of the schools I tested had no human reply after seventy two hours.</b> One answered in under a minute with class times, what to bring, and a question back. That school will win the enrolment every time.</p>
+        <div class="verdict">
+          <button class="v-ok" type="button">Fine</button>
+          <button class="v-bad" type="button">Not fine</button>
+        </div>
+      </li>
+
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What thirty schools looked like</h2>
+    <p class="lede">Two weeks, thirty independent schools across the United States and Australia, every door opened by hand. These are the ones that were costing somebody an enquiry.</p>
+    <ul class="found">
+      <li><span class="n">9</span><span class="t">had a call button written so that some phones will not dial it</span></li>
+      <li><span class="n">3</span><span class="t">had a social icon on their own site that led nowhere</span></li>
+      <li><span class="n">2</span><span class="t">had two Google listings splitting their reviews between them</span></li>
+      <li><span class="n">1</span><span class="t">was telling every searcher it was temporarily closed while trading normally</span></li>
+      <li><span class="n">1</span><span class="t">published an email address on its own site that bounces mail back</span></li>
+      <li><span class="n">1</span><span class="t">still had last summer's timetable as the only schedule a parent could download</span></li>
+    </ul>
+    <p class="note">None of this is about how a school teaches. Every one of these was a small thing nobody had happened to check, on a site that was built once and then left to run. That is the ordinary way it goes.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Who is writing this</h2>
+    <p class="lede">I build the path a parent walks from finding you to paying you, and every piece along it. Most of my work is the part nobody sees, which is why I notice when it is missing.</p>
+  </div>
+
+  <div class="wrap wide">
+    <div class="stages">
+      <div class="stage">
+        <p class="st-head"><span class="st-n">Before</span> they contact you</p>
+        <ul>
+          <li>The website, and a real page for each programme</li>
+          <li>Writing that answers what a parent is actually asking</li>
+          <li>Google and Apple listings, correct and claimed</li>
+          <li>Speed and layout on a phone, which is where they are</li>
+        </ul>
+      </div>
+      <div class="stage">
+        <p class="st-head"><span class="st-n">When</span> they contact you</p>
+        <ul>
+          <li>Enquiry forms that arrive somewhere a person reads</li>
+          <li>The reply that goes out at nine at night on its own</li>
+          <li>Online booking for a trial class, and the waiver with it</li>
+          <li>Every enquiry landing in one list instead of four inboxes</li>
+        </ul>
+      </div>
+      <div class="stage">
+        <p class="st-head"><span class="st-n">After</span> they contact you</p>
+        <ul>
+          <li>Follow ups for the parent who asked and did not book</li>
+          <li>Card payments, monthly fees, and failed payment chasing</li>
+          <li>Grading reminders and memberships about to lapse</li>
+          <li>Win back messages for a student who stopped coming</li>
+        </ul>
+      </div>
+      <div class="stage">
+        <p class="st-head"><span class="st-n">So you can see it</span></p>
+        <ul>
+          <li>One page telling you how many enquiries came in</li>
+          <li>How many were answered, and how fast</li>
+          <li>Which of your doors is bringing people and which is dead</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="note proof">The largest thing I have built is a complete platform for a coaching business, running live: twenty six thousand lines of code, twenty six pages, thirty four endpoints, eighty three email templates, e signature, card subscriptions, and eight scheduled jobs that run every day without anyone opening a laptop. Five years of this, fifty eight client systems. A martial arts school needs a small corner of it, which is the corner I am offering.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What it costs</h2>
+    <p class="lede">Martial arts schools are what I have been looking at all month, so I already know where these break and I am not learning on your money.</p>
+    <ul class="price">
+      <li>
+        <span class="what">The check itself<small>Every door, written up in one page, with what I would fix first</small></span>
+        <span class="amt">Free</span>
+      </li>
+      <li>
+        <span class="what">Repair<small>Broken links, dead buttons, wrong numbers, stale content, the contact form working properly</small></span>
+        <span class="amt">$300</span>
+      </li>
+      <li>
+        <span class="what">Rebuild<small>A new site for a small school, written and built to turn a visitor into an enquiry</small></span>
+        <span class="amt">$700</span>
+      </li>
+      <li>
+        <span class="what">Monthly check afterwards<small>Optional. I run the whole test again each month and send you what changed</small></span>
+        <span class="amt">$49 <small>/ AUD 79</small></span>
+      </li>
+    </ul>
+    <p class="note">The booking, payments and follow up side is quoted separately, once I have seen what you already run on. No calls unless you want one. No contract, no retainer, nothing to install. I work from Manila, which is why I answer overnight your time and why the price is what it is.</p>
+  </div>
+</section>
+
+<footer class="end">
+  <div class="wrap">
+    <h2>If you want the check</h2>
+    <p>Reply to the email I sent you, or write to the address below with your school name. I will run every door, on a phone, and send you the page. It is free whether or not you ever pay me anything, and if everything passes I will tell you that instead of inventing something.</p>
+    <p>One more thing worth saying plainly. This page is the work. If you like how it reads and how it holds together on your phone, that is what I would be doing for yours.</p>
+    <p class="sig">
+      <b>John Boy Roxas</b><br>
+      Manila, Philippines<br>
+      <a href="mailto:uix.johnboy@gmail.com">uix.johnboy@gmail.com</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var checks = Array.prototype.slice.call(document.querySelectorAll('.check'));
+    var nEl = document.getElementById('tallyN');
+    var labelEl = document.getElementById('tallyLabel');
+    var noteEl = document.getElementById('tallyNote');
+    var KEY = 'fdc.v1';
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+    }
+    function save(state) {
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* private window */ }
+    }
+
+    function render() {
+      var bad = 0, marked = 0;
+      checks.forEach(function (c) {
+        var s = c.getAttribute('data-state');
+        if (s === 'bad') bad++;
+        if (s === 'ok' || s === 'bad') marked++;
+      });
+      nEl.textContent = String(bad);
+      nEl.classList.toggle('hit', bad > 0);
+
+      if (!marked) {
+        labelEl.textContent = 'nothing marked yet';
+        noteEl.textContent = '';
+        return;
+      }
+      labelEl.textContent = bad === 1 ? 'thing to fix' : 'things to fix';
+      if (bad === 0) {
+        noteEl.textContent = marked < checks.length
+          ? 'clean so far'
+          : 'all five clean, which is unusual';
+      } else if (bad <= 2) {
+        noteEl.textContent = 'about what I find at most schools';
+      } else {
+        noteEl.textContent = 'more than most, and all of it is fixable';
+      }
+    }
+
+    var saved = load();
+    checks.forEach(function (c, i) {
+      if (saved[i] === 'ok' || saved[i] === 'bad') c.setAttribute('data-state', saved[i]);
+      c.querySelector('.v-ok').addEventListener('click', function () { set(c, 'ok'); });
+      c.querySelector('.v-bad').addEventListener('click', function () { set(c, 'bad'); });
+    });
+
+    function set(card, val) {
+      card.setAttribute('data-state', card.getAttribute('data-state') === val ? '' : val);
+      save(checks.map(function (c) { return c.getAttribute('data-state'); }));
+      render();
+    }
+
+    render();
+  })();
+</script>
+
+</body>
+</html>
