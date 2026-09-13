@@ -1,0 +1,438 @@
+/*
+  Corrections page for Built Before Machines. Styled as a 19th century
+  engineering plate: cream paper, ink, a second ink, one accent, hairline
+  rules. Every class here is a CSS Module class, so nothing leaks into the
+  portfolio routes, and the portfolio's dark ground is only overridden on a
+  document that contains this page.
+*/
+
+.page {
+  --paper: #f5eede;
+  --paper-light: #faf5ea;
+  --ink: #221e18;
+  --ink-2: #6f6555;
+  --accent: #b4471f;
+  --hair: rgba(111, 101, 85, 0.38);
+
+  flex: 1 0 auto;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(0.75rem, 3vw, 3rem) clamp(0.625rem, 3vw, 3rem);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--errata-text), Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The root layout paints a dark body for the portfolio. On this page only,
+   the whole canvas is paper, including overscroll. */
+:global(html):has(.page),
+:global(body):has(.page) {
+  background: #f5eede;
+  color-scheme: light;
+}
+
+.page ::selection {
+  background: rgba(180, 71, 31, 0.18);
+}
+
+/* The plate: a heavy outer rule with a hairline inside it. */
+.plate {
+  position: relative;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 4rem) clamp(1.125rem, 5vw, 4.5rem);
+  border: 2px solid var(--ink);
+}
+
+.plate::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--hair);
+  pointer-events: none;
+}
+
+/* Header */
+
+.header {
+  text-align: center;
+  margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.kicker {
+  margin: 0 0 0.6rem;
+  font-family: var(--errata-display), Georgia, serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--errata-display), Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 8.5vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 22rem;
+  margin: 1rem auto 0;
+}
+
+.rule::before,
+.rule::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--ink);
+}
+
+.rule span {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+
+/* Body copy */
+
+.intro p,
+.section > p {
+  max-width: 44rem;
+  margin: 0 0 1rem;
+}
+
+.section {
+  margin-top: clamp(2rem, 5vw, 3rem);
+}
+
+.heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--ink);
+  font-family: var(--errata-display), Georgia, serif;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Empty state, printed like a label on the plate: light field, hairline
+   border, ink text, one accent rule at the left. */
+
+.empty {
+  max-width: 44rem;
+  padding: 1rem 1.25rem;
+  background: var(--paper-light);
+  border: 1px solid var(--hair);
+  border-left: 3px solid var(--accent);
+}
+
+.empty p {
+  margin: 0;
+}
+
+.empty p + p {
+  color: var(--ink-2);
+}
+
+/* Links */
+
+.link,
+.anchor,
+.channelLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(180, 71, 31, 0.55);
+  text-underline-offset: 0.18em;
+}
+
+.link:hover,
+.anchor:hover,
+.channelLink:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.link:focus-visible,
+.anchor:focus-visible,
+.channelLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.anchor {
+  text-decoration-color: var(--hair);
+}
+
+/* The log, as a table on wide screens */
+
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.caption {
+  caption-side: bottom;
+  padding-top: 0.75rem;
+  text-align: left;
+  font-family: var(--errata-display), Georgia, serif;
+  font-style: italic;
+  font-size: 0.9375rem;
+  color: var(--ink-2);
+}
+
+.table th {
+  padding: 0 0.75rem 0.5rem;
+  text-align: left;
+  vertical-align: bottom;
+  font-family: var(--errata-display), Georgia, serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--ink);
+  white-space: nowrap;
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: 0;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: 0;
+}
+
+.table td {
+  padding: 0.9rem 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid var(--hair);
+  overflow-wrap: anywhere;
+}
+
+/* Each group is one correction and any lines it replaced. A full ink rule
+   opens a group, a dashed hairline joins a struck line to its replacement. */
+@media (min-width: 56.0625rem) {
+  .group tr:first-child td {
+    border-top-color: var(--ink);
+  }
+
+  .group tr + tr td {
+    border-top-style: dashed;
+  }
+
+  .group:last-of-type tr:last-child td {
+    border-bottom: 1px solid var(--ink);
+  }
+}
+
+.cellNo,
+.cellDate {
+  font-family: var(--errata-mono), ui-monospace, "Courier New", monospace;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.cellNo {
+  min-width: 5.5rem;
+}
+
+.value {
+  display: inline;
+}
+
+.flag {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--accent);
+  white-space: normal;
+}
+
+.note {
+  display: block;
+  margin-top: 0.4rem;
+  font-style: italic;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+/* Superseded rows stay readable: second ink, struck in the accent. */
+.superseded td {
+  color: var(--ink-2);
+}
+
+.superseded s {
+  text-decoration-line: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent);
+}
+
+.superseded .link {
+  text-decoration-line: line-through;
+}
+
+/* Footer */
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  padding-top: 1rem;
+  border-top: 1px solid var(--ink);
+}
+
+.channelLink {
+  font-family: var(--errata-display), Georgia, serif;
+  font-size: 0.9375rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.updated {
+  margin: 0;
+  font-family: var(--errata-mono), ui-monospace, "Courier New", monospace;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+/* The log, as stacked cards on narrow screens */
+
+@media (max-width: 56rem) {
+  .tableWrap {
+    overflow-x: visible;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td,
+  .caption {
+    display: block;
+    width: 100%;
+  }
+
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .caption {
+    padding: 0 0 0.75rem;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 0;
+    padding: 0.875rem 1rem 1rem;
+    background: var(--paper-light);
+    border: 1px solid var(--hair);
+    border-top: 2px solid var(--ink);
+  }
+
+  .table tr.superseded {
+    border-top-color: var(--ink-2);
+    background: transparent;
+  }
+
+  .table td,
+  .table td:first-child,
+  .table td:last-child {
+    grid-column: 1 / -1;
+    padding: 0.5rem 0 0;
+    border-top: 0;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.1rem;
+    font-family: var(--errata-display), Georgia, serif;
+    font-weight: 700;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .table td.cellNo,
+  .table td.cellDate {
+    padding-top: 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--hair);
+  }
+
+  .table td.cellNo {
+    grid-column: 1;
+    min-width: 0;
+  }
+
+  .table td.cellDate {
+    grid-column: 2;
+    padding-left: 1rem;
+    text-align: right;
+  }
+
+  .table td.cellNo::before,
+  .table td.cellDate::before {
+    content: none;
+  }
+}
+
+@media print {
+  .page {
+    min-height: 0;
+    padding: 0;
+  }
+
+  .plate {
+    border: 0;
+    padding: 0;
+  }
+
+  .plate::before {
+    content: none;
+  }
+}
