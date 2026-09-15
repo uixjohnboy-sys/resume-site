@@ -62,4 +62,16 @@ export const EMPTY_STATE = [
   "The first episode has not been published.",
 ];
 
-export const corrections: Correction[] = [];
+export const corrections: Correction[] = [
+  {
+    date: '2026-09-15',
+    episode: '12 Metres of Fall Across 50 Kilometres',
+    episodeUrl: 'https://www.youtube.com/watch?v=MpX93n_ain8',
+    said: 'At 20:51 the narration says nobody has ever found a Roman levelling instrument, and the Still unsettled card says none has been excavated.',
+    correct: 'That is broader than our sources. No excavated dioptra, water level or chorobates is known, and Lewis says no dioptra has yet been found, or at least identified. Romans also used a plain A-frame builder\'s level with a plumb line, and we have not confirmed that no example survives.',
+    source: {
+      label: 'M. J. T. Lewis, Surveying Instruments of Greece and Rome, Cambridge 2001, chapter 3 summary',
+      url: 'https://www.cambridge.org/core/books/abs/surveying-instruments-of-greece-and-rome/dioptra/2B856B941F3387835E75709853E49DEC',
+    },
+  },
+];
