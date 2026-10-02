@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { archivo, jetmono, serif } from "../fonts";
 import V3Motion from "@/components/v3/V3Motion";
+import PortraitDissolve from "@/components/v3/PortraitDissolve";
 import "./v3.css";
 
 // Portfolio v3, in progress beside the live homepage. Nothing links here and
@@ -111,6 +112,7 @@ export default function V3() {
                 quality={90}
                 sizes="(max-width: 760px) 92vw, 640px"
               />
+              <PortraitDissolve />
             </div>
 
             {/* Floating artifacts. Each is a real pattern from his builds. */}

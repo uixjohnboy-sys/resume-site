@@ -214,6 +214,21 @@
   mask-image: linear-gradient(to bottom, #000 62%, transparent 98%);
 }
 
+/* The dissolving portrait (PortraitDissolve.tsx) draws over the <Image>.
+   Only once it has drawn does the plain image hide, so a failed canvas
+   leaves the normal portrait in place. */
+.v3-dissolve {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.v3-portrait[data-dissolve="on"] img {
+  visibility: hidden;
+}
+
 /* ---------- floating artifacts ---------- */
 
 .v3-art {
