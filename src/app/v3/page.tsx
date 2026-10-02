@@ -3,6 +3,7 @@ import Image from "next/image";
 import { archivo, jetmono, serif } from "../fonts";
 import V3Motion from "@/components/v3/V3Motion";
 import PortraitDissolve from "@/components/v3/PortraitDissolve";
+import TwinVoice from "@/components/v3/TwinVoice";
 import "./v3.css";
 
 // Portfolio v3, in progress beside the live homepage. Nothing links here and
@@ -102,6 +103,8 @@ export default function V3() {
           </div>
 
           <div className="v3-stage">
+            {/* Amber glow behind the figure, driven by the twin's voice (--vl). */}
+            <div className="v3-voiceglow" aria-hidden="true" />
             <div className="v3-portrait" data-depth="0.35">
               <Image
                 src="/v3/jb-hero.webp"
@@ -167,8 +170,10 @@ export default function V3() {
                 <dt>fallback</dt>
                 <dd>armed</dd>
               </dl>
-              <div className="v3-art-foot">wiring up</div>
+              <div className="v3-art-foot">voice live, chat wiring up</div>
             </div>
+
+            <TwinVoice />
           </div>
 
           <div className="v3-copy">

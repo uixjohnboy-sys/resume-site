@@ -229,6 +229,170 @@
   visibility: hidden;
 }
 
+/* ---------- the AI twin's voice (TwinVoice.tsx) ----------
+   --vl is the live loudness of the voice, 0 to 1, written per frame on
+   .v3-stage. Only opacity and transform read it, so it stays on the
+   compositor. */
+
+.v3-voiceglow {
+  position: absolute;
+  left: 6%;
+  top: -6%;
+  width: 88%;
+  height: 86%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 178, 36, 0.6), rgba(255, 178, 36, 0.14) 48%, rgba(255, 178, 36, 0) 68%);
+  filter: blur(18px);
+  opacity: calc(var(--vl, 0) * 1.25);
+  transform: scale(calc(0.92 + var(--vl, 0) * 0.16));
+}
+
+/* Centred with left/right, not a transform, because the GSAP intro animates
+   this element's transform. */
+.v3-twin {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 5%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* Captions: one phrase at a time, over the chest, readable on any frame. */
+.v3-twin-cap {
+  min-height: 1.5em;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(15px, 1.35vw, 19px);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  color: var(--text);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.9);
+}
+
+.v3-twin-cap span {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: rgba(7, 7, 11, 0.62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: v3-cap-in 0.28s ease-out;
+}
+
+@keyframes v3-cap-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.v3-twin-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 18px 8px 8px;
+  border: 1px solid rgba(255, 178, 36, 0.35);
+  border-radius: 999px;
+  background: rgba(14, 12, 22, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.9), 0 0 0 0 var(--neon-soft);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.v3-twin-btn:hover {
+  border-color: var(--neon);
+  transform: translateY(-2px);
+}
+
+.v3-twin-btn:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 3px;
+}
+
+/* Idle: a slow amber ring invites the tap. */
+.v3-twin[data-phase="idle"] .v3-twin-btn {
+  animation: v3-ring 2.6s ease-out infinite;
+}
+
+@keyframes v3-ring {
+  0% {
+    box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.9), 0 0 0 0 rgba(255, 178, 36, 0.45);
+  }
+  70%,
+  100% {
+    box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.9), 0 0 0 14px rgba(255, 178, 36, 0);
+  }
+}
+
+.v3-twin-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--neon);
+  color: var(--neon-ink);
+  flex: none;
+}
+
+.v3-twin-play {
+  width: 14px;
+  height: 14px;
+  margin-left: 2px;
+}
+
+.v3-twin-wave {
+  display: none;
+  width: 34px;
+  height: 18px;
+}
+
+/* Playing: the play glyph gives way to the live waveform on dark. */
+.v3-twin[data-phase="playing"] .v3-twin-icon {
+  background: rgba(255, 178, 36, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 178, 36, 0.5);
+}
+.v3-twin[data-phase="playing"] .v3-twin-play {
+  display: none;
+}
+.v3-twin[data-phase="playing"] .v3-twin-wave {
+  display: block;
+}
+
+.v3-twin-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.v3-twin-text b {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.v3-twin-text small {
+  margin-top: 3px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 /* ---------- floating artifacts ---------- */
 
 .v3-art {
@@ -680,20 +844,21 @@
     left: 0;
     top: 58%;
   }
-  /* The twin card collapses to its status line on phones. */
+  /* On phones the voice button is the twin, so its spec card steps aside. */
   .v3-art-twin {
-    right: 0;
-    top: 72%;
-  }
-  .v3-art-twin dl {
     display: none;
   }
-  .v3-art-twin .v3-art-head {
-    margin-bottom: 0;
+  .v3-twin {
+    bottom: 3%;
+    gap: 8px;
   }
-  .v3-art-twin .v3-art-foot {
-    margin-top: 4px;
-    padding-top: 4px;
+  /* The captions rise into the count card's spot, so it steps out while the
+     twin speaks. */
+  .v3-art-count {
+    transition: opacity 0.3s;
+  }
+  .v3-stage:has(.v3-twin-cap span) .v3-art-count {
+    opacity: 0 !important;
   }
 
   .v3-sub {
@@ -711,8 +876,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .v3-dot-live {
+  .v3-dot-live,
+  .v3-twin[data-phase="idle"] .v3-twin-btn,
+  .v3-twin-cap span {
     animation: none;
+  }
+  .v3-voiceglow {
+    transform: none;
   }
   .v3-btn {
     transition: none;

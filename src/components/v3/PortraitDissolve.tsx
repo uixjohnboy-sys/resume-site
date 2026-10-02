@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { voice } from "./voice";
 
 // The portrait, dissolving into data.
 //
@@ -19,6 +20,8 @@ import { useEffect, useRef } from "react";
 //   2. particle canvas, animated: blocks sampled from the dissolved cells,
 //      rising and fading. Paused off-screen and when the tab is hidden; not
 //      drawn at all under prefers-reduced-motion.
+// While the AI twin speaks (TwinVoice), voice.level lifts the particle count
+// and speed and turns some of them amber, so the figure visibly "talks".
 // If anything fails, the plain <Image> underneath stays visible.
 
 type Cell = { x: number; y: number; r: number; g: number; b: number };
@@ -156,7 +159,8 @@ export default function PortraitDissolve() {
     const spawn = (): Particle | null => {
       if (!cells.length) return null;
       const c = cells[(Math.random() * cells.length) | 0];
-      const tint = Math.random() < 0.28;
+      const amber = Math.random() < voice.level * 0.7;
+      const tint = !amber && Math.random() < 0.28;
       const max = 120 + Math.random() * 180;
       return {
         x: c.x,
@@ -166,11 +170,11 @@ export default function PortraitDissolve() {
         life: 0,
         max,
         s: cellPx * (0.45 + Math.random() * 0.6),
-        c: tint ? "255,45,111" : `${c.r},${c.g},${c.b}`,
+        c: amber ? "255,178,36" : tint ? "255,45,111" : `${c.r},${c.g},${c.b}`,
       };
     };
 
-    const target = () => (window.innerWidth < 761 ? 60 : 150);
+    const target = () => Math.round((window.innerWidth < 761 ? 60 : 150) * (1 + voice.level * 0.9));
 
     const frame = () => {
       raf = 0;
@@ -184,13 +188,20 @@ export default function PortraitDissolve() {
         p.life = Math.random() * p.max; // stagger the first batch
         particles.push(p);
       }
+      const boost = 1 + voice.level * 2.6;
       for (let k = 0; k < particles.length; k++) {
         const p = particles[k];
-        p.life++;
-        p.x += p.vx;
-        p.y += p.vy;
+        p.life += boost > 1.05 ? 1.4 : 1;
+        p.x += p.vx * boost;
+        p.y += p.vy * boost;
         const t = p.life / p.max;
         if (t >= 1) {
+          // Shed the extra particles once the voice goes quiet again.
+          if (particles.length > target()) {
+            particles.splice(k, 1);
+            k--;
+            continue;
+          }
           const n = spawn();
           if (n) particles[k] = n;
           continue;
