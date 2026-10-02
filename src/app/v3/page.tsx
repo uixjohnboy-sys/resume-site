@@ -116,6 +116,15 @@ export default function V3() {
                 sizes="(max-width: 760px) 92vw, 640px"
               />
               <PortraitDissolve />
+              {/* The AI half. Hidden until the twin speaks (TwinVoice sets
+                  data-twin on the stage), then it glitches in over the right
+                  side of the face. Pre-masked, so only the cyborg half has
+                  pixels; framing matches jb-hero.webp. */}
+              {/* A plain img on purpose: 33KB, pre-sized, invisible on load,
+                  and it must match the portrait's box exactly. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="v3-cyborg" src="/v3/jb-cyborg.webp" alt="" aria-hidden="true" decoding="async" />
+              <span className="v3-cyborg-eye" aria-hidden="true" />
             </div>
 
             {/* Floating artifacts. Each is a real pattern from his builds. */}
