@@ -7,12 +7,14 @@ import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
 // The AI twin wakes up and introduces itself, with no buttons on screen.
 //
 // Order of events:
-//   1. Nothing starts until the page has finished loading, then 3 more
-//      seconds pass, the audio can play through without stalling and the
-//      cyborg overlay has decoded. On a slow connection it waits; if the
-//      audio is still not ready after 12 seconds the intro is skipped (the
-//      cyborg half still wakes, silently). It also waits until the hero is on
-//      screen and the tab is visible.
+//   1. The voice (156KB) and the cyborg overlay (31KB) start downloading the
+//      moment the page is interactive. The twin speaks 1.2 seconds later,
+//      as the hero intro settles, or as soon as both have arrived if that
+//      takes longer: it never starts on audio that would stall. On a very
+//      slow connection, if the audio is still not ready after 12 seconds the
+//      intro is skipped (the cyborg half still wakes, silently). It also
+//      waits until the hero is on screen and the tab is visible.
+//      (JB found load + 3 seconds too slow, 2026-10-02.)
 //   2. The right half of the face glitches into the cyborg and STAYS that
 //      way for the rest of the visit: John Boy on the left, his AI on the
 //      right. The live tag says which is which.
@@ -33,7 +35,7 @@ import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
 
 const SRC = "/v3/twin-intro.mp3";
 const CYBORG = "/v3/jb-cyborg.webp";
-const START_DELAY_MS = 3000;
+const START_DELAY_MS = 1200;
 const READY_TIMEOUT_MS = 12000;
 const SESSION_KEY = "v3-twin-heard";
 
@@ -185,15 +187,9 @@ export default function TwinVoice() {
     };
     window.addEventListener("keydown", onKey);
 
-    // ---- the gate: loaded + 3s, audio ready, cyborg decoded, in view ----
-    const pageLoaded = new Promise<void>((res) => {
-      if (document.readyState === "complete") res();
-      else window.addEventListener("load", () => res(), { once: true });
-    });
-    const delay = pageLoaded.then(() => new Promise<void>((res) => window.setTimeout(res, START_DELAY_MS)));
-    // The audio is only requested once the page itself has loaded, so it
-    // never competes with the hero for bandwidth.
-    const audioReady = pageLoaded.then(
+    // ---- the gate: 1.2s, audio ready, cyborg decoded, in view ----
+    const delay = new Promise<void>((res) => window.setTimeout(res, START_DELAY_MS));
+    const audioReady = Promise.resolve().then(
       () =>
         new Promise<boolean>((res) => {
           const t = window.setTimeout(() => res(false), READY_TIMEOUT_MS);
