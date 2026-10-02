@@ -309,58 +309,38 @@
   color: var(--neon);
 }
 
-/* Small chips: Tap for sound / Mute / Hear my AI twin. */
-.v3-twin-chip {
+/* Keyboard-only mute: visually hidden until it receives focus. */
+.v3-twin-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
   pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
+}
+
+.v3-twin-sr:focus-visible {
+  position: static;
+  width: auto;
+  height: auto;
+  clip-path: none;
+  padding: 7px 13px;
   border: 1px solid var(--neon);
   border-radius: 999px;
-  background: var(--neon);
-  color: var(--neon-ink);
+  background: rgba(14, 12, 22, 0.85);
+  color: var(--text);
   font: inherit;
   font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 10px 26px -10px var(--neon-soft);
-  transition: transform 0.2s, background 0.2s, border-color 0.2s;
-  animation: v3-cap-in 0.3s ease-out;
-}
-
-.v3-twin-chip svg {
-  width: 15px;
-  height: 15px;
-  flex: none;
-}
-
-.v3-twin-chip:hover {
-  transform: translateY(-2px);
-}
-
-.v3-twin-chip:focus-visible {
   outline: 2px solid var(--neon);
   outline-offset: 3px;
-}
-
-.v3-twin-chip-quiet {
-  border-color: rgba(255, 178, 36, 0.35);
-  background: rgba(14, 12, 22, 0.72);
-  color: var(--text);
-  box-shadow: none;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.v3-twin-chip-quiet:hover {
-  border-color: var(--neon);
 }
 
 /* ---------- the cyborg half ----------
    jb-cyborg.webp is pre-masked to the right half of the face and neck and
    framed exactly like jb-hero.webp, so it lies over the portrait 1:1. It
-   glitches in when the twin starts speaking and fades out after. */
+   glitches in when the twin first wakes and then stays for the visit:
+   data-twin is "speaking" while the voice plays and "awake" after. */
 
 .v3-portrait img.v3-cyborg,
 .v3-portrait[data-dissolve="on"] img.v3-cyborg {
@@ -376,7 +356,7 @@
   transition: opacity 0.7s ease;
 }
 
-.v3-stage[data-twin="speaking"] .v3-cyborg {
+.v3-stage[data-twin] .v3-cyborg {
   opacity: 1;
   animation: v3-glitch-in 0.75s steps(1, end) both;
 }
@@ -431,6 +411,21 @@
 .v3-stage[data-twin="speaking"] .v3-cyborg-eye {
   opacity: calc(0.25 + var(--vl, 0) * 0.9);
   transition: none;
+}
+
+/* Awake and quiet: the eye idles with a slow standby pulse. */
+.v3-stage[data-twin="awake"] .v3-cyborg-eye {
+  animation: v3-eye-idle 3.2s ease-in-out infinite;
+}
+
+@keyframes v3-eye-idle {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.42;
+  }
 }
 
 /* ---------- floating artifacts ---------- */
@@ -918,12 +913,15 @@
 @media (prefers-reduced-motion: reduce) {
   .v3-dot-live,
   .v3-twin-cap span,
-  .v3-twin-chip,
-  .v3-stage[data-twin="speaking"] .v3-cyborg {
+  .v3-stage[data-twin] .v3-cyborg,
+  .v3-stage[data-twin="awake"] .v3-cyborg-eye {
     animation: none;
   }
   .v3-voiceglow {
     transform: none;
+  }
+  .v3-stage[data-twin="awake"] .v3-cyborg-eye {
+    opacity: 0.3;
   }
   .v3-btn {
     transition: none;

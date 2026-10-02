@@ -4,34 +4,38 @@ import { useEffect, useRef, useState } from "react";
 import { setSpeaking, setVoiceLevel, voice } from "./voice";
 import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
 
-// The AI twin introduces itself, on its own, once per visit.
+// The AI twin wakes up and introduces itself, with no buttons on screen.
 //
-// What happens:
+// Order of events:
 //   1. Nothing starts until the page has finished loading, then 3 more
 //      seconds pass, the audio can play through without stalling and the
-//      cyborg overlay image has decoded. On a slow connection it simply
-//      waits; if the audio is still not ready after 12 seconds, the intro is
-//      skipped rather than played in stutters. It also waits until the hero
-//      is on screen and the tab is visible.
-//   2. It tries to play WITH sound. Browsers only allow that for visitors who
-//      have already interacted with the site, so for most first visits it
-//      is refused. Then it plays MUTED instead (always allowed): the cyborg
-//      half still appears, captions still run and the portrait still reacts,
-//      with a small "Tap for sound" chip.
-//   3. While sound plays there is a "Mute" chip (anything that speaks on its
-//      own for more than 3 seconds must be stoppable), and when it ends a
-//      "Replay" chip.
+//      cyborg overlay has decoded. On a slow connection it waits; if the
+//      audio is still not ready after 12 seconds the intro is skipped (the
+//      cyborg half still wakes, silently). It also waits until the hero is on
+//      screen and the tab is visible.
+//   2. The right half of the face glitches into the cyborg and STAYS that
+//      way for the rest of the visit: John Boy on the left, his AI on the
+//      right. The live tag says which is which.
+//   3. It tries to speak WITH sound. Browsers refuse sound for visitors who
+//      have not interacted with the site yet, and that cannot be bypassed.
+//      Then it speaks MUTED (always allowed): captions and the reactive
+//      portrait still run. The first click, tap or key press anywhere on the
+//      page afterwards counts as permission, and the twin starts over from
+//      the top with sound, once.
+//   4. Sound that plays on its own must be stoppable (WCAG 1.4.2). With no
+//      visible buttons, that is Esc, plus a "Mute" control that only appears
+//      when reached with the keyboard.
 //
-// The voice is ElevenLabs ("Jon"), not John Boy; the live tag says "AI twin".
-// Reactivity reads a loudness envelope measured offline (twinEnvelope.ts), so
-// the portrait moves the same with sound or without. Played once per browser
-// session, so going back to the page does not repeat it.
+// The voice is ElevenLabs ("Jon"), not John Boy. Reactivity reads a loudness
+// envelope measured offline (twinEnvelope.ts), so the portrait moves the
+// same with sound or without. Once it has spoken with sound, it stays quiet
+// for the rest of the browser session.
 
 const SRC = "/v3/twin-intro.mp3";
 const CYBORG = "/v3/jb-cyborg.webp";
 const START_DELAY_MS = 3000;
 const READY_TIMEOUT_MS = 12000;
-const SESSION_KEY = "v3-twin-intro-played";
+const SESSION_KEY = "v3-twin-heard";
 
 // Phrase start times in seconds, measured from the audio's own pauses
 // (ffmpeg silencedetect). Re-measure if the audio is regenerated.
@@ -45,9 +49,12 @@ const CAPTIONS: [number, string][] = [
   [11.24, "or tell me what's broken in yours."],
 ];
 
-type Phase = "waiting" | "playing" | "done";
+// Real user activation in Chrome, Safari and Firefox. Scrolling is not one.
+const ACTIVATION_EVENTS = ["pointerup", "keydown", "touchend"] as const;
 
-function played() {
+type Phase = "waiting" | "speaking" | "awake";
+
+function heard() {
   try {
     return sessionStorage.getItem(SESSION_KEY) === "1";
   } catch {
@@ -55,37 +62,38 @@ function played() {
   }
 }
 
-function markPlayed() {
+function markHeard() {
   try {
     sessionStorage.setItem(SESSION_KEY, "1");
   } catch {
-    // Private mode or blocked storage: it may replay on return, harmless.
+    // Private mode or blocked storage: it may speak again on return, harmless.
   }
 }
 
 export default function TwinVoice() {
   const [phase, setPhase] = useState<Phase>("waiting");
-  const [muted, setMuted] = useState(false);
+  const [sound, setSound] = useState(false);
   const [line, setLine] = useState(-1);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const rafRef = useRef(0);
-  const clearRef = useRef(0);
 
   useEffect(() => {
     const st = rootRef.current?.closest(".v3-stage") as HTMLElement | null;
     if (!st) return;
     let alive = true;
+    let raf = 0;
+    let clearTimer = 0;
+    let armed = false;
     const audio = new Audio();
     audio.preload = "auto";
     audioRef.current = audio;
 
     const stopLoop = () => {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
+      cancelAnimationFrame(raf);
+      raf = 0;
     };
 
-    // Per frame while playing: captions and the voice level from the envelope.
+    // Per frame while speaking: captions and the voice level from the envelope.
     const loop = () => {
       const t = audio.currentTime;
       let idx = -1;
@@ -95,7 +103,7 @@ export default function TwinVoice() {
       // Fast attack, slower release: reads as speech, not flicker.
       setVoiceLevel(voice.level + (target - voice.level) * (target > voice.level ? 0.5 : 0.14));
       st.style.setProperty("--vl", voice.level.toFixed(3));
-      rafRef.current = requestAnimationFrame(loop);
+      raf = requestAnimationFrame(loop);
     };
 
     // Let the glow and particles settle instead of snapping off.
@@ -104,49 +112,78 @@ export default function TwinVoice() {
       const step = () => {
         setVoiceLevel(voice.level * 0.86);
         st.style.setProperty("--vl", voice.level.toFixed(3));
-        if (voice.level > 0.01) rafRef.current = requestAnimationFrame(step);
+        if (voice.level > 0.01) raf = requestAnimationFrame(step);
         else {
           setVoiceLevel(0);
           st.style.setProperty("--vl", "0");
-          rafRef.current = 0;
+          raf = 0;
         }
       };
-      rafRef.current = requestAnimationFrame(step);
+      raf = requestAnimationFrame(step);
+    };
+
+    // The cyborg half: once awake, it never goes back to human this visit.
+    const wake = (state: "speaking" | "awake") => {
+      st.setAttribute("data-twin", state);
+      setPhase(state);
     };
 
     const onPlaying = () => {
+      window.clearTimeout(clearTimer);
       setSpeaking(true);
-      st.setAttribute("data-twin", "speaking");
-      setPhase("playing");
+      wake("speaking");
       stopLoop();
-      rafRef.current = requestAnimationFrame(loop);
+      raf = requestAnimationFrame(loop);
     };
     const onEnded = () => {
       setSpeaking(false);
-      st.removeAttribute("data-twin");
-      setPhase("done");
+      wake("awake");
       decay();
-      window.clearTimeout(clearRef.current);
-      clearRef.current = window.setTimeout(() => setLine(-1), 1800);
+      window.clearTimeout(clearTimer);
+      clearTimer = window.setTimeout(() => setLine(-1), 1800);
     };
     audio.addEventListener("playing", onPlaying);
     audio.addEventListener("ended", onEnded);
 
-    if (played()) {
-      // Already heard this session: go straight to the replay chip.
-      Promise.resolve().then(() => alive && setPhase("done"));
-      return () => {
-        alive = false;
-        stopLoop();
-        window.clearTimeout(clearRef.current);
-        audio.pause();
-        audio.removeEventListener("playing", onPlaying);
-        audio.removeEventListener("ended", onEnded);
-        st.removeAttribute("data-twin");
-        setVoiceLevel(0);
-        setSpeaking(false);
-      };
-    }
+    // ---- first interaction = permission for sound ----
+    const disarm = () => {
+      armed = false;
+      ACTIVATION_EVENTS.forEach((ev) => window.removeEventListener(ev, onActivate, true));
+    };
+    const onActivate = (e: Event) => {
+      if (e instanceof KeyboardEvent && e.key === "Escape") return;
+      disarm();
+      if (!alive || heard()) return;
+      // Only start over if the twin is still on screen; a click far down
+      // the page should not suddenly talk about the hero.
+      const r = st.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) return;
+      audio.muted = false;
+      audio.currentTime = 0;
+      audio
+        .play()
+        .then(() => {
+          setSound(true);
+          markHeard();
+        })
+        .catch(() => {
+          // Still refused (rare): stay silent.
+        });
+    };
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      ACTIVATION_EVENTS.forEach((ev) => window.addEventListener(ev, onActivate, { capture: true, passive: true }));
+    };
+
+    // Esc always silences it.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !audio.muted && !audio.paused) {
+        audio.muted = true;
+        setSound(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
 
     // ---- the gate: loaded + 3s, audio ready, cyborg decoded, in view ----
     const pageLoaded = new Promise<void>((res) => {
@@ -178,11 +215,13 @@ export default function TwinVoice() {
       img.src = CYBORG;
       return img.decode().catch(() => undefined);
     })();
+    let io: IntersectionObserver | null = null;
+    let onVis: (() => void) | null = null;
     const inView = new Promise<void>((res) => {
-      const io = new IntersectionObserver(
+      io = new IntersectionObserver(
         ([e]) => {
           if (e.isIntersecting && !document.hidden) {
-            io.disconnect();
+            io?.disconnect();
             res();
           }
         },
@@ -190,10 +229,9 @@ export default function TwinVoice() {
       );
       io.observe(st);
       // Coming back to a hidden tab with the hero already on screen.
-      const onVis = () => {
+      onVis = () => {
         if (!document.hidden && st.getBoundingClientRect().top < window.innerHeight * 0.65) {
-          document.removeEventListener("visibilitychange", onVis);
-          io.disconnect();
+          io?.disconnect();
           res();
         }
       };
@@ -201,25 +239,29 @@ export default function TwinVoice() {
     });
 
     Promise.all([delay, audioReady, cyborgReady]).then(async ([, ok]) => {
-      if (!alive || !ok) {
-        if (alive) setPhase("done");
+      await inView;
+      if (onVis) document.removeEventListener("visibilitychange", onVis);
+      if (!alive) return;
+      if (!ok || heard()) {
+        // No audio in time, or already heard this session: wake silently.
+        wake("awake");
         return;
       }
-      await inView;
-      if (!alive) return;
-      markPlayed();
       audio.muted = false;
       try {
         await audio.play();
-        setMuted(false);
+        setSound(true);
+        markHeard();
       } catch {
-        // Sound refused: play silently, the visuals carry it.
+        // Sound refused: speak silently, and take the first interaction
+        // anywhere as the cue to start over with sound.
         audio.muted = true;
-        setMuted(true);
+        setSound(false);
+        arm();
         try {
           await audio.play();
         } catch {
-          if (alive) setPhase("done");
+          if (alive) wake("awake");
         }
       }
     });
@@ -227,7 +269,11 @@ export default function TwinVoice() {
     return () => {
       alive = false;
       stopLoop();
-      window.clearTimeout(clearRef.current);
+      disarm();
+      window.clearTimeout(clearTimer);
+      window.removeEventListener("keydown", onKey);
+      io?.disconnect();
+      if (onVis) document.removeEventListener("visibilitychange", onVis);
       audio.pause();
       audio.removeEventListener("playing", onPlaying);
       audio.removeEventListener("ended", onEnded);
@@ -237,82 +283,28 @@ export default function TwinVoice() {
     };
   }, []);
 
-  // Chip actions are real taps, so sound is always allowed from here.
-  const soundOn = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.muted = false;
-    audio.currentTime = 0;
-    setMuted(false);
-    try {
-      await audio.play();
-    } catch {
-      // Ignore: the next tap will try again.
-    }
-  };
-
   const mute = () => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.muted = true;
-    setMuted(true);
-  };
-
-  const replay = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (!audio.src) audio.src = SRC;
-    window.clearTimeout(clearRef.current);
-    audio.muted = false;
-    audio.currentTime = 0;
-    setMuted(false);
-    try {
-      await audio.play();
-    } catch {
-      // Ignore.
-    }
+    setSound(false);
   };
 
   return (
     <div className="v3-twin" ref={rootRef} data-phase={phase}>
-      {phase === "playing" ? (
+      {phase !== "waiting" ? (
         <p className="v3-twin-tag" aria-hidden="true">
-          <i className="v3-dot v3-dot-live" /> AI twin speaking
+          <i className={phase === "speaking" ? "v3-dot v3-dot-live" : "v3-dot"} />
+          {phase === "speaking" ? "AI twin speaking" : "Right half: John Boy's AI twin"}
         </p>
       ) : null}
       <p className="v3-twin-cap" aria-hidden="true">
         {line >= 0 ? <span key={line}>{CAPTIONS[line][1]}</span> : null}
       </p>
-      {phase === "playing" && muted ? (
-        <button type="button" className="v3-twin-chip" onClick={soundOn}>
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M2 6h3l4-3v10L5 10H2z" fill="currentColor" />
-            <path d="M11 5.5c1.3 1.3 1.3 3.7 0 5M12.8 3.8c2.2 2.3 2.2 6.1 0 8.4" stroke="currentColor" fill="none" strokeWidth="1.4" strokeLinecap="round" />
-          </svg>
-          Tap for sound
-        </button>
-      ) : null}
-      {phase === "playing" && !muted ? (
-        <button type="button" className="v3-twin-chip v3-twin-chip-quiet" onClick={mute}>
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M2 6h3l4-3v10L5 10H2z" fill="currentColor" />
-            <path d="M11 6l4 4M15 6l-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-          </svg>
-          Mute
-        </button>
-      ) : null}
-      {phase === "done" ? (
-        <button
-          type="button"
-          className="v3-twin-chip v3-twin-chip-quiet"
-          onClick={replay}
-          aria-label="Replay the 13 second intro spoken by John Boy's AI twin, an AI voice, not John Boy"
-        >
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M3 8a5 5 0 1 0 1.6-3.7" stroke="currentColor" fill="none" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M3.2 1.8v3h3" stroke="currentColor" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Hear my AI twin
+      {/* Keyboard-only: invisible until focused with Tab. Esc works too. */}
+      {phase === "speaking" && sound ? (
+        <button type="button" className="v3-twin-sr" onClick={mute}>
+          Mute the AI voice (Esc)
         </button>
       ) : null}
     </div>
