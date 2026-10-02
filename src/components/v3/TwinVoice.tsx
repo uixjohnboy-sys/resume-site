@@ -7,37 +7,34 @@ import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
 // The AI twin wakes up and introduces itself, with no buttons on screen.
 //
 // Order of events:
-//   1. The voice (156KB) and the cyborg overlay (31KB) start downloading the
-//      moment the page is interactive. The twin speaks 1.2 seconds later,
-//      as the hero intro settles, or as soon as both have arrived if that
-//      takes longer: it never starts on audio that would stall. On a very
-//      slow connection, if the audio is still not ready after 12 seconds the
-//      intro is skipped (the cyborg half still wakes, silently). It also
-//      waits until the hero is on screen and the tab is visible.
-//      (JB found load + 3 seconds too slow, 2026-10-02.)
+//   1. 1.2 seconds after the page is interactive, as the hero intro settles,
+//      once the cyborg overlay (31KB) has decoded and the hero is on screen
+//      in a visible tab. (JB found load + 3 seconds too slow, 2026-10-02.)
 //   2. The right half of the face glitches into the cyborg and STAYS that
 //      way for the rest of the visit: John Boy on the left, his AI on the
 //      right. The live tag says which is which.
-//   3. It tries to speak WITH sound. Browsers refuse sound for visitors who
-//      have not interacted with the site yet, and that cannot be bypassed.
-//      Then it speaks MUTED (always allowed): captions and the reactive
-//      portrait still run. The first click, tap or key press anywhere on the
-//      page afterwards counts as permission, and the twin starts over from
-//      the top with sound, once.
+//   3. It tries to speak WITH sound. Browsers refuse sound until the visitor
+//      has clicked, tapped or typed on the page, and that cannot be bypassed.
+//      Chrome desktop refuses even MUTED <audio> (muted autoplay is only
+//      allowed for <video>, measured 2026-10-02), and iOS Low Power Mode
+//      refuses all media. So when sound is refused the twin speaks SILENTLY
+//      on its own clock instead of a media element: captions, the cyborg and
+//      the reactive portrait run exactly as they would with sound. The first
+//      click, tap or key press anywhere afterwards counts as permission, and
+//      it starts over from the top with the real voice, once per session.
 //   4. Sound that plays on its own must be stoppable (WCAG 1.4.2). With no
 //      visible buttons, that is Esc, plus a "Mute" control that only appears
 //      when reached with the keyboard.
 //
 // The voice is ElevenLabs ("Jon"), not John Boy. Reactivity reads a loudness
 // envelope measured offline (twinEnvelope.ts), so the portrait moves the
-// same with sound or without. Once it has spoken with sound, it stays quiet
-// for the rest of the browser session.
+// same whichever clock drives it.
 
 const SRC = "/v3/twin-intro.mp3";
 const CYBORG = "/v3/jb-cyborg.webp";
 const START_DELAY_MS = 1200;
-const READY_TIMEOUT_MS = 12000;
 const SESSION_KEY = "v3-twin-heard";
+const DURATION = ENVELOPE.length / ENVELOPE_FPS;
 
 // Phrase start times in seconds, measured from the audio's own pauses
 // (ffmpeg silencedetect). Re-measure if the audio is regenerated.
@@ -86,26 +83,25 @@ export default function TwinVoice() {
     let raf = 0;
     let clearTimer = 0;
     let armed = false;
+    // Which clock drives the speech: the real audio, or a silent timer.
+    let mode: "audio" | "silent" = "silent";
+    let silentStart = 0;
     const audio = new Audio();
     audio.preload = "auto";
+    audio.src = SRC;
     audioRef.current = audio;
+
+    const now = () => (mode === "audio" ? audio.currentTime : (performance.now() - silentStart) / 1000);
 
     const stopLoop = () => {
       cancelAnimationFrame(raf);
       raf = 0;
     };
 
-    // Per frame while speaking: captions and the voice level from the envelope.
-    const loop = () => {
-      const t = audio.currentTime;
-      let idx = -1;
-      for (let i = 0; i < CAPTIONS.length; i++) if (t >= CAPTIONS[i][0]) idx = i;
-      setLine((cur) => (cur === idx ? cur : idx));
-      const target = (ENVELOPE[Math.floor(t * ENVELOPE_FPS)] ?? 0) / 99;
-      // Fast attack, slower release: reads as speech, not flicker.
-      setVoiceLevel(voice.level + (target - voice.level) * (target > voice.level ? 0.5 : 0.14));
-      st.style.setProperty("--vl", voice.level.toFixed(3));
-      raf = requestAnimationFrame(loop);
+    // The cyborg half: once awake, it never goes back to human this visit.
+    const wake = (state: "speaking" | "awake") => {
+      st.setAttribute("data-twin", state);
+      setPhase(state);
     };
 
     // Let the glow and particles settle instead of snapping off.
@@ -124,25 +120,52 @@ export default function TwinVoice() {
       raf = requestAnimationFrame(step);
     };
 
-    // The cyborg half: once awake, it never goes back to human this visit.
-    const wake = (state: "speaking" | "awake") => {
-      st.setAttribute("data-twin", state);
-      setPhase(state);
+    const finish = () => {
+      setSpeaking(false);
+      wake("awake");
+      decay();
+      window.clearTimeout(clearTimer);
+      clearTimer = window.setTimeout(() => setLine(-1), 1800);
     };
 
-    const onPlaying = () => {
+    // Per frame while speaking: captions and the voice level from the envelope.
+    const loop = () => {
+      const t = now();
+      if (mode === "silent" && t >= DURATION) {
+        finish();
+        return;
+      }
+      let idx = -1;
+      for (let i = 0; i < CAPTIONS.length; i++) if (t >= CAPTIONS[i][0]) idx = i;
+      setLine((cur) => (cur === idx ? cur : idx));
+      const target = (ENVELOPE[Math.floor(t * ENVELOPE_FPS)] ?? 0) / 99;
+      // Fast attack, slower release: reads as speech, not flicker.
+      setVoiceLevel(voice.level + (target - voice.level) * (target > voice.level ? 0.5 : 0.14));
+      st.style.setProperty("--vl", voice.level.toFixed(3));
+      raf = requestAnimationFrame(loop);
+    };
+
+    const begin = () => {
       window.clearTimeout(clearTimer);
       setSpeaking(true);
       wake("speaking");
       stopLoop();
       raf = requestAnimationFrame(loop);
     };
+
+    const speakSilently = () => {
+      mode = "silent";
+      silentStart = performance.now();
+      setSound(false);
+      begin();
+    };
+
+    const onPlaying = () => {
+      mode = "audio";
+      begin();
+    };
     const onEnded = () => {
-      setSpeaking(false);
-      wake("awake");
-      decay();
-      window.clearTimeout(clearTimer);
-      clearTimer = window.setTimeout(() => setLine(-1), 1800);
+      if (mode === "audio") finish();
     };
     audio.addEventListener("playing", onPlaying);
     audio.addEventListener("ended", onEnded);
@@ -169,7 +192,7 @@ export default function TwinVoice() {
           markHeard();
         })
         .catch(() => {
-          // Still refused (rare): stay silent.
+          // Still refused (rare): the silent run carries on.
         });
     };
     const arm = () => {
@@ -180,32 +203,15 @@ export default function TwinVoice() {
 
     // Esc always silences it.
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !audio.muted && !audio.paused) {
+      if (e.key === "Escape" && mode === "audio" && !audio.muted && !audio.paused) {
         audio.muted = true;
         setSound(false);
       }
     };
     window.addEventListener("keydown", onKey);
 
-    // ---- the gate: 1.2s, audio ready, cyborg decoded, in view ----
+    // ---- the gate: 1.2s, cyborg decoded, hero in view ----
     const delay = new Promise<void>((res) => window.setTimeout(res, START_DELAY_MS));
-    const audioReady = Promise.resolve().then(
-      () =>
-        new Promise<boolean>((res) => {
-          const t = window.setTimeout(() => res(false), READY_TIMEOUT_MS);
-          audio.addEventListener(
-            "canplaythrough",
-            () => {
-              window.clearTimeout(t);
-              res(true);
-            },
-            { once: true }
-          );
-          audio.addEventListener("error", () => res(false), { once: true });
-          audio.src = SRC;
-          audio.load();
-        })
-    );
     const cyborgReady = (() => {
       const img = new Image();
       img.src = CYBORG;
@@ -234,31 +240,25 @@ export default function TwinVoice() {
       document.addEventListener("visibilitychange", onVis);
     });
 
-    Promise.all([delay, audioReady, cyborgReady]).then(async ([, ok]) => {
+    Promise.all([delay, cyborgReady]).then(async () => {
       await inView;
       if (onVis) document.removeEventListener("visibilitychange", onVis);
       if (!alive) return;
-      if (!ok || heard()) {
-        // No audio in time, or already heard this session: wake silently.
-        wake("awake");
+      // Already heard with sound this session: speak silently, no sound cue.
+      if (heard()) {
+        speakSilently();
         return;
       }
-      audio.muted = false;
       try {
+        // Rejected at once when there has been no interaction yet, so this
+        // costs no delay on a first visit.
         await audio.play();
         setSound(true);
         markHeard();
       } catch {
-        // Sound refused: speak silently, and take the first interaction
-        // anywhere as the cue to start over with sound.
-        audio.muted = true;
-        setSound(false);
+        if (!alive) return;
+        speakSilently();
         arm();
-        try {
-          await audio.play();
-        } catch {
-          if (alive) wake("awake");
-        }
       }
     });
 
