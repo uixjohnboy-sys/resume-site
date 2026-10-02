@@ -105,9 +105,10 @@ export default function V3() {
               <Image
                 src="/v3/jb-hero.webp"
                 alt="John Boy Roxas"
-                width={1400}
-                height={1400}
+                width={2000}
+                height={2000}
                 preload
+                quality={90}
                 sizes="(max-width: 760px) 92vw, 640px"
               />
             </div>

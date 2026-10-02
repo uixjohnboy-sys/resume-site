@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    // Next 16 only allows qualities listed here and defaults to [75]. The v3
+    // portrait is an upscaled source, so the extra re-compression at 75 was
+    // visibly softening his face; it asks for 90.
+    qualities: [75, 90],
+  },
   async rewrites() {
     return [
       // The Front Door Check, the page linked from cold outreach to martial
