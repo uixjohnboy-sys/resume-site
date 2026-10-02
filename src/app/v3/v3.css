@@ -311,31 +311,68 @@
   color: var(--neon);
 }
 
-/* Keyboard-only mute: visually hidden until it receives focus. */
-.v3-twin-sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+/* "Talk to my AI": the one control. Amber, with a slow ring that invites
+   the tap while the twin speaks silently; "Mute" (quiet style) while the
+   voice plays. */
+.v3-twin-btn {
   pointer-events: auto;
-}
-
-.v3-twin-sr:focus-visible {
-  position: static;
-  width: auto;
-  height: auto;
-  clip-path: none;
-  padding: 7px 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 2px;
+  padding: 11px 20px;
   border: 1px solid var(--neon);
   border-radius: 999px;
-  background: rgba(14, 12, 22, 0.85);
-  color: var(--text);
+  background: var(--neon);
+  color: var(--neon-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 30px -12px var(--neon-soft);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  animation: v3-ring 2.6s ease-out infinite;
+}
+
+.v3-twin-btn svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+
+.v3-twin-btn:hover {
+  background: var(--neon-hover);
+  transform: translateY(-2px);
+}
+
+.v3-twin-btn:focus-visible {
   outline: 2px solid var(--neon);
   outline-offset: 3px;
+}
+
+.v3-twin-btn-quiet {
+  border-color: rgba(255, 178, 36, 0.4);
+  background: rgba(14, 12, 22, 0.78);
+  color: var(--text);
+  box-shadow: none;
+  animation: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.v3-twin-btn-quiet:hover {
+  background: rgba(14, 12, 22, 0.9);
+  border-color: var(--neon);
+}
+
+@keyframes v3-ring {
+  0% {
+    box-shadow: 0 12px 30px -12px var(--neon-soft), 0 0 0 0 rgba(255, 178, 36, 0.5);
+  }
+  70%,
+  100% {
+    box-shadow: 0 12px 30px -12px var(--neon-soft), 0 0 0 14px rgba(255, 178, 36, 0);
+  }
 }
 
 /* ---------- the cyborg half ----------
@@ -889,12 +926,13 @@
     bottom: 3%;
     gap: 8px;
   }
-  /* The captions rise into the count card's spot, so it steps out while the
-     twin speaks. */
+  /* The twin's tag and captions take the count card's spot, so on phones
+     it steps out once the twin wakes. */
   .v3-art-count {
     transition: opacity 0.3s;
   }
-  .v3-stage:has(.v3-twin-cap span) .v3-art-count {
+  .v3-stage:has(.v3-twin-cap span) .v3-art-count,
+  .v3-stage[data-twin] .v3-art-count {
     opacity: 0 !important;
   }
 
@@ -915,6 +953,7 @@
 @media (prefers-reduced-motion: reduce) {
   .v3-dot-live,
   .v3-twin-cap span,
+  .v3-twin-btn,
   .v3-stage[data-twin] .v3-cyborg,
   .v3-stage[data-twin="awake"] .v3-cyborg-eye {
     animation: none;

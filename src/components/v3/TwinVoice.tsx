@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { setSpeaking, setVoiceLevel, voice } from "./voice";
 import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
 
-// The AI twin wakes up and introduces itself, with no buttons on screen.
+// The AI twin wakes up and introduces itself, and a "Talk to my AI" button
+// plays it with sound (JB's call 2026-10-03, after learning that no browser
+// allows sound before the visitor interacts).
 //
 // Order of events:
 //   1. 1.2 seconds after the page is interactive, as the hero intro settles,
@@ -22,9 +24,10 @@ import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
 //      the reactive portrait run exactly as they would with sound. The first
 //      click, tap or key press anywhere afterwards counts as permission, and
 //      it starts over from the top with the real voice, once per session.
-//   4. Sound that plays on its own must be stoppable (WCAG 1.4.2). With no
-//      visible buttons, that is Esc, plus a "Mute" control that only appears
-//      when reached with the keyboard.
+//   4. "Talk to my AI" restarts the intro with the real voice at any time;
+//      while the voice plays the same button reads "Mute" (WCAG 1.4.2), and
+//      Esc mutes too. Until the chat exists, talking means this intro; when
+//      the chat ships, this button is where it opens.
 //
 // The voice is ElevenLabs ("Jon"), not John Boy. Reactivity reads a loudness
 // envelope measured offline (twinEnvelope.ts), so the portrait moves the
@@ -75,6 +78,8 @@ export default function TwinVoice() {
   const [line, setLine] = useState(-1);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Set inside the effect: start the intro over with the real voice.
+  const talkRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     const st = rootRef.current?.closest(".v3-stage") as HTMLElement | null;
@@ -175,14 +180,8 @@ export default function TwinVoice() {
       armed = false;
       ACTIVATION_EVENTS.forEach((ev) => window.removeEventListener(ev, onActivate, true));
     };
-    const onActivate = (e: Event) => {
-      if (e instanceof KeyboardEvent && e.key === "Escape") return;
+    const talk = () => {
       disarm();
-      if (!alive || heard()) return;
-      // Only start over if the twin is still on screen; a click far down
-      // the page should not suddenly talk about the hero.
-      const r = st.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > window.innerHeight) return;
       audio.muted = false;
       audio.currentTime = 0;
       audio
@@ -194,6 +193,19 @@ export default function TwinVoice() {
         .catch(() => {
           // Still refused (rare): the silent run carries on.
         });
+    };
+    talkRef.current = talk;
+    const onActivate = (e: Event) => {
+      if (e instanceof KeyboardEvent && e.key === "Escape") return;
+      // The button handles its own click.
+      if (e.target instanceof Element && e.target.closest(".v3-twin-btn")) return;
+      disarm();
+      if (!alive || heard()) return;
+      // Only start over if the twin is still on screen; a click far down
+      // the page should not suddenly talk about the hero.
+      const r = st.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) return;
+      talk();
     };
     const arm = () => {
       if (armed) return;
@@ -297,12 +309,28 @@ export default function TwinVoice() {
       <p className="v3-twin-cap" aria-hidden="true">
         {line >= 0 ? <span key={line}>{CAPTIONS[line][1]}</span> : null}
       </p>
-      {/* Keyboard-only: invisible until focused with Tab. Esc works too. */}
       {phase === "speaking" && sound ? (
-        <button type="button" className="v3-twin-sr" onClick={mute}>
-          Mute the AI voice (Esc)
+        <button type="button" className="v3-twin-btn v3-twin-btn-quiet" onClick={mute}>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 6h3l4-3v10L5 10H2z" fill="currentColor" />
+            <path d="M11 6l4 4M15 6l-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          </svg>
+          Mute
         </button>
-      ) : null}
+      ) : (
+        <button
+          type="button"
+          className="v3-twin-btn"
+          onClick={() => talkRef.current()}
+          aria-label="Talk to my AI: plays a 13 second intro spoken by John Boy's AI twin, an AI voice, not John Boy"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 6h3l4-3v10L5 10H2z" fill="currentColor" />
+            <path d="M11 5.5c1.3 1.3 1.3 3.7 0 5M12.8 3.8c2.2 2.3 2.2 6.1 0 8.4" stroke="currentColor" fill="none" strokeWidth="1.4" strokeLinecap="round" />
+          </svg>
+          Talk to my AI
+        </button>
+      )}
     </div>
   );
 }
