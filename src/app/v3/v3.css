@@ -1,0 +1,705 @@
+/* Portfolio v3: "the AI world".
+   Scoped under .v3 so nothing leaks into the live neon homepage.
+
+   Palette logic: the portrait was lit with a magenta key light from the
+   left, so the world is built around that light instead of fighting it.
+   Deep ink, a violet glow up and right, a magenta glow on the side his
+   face is lit from, and one amber accent that means "system state" (live
+   dots, ok codes, the primary button). The token is still named --neon for
+   continuity with home.css; see the note on it below. */
+
+.v3 {
+  --ink: #07070b;
+  --ink-2: #0d0d15;
+  --glass: rgba(16, 15, 26, 0.58);
+  --glass-line: rgba(255, 255, 255, 0.09);
+  --text: #f2f0ea;
+  --text-2: #b9b5ad;
+  --muted: #8a8698;
+  /* The one accent, chosen 2026-10-02 after testing lime, magenta, ice and
+     amber on this exact hero. Amber won on three counts: it sits opposite
+     the violet world so buttons still jump out, it belongs to the same warm
+     family as the magenta light on his face so it agrees with the portrait
+     instead of fighting it, and almost no GoHighLevel freelancer uses it
+     (their sites are blue, green or lime). Lime stays the Coach OS product
+     colour; this is John Boy's own. Every accent use reads these tokens, so
+     the brand colour remains a single-line change. */
+  --neon: #ffb224;
+  --neon-ink: #1f1300;
+  --neon-hover: #ffc65c;
+  --neon-soft: rgba(255, 178, 36, 0.5);
+  --neon-trace: #ffcf73;
+  --violet: #5b21d6;
+  --magenta: #ff2d6f;
+
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--font-archivo), "Archivo", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+.v3 *,
+.v3 *::before,
+.v3 *::after {
+  box-sizing: border-box;
+}
+
+.v3 ::selection {
+  background: var(--neon);
+  color: var(--neon-ink);
+}
+
+/* ---------- nav: a glass pill ---------- */
+
+.v3-nav {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  width: min(1120px, calc(100% - 28px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 10px 10px 22px;
+  border: 1px solid var(--glass-line);
+  border-radius: 999px;
+  background: rgba(12, 11, 20, 0.55);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+.v3-mark {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+  font-variation-settings: "wdth" 112;
+  letter-spacing: -0.01em;
+}
+
+.v3-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.v3-links a {
+  color: var(--text-2);
+  text-decoration: none;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 9px 14px;
+  border-radius: 999px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.v3-links a:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.v3-links .v3-links-cta {
+  background: var(--neon);
+  color: var(--neon-ink);
+  font-weight: 500;
+}
+
+.v3-links .v3-links-cta:hover {
+  background: var(--neon-hover);
+  color: var(--neon-ink);
+}
+
+/* ---------- hero ---------- */
+
+.v3-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
+  padding: 130px 6vw 64px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.v3-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -2;
+  filter: blur(20px);
+}
+
+.v3-glow-a {
+  width: 900px;
+  height: 900px;
+  right: -260px;
+  top: -320px;
+  background: radial-gradient(circle, rgba(91, 33, 214, 0.55), rgba(91, 33, 214, 0) 65%);
+}
+
+.v3-glow-b {
+  width: 700px;
+  height: 700px;
+  right: 22vw;
+  bottom: -260px;
+  background: radial-gradient(circle, rgba(255, 45, 111, 0.28), rgba(255, 45, 111, 0) 65%);
+}
+
+/* A faint engineering grid, faded out toward the edges. */
+.v3-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse at 65% 45%, #000 20%, transparent 72%);
+  mask-image: radial-gradient(ellipse at 65% 45%, #000 20%, transparent 72%);
+}
+
+/* The name, huge and outlined, sitting behind the portrait. */
+.v3-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 13vh;
+  display: flex;
+  justify-content: center;
+  gap: 0.18em;
+  z-index: -1;
+  pointer-events: none;
+  font-size: clamp(80px, 14.5vw, 240px);
+  line-height: 0.85;
+  font-weight: 800;
+  font-variation-settings: "wdth" 125;
+  letter-spacing: -0.03em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0));
+  -webkit-background-clip: text;
+  background-clip: text;
+  user-select: none;
+}
+
+.v3-stage {
+  position: absolute;
+  right: 7vw;
+  bottom: 0;
+  width: min(640px, 50vw);
+  aspect-ratio: 1 / 1;
+  z-index: 1;
+}
+
+.v3-portrait {
+  position: absolute;
+  inset: 0;
+}
+
+/* Never shown above ~640px wide: the source was upscaled and goes soft at
+   full size. The bottom fades into the ink so the cropped arms never read as
+   a cut edge. */
+.v3-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 98%);
+}
+
+/* ---------- floating artifacts ---------- */
+
+.v3-art {
+  position: absolute;
+  z-index: 2;
+  padding: 10px 13px;
+  border: 1px solid var(--glass-line);
+  border-radius: 12px;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #d4d0e2;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.v3-art span {
+  color: var(--muted);
+  margin: 0 2px;
+}
+
+.v3-art b {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.v3-art .v3-neon {
+  color: var(--neon);
+}
+
+.v3-art-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+  margin-bottom: 6px;
+}
+
+.v3-art dl {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 14px;
+  margin: 0;
+}
+
+.v3-art dt {
+  color: var(--muted);
+}
+
+.v3-art dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.v3-art-foot {
+  margin-top: 7px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  color: var(--neon);
+}
+
+.v3-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--neon);
+  box-shadow: 0 0 10px var(--neon);
+}
+
+.v3-dot-live {
+  animation: v3-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes v3-pulse {
+  50% {
+    opacity: 0.35;
+    box-shadow: 0 0 2px var(--neon);
+  }
+}
+
+.v3-art-pipe ol {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.v3-art-pipe li {
+  position: relative;
+  padding: 0 10px 0 13px;
+  color: var(--muted);
+}
+
+.v3-art-pipe li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  border: 1px solid var(--muted);
+}
+
+.v3-art-pipe li.on {
+  color: var(--text);
+}
+
+.v3-art-pipe li.on::before {
+  background: var(--neon);
+  border-color: var(--neon);
+}
+
+/* Positions are relative to the portrait stage. The face occupies roughly
+   x 35-70%, y 8-55% of the stage, so cards live in the dark space either
+   side of it or over the jacket, never across the face, and never past the
+   copy column on the left or the viewport edge on the right. */
+.v3-art-cron {
+  left: 0%;
+  top: 4%;
+}
+.v3-art-payload {
+  left: -4%;
+  top: 25%;
+}
+.v3-art-count {
+  left: -8%;
+  top: 63%;
+}
+.v3-art-pipe {
+  right: -6%;
+  top: 6%;
+}
+.v3-art-api {
+  right: -13%;
+  top: 44%;
+}
+.v3-art-twin {
+  right: -4%;
+  top: 62%;
+}
+
+/* ---------- hero copy ---------- */
+
+.v3-copy {
+  position: relative;
+  z-index: 3;
+  max-width: min(560px, 44vw);
+}
+
+.v3-eyebrow {
+  margin: 0 0 18px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.v3-eyebrow span {
+  color: var(--neon);
+  margin: 0 4px;
+}
+
+.v3-h1 {
+  margin: 0;
+  font-size: clamp(36px, 3.9vw, 58px);
+  line-height: 1.04;
+  font-weight: 700;
+  font-variation-settings: "wdth" 106;
+  letter-spacing: -0.025em;
+}
+
+.v3-line {
+  display: block;
+}
+
+.v3 em {
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: normal;
+  letter-spacing: -0.01em;
+  color: var(--neon);
+}
+
+.v3-sub {
+  margin: 22px 0 0;
+  max-width: 520px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.v3-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.v3-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.v3-btn:hover {
+  transform: translateY(-2px);
+}
+
+.v3-btn-primary {
+  background: var(--neon);
+  color: var(--neon-ink);
+  box-shadow: 0 10px 30px -10px var(--neon-soft);
+}
+
+.v3-btn-ghost {
+  color: var(--text);
+  border: 1px solid var(--glass-line);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.v3-btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.v3-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  margin: 36px 0 0;
+  padding: 18px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--glass-line);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.v3-stats b {
+  display: block;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  font-variation-settings: "wdth" 115;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.v3-scrollcue {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 3;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- the wall ---------- */
+
+.v3-wall {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 96px 6vw 48px;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(91, 33, 214, 0.16), transparent 55%),
+    var(--ink);
+}
+
+.v3-wall-in {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.v3-walls {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The pinned wall must fit one screen at 1440x900 including the closing
+   line, or the punchline sits below the fold for the whole pin. */
+.v3-wallrow {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  column-gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--glass-line);
+}
+
+.v3-wallnum {
+  grid-row: span 2;
+  padding-top: 10px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--neon);
+}
+
+.v3-wallsay {
+  font-size: clamp(24px, 2.85vw, 40px);
+  line-height: 1.1;
+  font-weight: 700;
+  font-variation-settings: "wdth" 108;
+  letter-spacing: -0.02em;
+}
+
+.v3-walltrace {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(12px, 1.2vw, 15px);
+  color: var(--neon-trace);
+  white-space: normal;
+}
+
+.v3-caret {
+  color: var(--muted);
+  margin-right: 4px;
+}
+
+.v3-wallclose {
+  margin: 24px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--glass-line);
+  font-size: clamp(28px, 3.6vw, 54px);
+  line-height: 1.05;
+  font-weight: 700;
+  font-variation-settings: "wdth" 110;
+  letter-spacing: -0.025em;
+}
+
+.v3-next {
+  padding: 80px 6vw 120px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+
+.v3-next a {
+  color: var(--neon);
+}
+
+/* ---------- motion arming ----------
+   The page is complete and readable as plain HTML. Only when the head
+   script has armed motion (html.fx-on) AND V3Motion has not finished
+   mounting do the intro elements start hidden. A failsafe in the page
+   flips data-motion to "off" if the script never arrives. */
+
+.fx-on .v3[data-motion="pending"] [data-v3="line"],
+.fx-on .v3[data-motion="pending"] .v3-art,
+.fx-on .v3[data-motion="pending"] .v3-portrait,
+.fx-on .v3[data-motion="pending"] .v3-name {
+  opacity: 0;
+}
+
+/* ---------- smaller screens ---------- */
+
+@media (max-width: 1180px) {
+  .v3-stage {
+    right: 3vw;
+  }
+  .v3-art-cron,
+  .v3-art-pipe {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .v3-nav {
+    top: 12px;
+    padding: 8px 8px 8px 16px;
+  }
+  .v3-links a:not(.v3-links-cta) {
+    display: none;
+  }
+
+  .v3-hero {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    padding: 96px 20px 48px;
+  }
+
+  .v3-name {
+    top: 84px;
+    flex-direction: column;
+    align-items: center;
+    font-size: 27vw;
+    line-height: 0.82;
+  }
+
+  .v3-copy {
+    max-width: none;
+  }
+
+  .v3-stage {
+    position: relative;
+    right: auto;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto 4px;
+  }
+
+  .v3-art {
+    font-size: 10px;
+    padding: 7px 10px;
+  }
+
+  /* Phones keep two cards, both over the jacket, clear of the face. */
+  .v3-art-payload,
+  .v3-art-pipe,
+  .v3-art-cron,
+  .v3-art-api {
+    display: none;
+  }
+
+  .v3-art-count {
+    left: 0;
+    top: 58%;
+  }
+  /* The twin card collapses to its status line on phones. */
+  .v3-art-twin {
+    right: 0;
+    top: 72%;
+  }
+  .v3-art-twin dl {
+    display: none;
+  }
+  .v3-art-twin .v3-art-head {
+    margin-bottom: 0;
+  }
+  .v3-art-twin .v3-art-foot {
+    margin-top: 4px;
+    padding-top: 4px;
+  }
+
+  .v3-sub {
+    font-size: 16px;
+  }
+
+  .v3-wallrow {
+    grid-template-columns: 34px 1fr;
+    column-gap: 10px;
+  }
+
+  .v3-scrollcue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-dot-live {
+    animation: none;
+  }
+  .v3-btn {
+    transition: none;
+  }
+}
