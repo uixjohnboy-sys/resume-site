@@ -19,6 +19,10 @@ import "lenis/dist/lenis.css";
 //   hero scrolls away, so the scene reads as layers in space.
 // - The wall: pinned on desktop, each wall lights up in turn and its real
 //   cause types out underneath. On phones it reveals row by row instead.
+// - Stats count up from zero as the copy arrives (the markup holds the real
+//   numbers, so no-JS and reduced-motion visitors read them as written).
+// - Desktop: an amber spotlight follows the cursor across the hero, and the
+//   primary button leans toward the cursor when it comes close.
 // - prefers-reduced-motion: none of the above; the page just shows.
 
 gsap.registerPlugin(ScrollTrigger);
@@ -62,6 +66,30 @@ export default function V3Motion() {
         .to(arts, { opacity: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.12 }, 0.7)
         .to(lines, { opacity: 1, y: 0, duration: 0.9, stagger: 0.1 }, 0.45);
 
+      // ---- stats count up ----
+      q(".v3-stats b").forEach((el, i) => {
+        const final = el.textContent || "";
+        const n = parseInt(final.replace(/,/g, ""), 10);
+        if (!Number.isFinite(n)) return;
+        const o = { v: 0 };
+        el.textContent = "0";
+        intro.to(
+          o,
+          {
+            v: n,
+            duration: 1.6,
+            ease: "power2.out",
+            onUpdate: () => {
+              el.textContent = Math.round(o.v).toLocaleString("en-US");
+            },
+            onComplete: () => {
+              el.textContent = final;
+            },
+          },
+          1.05 + i * 0.08
+        );
+      });
+
       // ---- artifacts: idle float ----
       arts.forEach((el, i) => {
         gsap.to(el, {
@@ -97,12 +125,31 @@ export default function V3Motion() {
             r: gsap.quickTo(el, "rotation", { duration: 1.2, ease: "power3.out" }),
           };
         });
+        // Spotlight and magnetic button.
+        const hero = q(".v3-hero")[0] as HTMLElement | undefined;
+        const cta = q(".v3-hero .v3-btn-primary")[0] as HTMLElement | undefined;
+        const ctaX = cta ? gsap.quickTo(cta, "x", { duration: 0.5, ease: "power3.out" }) : null;
+        const ctaY = cta ? gsap.quickTo(cta, "y", { duration: 0.5, ease: "power3.out" }) : null;
+
         const onMove = (e: PointerEvent) => {
           const nx = e.clientX / window.innerWidth - 0.5;
           movers.forEach((m) => {
             m.x(nx * 36 * m.d);
             m.r(nx * 1.2 * m.d);
           });
+          if (hero) {
+            const r = hero.getBoundingClientRect();
+            hero.style.setProperty("--mx", `${e.clientX - r.left}px`);
+            hero.style.setProperty("--my", `${e.clientY - r.top}px`);
+          }
+          if (cta && ctaX && ctaY) {
+            const r = cta.getBoundingClientRect();
+            const dx = e.clientX - (r.left + r.width / 2);
+            const dy = e.clientY - (r.top + r.height / 2);
+            const near = Math.hypot(dx, dy) < 130;
+            ctaX(near ? dx * 0.22 : 0);
+            ctaY(near ? dy * 0.3 : 0);
+          }
         };
         window.addEventListener("pointermove", onMove);
 

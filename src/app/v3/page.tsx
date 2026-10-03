@@ -4,6 +4,7 @@ import { archivo, jetmono, serif } from "../fonts";
 import V3Motion from "@/components/v3/V3Motion";
 import PortraitDissolve from "@/components/v3/PortraitDissolve";
 import TwinVoice from "@/components/v3/TwinVoice";
+import LiveSystem from "@/components/v3/LiveSystem";
 import "./v3.css";
 
 // Portfolio v3, in progress beside the live homepage. Nothing links here and
@@ -80,6 +81,10 @@ export default function V3() {
         <a className="v3-mark" href="#top">
           John Boy Roxas
         </a>
+        {/* True while he is taking on client work; remove when he is full. */}
+        <span className="v3-avail">
+          <i className="v3-dot v3-dot-live" /> Open for new builds
+        </span>
         <nav className="v3-links" aria-label="Sections">
           <a href="#wall">The wall</a>
           <a href="#top">Proof</a>
@@ -96,6 +101,7 @@ export default function V3() {
           <div className="v3-glow v3-glow-a" aria-hidden="true" />
           <div className="v3-glow v3-glow-b" aria-hidden="true" />
           <div className="v3-grid" aria-hidden="true" />
+          <div className="v3-spot" aria-hidden="true" />
 
           <div className="v3-name" aria-hidden="true" data-depth="0.15">
             <span>JOHN</span>
@@ -127,7 +133,12 @@ export default function V3() {
               <span className="v3-cyborg-eye" aria-hidden="true" />
             </div>
 
-            {/* Floating artifacts. Each is a real pattern from his builds. */}
+            {/* Data packets between the cards: the idempotency story, live. */}
+            <LiveSystem />
+
+            {/* Floating artifacts. Each is a real pattern from his builds.
+                data-live marks what LiveSystem animates; the markup holds the
+                end state (5 deliveries, 1 payment, Won) for no-JS. */}
             <div className="v3-art v3-art-payload" data-depth="0.9" data-float="0">
               <div className="v3-art-head">
                 <i className="v3-dot" /> POST /webhooks/stripe
@@ -138,13 +149,21 @@ export default function V3() {
                 <dt>id</dt>
                 <dd>in_1Q8fK2</dd>
                 <dt>attempt</dt>
-                <dd>3 of 3</dd>
+                <dd>
+                  #<b data-live="attempt">5</b>
+                </dd>
               </dl>
-              <div className="v3-art-foot">duplicate, ignored</div>
+              <div className="v3-art-foot" data-live="verdict">
+                duplicate, ignored
+              </div>
             </div>
 
             <div className="v3-art v3-art-count" data-depth="1.2" data-float="1">
-              <b>5</b> events in <span>/</span> <b className="v3-neon">1</b> payment recorded
+              <b data-live="events">5</b> <i data-live="evword">events</i> in <span>/</span>{" "}
+              <b className="v3-neon" data-live="paid">
+                1
+              </b>{" "}
+              payment recorded
             </div>
 
             <div className="v3-art v3-art-pipe" data-depth="0.7" data-float="2">
@@ -153,12 +172,17 @@ export default function V3() {
                 <li className="on">New lead</li>
                 <li className="on">Contacted</li>
                 <li className="on">Booked</li>
-                <li>Won</li>
+                <li className="on" data-live="won">
+                  Won
+                </li>
               </ol>
             </div>
 
             <div className="v3-art v3-art-api" data-depth="1.05" data-float="3">
-              GHL v2 <span>/</span> contact.create <span>/</span> <b className="v3-neon">201</b> <span>/</span> 182ms
+              GHL v2 <span>/</span> contact.create <span>/</span> <b className="v3-neon">201</b> <span>/</span>{" "}
+              <b className="v3-ms" data-live="ms">
+                182ms
+              </b>
             </div>
 
             <div className="v3-art v3-art-cron" data-depth="0.55" data-float="4">
