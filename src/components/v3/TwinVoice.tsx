@@ -39,16 +39,39 @@ const START_DELAY_MS = 1200;
 const SESSION_KEY = "v3-twin-heard";
 const DURATION = ENVELOPE.length / ENVELOPE_FPS;
 
-// Phrase start times in seconds, measured from the audio's own pauses
-// (ffmpeg silencedetect). Re-measure if the audio is regenerated.
+// Phrase start times in seconds for the 66-second intro (2026-10-03),
+// measured from the audio's own pauses (ffmpeg silencedetect, -30dB, 0.12s).
+// Re-measure if the audio is regenerated, and regenerate twinEnvelope.ts.
 const CAPTIONS: [number, string][] = [
-  [0, "I'm John Boy's AI."],
-  [2.3, "He built me, so I only know"],
-  [4.0, "what he has actually shipped."],
-  [5.6, "Five years in GoHighLevel,"],
-  [7.84, "fifty-eight client systems."],
-  [9.5, "Ask me anything about his work,"],
-  [11.24, "or tell me what's broken in yours."],
+  [0, "Hi, I'm John Boy's AI."],
+  [2.25, "He built me,"],
+  [3.1, "so I only know what he has actually shipped."],
+  [5.65, "Here's the short version."],
+  [7.2, "Five years inside GoHighLevel."],
+  [9.9, "Fifty-eight client systems:"],
+  [11.9, "workflows, pipelines, snapshots, funnels,"],
+  [15.8, "the whole engine."],
+  [17.3, "But the real work starts"],
+  [19.05, "when GoHighLevel hits a wall."],
+  [21.45, "A client gets charged twice."],
+  [23.65, "The dashboard says forty leads,"],
+  [25.85, "but the CRM says twenty-seven."],
+  [28.55, "A launch slips two weeks"],
+  [30.75, "because A2P was filed late."],
+  [33.65, "That's where John Boy keeps building."],
+  [36.05, "Webhooks, the v2 API, Stripe,"],
+  [39, "and full apps, wired back into the CRM."],
+  [42.5, "Like a payment that Stripe delivers five times,"],
+  [45.45, "and his system records once."],
+  [47.55, "His biggest build, Coach OS,"],
+  [49.9, "is over thirty thousand lines of code,"],
+  [52.5, "running live,"],
+  [53.7, "wired into GoHighLevel in both directions."],
+  [56.45, "So here's the offer."],
+  [58.05, "Send him one workflow that isn't firing,"],
+  [60.8, "and he'll tell you exactly what's wrong with it,"],
+  [63, "free."],
+  [64.25, "Or ask me anything, right here."],
 ];
 
 // Real user activation in Chrome, Safari and Firefox. Scrolling is not one.
