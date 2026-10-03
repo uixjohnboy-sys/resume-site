@@ -13,19 +13,17 @@ import { smokeSprites, type SmokeTint } from "./smoke";
 //   "You just found the one who builds past it."
 //
 // The lines set up the page's own story (the wall section, then the proof).
-// First visit of a browser session only; refreshes go straight to the page.
+// Plays on every load and every refresh (JB, 2026-10-03).
 //
 // Safety, because a curtain that never lifts is worse than no curtain:
 // - It only shows when the head script armed motion (html.fx-on), so with no
 //   JS or reduced motion it is display:none from the first paint.
-// - An inline script right after it hides it at once on repeat visits in
-//   the session, and hides it after 6 seconds whatever happens (hidden, not
-//   removed, so React still finds the node it rendered when it hydrates).
+// - An inline script right after it hides it after 6 seconds whatever
+//   happens (hidden, not removed, so React still finds the node it rendered
+//   when it hydrates).
 // - It never waits more than 1.8 seconds for fonts and the portrait.
 // When it lifts it sets window.__v3Revealed and fires "v3:revealed": the
 // hero intro (V3Motion) and the AI twin (TwinVoice) wait for that.
-
-const SEEN = "v3-pre-seen";
 
 const LINE_A = "Every GoHighLevel build hits a wall.";
 const LINE_B = "You just found the one who";
@@ -100,12 +98,6 @@ export default function Preloader() {
       Promise.resolve().then(() => setGone(true));
       return;
     }
-    try {
-      sessionStorage.setItem(SEEN, "1");
-    } catch {
-      // Not remembered: it plays again next time, harmless.
-    }
-
     // ---- the smoke ----
     const g = cv.getContext("2d");
     const sprites = smokeSprites();
@@ -264,9 +256,7 @@ export default function Preloader() {
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "(function(){var p=document.querySelector('.v3-pre');if(!p)return;try{if(sessionStorage.getItem('" +
-            SEEN +
-            "')==='1'){p.style.display='none';window.__v3Revealed=true;return}}catch(e){}setTimeout(function(){if(p.style.display!=='none'){p.style.display='none';window.__v3Revealed=true;window.dispatchEvent(new Event('v3:revealed'))}},6000)})()",
+            "(function(){var p=document.querySelector('.v3-pre');if(!p)return;setTimeout(function(){if(p.style.display!=='none'){p.style.display='none';window.__v3Revealed=true;window.dispatchEvent(new Event('v3:revealed'))}},6000)})()",
         }}
       />
     </>

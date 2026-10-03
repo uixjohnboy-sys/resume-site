@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import { onRevealed } from "./Preloader";
+import { setErode } from "./scene";
 
 // All of v3's movement lives here, layered on top of a page that is already
 // complete as plain HTML. Nothing in the markup depends on this running.
@@ -30,6 +31,12 @@ import { onRevealed } from "./Preloader";
 // - The HUD in the corner names the section in view and shows progress.
 // - Desktop: an amber spotlight follows the cursor across the hero, the
 //   primary buttons lean toward the cursor, and button labels roll on hover.
+// - Scrolling away from the hero turns the portrait to smoke (scene.erode,
+//   read by PortraitDissolve and HeroShader).
+// - The stage tilts in 3D toward the cursor; the outlined name stretches
+//   with scroll speed; the nav slips away on scroll down and returns on up.
+// - Mono labels decode in (terminal style): eyebrows on enter, the HUD on
+//   change, nav links on hover.
 // - prefers-reduced-motion: none of the above; the page just shows.
 
 gsap.registerPlugin(ScrollTrigger);
@@ -65,6 +72,37 @@ function splitWords(el: HTMLElement) {
   walk(el);
   el.dataset.splitDone = "1";
   return Array.from(el.querySelectorAll<HTMLElement>(".v3-wi"));
+}
+
+// Terminal-style decode: every text node of the element churns through
+// random glyphs and settles on its real text, left to right.
+const GLYPHS = "01<>/_#%&=+*ABCDEFGHJKLMNPQRSTUVWXYZ";
+function decode(el: Element, duration = 700) {
+  const nodes: { n: Text; final: string }[] = [];
+  const walk = (node: Node) => {
+    node.childNodes.forEach((c) => {
+      if (c.nodeType === Node.TEXT_NODE && (c.textContent || "").trim()) nodes.push({ n: c as Text, final: c.textContent || "" });
+      else if (c.nodeType === Node.ELEMENT_NODE) walk(c);
+    });
+  };
+  walk(el);
+  if (!nodes.length) return;
+  const t0 = performance.now();
+  const step = () => {
+    const k = Math.min(1, (performance.now() - t0) / duration);
+    for (const { n, final } of nodes) {
+      let out = "";
+      for (let i = 0; i < final.length; i++) {
+        const ch = final[i];
+        if (ch === " " || i / final.length < k) out += ch;
+        else out += GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      }
+      n.textContent = out;
+    }
+    if (k < 1) requestAnimationFrame(step);
+    else for (const { n, final } of nodes) n.textContent = final;
+  };
+  requestAnimationFrame(step);
 }
 
 // Give a button label a second copy below it that rolls up on hover.
@@ -150,7 +188,32 @@ export default function V3Motion() {
         );
       });
 
+      intro.add(() => q(".v3-hero .v3-eyebrow").forEach((e) => decode(e, 900)), 0.5);
       offReveal = onRevealed(() => intro.play());
+
+      // ---- scrolling away: he turns to smoke ----
+      ScrollTrigger.create({
+        trigger: q(".v3-hero")[0],
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+        onUpdate: (self) => setErode(self.progress),
+      });
+
+      // ---- mono labels decode in ----
+      q(".v3-section .v3-eyebrow, .v3-wall .v3-eyebrow").forEach((e) => {
+        ScrollTrigger.create({ trigger: e, start: "top 88%", once: true, onEnter: () => decode(e, 800) });
+      });
+      q(".v3-links a:not(.v3-links-cta)").forEach((a) => {
+        a.addEventListener("pointerenter", () => decode(a, 420));
+      });
+
+      // ---- nav: away on scroll down, back on scroll up ----
+      lenis.on("scroll", (l: Lenis) => {
+        const hide = l.direction === 1 && l.scroll > 140;
+        if (hide) root.setAttribute("data-nav", "hidden");
+        else root.removeAttribute("data-nav");
+      });
 
       // ---- artifacts: idle float ----
       arts.forEach((el, i) => {
@@ -182,8 +245,15 @@ export default function V3Motion() {
         return { track, x: 0, dir: i === 0 ? -1 : 1 };
       });
       const bandSkew = gsap.quickTo(bandRows, "skewX", { duration: 0.5, ease: "power3.out" });
+      const nameEl = q(".v3-name")[0] as HTMLElement | undefined;
+      let nameW = 125;
       const bandTick = () => {
         const v = lenis.velocity || 0;
+        // The outlined name stretches with scroll speed and eases back.
+        if (nameEl) {
+          nameW += (125 + gsap.utils.clamp(-18, 30, v * 0.5) - nameW) * 0.12;
+          nameEl.style.fontVariationSettings = `"wdth" ${nameW.toFixed(1)}`;
+        }
         bandState.forEach((b) => {
           if (!b.track) return;
           const half = b.track.scrollWidth / 2;
@@ -270,7 +340,8 @@ export default function V3Motion() {
             // the animation never gets a frame.
             hudN.textContent = n;
             hudT.textContent = t;
-            gsap.fromTo([hudN, hudT], { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.35, ease: "power3.out", overwrite: true });
+            decode(hudT, 500);
+            gsap.fromTo(hudN, { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.35, ease: "power3.out", overwrite: true });
           },
         });
       });
@@ -300,6 +371,11 @@ export default function V3Motion() {
           };
         });
         const hero = q(".v3-hero")[0] as HTMLElement | undefined;
+        // The stage tilts toward the cursor, a few degrees, in perspective.
+        const stage = q(".v3-stage")[0] as HTMLElement | undefined;
+        if (stage) gsap.set(stage, { transformPerspective: 1100 });
+        const tiltX = stage ? gsap.quickTo(stage, "rotationX", { duration: 1.1, ease: "power3.out" }) : null;
+        const tiltY = stage ? gsap.quickTo(stage, "rotationY", { duration: 1.1, ease: "power3.out" }) : null;
         const magnets = q(".v3-btn-primary").map((el) => ({
           el: el as HTMLElement,
           x: gsap.quickTo(el, "x", { duration: 0.5, ease: "power3.out" }),
@@ -308,6 +384,9 @@ export default function V3Motion() {
 
         const onMove = (e: PointerEvent) => {
           const nx = e.clientX / window.innerWidth - 0.5;
+          const ny = e.clientY / window.innerHeight - 0.5;
+          tiltY?.(nx * 7);
+          tiltX?.(-ny * 5);
           movers.forEach((m) => {
             m.x(nx * 36 * m.d);
             m.r(nx * 1.2 * m.d);

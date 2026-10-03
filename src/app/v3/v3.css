@@ -2667,3 +2667,50 @@
     transition: none;
   }
 }
+
+/* ---------- top-1 pass (2026-10-03): shader, smart nav, name stretch, time ---------- */
+
+/* GPU aurora smoke behind everything in the hero (HeroShader.tsx). */
+.v3-shader {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* With the shader running, the CSS glows step back and let it lead. */
+.v3-hero[data-shader="on"] .v3-glow {
+  opacity: 0.4;
+}
+
+/* The nav slips away on scroll down and returns on scroll up (V3Motion). */
+.v3-nav {
+  transition: transform 0.55s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.4s;
+}
+
+.v3[data-nav="hidden"] .v3-nav {
+  transform: translate(-50%, -160%);
+  opacity: 0;
+}
+
+.v3-name {
+  will-change: font-variation-settings;
+}
+
+.v3-stage {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.v3-time span {
+  color: var(--neon);
+  margin: 0 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-nav {
+    transition: none;
+  }
+}

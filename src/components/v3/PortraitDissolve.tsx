@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { voice } from "./voice";
+import { scene } from "./scene";
 import { smokeSprites, type SmokeTint } from "./smoke";
 
 // The portrait, turning to smoke at its edges (JB, 2026-10-03: the old pixel
@@ -23,7 +24,9 @@ import { smokeSprites, type SmokeTint } from "./smoke";
 //      the fraying band, drifting outward and up, swelling and fading,
 //      painted additively and screened over the photo.
 // While the AI twin speaks (TwinVoice), voice.level releases more smoke,
-// faster and warmer, so the figure visibly "talks".
+// faster and warmer, so the figure visibly "talks". As the hero scrolls
+// away, scene.erode (set by V3Motion) eats the mask inward until the whole
+// figure has gone to smoke, and the smoke rises faster to carry him off.
 // Paused off-screen and in hidden tabs; with prefers-reduced-motion the mask
 // is drawn once and no smoke moves. If anything fails, the plain <Image>
 // underneath stays visible.
@@ -83,7 +86,9 @@ function fbm(x: number, y: number) {
 // How much of the photo survives at (nx, ny) at time t: 1 at the core, 0 in
 // the smoke. The noise is sampled lower as time passes, so its shapes rise.
 function maskAt(nx: number, ny: number, t: number) {
-  const d = dissolveAt(nx, ny);
+  // Scrolling away pushes the whole field up, so the smoke reaches the face
+  // last and takes everything by the time the hero has left.
+  const d = dissolveAt(nx, ny) + scene.erode * 1.35;
   if (d <= 0.001) return 1;
   const n = fbm(nx * 3.4 + t * 0.004, ny * 3.4 + t * 0.016);
   return 1 - smooth(0.42, 0.86, d * 1.35 + (n - 0.5) * 0.95);
@@ -239,7 +244,7 @@ export default function PortraitDissolve() {
     const drawSmoke = () => {
       pctx.clearRect(0, 0, P, P);
       pctx.globalCompositeOperation = "lighter";
-      const target = Math.round((phone() ? 45 : 110) * (1 + voice.level * 1.5));
+      const target = Math.round((phone() ? 45 : 110) * (1 + voice.level * 1.5 + scene.erode * 0.9));
       // Release a few per frame until the room is full.
       for (let n = 0; n < 3 && puffs.length < target; n++) spawn();
       for (let i = puffs.length - 1; i >= 0; i--) {
@@ -251,7 +256,7 @@ export default function PortraitDissolve() {
           continue;
         }
         p.x += p.vx;
-        p.y += p.vy;
+        p.y += p.vy * (1 + scene.erode * 2.2);
         p.vx *= 0.99;
         p.vy *= 0.995;
         p.r += p.grow;
