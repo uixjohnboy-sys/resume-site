@@ -2430,82 +2430,16 @@
   color: var(--neon);
 }
 
-/* Cursor (Cursor.tsx): dot + trailing ring. */
-.v3-cur-dot,
-.v3-cur-ring {
+/* Smoke trailing the mouse (Cursor.tsx). The system cursor stays; this
+   canvas never takes a click. */
+.v3-smoke {
   position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 150;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 110;
   pointer-events: none;
-  opacity: 0;
-}
-
-.v3-cur-dot {
-  width: 6px;
-  height: 6px;
-  margin: -3px 0 0 -3px;
-  border-radius: 50%;
-  background: var(--neon);
-}
-
-.v3-cur-ring {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  margin: -18px 0 0 -18px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 999px;
-  transition: width 0.3s, height 0.3s, margin 0.3s, background 0.3s, border-color 0.3s, scale 0.15s;
-}
-
-.v3-cur-ring span {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--neon-ink);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.v3-cur-ring[data-state="hot"] {
-  width: 58px;
-  height: 58px;
-  margin: -29px 0 0 -29px;
-  border-color: var(--neon);
-  background: rgba(255, 178, 36, 0.08);
-}
-
-.v3-cur-ring[data-state="label"] {
-  width: 86px;
-  height: 86px;
-  margin: -43px 0 0 -43px;
-  border-color: var(--neon);
-  background: var(--neon);
-}
-
-.v3-cur-ring[data-state="label"] span {
-  opacity: 1;
-}
-
-.v3-cur-ring[data-state="text"] {
-  width: 2px;
-  height: 26px;
-  margin: -13px 0 0 -1px;
-  border-color: var(--neon);
-  background: var(--neon);
-}
-
-.v3-cur-ring.is-down {
-  scale: 0.85;
-}
-
-.v3[data-cursor="on"],
-.v3[data-cursor="on"] * {
-  cursor: none !important;
+  mix-blend-mode: screen;
 }
 
 /* Film grain over everything, very faint. */
