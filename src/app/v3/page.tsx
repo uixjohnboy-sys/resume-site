@@ -5,6 +5,7 @@ import V3Motion from "@/components/v3/V3Motion";
 import PortraitDissolve from "@/components/v3/PortraitDissolve";
 import TwinVoice from "@/components/v3/TwinVoice";
 import LiveSystem from "@/components/v3/LiveSystem";
+import TwinChat from "@/components/v3/TwinChat";
 import "./v3.css";
 
 // Portfolio v3, in progress beside the live homepage. Nothing links here and
@@ -243,6 +244,9 @@ export default function V3() {
               ))}
             </ul>
           </div>
+
+          {/* "Talk to my AI" opens this; on wide screens it takes the copy column. */}
+          <TwinChat />
 
           <div className="v3-scrollcue" aria-hidden="true">
             scroll

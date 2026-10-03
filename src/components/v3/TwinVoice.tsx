@@ -24,10 +24,10 @@ import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
 //      the reactive portrait run exactly as they would with sound. The first
 //      click, tap or key press anywhere afterwards counts as permission, and
 //      it starts over from the top with the real voice, once per session.
-//   4. "Talk to my AI" restarts the intro with the real voice at any time;
-//      while the voice plays the same button reads "Mute" (WCAG 1.4.2), and
-//      Esc mutes too. Until the chat exists, talking means this intro; when
-//      the chat ships, this button is where it opens.
+//   4. "Talk to my AI" opens the chat (TwinChat.tsx); the first time in a
+//      session it also plays the intro with the real voice as the greeting.
+//      While the voice plays the same button reads "Mute" (WCAG 1.4.2), and
+//      Esc mutes too.
 //
 // The voice is ElevenLabs ("Jon"), not John Boy. Reactivity reads a loudness
 // envelope measured offline (twinEnvelope.ts), so the portrait moves the
@@ -321,8 +321,13 @@ export default function TwinVoice() {
         <button
           type="button"
           className="v3-twin-btn"
-          onClick={() => talkRef.current()}
-          aria-label="Talk to my AI: plays a 13 second intro spoken by John Boy's AI twin, an AI voice, not John Boy"
+          onClick={() => {
+            // Opens the chat (TwinChat); the first time this session, the
+            // intro also plays with the real voice as the greeting.
+            window.dispatchEvent(new Event("v3:chat-open"));
+            if (!heard()) talkRef.current();
+          }}
+          aria-label="Talk to my AI: opens a chat with John Boy's AI twin, an AI, not John Boy"
         >
           <svg viewBox="0 0 16 16" aria-hidden="true">
             <path d="M2 6h3l4-3v10L5 10H2z" fill="currentColor" />
