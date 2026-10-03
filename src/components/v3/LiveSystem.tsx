@@ -16,7 +16,7 @@ import { useEffect, useRef } from "react";
 // Packets are drawn on one canvas behind the cards (so lines tuck under
 // them) and in front of the portrait (so data visibly runs through him).
 // Card positions are re-read every frame because the cards float and follow
-// the pointer. Wide screens only (below 1001px most cards are hidden), off under
+// the pointer. Wide screens only (below 1181px most cards are hidden), off under
 // prefers-reduced-motion, and paused whenever the hero is off screen or the
 // tab is hidden: the sequence runs on its own clock, which only advances
 // while it is visible.
@@ -55,8 +55,8 @@ export default function LiveSystem() {
     const hero = cv?.closest(".v3-hero");
     if (!cv || !stage || !hero) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // Below 1001px most of the cards it routes between are hidden.
-    if (window.matchMedia("(max-width: 1000px)").matches) return;
+    // Below 1181px most of the cards it routes between are hidden.
+    if (window.matchMedia("(max-width: 1180px)").matches) return;
     const g = cv.getContext("2d");
     if (!g) return;
 

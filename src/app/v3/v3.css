@@ -747,7 +747,7 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.v3[data-chat="open"] .v3-copy {
+.v3[data-chat="open"] .v3-copy-l {
   opacity: 0;
   transform: translateY(-12px);
   pointer-events: none;
@@ -1146,7 +1146,7 @@
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1180px) {
   .v3-chat {
     position: fixed;
     left: 0;
@@ -1167,7 +1167,7 @@
     transform: none;
   }
   /* On phones the copy sits under the sheet; it stays put. */
-  .v3[data-chat="open"] .v3-copy {
+  .v3[data-chat="open"] .v3-copy-l {
     opacity: 1;
     transform: none;
   }
@@ -1558,5 +1558,135 @@
   }
   .v3-btn {
     transition: none;
+  }
+}
+
+/* ---------- centre stage (JB, 2026-10-03) ----------
+   Wide screens: the twin stands in the middle of the hero, the headline on
+   its left, the details on its right. Placed last so it wins over the
+   earlier split-layout rules. */
+@media (min-width: 1181px) {
+  .v3-stage {
+    left: 50%;
+    right: auto;
+    width: min(640px, 44vw);
+    margin-left: calc(min(640px, 44vw) / -2);
+  }
+
+  .v3-copy {
+    position: absolute;
+    max-width: none;
+    width: calc(50vw - min(640px, 44vw) / 2 - 5vw - 32px);
+  }
+
+  .v3-copy-l {
+    left: 5vw;
+    top: 27%;
+  }
+
+  .v3-copy-r {
+    right: 5vw;
+    top: 31%;
+  }
+
+  .v3-h1 {
+    font-size: clamp(34px, 2.9vw, 50px);
+    line-height: 1.02;
+  }
+
+  .v3-sub {
+    margin-top: 0;
+    font-size: 16px;
+  }
+
+  .v3-ctas {
+    margin-top: 22px;
+  }
+
+  .v3-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 18px;
+    margin-top: 26px;
+  }
+
+  /* Cards hug the figure now that both sides hold copy. The cron and twin
+     cards step out (the voice button and its tag are the twin here). */
+  .v3-art-cron,
+  .v3-art-twin {
+    display: none;
+  }
+  .v3-art-payload {
+    left: -3%;
+    top: 22%;
+  }
+  /* Out past the figure, under the headline, clear of the twin tag. */
+  .v3-art-count {
+    left: -16%;
+    top: 70%;
+  }
+  .v3-art-pipe {
+    display: block;
+    right: -4%;
+    top: 7%;
+  }
+  .v3-art-pipe ol {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+  .v3-art-api {
+    right: -5%;
+    top: 47%;
+    width: 13.5em;
+    white-space: normal;
+  }
+
+  /* The chat takes the headline's side and leaves the twin in view; the
+     cards that would sit behind it step out. */
+  .v3[data-chat="open"] .v3-art-payload,
+  .v3[data-chat="open"] .v3-art-count {
+    opacity: 0 !important;
+    transition: opacity 0.3s;
+  }
+  /* The chat takes the headline's side and leaves the twin in view. */
+  .v3-chat {
+    left: 4vw;
+    width: min(460px, calc(50vw - min(640px, 44vw) / 2 - 4vw + 60px));
+  }
+}
+
+/* Tablets: stack the twin, then the headline, then the details. */
+@media (min-width: 761px) and (max-width: 1180px) {
+  .v3-hero {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 110px 6vw 56px;
+  }
+  .v3-stage {
+    position: relative;
+    right: auto;
+    width: min(560px, 72vw);
+    margin: 0 auto 10px;
+  }
+  .v3-copy {
+    width: 100%;
+    max-width: 640px;
+  }
+  .v3-copy-r {
+    margin-top: 18px;
+  }
+  /* The twin's tag takes the count card's spot once it wakes. */
+  .v3-stage[data-twin] .v3-art-count {
+    opacity: 0 !important;
+    transition: opacity 0.3s;
+  }
+  .v3-art-payload,
+  .v3-art-api,
+  .v3-art-twin,
+  .v3-art-pipe,
+  .v3-art-cron {
+    display: none;
   }
 }

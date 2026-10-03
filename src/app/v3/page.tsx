@@ -210,7 +210,10 @@ export default function V3() {
             <TwinVoice />
           </div>
 
-          <div className="v3-copy">
+          {/* Wide screens: the twin stands in the centre, the headline on its
+              left and the details on its right (JB, 2026-10-03). Narrower
+              screens stack them under the portrait. */}
+          <div className="v3-copy v3-copy-l">
             <p className="v3-eyebrow" data-v3="line">
               GoHighLevel architect <span>/</span> AI automation <span>/</span> Philippines
             </p>
@@ -222,6 +225,9 @@ export default function V3() {
                 And the part that <em>leaves</em> GoHighLevel.
               </span>
             </h1>
+          </div>
+
+          <div className="v3-copy v3-copy-r">
             <p className="v3-sub" data-v3="line">
               Five years and 58 client systems inside GHL: workflows, pipelines, snapshots and sub-accounts. Then
               the part most people hand to a developer. Webhooks, the v2 API, Stripe, A2P and full Next.js apps,
