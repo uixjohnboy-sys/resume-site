@@ -128,6 +128,9 @@ export default function TwinVoice() {
 
     // The cyborg half: once awake, it never goes back to human this visit.
     const wake = (state: "speaking" | "awake") => {
+      // While the chat is diagnosing a question (TwinChat sets "scanning"),
+      // the scan stays in front of the intro's own state.
+      if (st.getAttribute("data-twin") === "scanning" && state === "speaking") return;
       st.setAttribute("data-twin", state);
       setPhase(state);
     };

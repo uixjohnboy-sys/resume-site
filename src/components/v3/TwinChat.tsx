@@ -37,7 +37,25 @@ type Trace = {
   costUsd?: number;
 };
 
-type Msg = { role: "user" | "assistant"; content: string; trace?: Trace; note?: boolean };
+// The diagnosis shown while an answer is prepared (JB, 2026-10-03: he wanted
+// a countdown moment before the solution appears). Every step is real: the
+// facts listed are the ones the answer cites, and the answer is already in
+// hand before the countdown runs, so nothing is ever faked or delayed past
+// about eight seconds.
+type Diag = { step: 1 | 2 | 3 | 4; tick: string; facts: string[]; count: number; elapsed: string };
+
+type Msg = { role: "user" | "assistant"; content: string; trace?: Trace; note?: boolean; diag?: Diag; live?: boolean };
+
+// What the scanner is "looking through": the parts of his 58 builds.
+const SYSTEMS = [
+  "workflows", "pipelines", "webhook handlers", "Stripe lifecycle", "A2P 10DLC", "v2 API calls", "Coach OS",
+  "snapshots", "sub-accounts", "Next.js apps", "Firebase rules", "n8n flows", "Zapier zaps", "Make scenarios",
+  "calendars", "forms", "email templates", "scheduled jobs", "idempotency keys", "signed contracts",
+];
+
+type Answer = { text: string; trace?: Trace; note?: boolean; gate?: boolean };
+
+const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms));
 
 const GREETING =
   "I'm John Boy's AI. He built me, so I only know what he has actually shipped. Ask me anything about his work, or tell me what's broken in yours.";
@@ -101,6 +119,45 @@ function savePass(pass: string | null) {
   } catch {
     // Not saved: they will be asked again next visit.
   }
+}
+
+function Diagnosis({ d }: { d: Diag }) {
+  const st = (n: number) => (d.step > n ? "done" : d.step === n ? "active" : "todo");
+  return (
+    <div className="v3-diag" data-step={d.step}>
+      <p className="v3-diag-head">
+        <i className="v3-diag-ring" /> Diagnosing <span>{d.elapsed}</span>
+      </p>
+      <ol className="v3-diag-steps">
+        <li data-s={st(1)}>Reading your message</li>
+        <li data-s={st(2)}>
+          Scanning 58 client systems
+          {d.step === 2 ? <code>{d.tick}</code> : null}
+        </li>
+        <li data-s={st(3)}>
+          Matching verified facts
+          {d.step >= 3 ? (
+            <span className="v3-diag-facts">
+              {d.facts.length ? (
+                d.facts.map((id) => (
+                  <i key={id} className="v3-trace-fact">
+                    {title(id)}
+                  </i>
+                ))
+              ) : (
+                <i className="v3-trace-none">general reply</i>
+              )}
+            </span>
+          ) : null}
+        </li>
+      </ol>
+      {d.step === 4 ? (
+        <p className="v3-diag-count" key={d.count}>
+          {d.count}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 function TraceView({ t }: { t: Trace }) {
@@ -221,14 +278,122 @@ export default function TwinChat() {
     if (gate) window.setTimeout(() => nameRef.current?.focus({ preventScroll: true }), 50);
   }, [gate]);
 
-  const askFaq = (f: (typeof FAQ)[number]) => {
+  const patchLast = (fn: (m: Msg) => Msg) =>
+    setMsgs((cur) => {
+      const next = cur.slice();
+      next[next.length - 1] = fn(next[next.length - 1]);
+      return next;
+    });
+
+  // The diagnosis, then the answer typed out live. "answer" is already being
+  // fetched; the steps run in parallel and never finish before it arrives.
+  const dramatize = useCallback(
+    async (answer: Promise<Answer>, canned: boolean) => {
+      const stage = rootRef.current?.closest(".v3-hero")?.querySelector(".v3-stage") as HTMLElement | null;
+      const t0 = performance.now();
+      const elapsed = () => {
+        const ms = performance.now() - t0;
+        return `0:${String(Math.floor(ms / 1000)).padStart(2, "0")}.${Math.floor((ms % 1000) / 100)}`;
+      };
+      const diag: Diag = { step: 1, tick: SYSTEMS[0], facts: [], count: 3, elapsed: "0:00.0" };
+      const show = () => patchLast((m) => ({ ...m, diag: { ...diag } }));
+      show();
+
+      // The twin scans: the eye and smoke pulse, a scan line crosses the face.
+      stage?.setAttribute("data-twin", "scanning");
+      let mode: "scan" | "speak" | "off" = "scan";
+      let raf = 0;
+      const pump = () => {
+        if (mode === "scan") setVoiceLevel(0.3 + 0.22 * Math.sin(performance.now() / 160));
+        else setVoiceLevel(voice.level * 0.9);
+        stage?.style.setProperty("--vl", voice.level.toFixed(3));
+        if (mode !== "off" || voice.level > 0.01) raf = requestAnimationFrame(pump);
+      };
+      raf = requestAnimationFrame(pump);
+
+      const speed = canned ? 0.55 : 1;
+      let tickId = 0;
+      try {
+        await wait(1100 * speed);
+        diag.step = 2;
+        let i = 0;
+        tickId = window.setInterval(() => {
+          i = (i + 1) % SYSTEMS.length;
+          diag.tick = SYSTEMS[i];
+          diag.elapsed = elapsed();
+          show();
+        }, 85);
+        // Scan at least this long, and until the answer is in hand.
+        const [res] = await Promise.all([answer, wait(2900 * speed)]);
+        window.clearInterval(tickId);
+
+        if (res.gate) return res;
+        if (res.note) {
+          // A cap or a failure: no theatre, say it plainly.
+          patchLast((m) => ({ ...m, content: res.text, note: true, diag: undefined }));
+          return res;
+        }
+
+        diag.step = 3;
+        diag.facts = res.trace?.facts ?? [];
+        diag.elapsed = elapsed();
+        show();
+        await wait(1400 * speed);
+
+        diag.step = 4;
+        for (const n of [3, 2, 1]) {
+          diag.count = n as 3 | 2 | 1;
+          diag.elapsed = elapsed();
+          show();
+          await wait(canned ? 420 : 650);
+        }
+
+        // The answer, typed out as the twin speaks it.
+        mode = "speak";
+        stage?.setAttribute("data-twin", "speaking");
+        patchLast((m) => ({ ...m, diag: undefined, live: true, content: "" }));
+        const words = res.text.split(/(\s+)/);
+        const per = Math.min(42, 2600 / Math.max(1, words.length));
+        let out = "";
+        for (const w of words) {
+          out += w;
+          if (w.trim()) {
+            setVoiceLevel(Math.min(1, voice.level + 0.25 + Math.min(0.3, w.length / 20)));
+            patchLast((m) => ({ ...m, content: out }));
+            await wait(per);
+          }
+        }
+        patchLast((m) => ({ ...m, content: res.text, live: false, trace: res.trace }));
+        return res;
+      } finally {
+        window.clearInterval(tickId);
+        mode = "off";
+        window.setTimeout(() => {
+          cancelAnimationFrame(raf);
+          if (stage) {
+            // Back to awake (the cyborg half stays), unless the intro voice
+            // is still talking.
+            const cur = stage.getAttribute("data-twin");
+            if ((cur === "speaking" || cur === "scanning") && !voice.speaking) stage.setAttribute("data-twin", "awake");
+            stage.style.setProperty("--vl", "0");
+          }
+          setVoiceLevel(voice.speaking ? voice.level : 0);
+        }, 600);
+      }
+    },
+    []
+  );
+
+  const askFaq = async (f: (typeof FAQ)[number]) => {
     if (busy) return;
     setShown(null);
-    setMsgs((cur) => [
-      ...cur,
-      { role: "user", content: f.q },
-      { role: "assistant", content: f.a, trace: { canned: true, facts: f.facts } },
-    ]);
+    setMsgs((cur) => [...cur, { role: "user", content: f.q }, { role: "assistant", content: "" }]);
+    setBusy(true);
+    try {
+      await dramatize(Promise.resolve({ text: f.a, trace: { canned: true, facts: f.facts } }), true);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const ask = useCallback(
@@ -246,88 +411,62 @@ export default function TwinChat() {
       setMsgs((cur) => [...cur, { role: "user", content: q }, { role: "assistant", content: "" }]);
       setBusy(true);
 
-      // The twin "speaks" while the answer streams.
-      const stage = rootRef.current?.closest(".v3-hero")?.querySelector(".v3-stage") as HTMLElement | null;
-      stage?.setAttribute("data-twin", "speaking");
-      let raf = 0;
-      let streaming = true;
-      const pump = () => {
-        setVoiceLevel(voice.level * 0.9);
-        stage?.style.setProperty("--vl", voice.level.toFixed(3));
-        if (streaming || voice.level > 0.01) raf = requestAnimationFrame(pump);
-      };
-      raf = requestAnimationFrame(pump);
-
-      const patch = (fn: (m: Msg) => Msg) =>
-        setMsgs((cur) => {
-          const next = cur.slice();
-          next[next.length - 1] = fn(next[next.length - 1]);
-          return next;
-        });
-
-      try {
-        const res = await fetch("/api/twin", {
-          method: "POST",
-          headers: { "content-type": "application/json", "x-twin-pass": usePass },
-          body: JSON.stringify({ messages: turns }),
-        });
-        if (!res.body) throw new Error("no body");
-        const reader = res.body.getReader();
-        const dec = new TextDecoder();
-        let buf = "";
-        for (;;) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buf += dec.decode(value, { stream: true });
-          let nl: number;
-          while ((nl = buf.indexOf("\n")) >= 0) {
-            const raw = buf.slice(0, nl);
-            buf = buf.slice(nl + 1);
-            if (!raw.trim()) continue;
-            const ev = JSON.parse(raw) as { t: string; v?: string; trace?: Trace };
-            if (ev.t === "text" && ev.v) {
-              const chunk = ev.v;
-              setVoiceLevel(Math.min(1, voice.level + 0.3 + Math.min(0.3, chunk.length / 60)));
-              patch((m) => ({ ...m, content: m.content + chunk }));
-            } else if (ev.t === "done" && ev.trace) {
-              const trace = ev.trace;
-              patch((m) => ({ ...m, content: m.content.trim(), trace }));
-            } else if (ev.t === "gate") {
-              // The pass expired or was refused: take the question back
-              // and ask for the details again.
-              savePass(null);
-              setPass(null);
-              setMsgs((cur) => cur.slice(0, -2));
-              setGate({ pending: q });
-            } else if ((ev.t === "limit" || ev.t === "error") && ev.v) {
-              const v = ev.v;
-              patch((m) => ({ ...m, content: m.content ? `${m.content.trim()}\n\n${v}` : v, note: true }));
+      // Fetch the whole answer; the diagnosis plays while it streams in.
+      const fetchAnswer = async (): Promise<Answer> => {
+        try {
+          const res = await fetch("/api/twin", {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-twin-pass": usePass },
+            body: JSON.stringify({ messages: turns }),
+          });
+          if (!res.body) throw new Error("no body");
+          const reader = res.body.getReader();
+          const dec = new TextDecoder();
+          let buf = "";
+          let text = "";
+          let trace: Trace | undefined;
+          let note: string | null = null;
+          for (;;) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buf += dec.decode(value, { stream: true });
+            let nl: number;
+            while ((nl = buf.indexOf("\n")) >= 0) {
+              const raw = buf.slice(0, nl);
+              buf = buf.slice(nl + 1);
+              if (!raw.trim()) continue;
+              const ev = JSON.parse(raw) as { t: string; v?: string; trace?: Trace };
+              if (ev.t === "text" && ev.v) text += ev.v;
+              else if (ev.t === "done" && ev.trace) trace = ev.trace;
+              else if (ev.t === "gate") return { text: "", gate: true };
+              else if ((ev.t === "limit" || ev.t === "error") && ev.v) note = ev.v;
             }
           }
+          if (note) return { text: text ? `${text.trim()}\n\n${note}` : note, note: true };
+          return { text: text.trim(), trace };
+        } catch {
+          return {
+            text: "I can't answer right now. You can reach John Boy directly at uix.johnboy@gmail.com or book a call at johnboydesign.com/book.",
+            note: true,
+          };
         }
-      } catch {
-        patch((m) => ({
-          ...m,
-          content:
-            "I can't answer right now. You can reach John Boy directly at uix.johnboy@gmail.com or book a call at johnboydesign.com/book.",
-          note: true,
-        }));
+      };
+
+      try {
+        const res = await dramatize(fetchAnswer(), false);
+        if (res.gate) {
+          // The pass expired or was refused: take the question back and ask
+          // for the details again.
+          savePass(null);
+          setPass(null);
+          setMsgs((cur) => cur.slice(0, -2));
+          setGate({ pending: q });
+        }
       } finally {
-        streaming = false;
         setBusy(false);
-        window.setTimeout(() => {
-          cancelAnimationFrame(raf);
-          if (stage) {
-            // Back to awake (the cyborg half stays), unless the intro voice
-            // is still talking.
-            if (stage.getAttribute("data-twin") === "speaking" && !voice.speaking) stage.setAttribute("data-twin", "awake");
-            stage.style.setProperty("--vl", "0");
-          }
-          setVoiceLevel(voice.speaking ? voice.level : 0);
-        }, 600);
       }
     },
-    [msgs]
+    [msgs, dramatize]
   );
 
   const send = (text: string) => {
@@ -401,8 +540,9 @@ export default function TwinChat() {
 
       <div className="v3-chat-list" ref={listRef} data-lenis-prevent aria-live="polite">
         {msgs.map((m, i) => (
-          <div key={i} className={`v3-msg v3-msg-${m.role}`}>
-            <p className="v3-msg-text">
+          <div key={i} className={`v3-msg v3-msg-${m.role}`} data-live={m.live ? "true" : undefined}>
+            {m.diag ? <Diagnosis d={m.diag} /> : null}
+            <p className="v3-msg-text" hidden={!!m.diag}>
               {m.content ||
                 (busy && i === msgs.length - 1 ? (
                   <span className="v3-typing" aria-label="Thinking">

@@ -197,6 +197,8 @@ export default function V3() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="v3-cyborg" src="/v3/jb-cyborg.webp" alt="" aria-hidden="true" decoding="async" />
               <span className="v3-cyborg-eye" aria-hidden="true" />
+              {/* Sweeps the face while the twin diagnoses a question (TwinChat). */}
+              <span className="v3-scan" aria-hidden="true" />
             </div>
 
             {/* Data packets between the cards: the idempotency story, live. */}

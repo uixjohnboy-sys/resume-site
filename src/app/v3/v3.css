@@ -2699,3 +2699,229 @@
     transition: none;
   }
 }
+
+/* ---------- the diagnosis (TwinChat.tsx) ---------- */
+
+.v3-diag {
+  width: min(100%, 420px);
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 178, 36, 0.35);
+  border-top-left-radius: 4px;
+  border-radius: 14px;
+  background: rgba(7, 7, 11, 0.7);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.v3-diag-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--neon);
+}
+
+.v3-diag-head span {
+  margin-left: auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.v3-diag-ring {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 178, 36, 0.25);
+  border-top-color: var(--neon);
+  animation: v3-spin 0.9s linear infinite;
+}
+
+@keyframes v3-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.v3-diag-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.v3-diag-steps li {
+  position: relative;
+  padding: 5px 0 5px 20px;
+  color: var(--muted);
+  transition: color 0.3s;
+}
+
+.v3-diag-steps li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--muted);
+}
+
+.v3-diag-steps li[data-s="active"] {
+  color: var(--text);
+}
+
+.v3-diag-steps li[data-s="active"]::before {
+  border-color: var(--neon);
+  background: var(--neon);
+  box-shadow: 0 0 10px var(--neon);
+  animation: v3-pulse 1s ease-in-out infinite;
+}
+
+.v3-diag-steps li[data-s="done"] {
+  color: var(--text-2);
+}
+
+.v3-diag-steps li[data-s="done"]::before {
+  border-color: var(--neon);
+  background: var(--neon);
+}
+
+.v3-diag-steps code {
+  display: block;
+  margin-top: 2px;
+  color: var(--neon-trace);
+  font-size: 11px;
+}
+
+.v3-diag-steps code::before {
+  content: "> ";
+  color: var(--muted);
+}
+
+.v3-diag-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.v3-diag-facts i {
+  font-style: normal;
+  animation: v3-cap-in 0.35s ease-out both;
+}
+
+.v3-diag-facts i:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.v3-diag-facts i:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.v3-diag-count {
+  margin: 12px 0 2px;
+  text-align: center;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 800;
+  font-variation-settings: "wdth" 120;
+  color: var(--neon);
+  animation: v3-count 0.65s ease-out both;
+}
+
+@keyframes v3-count {
+  0% {
+    opacity: 0;
+    transform: scale(1.5);
+    filter: blur(6px);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
+
+/* The answer being typed: a blinking caret after the last word. */
+.v3-msg[data-live="true"] .v3-msg-text::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--neon);
+  animation: v3-caret 0.8s steps(1) infinite;
+}
+
+@keyframes v3-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The scan line over the portrait while the twin diagnoses. */
+.v3-scan {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: -16%;
+  height: 16%;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 178, 36, 0) 0%,
+    rgba(255, 178, 36, 0.22) 40%,
+    rgba(255, 220, 140, 0.85) 50%,
+    rgba(255, 178, 36, 0.22) 60%,
+    rgba(255, 178, 36, 0) 100%
+  );
+  mix-blend-mode: screen;
+}
+
+.v3-stage[data-twin="scanning"] .v3-scan {
+  opacity: 1;
+  animation: v3-scan 1.7s linear infinite;
+}
+
+@keyframes v3-scan {
+  from {
+    top: -16%;
+  }
+  to {
+    top: 100%;
+  }
+}
+
+.v3-stage[data-twin="scanning"] .v3-cyborg-eye {
+  opacity: 0.95;
+  animation: v3-eye-scan 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes v3-eye-scan {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-diag-ring,
+  .v3-diag-steps li[data-s="active"]::before,
+  .v3-diag-count,
+  .v3-stage[data-twin="scanning"] .v3-scan,
+  .v3-stage[data-twin="scanning"] .v3-cyborg-eye,
+  .v3-msg[data-live="true"] .v3-msg-text::after {
+    animation: none;
+  }
+}
