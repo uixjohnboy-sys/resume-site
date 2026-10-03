@@ -225,6 +225,15 @@
   pointer-events: none;
 }
 
+/* The smoke layer is larger than the photo (PortraitDissolve PAD = 15%)
+   and screened over it, so puffs glow and are never cut at the box edge. */
+.v3-dissolve.v3-dissolve-particles {
+  inset: -15%;
+  width: 130%;
+  height: 130%;
+  mix-blend-mode: screen;
+}
+
 .v3-portrait[data-dissolve="on"] img {
   visibility: hidden;
 }

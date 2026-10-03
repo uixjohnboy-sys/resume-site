@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { smokeSprites } from "./smoke";
 
 // Smoke that trails the mouse (JB, 2026-10-03: no custom cursor icon, he
 // wanted a smoke effect instead). The system cursor stays as it is; this
@@ -32,34 +33,6 @@ type Puff = {
 };
 
 const MAX = 160;
-const TINTS = ["255,178,36", "255,80,140", "140,90,255", "255,236,210"];
-
-// A soft, slightly irregular puff: a few offset radial blobs.
-function sprite(rgb: string) {
-  const size = 128;
-  const c = document.createElement("canvas");
-  c.width = c.height = size;
-  const g = c.getContext("2d");
-  if (!g) return c;
-  const blobs = [
-    [64, 64, 52, 0.55],
-    [48, 56, 34, 0.35],
-    [80, 70, 30, 0.3],
-    [62, 82, 28, 0.25],
-  ];
-  for (const [x, y, r, a] of blobs) {
-    const grad = g.createRadialGradient(x, y, 0, x, y, r);
-    grad.addColorStop(0, `rgba(${rgb},${a})`);
-    grad.addColorStop(0.55, `rgba(${rgb},${a * 0.45})`);
-    grad.addColorStop(1, `rgba(${rgb},0)`);
-    g.fillStyle = grad;
-    g.beginPath();
-    g.arc(x, y, r, 0, Math.PI * 2);
-    g.fill();
-  }
-  return c;
-}
-
 export default function Cursor() {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
@@ -72,7 +45,8 @@ export default function Cursor() {
     const g = cv.getContext("2d");
     if (!g) return;
 
-    const sprites = TINTS.map(sprite);
+    const all = smokeSprites();
+    const sprites = [all.amber, all.pink, all.violet, all.pale];
     let dpr = 1;
     const size = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
