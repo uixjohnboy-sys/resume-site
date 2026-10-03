@@ -24,9 +24,11 @@ import { onRevealed } from "./Preloader";
 //      on its own clock instead of a media element: captions, the cyborg and
 //      the reactive portrait run exactly as they would with sound. The first
 //      click, tap or key press anywhere afterwards counts as permission, and
-//      it starts over from the top with the real voice, once per session.
-//   4. "Talk to my AI" opens the chat (TwinChat.tsx); the first time in a
-//      session it also plays the intro with the real voice as the greeting.
+//      it starts over from the top with the real voice, once per page load.
+//      Every load and every refresh tries again (JB, 2026-10-03: he wants the
+//      robot to speak each time the page is refreshed).
+//   4. "Talk to my AI" opens the chat (TwinChat.tsx); if the intro has not
+//      been heard with sound on this page load, it plays it as the greeting.
 //      While the voice plays the same button reads "Mute" (WCAG 1.4.2), and
 //      Esc mutes too.
 //
@@ -39,7 +41,6 @@ const CYBORG = "/v3/jb-cyborg.webp";
 // Counted from the moment the preloader's curtain parts (at once on repeat
 // visits, when there is no curtain).
 const START_DELAY_MS = 900;
-const SESSION_KEY = "v3-twin-heard";
 const DURATION = ENVELOPE.length / ENVELOPE_FPS;
 
 // Phrase start times in seconds for the 66-second intro (2026-10-03),
@@ -82,20 +83,16 @@ const ACTIVATION_EVENTS = ["pointerup", "keydown", "touchend"] as const;
 
 type Phase = "waiting" | "speaking" | "awake";
 
+// Heard with sound on this page load. Deliberately not stored: a refresh
+// starts fresh and the twin speaks again.
+let heardNow = false;
+
 function heard() {
-  try {
-    return sessionStorage.getItem(SESSION_KEY) === "1";
-  } catch {
-    return false;
-  }
+  return heardNow;
 }
 
 function markHeard() {
-  try {
-    sessionStorage.setItem(SESSION_KEY, "1");
-  } catch {
-    // Private mode or blocked storage: it may speak again on return, harmless.
-  }
+  heardNow = true;
 }
 
 export default function TwinVoice() {
@@ -284,11 +281,6 @@ export default function TwinVoice() {
       await inView;
       if (onVis) document.removeEventListener("visibilitychange", onVis);
       if (!alive) return;
-      // Already heard with sound this session: speak silently, no sound cue.
-      if (heard()) {
-        speakSilently();
-        return;
-      }
       try {
         // Rejected at once when there has been no interaction yet, so this
         // costs no delay on a first visit.

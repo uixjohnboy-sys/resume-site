@@ -2372,34 +2372,25 @@
 /* ---------- award pass (2026-10-03): preloader, cursor, grain, HUD,
    skills band, word reveals, rolling labels, sideways work ---------- */
 
-/* Preloader: only exists for a visit with motion armed (Preloader.tsx). */
+/* Preloader (Preloader.tsx): smoke gathers, two lines resolve out of it,
+   the smoke carries them away. Only exists with motion armed (html.fx-on). */
 .v3-pre {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 200;
+  background: radial-gradient(ellipse at 50% 62%, #140e1f 0%, var(--ink) 68%);
 }
 
 .fx-on .v3-pre {
   display: block;
 }
 
-.v3-pre-top,
-.v3-pre-bot {
+.v3-pre-smoke {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 50.5%;
-  background: var(--ink);
-}
-
-.v3-pre-top {
-  top: 0;
-  border-bottom: 1px solid rgba(255, 178, 36, 0.25);
-}
-
-.v3-pre-bot {
-  bottom: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .v3-pre-mid {
@@ -2409,33 +2400,52 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
+  padding: 0 6vw;
+  text-align: center;
 }
 
-.v3-pre-line {
-  display: block;
-}
-
-.v3-pre-name,
-.v3-pre-tag {
+.v3-pre-eyebrow {
+  margin: 0 0 14px;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11px;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--text-2);
-}
-
-.v3-pre-tag {
   color: var(--muted);
 }
 
-.v3-pre-count {
-  font-size: clamp(72px, 13vw, 180px);
-  line-height: 0.9;
-  font-weight: 800;
-  font-variation-settings: "wdth" 120;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
+.v3-pre-line {
+  max-width: 19em;
+  margin: 0;
+  font-size: clamp(26px, 3.6vw, 56px);
+  line-height: 1.12;
+  font-weight: 700;
+  font-variation-settings: "wdth" 110;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-shadow: 0 0 40px rgba(7, 7, 11, 0.8);
+}
+
+.v3-pre-a {
+  color: var(--text-2);
+}
+
+.v3-pre-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.v3-pre-ch {
+  display: inline-block;
+  will-change: transform, filter, opacity;
+}
+
+.v3-pre-em {
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: normal;
+  letter-spacing: -0.01em;
   color: var(--neon);
 }
 
