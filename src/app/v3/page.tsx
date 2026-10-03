@@ -7,6 +7,8 @@ import TwinVoice from "@/components/v3/TwinVoice";
 import LiveSystem from "@/components/v3/LiveSystem";
 import TwinChat from "@/components/v3/TwinChat";
 import ProofLab from "@/components/v3/ProofLab";
+import Preloader from "@/components/v3/Preloader";
+import Cursor from "@/components/v3/Cursor";
 import "./v3.css";
 
 // Portfolio v3, in progress beside the live homepage. Nothing links here and
@@ -99,6 +101,20 @@ const badges = [
   { img: "/badge-course-community-expert.png", name: "Course & Community Expert" },
 ];
 
+const skills = [
+  "GoHighLevel",
+  "Webhooks",
+  "v2 API",
+  "Stripe",
+  "A2P 10DLC",
+  "Next.js",
+  "Firebase",
+  "Claude API",
+  "n8n",
+  "Zapier",
+  "Make",
+];
+
 export default function V3() {
   return (
     <div
@@ -114,7 +130,17 @@ export default function V3() {
             "setTimeout(function(){var r=document.getElementById('v3-root');if(r&&r.getAttribute('data-motion')==='pending')r.setAttribute('data-motion','off')},2500)",
         }}
       />
+      <Preloader />
       <V3Motion />
+      <Cursor />
+      <div className="v3-grain" aria-hidden="true" />
+      <div className="v3-hud" aria-hidden="true">
+        <span className="v3-hud-n">01</span>
+        <span className="v3-hud-bar">
+          <i />
+        </span>
+        <span className="v3-hud-t">Intro</span>
+      </div>
 
       <header className="v3-nav" data-v3="nav">
         <a className="v3-mark" href="#top">
@@ -136,7 +162,7 @@ export default function V3() {
 
       <main id="top">
         {/* ---------- HERO: the AI world ---------- */}
-        <section className="v3-hero" data-v3="hero">
+        <section className="v3-hero" data-v3="hero" data-hud="01|Intro">
           <div className="v3-glow v3-glow-a" aria-hidden="true" />
           <div className="v3-glow v3-glow-b" aria-hidden="true" />
           <div className="v3-grid" aria-hidden="true" />
@@ -255,11 +281,11 @@ export default function V3() {
             <p className="v3-eyebrow" data-v3="line">
               GoHighLevel architect <span>/</span> AI automation <span>/</span> Philippines
             </p>
-            <h1 className="v3-h1">
-              <span className="v3-line" data-v3="line">
+            <h1 className="v3-h1" data-split="intro">
+              <span className="v3-line">
                 GoHighLevel specialist.
               </span>
-              <span className="v3-line" data-v3="line">
+              <span className="v3-line">
                 And the part that <em>leaves</em> GoHighLevel.
               </span>
             </h1>
@@ -298,7 +324,22 @@ export default function V3() {
         </section>
 
         {/* ---------- THE WALL: pinned scroll story ---------- */}
-        <section className="v3-wall" id="wall" data-v3="wall">
+        <section className="v3-band" aria-label="Tools he wires together">
+          {[0, 1].map((row) => (
+            <div key={row} className="v3-band-row" data-row={row} aria-hidden={row === 1}>
+              <div className="v3-band-track">
+                {[...skills, ...skills].map((k, i) => (
+                  <span key={i} className="v3-band-item">
+                    {k}
+                    <i className="v3-band-dot" />
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <section className="v3-wall" id="wall" data-v3="wall" data-hud="02|The wall">
           <div className="v3-wall-in">
             <p className="v3-eyebrow">Every GoHighLevel build hits a wall</p>
             <ol className="v3-walls">
@@ -319,12 +360,12 @@ export default function V3() {
         </section>
 
         {/* ---------- PROOF LAB: break the walls yourself ---------- */}
-        <section className="v3-section v3-proof" id="proof">
+        <section className="v3-section v3-proof" id="proof" data-hud="03|Proof lab">
           <div className="v3-section-in">
             <p className="v3-eyebrow" data-v3="reveal">
               Proof lab <span>/</span> try it yourself
             </p>
-            <h2 className="v3-h2" data-v3="reveal">
+            <h2 className="v3-h2" data-split="scroll">
               Don&apos;t take my word for it. <em>Break it.</em>
             </h2>
             <p className="v3-section-sub" data-v3="reveal">
@@ -338,12 +379,12 @@ export default function V3() {
         </section>
 
         {/* ---------- WORK ---------- */}
-        <section className="v3-section v3-work" id="work">
+        <section className="v3-section v3-work" id="work" data-hud="04|Work">
           <div className="v3-section-in">
             <p className="v3-eyebrow" data-v3="reveal">
               Work <span>/</span> shipped, running
             </p>
-            <h2 className="v3-h2" data-v3="reveal">
+            <h2 className="v3-h2" data-split="scroll">
               The flagship, then the <em>funnels.</em>
             </h2>
 
@@ -367,7 +408,7 @@ export default function V3() {
                   ))}
                 </ul>
                 <div className="v3-ctas">
-                  <a className="v3-btn v3-btn-primary" href="https://coachos.johnboydesign.com/tour">
+                  <a className="v3-btn v3-btn-primary" href="https://coachos.johnboydesign.com/tour" data-cursor="Open">
                     Open the live tour
                   </a>
                   <a className="v3-btn v3-btn-ghost" href="/coach-os">
@@ -377,7 +418,7 @@ export default function V3() {
               </div>
               <div className="v3-coach-shots">
                 {coachShots.map((c, i) => (
-                  <figure key={c.img} className="v3-coach-shot" data-i={i}>
+                  <figure key={c.img} className="v3-coach-shot" data-i={i} data-clip>
                     <Image src={c.img} alt={c.cap} width={1440} height={760} sizes="(max-width: 760px) 92vw, 560px" />
                     <figcaption>{c.cap}</figcaption>
                   </figure>
@@ -385,9 +426,10 @@ export default function V3() {
               </div>
             </article>
 
+            <div className="v3-hwrap">
             <ul className="v3-works">
               {works.map((w) => (
-                <li key={w.img} className="v3-workcard" data-v3="reveal">
+                <li key={w.img} className="v3-workcard" data-cursor="Look">
                   <div className="v3-workframe">
                     <Image src={w.img} alt={`${w.name}, ${w.kind}`} width={900} height={2000} sizes="(max-width: 760px) 92vw, 380px" />
                   </div>
@@ -403,11 +445,12 @@ export default function V3() {
                 </li>
               ))}
             </ul>
+            </div>
           </div>
         </section>
 
         {/* ---------- CERTIFIED ---------- */}
-        <section className="v3-section v3-certs">
+        <section className="v3-section v3-certs" data-hud="05|Certified">
           <div className="v3-section-in">
             <p className="v3-eyebrow" data-v3="reveal">
               Certified by HighLevel
@@ -424,9 +467,9 @@ export default function V3() {
         </section>
 
         {/* ---------- THE OFFER ---------- */}
-        <section className="v3-section v3-offer" id="contact">
+        <section className="v3-section v3-offer" id="contact" data-hud="06|Contact">
           <div className="v3-section-in">
-            <h2 className="v3-offer-h" data-v3="reveal">
+            <h2 className="v3-offer-h" data-split="scrub">
               Send me one <em>broken</em> workflow.
             </h2>
             <p className="v3-offer-text" data-v3="reveal">

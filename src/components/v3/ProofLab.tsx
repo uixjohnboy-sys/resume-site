@@ -67,7 +67,7 @@ function ChargeLab() {
         </div>
       </div>
       <div className="v3-lab-actions">
-        <button type="button" className="v3-lab-btn" onClick={() => setDeliveries((d) => Math.min(d + 1, 9))}>
+        <button type="button" className="v3-lab-btn" data-cursor="Try" onClick={() => setDeliveries((d) => Math.min(d + 1, 9))}>
           {deliveries === 0 ? "Deliver the webhook" : "Stripe retries the webhook"}
         </button>
         {deliveries > 0 ? (
@@ -204,10 +204,10 @@ function StockLab() {
         A workshop has {STOCK} seats and two prices, early bird and standard. Sell some of each.
       </p>
       <div className="v3-lab-actions">
-        <button type="button" className="v3-lab-btn" onClick={() => sell("early")}>
+        <button type="button" className="v3-lab-btn" data-cursor="Try" onClick={() => sell("early")}>
           Sell early bird
         </button>
-        <button type="button" className="v3-lab-btn" onClick={() => sell("standard")}>
+        <button type="button" className="v3-lab-btn" data-cursor="Try" onClick={() => sell("standard")}>
           Sell standard
         </button>
         {sold ? (

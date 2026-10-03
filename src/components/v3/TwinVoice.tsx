@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { setSpeaking, setVoiceLevel, voice } from "./voice";
 import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
+import { onRevealed } from "./Preloader";
 
 // The AI twin wakes up and introduces itself, and a "Talk to my AI" button
 // plays it with sound (JB's call 2026-10-03, after learning that no browser
@@ -35,7 +36,9 @@ import { ENVELOPE, ENVELOPE_FPS } from "./twinEnvelope";
 
 const SRC = "/v3/twin-intro.mp3";
 const CYBORG = "/v3/jb-cyborg.webp";
-const START_DELAY_MS = 1200;
+// Counted from the moment the preloader's curtain parts (at once on repeat
+// visits, when there is no curtain).
+const START_DELAY_MS = 900;
 const SESSION_KEY = "v3-twin-heard";
 const DURATION = ENVELOPE.length / ENVELOPE_FPS;
 
@@ -246,7 +249,9 @@ export default function TwinVoice() {
     window.addEventListener("keydown", onKey);
 
     // ---- the gate: 1.2s, cyborg decoded, hero in view ----
-    const delay = new Promise<void>((res) => window.setTimeout(res, START_DELAY_MS));
+    const delay = new Promise<void>((res) => {
+      onRevealed(() => window.setTimeout(res, START_DELAY_MS));
+    });
     const cyborgReady = (() => {
       const img = new Image();
       img.src = CYBORG;
@@ -322,7 +327,7 @@ export default function TwinVoice() {
   };
 
   return (
-    <div className="v3-twin" ref={rootRef} data-phase={phase}>
+    <div className="v3-twin" ref={rootRef} data-phase={phase} data-v3="line">
       {phase !== "waiting" ? (
         <p className="v3-twin-tag" aria-hidden="true">
           <i className={phase === "speaking" ? "v3-dot v3-dot-live" : "v3-dot"} />
@@ -344,6 +349,7 @@ export default function TwinVoice() {
         <button
           type="button"
           className="v3-twin-btn"
+          data-cursor="Talk"
           onClick={() => {
             // Opens the chat (TwinChat); the first time this session, the
             // intro also plays with the real voice as the greeting.
