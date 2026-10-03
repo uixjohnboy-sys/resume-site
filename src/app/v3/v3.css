@@ -974,6 +974,108 @@
   background: rgba(255, 178, 36, 0.14);
 }
 
+/* The contact gate, inside the chat list. */
+.v3-gate {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid rgba(255, 178, 36, 0.35);
+  border-radius: 16px;
+  background: rgba(255, 178, 36, 0.05);
+}
+
+.v3-gate-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.v3-gate-q {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+.v3-gate label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.v3-gate label span {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.v3-gate input {
+  padding: 10px 12px;
+  border: 1px solid var(--glass-line);
+  border-radius: 10px;
+  background: rgba(7, 7, 11, 0.6);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  outline: 0;
+}
+
+.v3-gate input:focus {
+  border-color: rgba(255, 178, 36, 0.6);
+}
+
+.v3-gate .v3-gate-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.v3-gate-err {
+  margin: 0;
+  font-size: 13px;
+  color: var(--magenta);
+}
+
+.v3-gate-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.v3-gate-row button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--neon);
+  color: var(--neon-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.v3-gate-row button:disabled {
+  opacity: 0.6;
+}
+
+.v3-gate-row .v3-gate-cancel {
+  background: none;
+  color: var(--text-2);
+  font-weight: 400;
+}
+
+.v3-gate-note {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
 .v3-chat-form {
   display: flex;
   align-items: flex-end;

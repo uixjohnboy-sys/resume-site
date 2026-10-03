@@ -1,25 +1,33 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { createHash } from "node:crypto";
 import { getRedis } from "@/lib/redis";
 import { FACTS, FACT_IDS } from "@/lib/twin/facts";
+import { clientIp, hashKey, readPass } from "@/lib/twin/gate";
 
 // John Boy's AI twin: the chat behind "Talk to my AI" on /v3.
 //
 // Request:  POST { messages: [{ role: "user" | "assistant", content: string }] }
+//           header x-twin-pass: the pass from /api/twin/lead (contact gate)
 // Response: NDJSON, one event per line:
 //   {"t":"text","v":"..."}            answer text as it streams
 //   {"t":"done","trace":{...}}        what the "See how I answered" panel shows
 //   {"t":"limit","v":"..."}           a cap was hit; v is the message to show
+//   {"t":"gate"}                      no valid pass: ask for name and email
 //   {"t":"error","v":"..."}           anything else went wrong; v is shown
 //
-// Cost control, in layers:
-//   1. Short answers: max_tokens 1024, effort low, a fixed cached prompt.
-//   2. Per visitor: 25 messages a day, keyed by a salted hash of the IP
-//      (the IP itself is never stored).
-//   3. Whole site: 250 messages a day.
+// Cost control, in layers (JB, 2026-10-03: keep it cheap, stop trolls):
+//   1. The contact gate: no name and email, no AI call at all.
+//   2. Claude Haiku 4.5 (JB's choice over Opus 5.5 for cost), short answers
+//      (max_tokens 500), only the last six turns of history sent.
+//   3. Caps a day: 10 questions per email, 15 per connection (salted hash,
+//      the IP is never stored), 150 for the whole site.
 //   4. The Anthropic Console spend limit on the key's workspace, which John
 //      Boy sets himself; this route cannot exceed it whatever happens here.
-// Conversations are not stored; only the two counters are.
+// The four suggestion questions are answered in the browser from written
+// answers and never reach this route.
+//
+// Stored: the lead (name, email) and the questions each lead asked, so John
+// Boy can follow up; the visitor is told this at the gate. Answers are not
+// stored.
 //
 // Every failure path returns a working message with his email, never a
 // broken chat (the same fallback rule his own builds follow).
@@ -27,15 +35,17 @@ import { FACTS, FACT_IDS } from "@/lib/twin/facts";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const MODEL = "claude-opus-5-5";
-const PER_VISITOR_PER_DAY = 25;
-const SITE_PER_DAY = 250;
+const MODEL = "claude-haiku-4-5";
+const PER_EMAIL_PER_DAY = 10;
+const PER_IP_PER_DAY = 15;
+const SITE_PER_DAY = 150;
 const MAX_TURNS = 20;
+const HISTORY_SENT = 7;
 const MAX_USER_CHARS = 800;
 const MAX_ASSISTANT_CHARS = 3000;
 
-// USD per million tokens for claude-opus-5-5, for the trace's cost line.
-const PRICE = { input: 4, cacheWrite: 5, cacheRead: 0.2, output: 20 };
+// USD per million tokens for claude-haiku-4-5, for the trace's cost line.
+const PRICE = { input: 1, cacheWrite: 1.25, cacheRead: 0.1, output: 5 };
 
 const FALLBACK =
   "I can't answer right now. You can reach John Boy directly at uix.johnboy@gmail.com or book a call at johnboydesign.com/book.";
@@ -95,33 +105,49 @@ function validate(body: unknown): InMsg[] | null {
   return out;
 }
 
-function visitorKey(req: Request) {
-  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
-  const salt = process.env.ADMIN_PASSWORD || "twin";
-  return createHash("sha256").update(`${salt}:${ip}`).digest("hex").slice(0, 24);
-}
-
 // Returns a message to show if a cap is hit, otherwise null. If Redis is not
 // configured or fails, the chat stays open: the Console spend limit is the
 // hard ceiling.
-async function overLimit(req: Request): Promise<string | null> {
+async function overLimit(req: Request, email: string): Promise<string | null> {
   const redis = getRedis();
   if (!redis) return null;
   const day = new Date().toISOString().slice(0, 10);
-  const vKey = `twin:v:${visitorKey(req)}:${day}`;
+  const eKey = `twin:e:${hashKey(email)}:${day}`;
+  const iKey = `twin:v:${hashKey(clientIp(req))}:${day}`;
   const sKey = `twin:site:${day}`;
   try {
-    const [v, s] = await Promise.all([redis.incr(vKey), redis.incr(sKey)]);
-    if (v === 1) await redis.expire(vKey, 60 * 60 * 48);
-    if (s === 1) await redis.expire(sKey, 60 * 60 * 48);
-    if (v > PER_VISITOR_PER_DAY)
-      return "That's my limit for today, so the rest is better with John Boy himself: uix.johnboy@gmail.com, or book a call at johnboydesign.com/book.";
+    const [e, v, s] = await Promise.all([redis.incr(eKey), redis.incr(iKey), redis.incr(sKey)]);
+    await Promise.all(
+      [
+        [eKey, e],
+        [iKey, v],
+        [sKey, s],
+      ]
+        .filter(([, n]) => n === 1)
+        .map(([k]) => redis.expire(k as string, 60 * 60 * 48))
+    );
+    if (e > PER_EMAIL_PER_DAY || v > PER_IP_PER_DAY)
+      return "That's my limit for today, so the rest is better with John Boy himself. He has your email, or reach him at uix.johnboy@gmail.com and book a call at johnboydesign.com/book.";
     if (s > SITE_PER_DAY)
       return "I've answered a lot of people today and hit my daily limit. John Boy reads every email: uix.johnboy@gmail.com, or book a call at johnboydesign.com/book.";
   } catch (err) {
     console.error("[twin] rate limit check failed", err);
   }
   return null;
+}
+
+// Keep what each lead asked, so John Boy can follow up with context.
+async function rememberQuestion(email: string, q: string) {
+  const redis = getRedis();
+  if (!redis) return;
+  const key = `twin:q:${hashKey(email)}`;
+  try {
+    await redis.lpush(key, JSON.stringify({ q, at: new Date().toISOString() }));
+    await redis.ltrim(key, 0, 49);
+    await redis.expire(key, 60 * 60 * 24 * 60);
+  } catch (err) {
+    console.error("[twin] could not store question", err);
+  }
 }
 
 const TRAILER = "[facts:";
@@ -151,13 +177,22 @@ export async function POST(req: Request) {
   const messages = validate(body);
   if (!messages) return oneShot({ t: "error", v: FALLBACK }, 400);
 
+  const email = readPass(req.headers.get("x-twin-pass"));
+  if (!email) return oneShot({ t: "gate" }, 401);
+
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error("[twin] ANTHROPIC_API_KEY is not set");
     return oneShot({ t: "error", v: FALLBACK }, 503);
   }
 
-  const limited = await overLimit(req);
+  const limited = await overLimit(req, email);
   if (limited) return oneShot({ t: "limit", v: limited });
+  await rememberQuestion(email, messages[messages.length - 1].content);
+
+  // Only the recent turns: older context costs tokens and rarely matters
+  // for questions about one person's work.
+  const recent = messages.slice(-HISTORY_SENT);
+  while (recent.length && recent[0].role !== "user") recent.shift();
 
   const client = new Anthropic();
   const started = Date.now();
@@ -175,16 +210,11 @@ export async function POST(req: Request) {
       };
 
       try {
-        const run = client.beta.messages.stream({
+        const run = client.messages.stream({
           model: MODEL,
-          max_tokens: 1024,
-          output_config: { effort: "low" },
-          // If Claude declines on a safety classifier, the API reruns the
-          // request on the model it picks for that category, in the same call.
-          betas: ["server-side-fallback-2026-07-01"],
-          fallbacks: "default",
+          max_tokens: 500,
           system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
-          messages,
+          messages: recent,
         });
 
         run.on("text", (delta) => {

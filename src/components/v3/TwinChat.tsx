@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { setVoiceLevel, voice } from "./voice";
 import { FACTS } from "@/lib/twin/facts";
 
-// The chat behind "Talk to my AI" (server: src/app/api/twin/route.ts).
+// The chat behind "Talk to my AI" (server: src/app/api/twin/route.ts and
+// src/app/api/twin/lead/route.ts).
 //
 // Opens on the "v3:chat-open" window event that TwinVoice's button sends.
 // On wide screens it takes the copy column's place, so the visitor talks
@@ -13,22 +14,27 @@ import { FACTS } from "@/lib/twin/facts";
 // data-twin="speaking" and each arriving chunk pulses the same voice level
 // the intro audio drives, so the eye and particles react to the text.
 //
-// Every answer carries a trace ("See how I answered"): which verified facts
-// it used, the model, timings, tokens and the cost of that one answer. That
-// panel is the proof that this is engineered, not a canned widget.
+// Cost rules (JB, 2026-10-03):
+// - The four suggestion questions are answered right here from written
+//   answers built only from the fact sheet: free, instant, no gate.
+// - A question of the visitor's own needs a name and email first (the
+//   contact gate). The pass from /api/twin/lead is kept in localStorage for
+//   its 24 hours, so a returning visitor is not asked twice.
 //
-// The conversation lives in sessionStorage only (and the server stores
-// nothing), so it survives a reload but not a closed tab.
+// Every answer carries a trace ("See how I answered"): which verified facts
+// it used and, for AI answers, the model, timings, tokens and the cost of
+// that one answer.
 
 type Trace = {
-  model: string;
+  canned?: boolean;
+  model?: string;
   facts: string[];
-  firstTokenMs: number | null;
-  totalMs: number;
-  inputTokens: number;
-  cachedTokens: number;
-  outputTokens: number;
-  costUsd: number;
+  firstTokenMs?: number | null;
+  totalMs?: number;
+  inputTokens?: number;
+  cachedTokens?: number;
+  outputTokens?: number;
+  costUsd?: number;
 };
 
 type Msg = { role: "user" | "assistant"; content: string; trace?: Trace; note?: boolean };
@@ -36,19 +42,37 @@ type Msg = { role: "user" | "assistant"; content: string; trace?: Trace; note?: 
 const GREETING =
   "I'm John Boy's AI. He built me, so I only know what he has actually shipped. Ask me anything about his work, or tell me what's broken in yours.";
 
-const SUGGESTIONS = [
-  "What can he build in GoHighLevel?",
-  "My client got charged twice. Can he fix that?",
-  "What is Coach OS?",
-  "How do I hire him?",
+// Written from src/lib/twin/facts.ts only. Keep them in step with it.
+const FAQ: { q: string; a: string; facts: string[] }[] = [
+  {
+    q: "What can he build in GoHighLevel?",
+    a: "Five years and 58 client systems inside GoHighLevel: workflows, pipelines, snapshots, sub-accounts, funnels, calendars and forms, with n8n, Zapier and Make for automation. Where GoHighLevel stops, he keeps building with webhooks, the v2 API, Stripe, A2P 10DLC and full Next.js apps wired back into the CRM. Send him one workflow that isn't firing and he'll tell you what's wrong with it, free: uix.johnboy@gmail.com.",
+    facts: ["ghl", "beyond", "offer"],
+  },
+  {
+    q: "My client got charged twice. Can he fix that?",
+    a: "That usually means Stripe retried the webhook and the handler wasn't idempotent, so one payment ran twice. In his builds every write path is idempotent, so a payment delivered five times is recorded once. You can watch exactly that in the cards on this page. Send him the workflow or the handler and he'll pinpoint it: uix.johnboy@gmail.com.",
+    facts: ["walls", "idempotent", "offer"],
+  },
+  {
+    q: "What is Coach OS?",
+    a: "Coach OS is a client-management platform for one-to-one coaches that he built from zero and wired into GoHighLevel in both directions: four lead tools, a passwordless client portal with an AI companion, e-signed agreements and Stripe subscriptions. It's 30,275 lines of code with 36 API endpoints and 10 scheduled jobs, running live on a labelled sample practice. Case study: johnboydesign.com/coach-os. Live tour: coachos.johnboydesign.com/tour.",
+    facts: ["coachos", "coachos-parts", "billing"],
+  },
+  {
+    q: "How do I hire him?",
+    a: "Easiest start: send him one automation that isn't firing or one funnel that isn't converting, and he'll tell you exactly what's wrong with it, free. Email uix.johnboy@gmail.com or book a call at johnboydesign.com/book. He quotes each project after seeing the scope.",
+    facts: ["offer"],
+  },
 ];
 
 const STORE = "v3-twin-chat";
+const PASS_STORE = "v3-twin-pass";
 const MAX_CHARS = 800;
 
 const title = (id: string) => FACTS.find((f) => f.id === id)?.title ?? id;
 
-function load(): Msg[] {
+function loadMsgs(): Msg[] | null {
   try {
     const raw = sessionStorage.getItem(STORE);
     const parsed = raw ? (JSON.parse(raw) as Msg[]) : null;
@@ -56,7 +80,27 @@ function load(): Msg[] {
   } catch {
     // Storage blocked or corrupt: start fresh.
   }
-  return [{ role: "assistant", content: GREETING, note: true }];
+  return null;
+}
+
+function loadPass(): string | null {
+  try {
+    const raw = localStorage.getItem(PASS_STORE);
+    if (!raw) return null;
+    const { pass, until } = JSON.parse(raw) as { pass: string; until: number };
+    return pass && until > Date.now() ? pass : null;
+  } catch {
+    return null;
+  }
+}
+
+function savePass(pass: string | null) {
+  try {
+    if (pass) localStorage.setItem(PASS_STORE, JSON.stringify({ pass, until: Date.now() + 23 * 60 * 60 * 1000 }));
+    else localStorage.removeItem(PASS_STORE);
+  } catch {
+    // Not saved: they will be asked again next visit.
+  }
 }
 
 function TraceView({ t }: { t: Trace }) {
@@ -74,19 +118,30 @@ function TraceView({ t }: { t: Trace }) {
           <span className="v3-trace-none">none, general reply</span>
         )}
       </dd>
-      <dt>model</dt>
-      <dd>{t.model}</dd>
-      <dt>first word</dt>
-      <dd>{t.firstTokenMs != null ? `${(t.firstTokenMs / 1000).toFixed(2)}s` : "n/a"}</dd>
-      <dt>full answer</dt>
-      <dd>{(t.totalMs / 1000).toFixed(2)}s</dd>
-      <dt>tokens</dt>
-      <dd>
-        {t.inputTokens.toLocaleString("en-US")} in ({t.cachedTokens.toLocaleString("en-US")} from cache),{" "}
-        {t.outputTokens.toLocaleString("en-US")} out
-      </dd>
-      <dt>cost</dt>
-      <dd>${t.costUsd.toFixed(4)}</dd>
+      {t.canned ? (
+        <>
+          <dt>source</dt>
+          <dd>written answer, no AI call</dd>
+          <dt>cost</dt>
+          <dd>$0</dd>
+        </>
+      ) : (
+        <>
+          <dt>model</dt>
+          <dd>{t.model}</dd>
+          <dt>first word</dt>
+          <dd>{t.firstTokenMs != null ? `${(t.firstTokenMs / 1000).toFixed(2)}s` : "n/a"}</dd>
+          <dt>full answer</dt>
+          <dd>{((t.totalMs ?? 0) / 1000).toFixed(2)}s</dd>
+          <dt>tokens</dt>
+          <dd>
+            {(t.inputTokens ?? 0).toLocaleString("en-US")} in ({(t.cachedTokens ?? 0).toLocaleString("en-US")} from
+            cache), {(t.outputTokens ?? 0).toLocaleString("en-US")} out
+          </dd>
+          <dt>cost</dt>
+          <dd>${(t.costUsd ?? 0).toFixed(4)}</dd>
+        </>
+      )}
     </dl>
   );
 }
@@ -97,16 +152,25 @@ export default function TwinChat() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [shown, setShown] = useState<number | null>(null);
+  const [pass, setPass] = useState<string | null>(null);
+  const [gate, setGate] = useState<{ pending: string } | null>(null);
+  const [gateErr, setGateErr] = useState("");
+  const [gateBusy, setGateBusy] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const nameRef = useRef<HTMLInputElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const loaded = useRef(false);
 
-  // Restore after hydration (sessionStorage is client-only).
+  // Restore after hydration (storage is client-only).
   useEffect(() => {
-    const restored = load();
+    const restored = loadMsgs();
+    const p = loadPass();
     loaded.current = true;
-    if (restored.length > 1) Promise.resolve().then(() => setMsgs(restored));
+    Promise.resolve().then(() => {
+      if (restored) setMsgs(restored);
+      if (p) setPass(p);
+    });
   }, []);
 
   useEffect(() => {
@@ -147,21 +211,32 @@ export default function TwinChat() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Keep the newest message in view.
+  // Keep the newest message (or the gate) in view.
   useEffect(() => {
     const el = listRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [msgs, open]);
+  }, [msgs, open, gate]);
 
-  const send = useCallback(
-    async (text: string) => {
-      const q = text.trim().slice(0, MAX_CHARS);
-      if (!q || busy) return;
-      setInput("");
+  useEffect(() => {
+    if (gate) window.setTimeout(() => nameRef.current?.focus({ preventScroll: true }), 50);
+  }, [gate]);
+
+  const askFaq = (f: (typeof FAQ)[number]) => {
+    if (busy) return;
+    setShown(null);
+    setMsgs((cur) => [
+      ...cur,
+      { role: "user", content: f.q },
+      { role: "assistant", content: f.a, trace: { canned: true, facts: f.facts } },
+    ]);
+  };
+
+  const ask = useCallback(
+    async (q: string, usePass: string) => {
       setShown(null);
 
-      // History for the API: real turns only, alternating, ending on the
-      // new question. The greeting is a UI note, not a model turn.
+      // History for the API: real turns only (FAQ answers included, they are
+      // true and give context), alternating, ending on the new question.
       const history = msgs.filter((m) => !m.note);
       const turns = [...history, { role: "user" as const, content: q }]
         .slice(-19)
@@ -173,7 +248,6 @@ export default function TwinChat() {
 
       // The twin "speaks" while the answer streams.
       const stage = rootRef.current?.closest(".v3-hero")?.querySelector(".v3-stage") as HTMLElement | null;
-      const prevTwin = stage?.getAttribute("data-twin") ?? null;
       stage?.setAttribute("data-twin", "speaking");
       let raf = 0;
       let streaming = true;
@@ -194,7 +268,7 @@ export default function TwinChat() {
       try {
         const res = await fetch("/api/twin", {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json", "x-twin-pass": usePass },
           body: JSON.stringify({ messages: turns }),
         });
         if (!res.body) throw new Error("no body");
@@ -218,6 +292,13 @@ export default function TwinChat() {
             } else if (ev.t === "done" && ev.trace) {
               const trace = ev.trace;
               patch((m) => ({ ...m, content: m.content.trim(), trace }));
+            } else if (ev.t === "gate") {
+              // The pass expired or was refused: take the question back
+              // and ask for the details again.
+              savePass(null);
+              setPass(null);
+              setMsgs((cur) => cur.slice(0, -2));
+              setGate({ pending: q });
             } else if ((ev.t === "limit" || ev.t === "error") && ev.v) {
               const v = ev.v;
               patch((m) => ({ ...m, content: m.content ? `${m.content.trim()}\n\n${v}` : v, note: true }));
@@ -239,18 +320,60 @@ export default function TwinChat() {
           if (stage) {
             // Back to awake (the cyborg half stays), unless the intro voice
             // is still talking.
-            if (stage.getAttribute("data-twin") === "speaking" && !voice.speaking)
-              stage.setAttribute("data-twin", prevTwin === "speaking" ? "awake" : prevTwin || "awake");
+            if (stage.getAttribute("data-twin") === "speaking" && !voice.speaking) stage.setAttribute("data-twin", "awake");
             stage.style.setProperty("--vl", "0");
           }
           setVoiceLevel(voice.speaking ? voice.level : 0);
         }, 600);
       }
     },
-    [busy, msgs]
+    [msgs]
   );
 
-  const onlyGreeting = msgs.length === 1;
+  const send = (text: string) => {
+    const q = text.trim().slice(0, MAX_CHARS);
+    if (!q || busy) return;
+    const faq = FAQ.find((f) => f.q.toLowerCase() === q.toLowerCase());
+    setInput("");
+    if (faq) return askFaq(faq);
+    if (!pass) {
+      setGate({ pending: q });
+      return;
+    }
+    ask(q, pass);
+  };
+
+  const submitGate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!gate || gateBusy) return;
+    const fd = new FormData(e.currentTarget);
+    setGateErr("");
+    setGateBusy(true);
+    try {
+      const res = await fetch("/api/twin/lead", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: fd.get("name"), email: fd.get("email"), website: fd.get("website") }),
+      });
+      const d = (await res.json()) as { ok: boolean; pass?: string; error?: string };
+      if (!d.ok || !d.pass) {
+        setGateErr(d.error || "Something went wrong. Please try again.");
+        return;
+      }
+      savePass(d.pass);
+      setPass(d.pass);
+      const pending = gate.pending;
+      setGate(null);
+      ask(pending, d.pass);
+    } catch {
+      setGateErr("Something went wrong. Please try again.");
+    } finally {
+      setGateBusy(false);
+    }
+  };
+
+  const asked = new Set(msgs.filter((m) => m.role === "user").map((m) => m.content));
+  const unused = FAQ.filter((f) => !asked.has(f.q));
 
   return (
     <div
@@ -267,7 +390,7 @@ export default function TwinChat() {
           <p className="v3-chat-title">
             <i className="v3-dot v3-dot-live" /> John Boy&apos;s AI twin
           </p>
-          <p className="v3-chat-sub">Claude &middot; answers from verified facts only</p>
+          <p className="v3-chat-sub">answers from verified facts only</p>
         </div>
         <button type="button" className="v3-chat-close" onClick={() => setOpen(false)} aria-label="Close the chat">
           <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -304,46 +427,76 @@ export default function TwinChat() {
             ) : null}
           </div>
         ))}
-        {onlyGreeting ? (
+        {!busy && !gate && unused.length ? (
           <div className="v3-chat-suggest">
-            {SUGGESTIONS.map((s) => (
-              <button key={s} type="button" onClick={() => send(s)} disabled={busy}>
-                {s}
+            {unused.map((f) => (
+              <button key={f.q} type="button" onClick={() => askFaq(f)}>
+                {f.q}
               </button>
             ))}
           </div>
         ) : null}
+        {gate ? (
+          <form className="v3-gate" onSubmit={submitGate}>
+            <p className="v3-gate-title">Before I answer that: who am I talking to?</p>
+            <p className="v3-gate-q">&ldquo;{gate.pending}&rdquo;</p>
+            <label>
+              <span>Name</span>
+              <input ref={nameRef} name="name" autoComplete="name" maxLength={80} required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input name="email" type="email" autoComplete="email" maxLength={120} required />
+            </label>
+            {/* Honeypot: hidden from people, filled by bots. */}
+            <input className="v3-gate-hp" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+            {gateErr ? <p className="v3-gate-err">{gateErr}</p> : null}
+            <div className="v3-gate-row">
+              <button type="submit" disabled={gateBusy}>
+                {gateBusy ? "One moment" : "Ask my question"}
+              </button>
+              <button type="button" className="v3-gate-cancel" onClick={() => setGate(null)}>
+                Cancel
+              </button>
+            </div>
+            <p className="v3-gate-note">
+              Your name, email and questions go to John Boy so he can follow up. No newsletter, no spam.
+            </p>
+          </form>
+        ) : null}
       </div>
 
-      <form
-        className="v3-chat-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          send(input);
-        }}
-      >
-        <textarea
-          ref={inputRef}
-          value={input}
-          rows={1}
-          maxLength={MAX_CHARS}
-          placeholder="Ask about his work, or describe what's broken"
-          aria-label="Your question"
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              send(input);
-            }
+      {gate ? null : (
+        <form
+          className="v3-chat-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            send(input);
           }}
-        />
-        <button type="submit" disabled={busy || !input.trim()} aria-label="Send">
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M2.5 8h10M8.5 3.5L13 8l-4.5 4.5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </form>
-      <p className="v3-chat-foot">An AI, so it can be wrong. This chat stays in this browser tab; nothing is stored on the server.</p>
+        >
+          <textarea
+            ref={inputRef}
+            value={input}
+            rows={1}
+            maxLength={MAX_CHARS}
+            placeholder="Ask about his work, or describe what's broken"
+            aria-label="Your question"
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send(input);
+              }
+            }}
+          />
+          <button type="submit" disabled={busy || !input.trim()} aria-label="Send">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M2.5 8h10M8.5 3.5L13 8l-4.5 4.5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </form>
+      )}
+      <p className="v3-chat-foot">An AI, so it can be wrong. The suggested questions are free and need no sign-in.</p>
     </div>
   );
 }

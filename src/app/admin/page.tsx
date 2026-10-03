@@ -10,6 +10,9 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState("");
   const [available, setAvailable] = useState<boolean | null>(null);
   const [saving, setSaving] = useState(false);
+  const [leads, setLeads] = useState<
+    { name: string; email: string; at: string; questions: { q: string; at: string }[] }[] | null
+  >(null);
 
   useEffect(() => {
     fetch("/api/admin/session")
@@ -25,6 +28,11 @@ export default function AdminPage() {
     fetch("/api/availability")
       .then((r) => r.json())
       .then((d) => setAvailable(d.available));
+    // People who signed in to the AI twin chat on /v3, with their questions.
+    fetch("/api/twin/leads")
+      .then((r) => r.json())
+      .then((d) => setLeads(d.leads ?? []))
+      .catch(() => setLeads([]));
   }, [authed]);
 
   async function handleLogin(e: React.FormEvent) {
@@ -118,7 +126,7 @@ export default function AdminPage() {
 
   return (
     <div
-      className="flex min-h-screen items-center justify-center px-4"
+      className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 py-10"
       style={{ background: "var(--bg-page, #1A1917)" }}
     >
       <div
@@ -163,6 +171,54 @@ export default function AdminPage() {
               </span>
             </span>
           </button>
+        )}
+      </div>
+
+      <div
+        className="flex w-full max-w-xl flex-col gap-3 rounded-[24px] p-6"
+        style={{ background: "var(--bg-surface)", boxShadow: "var(--surface-shadow)" }}
+      >
+        <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+          AI twin leads
+        </p>
+        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+          Everyone who gave their name and email to chat with your AI on /v3, newest first, with what they asked.
+        </p>
+        {leads === null ? (
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            Loading...
+          </p>
+        ) : leads.length === 0 ? (
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            No leads yet.
+          </p>
+        ) : (
+          leads.map((l) => (
+            <div
+              key={l.email}
+              className="rounded-[16px] p-4"
+              style={{ background: "var(--bg-surface-2)", border: "1px solid var(--border-surface)" }}
+            >
+              <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                {l.name} ·{" "}
+                <a href={"mailto:" + l.email} style={{ color: "#EF9F27" }}>
+                  {l.email}
+                </a>
+              </p>
+              <p className="mt-0.5 text-[11px]" style={{ color: "var(--text-muted)" }}>
+                {new Date(l.at).toLocaleString()}
+              </p>
+              {l.questions.length ? (
+                <ul className="mt-2 flex flex-col gap-1">
+                  {l.questions.map((q, i) => (
+                    <li key={i} className="text-xs" style={{ color: "var(--text-primary)" }}>
+                      &ldquo;{q.q}&rdquo;
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ))
         )}
       </div>
     </div>
