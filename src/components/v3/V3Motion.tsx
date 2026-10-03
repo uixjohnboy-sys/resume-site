@@ -182,6 +182,19 @@ export default function V3Motion() {
         return () => window.removeEventListener("pointermove", onMove);
       });
 
+      // ---- sections below the wall: rise in as they enter ----
+      // Hidden only here, so with no JS or reduced motion they just show.
+      const reveals = q('[data-v3="reveal"]');
+      if (reveals.length) {
+        gsap.set(reveals, { opacity: 0, y: 34 });
+        ScrollTrigger.batch(reveals, {
+          start: "top 90%",
+          once: true,
+          onEnter: (batch) =>
+            gsap.to(batch, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: 0.08, overwrite: true }),
+        });
+      }
+
       // ---- phones: simple row reveals, no pinning ----
       mm.add("(max-width: 760px)", () => {
         q('[data-v3="wallrow"], [data-v3="wallclose"]').forEach((el) => {

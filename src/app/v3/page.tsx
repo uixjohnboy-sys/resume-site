@@ -6,6 +6,7 @@ import PortraitDissolve from "@/components/v3/PortraitDissolve";
 import TwinVoice from "@/components/v3/TwinVoice";
 import LiveSystem from "@/components/v3/LiveSystem";
 import TwinChat from "@/components/v3/TwinChat";
+import ProofLab from "@/components/v3/ProofLab";
 import "./v3.css";
 
 // Portfolio v3, in progress beside the live homepage. Nothing links here and
@@ -61,6 +62,43 @@ const walls = [
   },
 ];
 
+// The builds already public on johnboydesign.com, same names and labels.
+// Tall full-page captures: the frame pans down them on hover.
+const works = [
+  { img: "/work/chaos-to-closing.jpg", name: "Chaos to Closing", kind: "Coaching business site", tags: ["GoHighLevel", "Site", "US"] },
+  { img: "/work/chaos-ai-funnel.jpg", name: "Chaos to Closing", kind: "AI funnel", tags: ["GoHighLevel", "Funnel", "AI"] },
+  { img: "/work/chaos-sales-page.jpg", name: "Chaos to Closing", kind: "Sales page", tags: ["GoHighLevel", "Funnel"] },
+  { img: "/work/mindset-coaching.jpg", name: "Mindset Coaching", kind: "Coaching funnel", tags: ["GoHighLevel", "Funnel"] },
+  { img: "/work/melbourne-chiropractic.jpg", name: "Melbourne Chiropractic", kind: "Clinic site", tags: ["Site", "AU"] },
+  { img: "/work/dental-clinic.jpg", name: "Dental Clinic", kind: "Clinic site", tags: ["Site"] },
+  { img: "/work/words-like-alice.jpg", name: "Words Like Alice", kind: "Author site", tags: ["Site"] },
+  { img: "/work/digital-products.jpg", name: "Digital Products", kind: "Storefront funnel", tags: ["GoHighLevel", "Funnel"] },
+  { img: "/work/landscaping.jpg", name: "Landscaping", kind: "Local service site", tags: ["Site"] },
+];
+
+// Coach OS, counted from the repository (recounted 2026-09-29).
+const coachStats = [
+  { v: "30,275", l: "lines of code" },
+  { v: "36", l: "API endpoints" },
+  { v: "10", l: "scheduled jobs" },
+  { v: "84", l: "email templates" },
+  { v: "26", l: "GHL events sent" },
+  { v: "26", l: "pages" },
+];
+
+const coachShots = [
+  { img: "/coach-os-shots/app-portal.jpg", cap: "Client portal with an AI companion that answers from the client's own history" },
+  { img: "/coach-os-shots/app-dash-kanban.jpg", cap: "One pipeline for every lead from every tool" },
+  { img: "/coach-os-shots/app-diagnostic.jpg", cap: "A scored diagnostic quiz that writes into the CRM and books the call" },
+];
+
+const badges = [
+  { img: "/badge-workflow-automation-expert.png", name: "Workflow Automation Expert" },
+  { img: "/badge-funnel-building-expert.png", name: "Funnel Building Expert" },
+  { img: "/badge-ai-employee-specialist.png", name: "AI Employee Specialist" },
+  { img: "/badge-course-community-expert.png", name: "Course & Community Expert" },
+];
+
 export default function V3() {
   return (
     <div
@@ -88,8 +126,8 @@ export default function V3() {
         </span>
         <nav className="v3-links" aria-label="Sections">
           <a href="#wall">The wall</a>
-          <a href="#top">Proof</a>
-          <a href="#top">Work</a>
+          <a href="#proof">Proof</a>
+          <a href="#work">Work</a>
           <a className="v3-links-cta" href={MAIL}>
             Send a workflow
           </a>
@@ -280,11 +318,142 @@ export default function V3() {
           </div>
         </section>
 
-        <section className="v3-next">
-          <p>
-            Next pass: the live proof demos, the work, the AI twin. <a href="#top">Back to top</a>
-          </p>
+        {/* ---------- PROOF LAB: break the walls yourself ---------- */}
+        <section className="v3-section v3-proof" id="proof">
+          <div className="v3-section-in">
+            <p className="v3-eyebrow" data-v3="reveal">
+              Proof lab <span>/</span> try it yourself
+            </p>
+            <h2 className="v3-h2" data-v3="reveal">
+              Don&apos;t take my word for it. <em>Break it.</em>
+            </h2>
+            <p className="v3-section-sub" data-v3="reveal">
+              The four walls above, as small simulations. Press the buttons and watch the difference between a build
+              that looks done and one that survives a bad day.
+            </p>
+            <div data-v3="reveal">
+              <ProofLab />
+            </div>
+          </div>
         </section>
+
+        {/* ---------- WORK ---------- */}
+        <section className="v3-section v3-work" id="work">
+          <div className="v3-section-in">
+            <p className="v3-eyebrow" data-v3="reveal">
+              Work <span>/</span> shipped, running
+            </p>
+            <h2 className="v3-h2" data-v3="reveal">
+              The flagship, then the <em>funnels.</em>
+            </h2>
+
+            <article className="v3-coach" data-v3="reveal">
+              <div className="v3-coach-copy">
+                <p className="v3-coach-kicker">
+                  <i className="v3-dot v3-dot-live" /> Coach OS <span>/</span> live on sample data
+                </p>
+                <h3 className="v3-h3">A client-management platform, built from zero, wired into GoHighLevel both ways.</h3>
+                <p className="v3-coach-text">
+                  Four lead tools, a passwordless client portal with an AI companion, e-signed agreements, Stripe
+                  subscriptions and an owner dashboard with a health score per client. Not a template or a snapshot: a
+                  running product you can click through before you read another word.
+                </p>
+                <ul className="v3-coach-stats">
+                  {coachStats.map((c) => (
+                    <li key={c.l}>
+                      <b>{c.v}</b>
+                      {c.l}
+                    </li>
+                  ))}
+                </ul>
+                <div className="v3-ctas">
+                  <a className="v3-btn v3-btn-primary" href="https://coachos.johnboydesign.com/tour">
+                    Open the live tour
+                  </a>
+                  <a className="v3-btn v3-btn-ghost" href="/coach-os">
+                    Read the case study
+                  </a>
+                </div>
+              </div>
+              <div className="v3-coach-shots">
+                {coachShots.map((c, i) => (
+                  <figure key={c.img} className="v3-coach-shot" data-i={i}>
+                    <Image src={c.img} alt={c.cap} width={1440} height={760} sizes="(max-width: 760px) 92vw, 560px" />
+                    <figcaption>{c.cap}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </article>
+
+            <ul className="v3-works">
+              {works.map((w) => (
+                <li key={w.img} className="v3-workcard" data-v3="reveal">
+                  <div className="v3-workframe">
+                    <Image src={w.img} alt={`${w.name}, ${w.kind}`} width={900} height={2000} sizes="(max-width: 760px) 92vw, 380px" />
+                  </div>
+                  <div className="v3-workcap">
+                    <b>{w.name}</b>
+                    <span>{w.kind}</span>
+                  </div>
+                  <p className="v3-worktags">
+                    {w.tags.map((t) => (
+                      <i key={t}>{t}</i>
+                    ))}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ---------- CERTIFIED ---------- */}
+        <section className="v3-section v3-certs">
+          <div className="v3-section-in">
+            <p className="v3-eyebrow" data-v3="reveal">
+              Certified by HighLevel
+            </p>
+            <ul className="v3-badges" data-v3="reveal">
+              {badges.map((b) => (
+                <li key={b.name}>
+                  <Image src={b.img} alt="" width={160} height={160} />
+                  <span>{b.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ---------- THE OFFER ---------- */}
+        <section className="v3-section v3-offer" id="contact">
+          <div className="v3-section-in">
+            <h2 className="v3-offer-h" data-v3="reveal">
+              Send me one <em>broken</em> workflow.
+            </h2>
+            <p className="v3-offer-text" data-v3="reveal">
+              Before you hire anyone, me included: send one automation that is not firing or one funnel that is not
+              converting. I will tell you exactly what is wrong with it, free. That is a better interview than any
+              resume.
+            </p>
+            <div className="v3-ctas v3-offer-ctas" data-v3="reveal">
+              <a className="v3-btn v3-btn-primary" href={MAIL}>
+                Email the workflow
+              </a>
+              <a className="v3-btn v3-btn-ghost" href="/book">
+                Book a call
+              </a>
+            </div>
+            <p className="v3-offer-links" data-v3="reveal">
+              <a href="/Johnboy-Roxas-CV.pdf">CV (PDF)</a>
+              <a href="https://www.onlinejobs.ph/jobseekers/info/4412723">OnlineJobs.ph</a>
+              <a href="/coach-os">Coach OS case study</a>
+            </p>
+          </div>
+        </section>
+
+        <footer className="v3-foot">
+          <span>&copy; 2026 John Boy Roxas &middot; Tarlac, Philippines</span>
+          <span>Built by hand, AI twin included.</span>
+        </footer>
       </main>
     </div>
   );
