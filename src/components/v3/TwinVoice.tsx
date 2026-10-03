@@ -101,6 +101,9 @@ export default function TwinVoice() {
   const [line, setLine] = useState(-1);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Written per frame while speaking, outside React: time left and progress.
+  const leftRef = useRef<HTMLSpanElement | null>(null);
+  const barRef = useRef<HTMLElement | null>(null);
   // Set inside the effect: start the intro over with the real voice.
   const talkRef = useRef<() => void>(() => {});
 
@@ -159,9 +162,14 @@ export default function TwinVoice() {
       clearTimer = window.setTimeout(() => setLine(-1), 1800);
     };
 
-    // Per frame while speaking: captions and the voice level from the envelope.
+    const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.ceil(s % 60)).padStart(2, "0")}`;
+
+    // Per frame while speaking: captions, the voice level from the envelope,
+    // and how much is left (JB, 2026-10-03: visitors should see it will end).
     const loop = () => {
       const t = now();
+      if (leftRef.current) leftRef.current.textContent = fmt(Math.max(0, DURATION - t));
+      if (barRef.current) barRef.current.style.transform = `scaleX(${Math.min(1, t / DURATION).toFixed(4)})`;
       if (mode === "silent" && t >= DURATION) {
         finish();
         return;
@@ -327,7 +335,17 @@ export default function TwinVoice() {
         <p className="v3-twin-tag" aria-hidden="true">
           <i className={phase === "speaking" ? "v3-dot v3-dot-live" : "v3-dot"} />
           {phase === "speaking" ? "AI twin speaking" : "Right half: John Boy's AI twin"}
+          {phase === "speaking" ? (
+            <span className="v3-twin-left" ref={leftRef}>
+              1:06
+            </span>
+          ) : null}
         </p>
+      ) : null}
+      {phase === "speaking" ? (
+        <span className="v3-twin-bar" aria-hidden="true">
+          <i ref={barRef} />
+        </span>
       ) : null}
       <p className="v3-twin-cap" aria-hidden="true">
         {line >= 0 ? <span key={line}>{CAPTIONS[line][1]}</span> : null}

@@ -230,13 +230,13 @@ export default function PortraitDissolve() {
         y: off + ny * W + (Math.random() - 0.5) * 10 * s,
         vx: ((nx - 0.52) * 0.9 + (Math.random() - 0.5) * 0.4) * s * speed,
         vy: -(0.25 + Math.random() * 0.55) * s * speed,
-        r: (10 + Math.random() * 18) * s,
+        r: (10 + Math.random() * 18) * s * (phone() ? 1.5 : 1),
         grow: (0.22 + Math.random() * 0.4) * s,
         rot: Math.random() * Math.PI * 2,
         vr: (Math.random() - 0.5) * 0.015,
         life: 0,
         max: 100 + Math.random() * 90,
-        a: 0.2 + Math.random() * 0.16,
+        a: (0.2 + Math.random() * 0.16) * (phone() ? 1.35 : 1),
         tint,
       });
     };
@@ -244,7 +244,9 @@ export default function PortraitDissolve() {
     const drawSmoke = () => {
       pctx.clearRect(0, 0, P, P);
       pctx.globalCompositeOperation = "lighter";
-      const target = Math.round((phone() ? 45 : 110) * (1 + voice.level * 1.5 + scene.erode * 0.9));
+      // Phones get as many puffs as desktops: at their size the smoke read
+      // too thin with fewer (JB, 2026-10-03).
+      const target = Math.round((phone() ? 110 : 110) * (1 + voice.level * 1.5 + scene.erode * 0.9));
       // Release a few per frame until the room is full.
       for (let n = 0; n < 3 && puffs.length < target; n++) spawn();
       for (let i = puffs.length - 1; i >= 0; i--) {

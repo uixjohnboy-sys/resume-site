@@ -110,7 +110,7 @@ export default function Preloader() {
     // How much smoke is released per frame; the timelines turn it up and down.
     const flow = { rate: 0.4, burst: 0, rise: 1 };
     const phone = vw < 761;
-    const cap = phone ? 90 : 170;
+    const cap = phone ? 150 : 170;
     let raf = 0;
     let running = true;
 
@@ -123,7 +123,7 @@ export default function Preloader() {
         y: vh * (0.56 + (Math.random() - 0.5) * 0.18),
         vx: (Math.random() - 0.5) * 0.7,
         vy: -(0.25 + Math.random() * 0.6),
-        r: 28 + Math.random() * 46,
+        r: (28 + Math.random() * 46) * (phone ? 1.3 : 1),
         grow: 0.35 + Math.random() * 0.6,
         rot: Math.random() * Math.PI * 2,
         vr: (Math.random() - 0.5) * 0.012,
