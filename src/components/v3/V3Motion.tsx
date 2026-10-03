@@ -32,7 +32,7 @@ import { setErode } from "./scene";
 // - Desktop: an amber spotlight follows the cursor across the hero, the
 //   primary buttons lean toward the cursor, and button labels roll on hover.
 // - Scrolling away from the hero turns the portrait to smoke (scene.erode,
-//   read by PortraitDissolve and HeroShader).
+//   read by PortraitDissolve).
 // - The stage tilts in 3D toward the cursor; the outlined name stretches
 //   with scroll speed; the nav slips away on scroll down and returns on up.
 // - Mono labels decode in (terminal style): eyebrows on enter, the HUD on

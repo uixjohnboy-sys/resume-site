@@ -9,7 +9,6 @@ import TwinChat from "@/components/v3/TwinChat";
 import ProofLab from "@/components/v3/ProofLab";
 import Preloader from "@/components/v3/Preloader";
 import Cursor from "@/components/v3/Cursor";
-import HeroShader from "@/components/v3/HeroShader";
 import LocalTime from "@/components/v3/LocalTime";
 import "./v3.css";
 
@@ -165,8 +164,6 @@ export default function V3() {
       <main id="top">
         {/* ---------- HERO: the AI world ---------- */}
         <section className="v3-hero" data-v3="hero" data-hud="01|Intro">
-          {/* GPU aurora smoke; the CSS glows below it stay as the no-WebGL fallback. */}
-          <HeroShader />
           <div className="v3-glow v3-glow-a" aria-hidden="true" />
           <div className="v3-glow v3-glow-b" aria-hidden="true" />
           <div className="v3-grid" aria-hidden="true" />
