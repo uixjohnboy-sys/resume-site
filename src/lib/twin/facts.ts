@@ -4,8 +4,7 @@
 // - Only facts that are already public on johnboydesign.com or counted from
 //   the Coach OS repository. Numbers recounted 2026-09-29.
 // - NEVER add NDA work: no client names, no portals or dashboards built for a
-//   named client, nothing from the Jessica Conner or Grace builds, in any
-//   form. The old homepage testimonials are not here either: they were never
+//   named client, nothing from any confidential client build, in any form. The old homepage testimonials are not here either: they were never
 //   re-verified with the clients, so the twin must not quote them.
 // - No prices. He quotes per project after seeing the scope.
 // - Every fact has a stable id; the twin cites the ids it used and the chat

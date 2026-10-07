@@ -25,8 +25,8 @@ import "./v3.css";
 // - Every artifact on screen is a real pattern from his own work, written
 //   generically. No NDA projects, no invented results, no testimonials (the
 //   old ones were never re-verified with the clients).
-// - The experience list matches the CV PDF. The current Australian
-//   consultancy is described, not named, on this page.
+// - The experience list matches the CV PDF. The NDA client is listed only as
+//   a confidential client: no name, country, industry or project detail.
 // - Content is fully visible with JavaScript off or reduced motion on;
 //   V3Motion only adds movement on top of a finished static page.
 
@@ -58,10 +58,10 @@ const CV = "/Johnboy-Roxas-CV.pdf";
 const experience = [
   {
     when: "Apr 2026 - now",
-    where: "Australia",
-    who: "Business consultancy",
+    where: "Remote",
+    who: "Confidential client (NDA)",
     role: "GoHighLevel Specialist, Automation",
-    did: "Builds and maintains the firm's GoHighLevel workflow automation, extended with n8n, Zapier and Claude.",
+    did: "Builds and maintains GoHighLevel workflow automation, extended with n8n, Zapier and Claude.",
   },
   {
     when: "Mar 2026 - now",
