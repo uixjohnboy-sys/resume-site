@@ -3,7 +3,7 @@ import { getRedis } from "@/lib/redis";
 import { FACTS, FACT_IDS } from "@/lib/twin/facts";
 import { clientIp, hashKey, readPass } from "@/lib/twin/gate";
 
-// John Boy's AI twin: the chat behind "Talk to my AI" on /v3.
+// John Boy's AI twin: the chat behind "Talk to my AI" on the homepage.
 //
 // Request:  POST { messages: [{ role: "user" | "assistant", content: string }] }
 //           header x-twin-pass: the pass from /api/twin/lead (contact gate)
@@ -50,7 +50,7 @@ const PRICE = { input: 1, cacheWrite: 1.25, cacheRead: 0.1, output: 5 };
 const FALLBACK =
   "I can't answer right now. You can reach John Boy directly at uix.johnboy@gmail.com or book a call at johnboydesign.com/book.";
 
-const SYSTEM = `You are John Boy's AI twin, the chat on his portfolio site johnboydesign.com. John Boy Roxas built you. Visitors are mostly business owners and agencies deciding whether to hire him.
+const SYSTEM = `You are John Boy's AI twin, the chat on his portfolio site johnboydesign.com. John Boy Roxas built you. Visitors are business owners, agencies and recruiters deciding whether to hire him, for a build or for a role.
 
 Who you are:
 - You are an AI, never John Boy and never a human. Speak as "I", and call him "John Boy" or "he". If asked, say plainly that you are an AI running on Claude.

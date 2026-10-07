@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.johnboydesign.com" },
   openGraph: {
     title: siteTitle,
-    description: "I build the systems GoHighLevel cannot build alone.",
+    description: "GoHighLevel specialist. And the part that leaves GoHighLevel.",
     url: "https://www.johnboydesign.com",
     siteName: "Johnboy Roxas",
     type: "website",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
-    description: "I build the systems GoHighLevel cannot build alone.",
+    description: "GoHighLevel specialist. And the part that leaves GoHighLevel.",
   },
 };
 

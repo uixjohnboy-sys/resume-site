@@ -17,7 +17,7 @@ export const FACTS: Fact[] = [
   {
     id: "who",
     title: "Who he is",
-    text: "John Boy Roxas is a GoHighLevel systems builder and AI automation developer based in Tarlac, Philippines (Philippine time, UTC+8). He works remotely with businesses in the US and Australia and is currently open for new builds, part-time.",
+    text: "John Boy Roxas is a GoHighLevel systems builder and AI automation developer based in Tarlac, Philippines (Philippine time, UTC+8). He works remotely with businesses in the US and Australia and is currently open for new builds and part-time roles.",
   },
   {
     id: "ghl",
@@ -28,6 +28,16 @@ export const FACTS: Fact[] = [
     id: "beyond",
     title: "The part that leaves GoHighLevel",
     text: "Where GoHighLevel stops, he keeps building: webhooks, the GoHighLevel v2 API, Stripe, A2P 10DLC registration, Firebase, the Claude API, and full Next.js applications, all wired back into the CRM by webhook so the business keeps one system.",
+  },
+  {
+    id: "experience",
+    title: "Work history",
+    text: "Roles from his CV, newest first: GoHighLevel Systems Builder for Chaos to Closing (US, March 2026 to now), building the client's business inside GoHighLevel from scratch with social lead capture and ManyChat nurture. Lead Flow and Funnel Operations for Wrldinvsn (December 2025 to February 2026): lead tracking from first click to close, landing and VSL pages, and a booking system. Lead GHL Automation Architect at K Australia Design (Australia, September 2024 to October 2025): agency infrastructure, multi-channel nurture and A2P 10DLC registration. Freelance CRM and Automation Consultant since January 2024: 13+ GoHighLevel systems for med spas, real estate teams, coaches and chiropractors, including migrations and snapshots. Senior Design and Systems Strategist at Masterpiece Las Vegas (US, February 2021 to June 2023). Education: Bachelor's degree in Computer Science, 2013 to 2018. The full CV is at johnboydesign.com/Johnboy-Roxas-CV.pdf.",
+  },
+  {
+    id: "hiring",
+    title: "Availability for roles",
+    text: "He is open to remote part-time roles, contracts and fixed-scope builds, with flexible hours that overlap Australian business hours. He works in Slack and ClickUp and writes documentation with every build. For a role, email uix.johnboy@gmail.com; his LinkedIn is linkedin.com/in/john-boy-roxas-gohighlevel-specialist.",
   },
   {
     id: "certs",
@@ -82,7 +92,7 @@ export const FACTS: Fact[] = [
   {
     id: "twin",
     title: "About this AI",
-    text: "This chat is John Boy's AI twin, built by him. It runs on Claude by Anthropic and answers only from a fixed sheet of verified facts about his work. The voice in the intro is an ElevenLabs voice, not his, and the robot half of the portrait is an AI edit. It cannot book meetings or see his calendar yet, and conversations are not stored on the server.",
+    text: "This chat is John Boy's AI twin, built by him. It runs on Claude by Anthropic and answers only from a fixed sheet of verified facts about his work. The voice in the intro is an ElevenLabs voice, not his, and the robot half of the portrait is an AI edit. It cannot book meetings or see his calendar yet. The visitor's name, email and questions are kept so John Boy can follow up; the AI's answers are not stored.",
   },
   {
     id: "nda",

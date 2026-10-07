@@ -79,8 +79,8 @@ const FAQ: { q: string; a: string; facts: string[] }[] = [
   },
   {
     q: "How do I hire him?",
-    a: "Easiest start: send him one automation that isn't firing or one funnel that isn't converting, and he'll tell you exactly what's wrong with it, free. Email uix.johnboy@gmail.com or book a call at johnboydesign.com/book. He quotes each project after seeing the scope.",
-    facts: ["offer"],
+    a: "For a role: he's open to remote part-time work and contracts, with flexible hours that overlap Australian business hours. Email uix.johnboy@gmail.com, and his CV is at johnboydesign.com/Johnboy-Roxas-CV.pdf. For a build: send him one automation that isn't firing or one funnel that isn't converting, and he'll tell you exactly what's wrong with it, free, or book a call at johnboydesign.com/book.",
+    facts: ["hiring", "experience", "offer"],
   },
 ];
 

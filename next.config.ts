@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // The v3 preview became the homepage on 2026-10-07. Only the bare page
+      // path redirects: its images and audio still live under /v3/ in public.
+      // Temporary on purpose, in case the old homepage ever comes back.
+      { source: "/v3", destination: "/", permanent: false },
       // The Coach OS walkthrough booking page moved to the coachos
       // subdomain so the whole prospect journey (fit assessment ->
       // booking) lives under one brand. Old links in already-sent

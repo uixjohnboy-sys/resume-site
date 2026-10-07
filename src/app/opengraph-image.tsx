@@ -2,8 +2,8 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-// Social share card, matching the neon design system in home.css:
-// near-black ink, #D5FE38 accent, mono data strip along the bottom.
+// Social share card, matching the homepage (amber accent on violet ink):
+// near-black ink, amber accent, mono data strip along the bottom.
 
 export const runtime = "nodejs";
 export const alt = "John Boy Roxas · GoHighLevel Systems Builder";
@@ -21,7 +21,7 @@ export default function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          background: "#0C0D0A",
+          background: "#07070B",
           position: "relative",
           fontFamily: "sans-serif",
         }}
@@ -33,7 +33,7 @@ export default function OpengraphImage() {
             inset: 0,
             display: "flex",
             backgroundImage:
-              "linear-gradient(#2C3021 1px, transparent 1px), linear-gradient(90deg, #2C3021 1px, transparent 1px)",
+              "linear-gradient(#1C1A2A 1px, transparent 1px), linear-gradient(90deg, #1C1A2A 1px, transparent 1px)",
             backgroundSize: "48px 48px",
             opacity: 0.35,
           }}
@@ -47,7 +47,7 @@ export default function OpengraphImage() {
             width: 520,
             height: 520,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(213,254,56,0.22), transparent 70%)",
+            background: "radial-gradient(circle, rgba(91,33,214,0.45), transparent 70%)",
             display: "flex",
           }}
         />
@@ -67,18 +67,18 @@ export default function OpengraphImage() {
               display: "flex",
               alignItems: "center",
               gap: 10,
-              color: "#D5FE38",
+              color: "#FFB224",
               fontSize: 22,
               letterSpacing: 4,
               marginBottom: 26,
             }}
           >
-            <div style={{ width: 12, height: 12, borderRadius: 12, background: "#D5FE38", display: "flex" }} />
+            <div style={{ width: 12, height: 12, borderRadius: 12, background: "#FFB224", display: "flex" }} />
             JB·ROXAS
           </div>
           <div
             style={{
-              color: "#F4F2ED",
+              color: "#F2F0EA",
               fontSize: 64,
               fontWeight: 800,
               lineHeight: 1.05,
@@ -87,14 +87,17 @@ export default function OpengraphImage() {
               flexDirection: "column",
             }}
           >
-            <span>I build the systems</span>
-            <span style={{ color: "#D5FE38" }}>GoHighLevel</span>
-            <span>can&apos;t build alone.</span>
+            <span>GoHighLevel specialist.</span>
+            <span>And the part that</span>
+            <span style={{ display: "flex", gap: 16 }}>
+              <span style={{ color: "#FFB224" }}>leaves</span>
+              <span>GoHighLevel.</span>
+            </span>
           </div>
-          <div style={{ display: "flex", gap: 26, marginTop: 40, color: "#8F9482", fontSize: 24 }}>
-            <span style={{ color: "#D5FE38" }}>58 builds</span>
+          <div style={{ display: "flex", gap: 26, marginTop: 40, color: "#8A8698", fontSize: 24 }}>
+            <span style={{ color: "#FFB224" }}>58 builds</span>
             <span>·</span>
-            <span style={{ color: "#D5FE38" }}>5 years</span>
+            <span style={{ color: "#FFB224" }}>5 years</span>
             <span>·</span>
             <span>GHL + custom code + AI</span>
           </div>
@@ -109,7 +112,7 @@ export default function OpengraphImage() {
             width: 360,
             height: 520,
             display: "flex",
-            borderTop: "2px solid #D5FE38",
+            borderTop: "2px solid #FFB224",
             overflow: "hidden",
           }}
         >

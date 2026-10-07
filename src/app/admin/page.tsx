@@ -28,7 +28,7 @@ export default function AdminPage() {
     fetch("/api/availability")
       .then((r) => r.json())
       .then((d) => setAvailable(d.available));
-    // People who signed in to the AI twin chat on /v3, with their questions.
+    // People who signed in to the AI twin chat on the homepage, with their questions.
     fetch("/api/twin/leads")
       .then((r) => r.json())
       .then((d) => setLeads(d.leads ?? []))
@@ -182,7 +182,7 @@ export default function AdminPage() {
           AI twin leads
         </p>
         <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-          Everyone who gave their name and email to chat with your AI on /v3, newest first, with what they asked.
+          Everyone who gave their name and email to chat with your AI on the homepage, newest first, with what they asked.
         </p>
         {leads === null ? (
           <p className="text-xs" style={{ color: "var(--text-muted)" }}>

@@ -1,5 +1,5 @@
 /* Portfolio v3: "the AI world".
-   Scoped under .v3 so nothing leaks into the live neon homepage.
+   Scoped under .v3 so nothing leaks into the neon pages (/coach-os, /book).
 
    Palette logic: the portrait was lit with a magenta key light from the
    left, so the world is built around that light instead of fighting it.
@@ -1959,6 +1959,193 @@
   object-fit: contain;
 }
 
+/* ----- experience (for recruiters: dates, roles, hours, CV) ----- */
+
+.v3-exp {
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(91, 33, 214, 0.14), transparent 55%),
+    var(--ink);
+}
+
+.v3-exp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 48px;
+  align-items: start;
+  margin-top: 34px;
+}
+
+.v3-exp-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--glass-line);
+}
+
+.v3-exp-row {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--glass-line);
+}
+
+.v3-exp-when {
+  margin: 3px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text-2);
+}
+
+.v3-exp-when span {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.v3-exp-role {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 600;
+  font-variation-settings: "wdth" 104;
+}
+
+.v3-exp-role span {
+  color: var(--neon);
+  margin: 0 4px;
+}
+
+.v3-exp-role b {
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.v3-exp-did {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.v3-exp-card {
+  position: sticky;
+  top: 96px;
+  padding: 26px;
+  border: 1px solid var(--glass-line);
+  border-radius: 20px;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.v3-exp-card-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.v3-exp-card dl {
+  margin: 0;
+}
+
+.v3-exp-card dl > div {
+  padding: 11px 0;
+  border-top: 1px solid var(--glass-line);
+}
+
+.v3-exp-card dt {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.v3-exp-card dd {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.v3-exp-card-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* "Hiring for a role instead?" under the free-workflow offer. */
+.v3-hire {
+  max-width: 640px;
+  margin-top: 46px;
+  padding-top: 26px;
+  border-top: 1px solid var(--glass-line);
+}
+
+.v3-hire-h {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  font-variation-settings: "wdth" 108;
+}
+
+.v3-hire-text {
+  margin: 8px 0 14px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.v3-hire-mail {
+  display: inline-block;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(16px, 2.2vw, 22px);
+  color: var(--neon);
+  text-decoration: none;
+  border-bottom: 1px solid var(--neon-soft);
+  overflow-wrap: anywhere;
+}
+
+.v3-hire-mail:hover {
+  color: var(--neon-hover);
+  border-color: var(--neon-hover);
+}
+
+@media (max-width: 1000px) {
+  .v3-exp-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .v3-exp-card {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .v3-exp-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .v3-exp-when {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+}
+
 /* ----- the offer ----- */
 
 .v3-offer {
@@ -2026,6 +2213,14 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+/* The fixed section HUD sits bottom-left from 761px up; lift the footer text
+   above it so the two never print over each other at the end of the page. */
+@media (min-width: 761px) {
+  .v3-foot {
+    padding-bottom: 62px;
+  }
 }
 
 @media (max-width: 1000px) {
