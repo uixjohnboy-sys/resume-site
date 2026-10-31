@@ -237,6 +237,7 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
           {con?.business} is booked for <b>{when(sb.region, j.bookedFor)}</b>.
         </p>
       )}
+      {viaStrata && !j.hold && <p className="tl-m-done">The building manager has told us the repair is done.</p>}
       <Photo src={s.photoUrl(j.photo)} alt="The photo you sent" />
     </div>
   );
@@ -270,6 +271,7 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
         {p.address}, {p.suburb}
       </p>
       <Photo src={s.photoUrl(j.photo)} alt="The tenant's photo" />
+      {j.triage?.chargeTo !== "strata" && (
       <dl className="tl-m-dl">
         <dt>Quote</dt>
         <dd>{j.quote ? `${money(sb.region, j.quote.amount)} incl. ${c.tax}` : "Not yet received"}</dd>
@@ -286,6 +288,7 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
         <dt>Your approval limit</dt>
         <dd>{money(sb.region, o.approvalLimit)}</dd>
       </dl>
+      )}
       {j.stage === "owner" ? (
         <div className="tl-m-actions">
           <button type="button" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy} onClick={() => s.act({ type: "owner", jobId: j.id, decision: "approved" })}>
@@ -318,7 +321,9 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
         </div>
       ) : (
         <p className="tl-m-done" role="status">
-          {j.triage?.chargeTo === "strata"
+          {j.triage?.chargeTo === "strata" && j.urgency === "urgent"
+            ? `Urgent: the on-call ${c.contractor} is making it safe, charged to the ${sb.region === "AU" ? "strata" : "block"}. Nothing for you to approve.`
+            : j.triage?.chargeTo === "strata"
             ? `Passed to the ${c.strataBody}: ${sb.region === "AU" ? "common property, paid by the owners corporation" : "part of the building, paid through the service charge"}. Nothing for you to approve.`
             : j.ownerDecision?.decision === "declined"
               ? `Declined. Your ${c.manager} will call you.`

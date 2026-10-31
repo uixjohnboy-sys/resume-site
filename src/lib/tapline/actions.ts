@@ -139,7 +139,7 @@ function dispatch(sb: Sandbox, j: Job, trade: Trade, urgency: Urgency, chargeTo:
     j.cap = undefined;
     j.hold = "strata";
     j.ownerDecision = undefined;
-    j.events.push({ at: now, by: "tapline", text: `Referred to ${p.strata?.manager ?? `the ${c.strataBody}`} to arrange and pay (common property). The ${c.owner} is told; no approval needed from them.` });
+    j.events.push({ at: now, by: "tapline", text: `Referred to ${p.strata?.manager ?? `the ${c.strataBody}`} to arrange (${sb.region === "AU" ? "common property, paid by the owners corporation" : "part of the building, paid through the service charge"}). The ${c.owner} is told; no approval needed from them.` });
     // Back to New with the hold, even when an on-call contractor had been paged first.
     enter(j, "new", now);
     return null;
@@ -440,7 +440,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       j.hold = undefined;
       j.completedAt = now;
       enter(j, "done", now);
-      j.events.push({ at: now, by: "manager", text: `${prop(j).strata?.manager ?? cap(c.strataBody)} confirmed the repair is done (paid by the strata)` });
+      j.events.push({ at: now, by: "manager", text: `${prop(j).strata?.manager ?? cap(c.strataBody)} confirmed the repair is done (${next.region === "AU" ? "paid by the owners corporation" : "paid through the service charge"})` });
       return { ok: true, sb: next };
     }
 

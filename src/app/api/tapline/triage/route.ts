@@ -284,7 +284,7 @@ export async function POST(req: Request) {
       if (aiUp) {
         // The AI called it routine: an urgent phrase it did not see is a question for a person, not an automatic page.
         needsCheck = rules.matched;
-        draft.reason = `${draft.reason} Keyword rules found "${rules.matched.join('", "')}" but the AI did not: the on-call manager was asked to check it now.`.trim();
+        draft.reason = `${draft.reason} Keyword rules found "${rules.matched.join('", "')}" but the AI did not. Check this now.`.trim();
       } else {
         draft.urgency = "urgent";
         raised = true;

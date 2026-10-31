@@ -262,6 +262,17 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
   const suggested = useRef(reply);
   const strataReply = `Hi ${p.tenant.split(" ")[0]}, thanks for reporting this. It's part of the building's shared property, so we've passed it to ${p.strata?.manager ?? `the ${c.strataBody}`}, who will arrange the repair. We'll keep you updated.\n\n${sb.agency}`;
   const [charge, setCharge] = useState<ChargeTo>(t?.chargeTo ?? "owner");
+  // Until the manager edits the reply, it is rebuilt from the path they pick: urgency, trade and payer. A night job
+  // downgraded to routine never tells the tenant "we're treating this as urgent" (G4 round 7).
+  const [edited, setEdited] = useState(false);
+  const autoReply = (u: Urgency, tr: Trade, ch: ChargeTo) => {
+    if (ch === "strata" && u === "routine") return strataReply;
+    if (u === (t?.urgency ?? "routine") && tr === (t?.trade ?? j.trade) && ch === (t?.chargeTo ?? "owner")) return suggested.current;
+    return tenantReply(sb.region, sb.agency, p.tenant.split(" ")[0], { stage: "sent", urgency: u, trade: tr });
+  };
+  const follow = (u: Urgency, tr: Trade, ch: ChargeTo) => {
+    if (!edited && !(workDone && awaitingConfirm(j))) setReply(autoReply(u, tr, ch));
+  };
   const [strata, setStrata] = useState(!!t?.strataReferral);
   const [ins, setIns] = useState(!!t?.insuranceClaim);
   const dispatched = awaitingConfirm(j);
@@ -304,7 +315,14 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
       <div className="tl-grid2">
         <label className="tl-field">
           <span>Trade</span>
-          <select value={trade} onChange={(e) => setTrade(e.target.value as Trade)} disabled={workDone && dispatched}>
+          <select
+            value={trade}
+            onChange={(e) => {
+              setTrade(e.target.value as Trade);
+              follow(urg, e.target.value as Trade, charge);
+            }}
+            disabled={workDone && dispatched}
+          >
             {TRADE_IDS.map((x) => (
               <option key={x} value={x}>
                 {tradeLabel(sb.region, x)}
@@ -326,7 +344,7 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
                   if (u === "routine") setSafety([]);
                   else if (!safety.length) setSafety(t.safety);
                   // An untouched reply follows the path: routine strata work is passed to the building.
-                  if (charge === "strata" && (reply === suggested.current || reply === strataReply)) setReply(u === "routine" ? strataReply : suggested.current);
+                  follow(u, trade, charge);
                 }}
               >
                 {u === "urgent" ? "Urgent" : "Routine"}
@@ -342,7 +360,7 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
               const next = e.target.value as ChargeTo;
               setCharge(next);
               // An untouched suggestion follows the payer: strata work is passed to the building, not to a tradie.
-              if (reply === suggested.current || reply === strataReply) setReply(next === "strata" && urg === "routine" ? strataReply : suggested.current);
+              follow(urg, trade, next);
             }}
           >
             {(["owner", "tenant", ...(p.strata ? ["strata"] : [])] as ChargeTo[]).map((x) => (
@@ -401,7 +419,15 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
 
       <label className="tl-field">
         <span>Reply to the tenant</span>
-        <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={5} maxLength={900} />
+        <textarea
+          value={reply}
+          onChange={(e) => {
+            setReply(e.target.value);
+            setEdited(true);
+          }}
+          rows={5}
+          maxLength={900}
+        />
       </label>
       <p className="tl-next">
         {charge === "strata" && urg === "routine" && !workDone
