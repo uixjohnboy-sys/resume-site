@@ -177,10 +177,12 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
   // The form has just been replaced by this view: move focus to its heading.
   useEffect(() => h1.current?.focus(), []);
   const booked = ["booked", "done", "billed"].includes(j.stage);
-  const steps = ["Received", j.hold === "strata" ? "Passed to the building" : `${cap(c.contractor)} ${booked ? "arranged" : "contacted"}`, "Visit booked", "Fixed"];
+  // Strata work never has a tradie or a visit from the agency: its steps are Received, Passed to the building, Fixed.
+  const viaStrata = j.hold === "strata" || (j.triage?.chargeTo === "strata" && !j.contractorId);
+  const steps = viaStrata ? ["Received", "Passed to the building", "Fixed"] : ["Received", `${cap(c.contractor)} ${booked ? "arranged" : "contacted"}`, "Visit booked", "Fixed"];
   // Safety steps are for while the problem is live: once the work is done they would only alarm.
   const live = !["done", "billed"].includes(j.stage);
-  const at = j.stage === "new" ? 0 : j.stage === "sent" || j.stage === "owner" ? 1 : j.stage === "booked" ? 2 : 3;
+  const at = viaStrata ? (j.hold === "strata" ? 1 : 2) : j.stage === "new" ? 0 : j.stage === "sent" || j.stage === "owner" ? 1 : j.stage === "booked" ? 2 : 3;
   const con = sb.contractors.find((t) => t.id === j.contractorId);
   const t = j.triage;
   const autoSafety = j.afterHours && t && t.urgency === "urgent" && !t.confirmedAt;
@@ -191,9 +193,9 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
       </h1>
       <p className="tl-m-sub">Reference {j.ref}</p>
       <p className="tl-sr">
-        Step {at + 1} of 4: {steps[at]}.
+        Step {at + 1} of {steps.length}: {steps[at]}.
       </p>
-      <ol className="tl-m-steps" aria-hidden="true">
+      <ol className="tl-m-steps" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${steps.length}, 1fr)` }}>
         {steps.map((x, i) => (
           <li key={x} className={i <= at ? "on" : ""}>
             {i < at && <IconCheck size={14} aria-hidden="true" />} {x}
@@ -260,7 +262,9 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
   const [question, setQuestion] = useState("");
   return (
     <div className="tl-m-card" ref={card}>
-      <p className="tl-m-sub">Hi {o.name.split(" ")[0]}, a repair at your property needs your OK.</p>
+      <p className="tl-m-sub">
+        Hi {o.name.split(" ")[0]}, {j.stage === "owner" ? "a repair at your property needs your OK." : "an update on a repair at your property."}
+      </p>
       <h1 tabIndex={-1}>{j.title}</h1>
       <p className="tl-m-sub">
         {p.address}, {p.suburb}
@@ -314,7 +318,15 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
         </div>
       ) : (
         <p className="tl-m-done" role="status">
-          {j.ownerDecision?.decision === "declined" ? `Declined. Your ${c.manager} will call you.` : j.ownerDecision ? "Thanks, approved." : `Status: ${stageLabel(sb.region, j.stage)}.`}
+          {j.triage?.chargeTo === "strata"
+            ? `Passed to the ${c.strataBody}: ${sb.region === "AU" ? "common property, paid by the owners corporation" : "part of the building, paid through the service charge"}. Nothing for you to approve.`
+            : j.ownerDecision?.decision === "declined"
+              ? `Declined. Your ${c.manager} will call you.`
+              : j.ownerDecision?.decision === "approved"
+                ? "Thanks, approved."
+                : j.ownerDecision?.decision === "urgent"
+                  ? `Urgent repair: sent to the on-call ${c.contractor} under the agency's urgent limit. Status: ${stageLabel(sb.region, j.stage)}.`
+                  : `Status: ${stageLabel(sb.region, j.stage)}.`}
         </p>
       )}
       {j.ownerQuestion && j.stage === "owner" && <p className="tl-m-fine">You asked: &ldquo;{j.ownerQuestion}&rdquo;</p>}
@@ -340,6 +352,13 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
   const [inv, setInv] = useState(String(j.quote?.amount ?? Math.min(j.cap ?? 380, 380)));
   const [photo, setPhoto] = useState<string | undefined>();
   const access = j.access?.mode === "keys" ? "Collect keys from the office" : j.access?.mode === "times" ? `Tenant available: ${j.access.note || "call first"}` : "Tenant will be home";
+  // A job that went to the strata, or was stood down, has nothing for a contractor to do.
+  if (!con)
+    return (
+      <p className="tl-m-card" ref={card}>
+        This job is no longer with a {c.contractor}. Nothing to do here.
+      </p>
+    );
 
   return (
     <div className="tl-m-card" ref={card}>

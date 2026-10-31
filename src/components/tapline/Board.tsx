@@ -354,6 +354,7 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
   if (j.invoice?.overApproved && j.stage === "done") pills.push("Invoice over approval");
   // After hours the on-call contractor can be paged, book and even finish before a manager has sent the reply.
   if (j.afterHours && j.triage && !j.triage.confirmedAt && j.stage !== "new") pills.push("Reply to confirm");
+  if (j.triage?.needsCheck?.length && !j.triage.confirmedAt) pills.push("Check now");
   if (j.hold === "strata") pills.push(sb.region === "AU" ? "With the strata" : "With the block agent");
   const timer = clock.state === "none" ? "" : `${clock.state === "late" ? "Overdue, " : clock.state === "soon" ? "Due soon, " : ""}${dur(clock.hours)} in this stage`;
   const label = [`${j.ref}, ${j.title}, ${p.address}, ${p.suburb}`, pills.join(", "), untriaged ? "" : tradeLabel(sb.region, j.trade), timer, `Manager ${m.name}`].filter(Boolean).join(". ") + ".";
@@ -373,7 +374,7 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
           {pills.map((x) => (
             <span
               key={x}
-              className={`tl-pill ${x === "Urgent" ? "tl-pill-urgent" : x === "Likely urgent" ? "tl-pill-likely" : x.includes("declined") || x.includes("over") || x === "Reply to confirm" ? "tl-pill-warn" : "tl-pill-neutral"}`}
+              className={`tl-pill ${x === "Urgent" ? "tl-pill-urgent" : x === "Likely urgent" || x === "Check now" ? "tl-pill-likely" : x.includes("declined") || x.includes("over") || x === "Reply to confirm" ? "tl-pill-warn" : "tl-pill-neutral"}`}
             >
               {x === "Repeat fault" && <IconRepeat size={12} aria-hidden="true" />}
               {x}

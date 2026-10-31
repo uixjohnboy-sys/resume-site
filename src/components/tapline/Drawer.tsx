@@ -80,7 +80,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
             <section className="tl-sec tl-callout">
               <h3>With {p.strata?.manager ?? `the ${c.strataBody}`}</h3>
               <p>
-                {`${sb.region === "AU" ? "Common property: the owners corporation" : "Part of the building: the block's managing agent"} arranges and pays for this repair. Follow up if it isn't fixed within 10 business days${p.strata ? ` (${p.strata.phone})` : ""}.`}
+                {`${sb.region === "AU" ? "Common property: the owners corporation arranges and pays for this repair" : "Part of the building: the block's managing agent arranges the repair, paid through the service charge"}. Follow up if it isn't fixed within 10 working days${p.strata ? ` (${p.strata.phone})` : ""}.`}
               </p>
             </section>
           )}
@@ -128,7 +128,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
               <TryOnPhone url={phoneLink(id, "owner", j.id)} who={c.owner} />
             </section>
           )}
-          {(j.stage === "booked" || j.stage === "done") && (
+          {(j.stage === "booked" || j.stage === "done") && j.contractorId && (
             <section className="tl-sec">
               <h3>Visit</h3>
               <p>
@@ -325,6 +325,8 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
                   setUrg(u);
                   if (u === "routine") setSafety([]);
                   else if (!safety.length) setSafety(t.safety);
+                  // An untouched reply follows the path: routine strata work is passed to the building.
+                  if (charge === "strata" && (reply === suggested.current || reply === strataReply)) setReply(u === "routine" ? strataReply : suggested.current);
                 }}
               >
                 {u === "urgent" ? "Urgent" : "Routine"}
@@ -403,7 +405,7 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
       </label>
       <p className="tl-next">
         {charge === "strata" && urg === "routine" && !workDone
-          ? `Confirming refers this to ${p.strata?.manager ?? `the ${c.strataBody}`}: ${sb.region === "AU" ? "common property, so the owners corporation" : "part of the building, so the block's managing agent"} arranges and pays. No ${c.workOrder} is sent and the ${c.owner} is not asked to approve.`
+          ? `Confirming refers this to ${p.strata?.manager ?? `the ${c.strataBody}`}: ${sb.region === "AU" ? "common property, so the owners corporation arranges and pays" : "part of the building, so the block's managing agent arranges it through the service charge"}.${j.contractorId ? ` The on-call ${c.contractor} is stood down.` : ""} No ${c.workOrder} is sent and the ${c.owner} is not asked to approve.`
           : workDone && dispatched
           ? `The on-call ${c.contractor} has already done the work. Confirming sends this reply to ${p.tenant.split(" ")[0]}.`
           : dispatched && !restands

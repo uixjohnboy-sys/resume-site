@@ -235,6 +235,8 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
         text: `${who} suggested: ${tradeWho(next.region, a.triage.trade)}, ${level}${a.triage.repeatOf ? `, related to ${a.triage.repeatOf.ref}` : ""}`,
       });
       if (a.triage.raisedBy?.length) j.events.push({ at: now, by: "tapline", text: `Keyword rules raised it to urgent (${a.triage.raisedBy.join(", ")})` });
+      if (a.triage.needsCheck?.length)
+        j.events.push({ at: now, by: "tapline", text: `On-call manager alerted to check now: keyword rules found "${a.triage.needsCheck.join('", "')}", the AI said routine. Nothing sent to the tenant yet.` });
       return { ok: true, sb: next };
     }
 

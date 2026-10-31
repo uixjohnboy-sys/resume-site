@@ -269,15 +269,27 @@ export async function POST(req: Request) {
     const rules = ruleTriage(text, region);
     // Core phrases always count; check and context phrases only when the AI saw the same hazard. A check phrase the
     // AI did not agree with is shown to the manager, never sent to the tenant on its own.
+    const aiUp = draft.source === "ai";
     const agreed = [...rules.check, ...rules.context].filter((h) => draft.hazards.includes(h));
-    const hazards = Array.from(new Set([...draft.hazards, ...rules.hazards, ...agreed]));
-    const unconfirmed = draft.source === "ai" ? rules.checkMatched.filter((_, i) => !draft.hazards.includes(rules.check[i])) : [];
+    // When the AI says routine and saw no such hazard, a core phrase is disputed: nothing is sent to the tenant and
+    // no contractor is paged on the rules' word alone; the on-call manager is alerted to check it now (G4 round 6:
+    // "the gas leak was fixed last week", "can you fit a CO alarm" paged on-call with emergency text).
+    const disputed = aiUp && draft.urgency !== "urgent" ? rules.hazards.filter((h) => !draft.hazards.includes(h)) : [];
+    const hazards = Array.from(new Set([...draft.hazards, ...rules.hazards.filter((h) => !disputed.includes(h)), ...agreed]));
+    const unconfirmed = aiUp ? rules.checkMatched.filter((_, i) => !draft.hazards.includes(rules.check[i])) : [];
     if (unconfirmed.length) draft.reason = `${draft.reason} Keyword rules flagged "${unconfirmed.join('", "')}": check the urgency.`.trim();
     let raised = false;
+    let needsCheck: string[] | undefined;
     if (rules.urgency === "urgent" && draft.urgency !== "urgent") {
-      draft.urgency = "urgent";
-      raised = true;
-      draft.reason = `${draft.reason} Raised to urgent by keyword rules (${rules.matched.join(", ")}).`.trim();
+      if (aiUp) {
+        // The AI called it routine: an urgent phrase it did not see is a question for a person, not an automatic page.
+        needsCheck = rules.matched;
+        draft.reason = `${draft.reason} Keyword rules found "${rules.matched.join('", "')}" but the AI did not: the on-call manager was asked to check it now.`.trim();
+      } else {
+        draft.urgency = "urgent";
+        raised = true;
+        draft.reason = `${draft.reason} Raised to urgent by keyword rules (${rules.matched.join(", ")}).`.trim();
+      }
     }
     draft.safety = notCovered(draft.safety, hazards);
     // NSW smoke alarms have their own fixed path (an electrician within 2 business days, no owner approval, no
@@ -311,6 +323,7 @@ export async function POST(req: Request) {
         strataReferral: draft.strataReferral,
         insuranceClaim: draft.insuranceClaim,
         raisedBy: raised ? rules.matched : undefined,
+        needsCheck,
         repeatOf: named
           ? { ref: named.ref, title: named.title, trade: named.trade, daysAgo: Math.round((j.createdAt - named.createdAt) / 86400_000) }
           : draft.source === "ai"

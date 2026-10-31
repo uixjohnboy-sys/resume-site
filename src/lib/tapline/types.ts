@@ -58,6 +58,8 @@ export type Triage = {
   confirmedAt?: number;
   /** Words the keyword rules raised it on, when the AI said routine (shown in the log, never hidden). */
   raisedBy?: string[];
+  /** Urgent words the keyword rules found that the AI did not: the on-call manager is asked to check, nothing is sent. */
+  needsCheck?: string[];
 };
 
 export type JobEvent = { at: number; by: Actor; text: string };

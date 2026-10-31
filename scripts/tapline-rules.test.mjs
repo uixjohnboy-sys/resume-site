@@ -126,6 +126,17 @@ const cases = [
   ["Power point. The power point behind the fridge has melted and is scorched black.", null, "urgent", "fire"], // S-26
   ["Shower. We get a tingle when we touch the shower tap.", null, "urgent", "electric"], // S-27
   ["Laundry. The washing machine hose came off and the laundry is under water.", null, "urgent", "flood"], // S-28
+  // G4 round 6 (AI Quality Lead): core phrases narrowed. Even with no AI, these everyday reports must not raise.
+  ["Boiler. The pilot light on the boiler won't stay alight.", "hvac", "routine"],
+  ["CO alarm. Can you fit a CO alarm in the lounge?", null, "routine"],
+  ["Meter. The gas leak at the meter was fixed last week, just letting you know the cover is loose.", null, "routine"],
+  ["Toaster. There is smoke from the toaster every morning, it burns everything.", null, "routine"],
+  // ...while the real thing still does.
+  ["Alarm. The CO alarm is going off and we feel sick.", "gas", "urgent", "co"],
+  ["Hood. The extractor hood is alight.", null, "urgent", "fire"],
+  // QA round 6: a ceiling fitting is not the ceiling.
+  ["Light. The ceiling light cover has fallen off.", "electrician", "routine"],
+  ["Paint. The ceiling paint is bulging a little in the corner.", null, "routine"],
 ];
 
 let fail = 0;

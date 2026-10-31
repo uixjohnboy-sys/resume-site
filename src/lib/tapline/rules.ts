@@ -333,7 +333,7 @@ export function slots(region: Region, from: number, count: number, leadHours: nu
 
 export type Hazard = "gas" | "co" | "fire" | "electricWater" | "electric" | "ceiling" | "flood" | "security";
 
-const THING = "(oven|stove|cooktop|cooker|hob|heater|power ?points?|sockets?|switch(board)?|outlets?|plugs?|walls?|ceiling|roof|meter|fuse ?box|wires?|wiring|dryer|washing machine|fridge|microwave|kettle|toaster|lights?|light fitting|fan|ceiling fan|extractor( hood| fan)?|range ?hood|air ?con|boiler|appliance|tap|taps|tv|television|computer|charger)";
+const THING = "(oven|stove|cooktop|cooker|hob|heater|power ?points?|sockets?|switch(board)?|outlets?|plugs?|walls?|ceiling|roof|meter|fuse ?box|wires?|wiring|dryer|washing machine|fridge|microwave|kettle|lights?|light fitting|fan|ceiling fan|extractor( hood| fan)?|range ?hood|air ?con|boiler|appliance|tap|taps|tv|television|computer|charger)";
 const R = (s: string) => new RegExp(s);
 const NONE = /$^/;
 
@@ -348,11 +348,19 @@ const NONE = /$^/;
 // - weak: everyday words ("flame", "smoking", "won't lock", "sewage"), shown as words worth a check.
 type Tier = { core: RegExp; check: RegExp; context: RegExp; weak: RegExp };
 const HAZARDS: [Hazard, Tier][] = [
-  ["co", { core: /\b(carbon monoxide|co (alarm|detector|monitor))\b/, check: NONE, context: NONE, weak: NONE }],
+  [
+    "co",
+    {
+      core: /\b((carbon monoxide|co) (alarm|detector|monitor)s? (is |are |keeps |has been |have been )?(going off|beeping|sounding|ringing|went off)|carbon monoxide (leak|poisoning|symptoms)|(smell|leak) of carbon monoxide)\b/,
+      check: NONE,
+      context: /\b(carbon monoxide|co (alarm|detector|monitor))\b/,
+      weak: NONE,
+    },
+  ],
   [
     "gas",
     {
-      core: /\b(smell(s|ing)? (strongly )?(of |like )?gas|reeks? of gas|gas (leak|smell)|leaking gas|gas (is )?(leaking|hissing|escaping)|rotten eggs?|gas (bottle|cylinder) (is )?(leaking|hissing)|hissing (from|near) the gas)\b/,
+      core: /\b(smell(s|ing)? (strongly )?(of |like )?gas|reeks? of gas|gas (leak|smell)(?!( \w+){0,5} (was|were|has been|got) (fixed|repaired|sorted))|leaking gas|gas (is )?(leaking|hissing|escaping)|rotten eggs?|gas (bottle|cylinder) (is )?(leaking|hissing)|hissing (from|near) the gas)\b/,
       check: NONE,
       context: NONE,
       weak: NONE,
@@ -363,7 +371,7 @@ const HAZARDS: [Hazard, Tier][] = [
     {
       // Never the bare word "fire": "gas fire", "fire alarm" and "fire door" are everyday words, not emergencies.
       core: R(
-        `\\b(on fire|caught fire|catching fire|alight|(a |there'?s a |there is a )fire in (the|our) (kitchen|house|flat|unit|bedroom|lounge|laundry|garage|building|roof|hallway)|flames? (are |is )?(coming|came|come|shooting|shot|pouring)( out)?( of| from)?|smoke( \\w+){0,4} (coming|pouring|billowing)( out)? (of|from) (the |a |our )?${THING}|smoke from (the |a |our )?${THING}|${THING} (is |are )?(smoking|on fire|alight)|${THING}( \\w+){1,3} (is|are) (smoking|on fire|alight)|${THING}( \\w+){0,4} (has |have |is |are )?(melted|melting|scorched)|(filling|filled|full) (up )?with smoke|full of smoke|smoke everywhere|burning plastic)\\b`
+        `\\b(on fire|caught fire|catching fire|(is|are|was) alight|(a |there'?s a |there is a )fire in (the|our) (kitchen|house|flat|unit|bedroom|lounge|laundry|garage|building|roof|hallway)|flames? (are |is )?(coming|came|come|shooting|shot|pouring)( out)?( of| from)?|smoke( \\w+){0,4} (coming|pouring|billowing)( out)? (of|from) (the |a |our )?${THING}|smoke from (the |a |our )?${THING}|${THING} (is |are )?(smoking|on fire|alight)|${THING}( \\w+){1,3} (is|are) (smoking|on fire|alight)|${THING}( \\w+){0,4} (has |have |is |are )?(melted|melting|scorched)|(filling|filled|full) (up )?with smoke|full of smoke|smoke everywhere|burning plastic)\\b`
       ),
       check: R(
         `\\b((burning smell|smell of burning|smells? (like |of )?burn(ing|t))( \\w+){0,3} (from|in|near|around|behind) (the |a |our )?${THING}|${THING}( \\w+){0,3} smells? (like |of )?(burning|burnt)(?! (dust|food|toast)))\\b`
@@ -395,7 +403,7 @@ const HAZARDS: [Hazard, Tier][] = [
   [
     "ceiling",
     {
-      core: /\b(sagging|bulging|collaps(e|ed|ing)) (the )?ceiling|ceiling( \w+){0,4} (is |has )?(sagging|bulging|collaps(e|ed|ing)|fallen|come down|caved in|dropped)\b/,
+      core: /\b(sagging|bulging|collaps(e|ed|ing)) (the )?ceiling|ceiling(?! (light|fan|paint|rose|cover|vent|hatch|globe))( \w+){0,4} (is |has )?(sagging|bulging|collaps(e|ed|ing)|fallen|come down|caved in|dropped)\b/,
       check: NONE,
       context: NONE,
       weak: NONE,
