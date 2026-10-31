@@ -335,7 +335,7 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
   if (j.invoice?.overApproved && j.stage === "done") pills.push("Invoice over approval");
   // After hours the on-call contractor can be paged, book and even finish before a manager has sent the reply.
   if (j.afterHours && j.triage && !j.triage.confirmedAt && j.stage !== "new") pills.push("Reply not sent");
-  const timer = clock.state === "none" ? "" : `${clock.state === "late" ? "Overdue, " : clock.state === "soon" ? "Due soon, " : ""}${dur(clock.hours)} ${clock.office ? "of office hours " : ""}in this stage`;
+  const timer = clock.state === "none" ? "" : `${clock.state === "late" ? "Overdue, " : clock.state === "soon" ? "Due soon, " : ""}${dur(clock.hours)} in this stage`;
   const label = [`${j.ref}, ${j.title}, ${p.address}, ${p.suburb}`, pills.join(", "), untriaged ? "" : tradeLabel(sb.region, j.trade), timer, `Manager ${m.name}`].filter(Boolean).join(". ") + ".";
   return (
     <button type="button" className={`tl-card tl-card-${clock.state}`} onClick={onOpen} aria-label={label} data-job={j.id}>

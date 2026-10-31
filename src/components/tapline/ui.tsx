@@ -50,7 +50,7 @@ export function TradeIcon({ trade, size = 14 }: { trade: Trade; size?: number })
 export function TimerChip({ state, hours, office = false }: { state: ClockState; hours: number; office?: boolean }) {
   const word = state === "late" ? "Overdue" : state === "soon" ? "Due soon" : null;
   return (
-    <span className={`tl-chip tl-chip-${state}`} title={office ? "Office hours in this stage (routine work)" : "Time in this stage"}>
+    <span className={`tl-chip tl-chip-${state}`} title={office ? "Time in this stage. Routine targets count office hours only." : "Time in this stage"}>
       {word ? (
         <>
           <span className="tl-chip-word">{word}</span>&nbsp;({dur(hours)})

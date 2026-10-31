@@ -24,8 +24,11 @@ export function stageClock(j: Job, now: number, region: Region) {
   const urgency = j.stage === "new" && !j.triage ? ruleTriage(`${j.title}. ${j.description}`, region).urgency : j.urgency;
   const target = j.stage === "new" && j.hold ? TARGET_HOURS.routine.new : TARGET_HOURS[urgency][j.stage];
   const office = urgency === "routine";
-  const hours = !target ? Math.max(0, (now - since) / H) : office ? officeHours(region, since, now) : Math.max(0, (now - since) / H);
-  const state: ClockState = !target ? "none" : hours > target ? "late" : hours > target * 0.75 ? "soon" : "ok";
+  // The chip shows elapsed time (what people think in); only the state follows office hours for routine work,
+  // so a weekend freezes the colour, not the number.
+  const hours = Math.max(0, (now - since) / H);
+  const counted = target && office ? officeHours(region, since, now) : hours;
+  const state: ClockState = !target ? "none" : counted > target ? "late" : counted > target * 0.75 ? "soon" : "ok";
   return { since, hours, target, state, office };
 }
 
