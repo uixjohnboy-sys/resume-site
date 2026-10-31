@@ -10,7 +10,7 @@ import { createJiti } from "jiti";
 const jiti = createJiti(import.meta.url, { alias: { "@/": new URL("../src/", import.meta.url).pathname.replace(/^\/(\w:)/, "$1") } });
 const { seedSandbox } = await jiti.import("../src/lib/tapline/seed.ts");
 const { REGION, ruleTriage, isAfterHours } = await jiti.import("../src/lib/tapline/rules.ts");
-const { kpis } = await jiti.import("../src/lib/tapline/metrics.ts");
+const { kpis, stageClock } = await jiti.import("../src/lib/tapline/metrics.ts");
 const NOW = process.env.SEED_NOW ? Number(process.env.SEED_NOW) : Date.now();
 
 let fail = 0;
@@ -90,6 +90,23 @@ for (const region of ["AU", "UK"]) {
   check(noReply.length === 0, `${region}: every confirmed job has the reply that was sent`);
   const common = sb.jobs.filter((j) => j.stage === "owner" && /shower|damp patch|fence|deck|roof|gutter/i.test(j.title) && sb.properties.find((p) => p.id === j.propertyId).strata);
   check(common.length === 0, `${region}: no common-property work waits on a lot owner (${common.map((j) => j.ref).join(",")})`);
+
+  // Round 4: what the seed says must match what the product does.
+  const smokeLate = sb.jobs.filter((j) => j.dueBy && j.bookedFor && j.bookedFor > j.dueBy);
+  check(smokeLate.length === 0, `${region}: no smoke alarm visit after its legal due date (${smokeLate.map((j) => j.ref).join(",")})`);
+  const urgentNewLate = sb.jobs.filter((j) => j.stage === "new" && !j.triage && ruleTriage(`${j.title}. ${j.description}`, region).urgency === "urgent" && stageClock(j, now, region).state === "late");
+  check(urgentNewLate.length === 0, `${region}: no urgent report sits untriaged past its target (${urgentNewLate.map((j) => j.ref).join(",")})`);
+  const noSafety = sb.jobs.filter((j) => j.urgency === "urgent" && j.triage && ruleTriage(`${j.title}. ${j.description}`, region).hazards.length && !j.triage.emergency.length);
+  check(noSafety.length === 0, `${region}: seeded emergencies carry the fixed safety text (${noSafety.map((j) => j.ref).join(",")})`);
+  const staleReply = sb.jobs.filter((j) => {
+    const r = j.triage?.reply ?? "";
+    const accept = j.events.find((e) => /accepted and booked/.test(e.text))?.at;
+    const at = j.triage?.confirmedAt ?? now;
+    return accept !== undefined && at >= accept && /arranging|contacted our on-call|will confirm a time/.test(r);
+  });
+  check(staleReply.length === 0, `${region}: no reply says "arranging" once the visit is booked (${staleReply.map((j) => j.ref).join(",")})`);
+  const sevenOClock = sb.jobs.flatMap((j) => j.events.filter((e) => e.by === "contractor")).filter((e) => local(e.at).h === 7 && local(e.at).m === 0).length;
+  check(sevenOClock <= 2, `${region}: contractor replies are not all on the stroke of 7 (${sevenOClock})`);
 
   const k = kpis(sb, now);
   check(k.late <= 6, `${region}: the board is not a wall of red (${k.late} of ${k.open} open jobs late)`);

@@ -49,7 +49,7 @@ export default function OwnerReport({ sb, now }: { sb: Sandbox; now: number }) {
   const owners = sb.owners
     .map((o) => {
       const props = sb.properties.filter((p) => p.ownerId === o.id).map((p) => p.id);
-      const jobs = sb.jobs.filter((j) => props.includes(j.propertyId) && j.triage?.chargeTo !== "tenant" && (inPeriod(j.createdAt) || inPeriod(j.billedAt) || inPeriod(j.completedAt)));
+      const jobs = sb.jobs.filter((j) => props.includes(j.propertyId) && j.triage?.chargeTo !== "tenant" && j.triage?.chargeTo !== "strata" && (inPeriod(j.createdAt) || inPeriod(j.billedAt) || inPeriod(j.completedAt)));
       return { o, jobs };
     })
     .filter((x) => x.jobs.length)

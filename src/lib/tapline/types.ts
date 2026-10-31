@@ -87,7 +87,8 @@ export type Job = {
   quote?: { amount: number; note: string; at: number };
   ownerDecision?: { decision: "approved" | "declined" | "auto" | "urgent"; at: number; note?: string };
   ownerQuestion?: string;
-  hold?: "ownerDeclined";
+  /** ownerDeclined: waiting on a call to the owner. strata: common property, referred to the strata or block manager, who arranges and pays. */
+  hold?: "ownerDeclined" | "strata";
   bookedFor?: number;
   completedAt?: number;
   invoice?: { amount: number; at: number; overApproved: boolean };

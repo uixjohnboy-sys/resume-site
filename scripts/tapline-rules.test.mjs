@@ -68,6 +68,36 @@ const cases = [
   ["The power point in the kitchen is smoking.", "electrician", "urgent", "fire"],
   ["Sewage is coming up through the shower drain.", "plumber", "urgent", "flood"],
   ["The sliding door won't lock and we're going away tomorrow.", "locksmith", "urgent", "security"],
+  // G4 round 4 (AI Quality Lead): E = everyday reports that must not raise on their own; S = real emergencies the
+  // life-safety tier must still catch with no AI at all.
+  ["Aircon. The split system gives a burst of cold air then stops.", null, "routine"], // E-01
+  ["Patio door. The patio door won't close smoothly, it sticks at the bottom but it does lock.", null, "routine"], // E-02
+  ["Shower screen. The kids smashed the glass on the shower screen, nobody is hurt and it is taped up.", null, "routine"], // E-03
+  ["Garage remote. The garage door won't close with the remote, we close it by hand.", null, "routine"], // E-04
+  ["Smell. There's a burning smell from the neighbour's barbecue most evenings.", null, "routine"], // E-05
+  ["Heater. The heater smells like burning dust the first time we turn it on each winter.", null, "routine"], // E-06
+  ["Shed. The power is out in the garden shed, the house is fine.", null, "routine"], // E-07
+  ["Bathroom. Water everywhere on the bathroom floor after every shower because the screen seal has gone.", null, "routine"], // E-08
+  ["Toast. Burnt toast set off the smoke alarm again, can it be moved away from the kitchen door?", null, "routine"], // E-09
+  ["Cat flap. The cat flap won't lock any more.", null, "routine"], // E-10
+  ["Candle. Soot marks above where we light candles, can the wall be repainted?", null, "routine"], // E-11
+  ["Downpipe. The downpipe is gushing onto the path when it rains.", null, "routine"], // E-12
+  ["Fan. There's smoke in the bedroom coming from the ceiling fan.", null, "urgent", "fire"], // S-01
+  ["Front door. The lock on the front door is broken and it won't lock.", null, "urgent", "security"], // S-02
+  ["Kitchen light. Water is coming out of the kitchen light fitting.", null, "urgent", "electricWater"], // S-03
+  ["Wires. There are wires hanging out of the wall where the power point fell off.", null, "urgent", "electric"], // S-04
+  ["Dryer. The dryer caught fire, we put it out but the laundry is black.", null, "urgent", "fire"], // S-05
+  ["Gas. Strong smell of gas in the hallway near the meter.", null, "urgent", "gas"], // S-06
+  ["Toilet. Sewage is overflowing from the toilet onto the floor.", null, "urgent", "flood"], // S-07
+  ["Break in. Someone broke in through the back window last night.", null, "urgent", "security"], // S-08
+  ["Power point. Smoke is pouring out of the power point in the kitchen.", null, "urgent", "fire"], // S-09
+  ["Socket. The plug socket in the lounge is sparking.", null, "urgent", "electric"], // S-10
+  ["Ceiling. Water is pouring through the ceiling onto the bed.", null, "urgent", "flood"], // S-11
+  ["Switchboard. The switchboard is smoking and smells of burning plastic.", null, "urgent", "fire"], // S-12
+  ["Sliding door. The balcony sliding door won't lock, someone tried to force it.", null, "urgent", "security"], // S-13
+  ["Alarm. CO alarm keeps going off in the kitchen.", null, "urgent", "co"], // S-14
+  ["Shock. I got an electric shock from the oven door.", null, "urgent", "electric"], // S-15
+  ["Kitchen. Flames came out of the back of the cooker when I turned it on.", null, "urgent", "fire"], // S-16
 ];
 
 let fail = 0;

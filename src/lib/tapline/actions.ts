@@ -28,13 +28,14 @@ export type PublicAction =
   | { type: "complete"; jobId: string; photo?: string }
   | { type: "invoice"; jobId: string; amount: number }
   | { type: "approveInvoice"; jobId: string }
-  | { type: "complianceJob"; complianceId: string };
+  | { type: "complianceJob"; complianceId: string }
+  | { type: "strataResolved"; jobId: string };
 
 /** Server-only actions: never accepted from the public API. */
 export type InternalAction = { type: "triage"; jobId: string; triage: Triage } | { type: "autoDispatch"; jobId: string };
 
 export type Action = PublicAction | InternalAction;
-export const PUBLIC_TYPES = new Set(["report", "confirm", "accept", "quote", "owner", "ownerQuestion", "requote", "complete", "invoice", "approveInvoice", "complianceJob"]);
+export const PUBLIC_TYPES = new Set(["report", "confirm", "accept", "quote", "owner", "ownerQuestion", "requote", "complete", "invoice", "approveInvoice", "complianceJob", "strataResolved"]);
 
 type Result = { ok: true; sb: Sandbox; jobId?: string } | { ok: false; error: string };
 
@@ -43,7 +44,7 @@ const D = 24 * H;
 // Size limits keep a demo small (the database is shared until the demo one is split out).
 const MAX_JOBS = 100;
 const MAX_EVENTS = 30;
-const LONG = { ok: false as const, error: "This job has a long history now. Use Reset demo to start again." };
+const LONG = { ok: false as const, error: "This job has a long history now. Start a fresh demo to keep going." };
 
 // ---------- input checks ----------
 
@@ -131,10 +132,28 @@ function dispatch(sb: Sandbox, j: Job, trade: Trade, urgency: Urgency, chargeTo:
   j.bookedFor = undefined;
   j.quote = undefined;
   j.dueBy = undefined;
+  if (chargeTo === "strata" && urgency !== "urgent") {
+    // Common property: the owners corporation (or the block's managing agent) arranges and pays. The agency refers
+    // it and follows up; the lot owner is never asked to approve it.
+    j.contractorId = undefined;
+    j.cap = undefined;
+    j.hold = "strata";
+    j.ownerDecision = undefined;
+    j.events.push({ at: now, by: "tapline", text: `Referred to ${p.strata?.manager ?? `the ${c.strataBody}`} to arrange and pay (common property). The ${c.owner} is told; no approval needed from them.` });
+    j.stageEnteredAt = now;
+    return null;
+  }
   if (urgency === "urgent") {
     j.cap = R.urgentLimit;
     j.ownerDecision = { decision: "urgent", at: now };
-    j.events.push({ at: now, by: "tapline", text: `Urgent: sent to on-call ${con.business} (up to ${money(sb.region, j.cap)}), ${c.owner} notified` });
+    j.events.push({
+      at: now,
+      by: "tapline",
+      text:
+        chargeTo === "strata"
+          ? `Urgent: on-call ${con.business} sent to make it safe (up to ${money(sb.region, j.cap)}), charged to the strata; ${p.strata?.manager ?? c.strataBody} told`
+          : `Urgent: sent to on-call ${con.business} (up to ${money(sb.region, j.cap)}), ${c.owner} notified`,
+    });
     // An urgent smoke alarm job (water or smoke at the alarm) still carries the law's 2-business-day deadline.
     if (sb.region === "AU" && trade === "electrician" && isSmokeAlarm(`${j.title} ${j.description}`)) j.dueBy = addBusinessDays(sb.region, j.createdAt, SMOKE_ALARM.businessDays);
   } else if (sb.region === "AU" && trade === "electrician" && isSmokeAlarm(`${j.title} ${j.description}`)) {
@@ -208,12 +227,13 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       j.trade = a.triage.trade;
       j.urgency = a.triage.urgency;
       const who = a.triage.source === "ai" ? "AI" : "Keyword rules";
-      const level = a.triage.raisedBy?.length ? `routine, raised to urgent by keyword rules (${a.triage.raisedBy.join(", ")})` : a.triage.urgency;
+      const level = a.triage.raisedBy?.length ? "routine" : a.triage.urgency;
       j.events.push({
         at: now,
         by: "tapline",
         text: `${who} suggested: ${tradeWho(next.region, a.triage.trade)}, ${level}${a.triage.repeatOf ? `, related to ${a.triage.repeatOf.ref}` : ""}`,
       });
+      if (a.triage.raisedBy?.length) j.events.push({ at: now, by: "tapline", text: `Keyword rules raised it to urgent (${a.triage.raisedBy.join(", ")})` });
       return { ok: true, sb: next };
     }
 
@@ -229,6 +249,8 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       j.urgency = "urgent";
       j.cap = R.urgentLimit;
       j.ownerDecision = { decision: "urgent", at: now };
+      // An urgent smoke alarm job paged at night keeps the law's 2-business-day deadline.
+      if (next.region === "AU" && j.trade === "electrician" && isSmokeAlarm(`${j.title} ${j.description}`)) j.dueBy = addBusinessDays(next.region, j.createdAt, SMOKE_ALARM.businessDays);
       enter(j, "sent", now);
       // Log only what was really sent: the fixed emergency text exists only when a hazard was found.
       j.events.push({
@@ -278,8 +300,8 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       if (dispatched && !changed) return { ok: true, sb: next }; // the on-call contractor stays on it
       // A changed trade or urgency stands the on-call contractor down and sends the job again by the normal rule.
       const before = next.contractors.find((x) => x.id === j.contractorId);
-      // A strata referral still sends a contractor to make the home safe; the
-      // cause and the cost go to the building manager when it is common property.
+      // Common property charged to the strata: urgent work is made safe by the on-call contractor; routine work is
+      // referred to the strata or block manager (see dispatch).
       const err = dispatch(next, j, trade, urgency, chargeTo, now);
       if (err) return { ok: false, error: err };
       if (dispatched && before) j.events.splice(j.events.length - 1, 0, { at: now, by: "manager", text: `Stood down ${before.business} (trade or urgency changed)` });
@@ -315,7 +337,9 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       const note = text(a.note, 200) || "Labour and parts";
       j.quote = { amount, note, at: now };
       const min = earliestVisit(next, j, now);
-      const earliest = typeof a.earliest === "number" && a.earliest >= min && a.earliest < now + 30 * D ? a.earliest : slots(next.region, min, 1, 0)[0];
+      let earliest = typeof a.earliest === "number" && a.earliest >= min && a.earliest < now + 30 * D ? a.earliest : slots(next.region, min, 1, 0)[0];
+      // A smoke alarm repair is booked inside its legal deadline.
+      if (j.dueBy && earliest > j.dueBy) earliest = slots(next.region, min, 1, 0)[0];
       j.bookedFor = earliest;
       j.events.push({ at: now, by: "contractor", text: `Quote sent: ${money(next.region, amount)}` });
       if (j.cap && amount <= j.cap) {
@@ -364,7 +388,6 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
     case "requote": {
       const j = job(a.jobId);
       if (!j || j.hold !== "ownerDeclined") return handled;
-      if (j.events.length >= MAX_EVENTS) return LONG;
       j.hold = undefined;
       j.quote = undefined;
       j.ownerDecision = undefined;
@@ -406,6 +429,16 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       if (!j || j.stage !== "done" || !j.invoice?.overApproved) return handled;
       j.events.push({ at: now, by: "manager", text: "Approved the invoice above the agreed amount" });
       return bill(next, j, now);
+    }
+
+    case "strataResolved": {
+      const j = job(a.jobId);
+      if (!j || j.hold !== "strata") return handled;
+      j.hold = undefined;
+      j.completedAt = now;
+      enter(j, "done", now);
+      j.events.push({ at: now, by: "manager", text: `${prop(j).strata?.manager ?? cap(c.strataBody)} confirmed the repair is done (paid by the strata)` });
+      return { ok: true, sb: next };
     }
 
     case "complianceJob": {
@@ -450,7 +483,7 @@ function bill(sb: Sandbox, j: Job, now: number): Result {
   const c = terms(sb.region);
   enter(j, "billed", now);
   j.billedAt = now;
-  j.events.push({ at: now, by: "tapline", text: `Bill entered in ${c.accounts}${j.triage?.chargeTo === "tenant" ? ", charged to the tenant" : ""}` });
+  j.events.push({ at: now, by: "tapline", text: `Bill entered in ${c.accounts}${j.triage?.chargeTo === "tenant" ? ", charged to the tenant" : j.triage?.chargeTo === "strata" ? ", charged to the strata" : ""}` });
   // A finished compliance job rolls its check forward.
   if (j.complianceId) {
     const item = sb.compliance.find((x) => x.id === j.complianceId);

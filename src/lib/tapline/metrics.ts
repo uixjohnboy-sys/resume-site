@@ -22,7 +22,7 @@ export function stageClock(j: Job, now: number, region: Region) {
   const since = j.stageEnteredAt ?? j.createdAt;
   // Before triage, a report the keyword rules call urgent is held to the urgent target; any other to the routine one.
   const urgency = j.stage === "new" && !j.triage ? ruleTriage(`${j.title}. ${j.description}`, region).urgency : j.urgency;
-  const target = j.stage === "new" && j.hold ? TARGET_HOURS.routine.new : TARGET_HOURS[urgency][j.stage];
+  const target = j.hold === "strata" ? undefined : j.stage === "new" && j.hold ? TARGET_HOURS.routine.new : TARGET_HOURS[urgency][j.stage];
   const office = urgency === "routine";
   // The chip shows elapsed time (what people think in); only the state follows office hours for routine work,
   // so a weekend freezes the colour, not the number.

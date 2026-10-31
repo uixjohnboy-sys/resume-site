@@ -323,38 +323,62 @@ export function slots(region: Region, from: number, count: number, leadHours: nu
 
 export type Hazard = "gas" | "co" | "fire" | "electricWater" | "electric" | "ceiling" | "flood" | "security";
 
-// Things that can smoke, spark or shock: "smoke from the oven" is a fire, "smoke from next door" is not.
-const THING = "(oven|stove|cooktop|hob|heater|power ?points?|sockets?|switch(board)?|outlets?|plugs?|walls?|ceiling|roof|meter|fuse ?box|wires?|wiring|dryer|washing machine|fridge|microwave|kettle|lights?|fan|air ?con|boiler|appliance|tap|taps)";
+const THING = "(oven|stove|cooktop|cooker|hob|heater|power ?points?|sockets?|switch(board)?|outlets?|plugs?|walls?|ceiling|roof|meter|fuse ?box|wires?|wiring|dryer|washing machine|fridge|microwave|kettle|lights?|light fitting|fan|ceiling fan|air ?con|boiler|appliance|tap|taps)";
 const R = (s: string) => new RegExp(s);
+const NONE = /$^/;
 
-// Strong phrases raise urgency on their own. Weak words ("flame", "smoking", "won't lock", "sewage") are everyday
-// words that are only emergencies in context: they never raise anything by themselves (G4 round 3: "pilot flame",
-// "neighbour smoking", "flood light", "bathroom door won't lock" all paged the on-call contractor).
-const HAZARDS: [Hazard, RegExp, RegExp][] = [
-  ["co", /\b(carbon monoxide|co alarm|co detector)\b/, /$^/],
-  ["gas", /\b(smell(s|ing)? (of )?gas|gas (leak|smell)|leaking gas|rotten eggs?|gas (bottle|cylinder) (is )?(leaking|hissing)|hissing (from|near) the gas)\b/, /$^/],
-  // Never the bare word "fire": "gas fire", "fire alarm" and "fire door" are everyday words, not emergencies.
+// Three tiers (G4 rounds 3 and 4):
+// - life: phrases that are emergencies on their own; they raise urgency and add the fixed emergency text.
+// - context: phrases that are emergencies only in some homes ("power is out" in a shed, "gushing" downpipe, "smell of
+//   burning" from a neighbour's barbecue). They count only when the AI flags the same hazard, or when the AI is
+//   unavailable (then a person confirms anyway).
+// - weak: everyday words ("flame", "smoking", "won't lock", "sewage") that never raise anything; shown to the
+//   manager as words worth a check.
+type Tier = { life: RegExp; context: RegExp; weak: RegExp };
+const HAZARDS: [Hazard, Tier][] = [
+  ["co", { life: /\b(carbon monoxide|co alarm|co detector)\b/, context: NONE, weak: NONE }],
+  ["gas", { life: /\b(smell(s|ing)? (of )?gas|gas (leak|smell)|leaking gas|rotten eggs?|gas (bottle|cylinder) (is )?(leaking|hissing)|hissing (from|near) the gas)\b/, context: NONE, weak: NONE }],
   [
     "fire",
-    R(`\\b(on fire|caught fire|catching fire|flames? (are |is )?(coming|shooting|pouring|out of|from)|smoke (is )?(coming|pouring|billowing)( out)?( of| from)?|smoke from (the |a |our )?${THING}|${THING} (is |are )?(smoking|on fire|burning)|${THING}( \\w+){1,3} (is|are) (smoking|on fire|burning)|full of smoke|smoke everywhere|burning smell|smell of burning|smells? (like |of )?burn(ing|t))\\b`),
-    /\b(flames?|smok(e|ing))\b/,
+    {
+      // Never the bare word "fire": "gas fire", "fire alarm" and "fire door" are everyday words, not emergencies.
+      life: R(
+        `\\b(on fire|caught fire|catching fire|flames? (are |is )?(coming|came|come|shooting|shot|pouring)( out)?( of| from)?|flames? (out of|from) (the |a )?${THING}|smoke( \\w+){0,4} (is )?(coming|pouring|billowing)( out)?( of| from)|smoke from (the |a |our )?${THING}|${THING} (is |are )?(smoking|on fire)|${THING}( \\w+){1,3} (is|are) (smoking|on fire)|full of smoke|smoke everywhere|burning plastic|(burning smell|smell of burning|smells? (like |of )?burn(ing|t))( \\w+){0,3} (from|in|near) (the |a )?${THING}|${THING}( \\w+){0,3} smells? (like |of )?(burning|burnt)(?! dust))\\b`
+      ),
+      context: /\b(burning smell|smell of burning|smells? (like |of )?burn(ing|t)(?! dust)|smoke (is )?(coming|pouring))\b/,
+      weak: /\b(flames?|smok(e|ing))\b/,
+    },
   ],
-  ["electricWater", /\b((water|dripping|leaking)( \w+){0,4} (light|lights|light fitting|downlights?|power ?points?|sockets?|switch(es)?)|wet (light|socket|power ?point))\b/, /$^/],
+  [
+    "electricWater",
+    { life: /\b((water|dripping|leaking)( \w+){0,6} (light|lights|light fitting|downlights?|power ?points?|sockets?|switch(es)?)|wet (light|socket|power ?point))\b/, context: NONE, weak: NONE },
+  ],
   [
     "electric",
-    R(`\\b(spark(s|ing|ed)?|exposed wires?|electric shock|shocked me|(?<!static )shock from (the |a )?(\\w+ ){0,2}${THING}|no power (in|to) (the )?(whole|entire|house|flat|unit|home|property)|no power (anywhere|at all)|power (is )?out|tripped (and|but) won'?t reset)\\b`),
-    /\b(shock|no power)\b/,
+    {
+      life: R(
+        `\\b(spark(s|ing|ed)?|exposed wires?|wires? (are )?(hanging|sticking|exposed|bare)|electric shock|shocked me|(?<!static )shock from (the |a )?(\\w+ ){0,2}${THING}|no power (in|to) (the )?(whole|entire|house|flat|unit|home|property)|no power (anywhere|at all)|power (is )?out (in|across|to) (the )?(whole|entire|house|flat|unit|home)|tripped (and|but) won'?t reset)\\b`
+      ),
+      context: /\b(power (is )?out|no power)\b/,
+      weak: /\b(shock)\b/,
+    },
   ],
-  ["ceiling", /\b(sagging|bulging|collaps(e|ed|ing)) (the )?ceiling|ceiling (is |has )?(sagging|bulging|collaps(e|ed|ing)|fallen|come down|caved in)\b/, /$^/],
+  ["ceiling", { life: /\b(sagging|bulging|collaps(e|ed|ing)) (the )?ceiling|ceiling (is |has )?(sagging|bulging|collaps(e|ed|ing)|fallen|come down|caved in)\b/, context: NONE, weak: NONE }],
   [
     "flood",
-    /\b(burst|flooded|flooding|(a|is a) flood(?! ?lights?)|gushing|water (is )?(pouring|spreading|everywhere)|through the ceiling|ceiling (is )?leaking|ceiling leak|sewage (is )?(coming|backing|overflowing|everywhere|on the floor|in the)|toilet (is )?overflow(ing)?|overflowing (onto|into|on) the)\b/,
-    /\b(sewage|flood|overflow\w*)\b/,
+    {
+      life: /\b(burst (water )?(pipe|pipes|main|hose|flexi|tap)|pipe (has )?burst|flooded|flooding|(a|is a) flood(?! ?lights?)|water (is )?(pouring|gushing) (through|from|out of|into|down)|through the ceiling|ceiling (is )?leaking|ceiling leak|sewage (is )?(coming|backing|overflowing|everywhere|on the floor|in the)|toilet (is )?overflow(ing)?)\b/,
+      context: /\b(burst|gushing|water everywhere|water (is )?(pouring|spreading)|overflowing (onto|into|on) the)\b/,
+      weak: /\b(sewage|flood|overflow\w*)\b/,
+    },
   ],
   [
     "security",
-    /\b((front|back|main|entry|sliding|balcony|patio|garage|security)( \w+)? door (won'?t|will not|doesn'?t|does not|can'?t|cannot) (lock|close|shut)|(can'?t|cannot|unable to) (lock|secure) (the )?(house|flat|unit|home|property|front|back|place)|locked out|forced (entry|open)|break-?in|broke in|broken into|kicked (the |our )?(front |back )?door in|smashed (the )?(back |front )?(window|door|glass)(es)?|window (won'?t|will not) (lock|close|shut))\b/,
-    /\b(won'?t lock|will not lock|can'?t lock|broken lock)\b/,
+    {
+      life: /\b((front|back|main|entry|sliding|balcony)( \w+)? door (won'?t|will not|doesn'?t|does not|can'?t|cannot) (lock|close|shut)|(patio|garage|security)( \w+)? door (won'?t|will not|doesn'?t|does not|can'?t|cannot) lock|(front|back|main|entry) door( \w+){1,5} (won'?t|will not|doesn'?t|does not|can'?t|cannot) lock|(can'?t|cannot|unable to) (lock|secure) (the )?(house|flat|unit|home|property|front|back|place)|locked out|forced (entry|open)|break-?in|broke in|broken into|kicked (the |our )?(front |back )?door in|smashed (the )?(back |front |bedroom |kitchen |lounge )?(window|door)s?\b(?! seal)|window (won'?t|will not) (lock|close|shut))\b/,
+      context: NONE,
+      weak: /\b(won'?t lock|will not lock|can'?t lock|broken lock)\b/,
+    },
   ],
 ];
 
@@ -392,19 +416,39 @@ export const isSmokeAlarm = (text: string) => /\b(smoke|heat|fire) (alarm|detect
  * approval, and the tenant needs only 1 hour's notice for the repair itself (NSW Fair Trading). */
 export const SMOKE_ALARM = { businessDays: 2, noticeHours: 1 };
 
-export function ruleTriage(text: string, region?: Region): { trade: Trade; urgency: Urgency; hazards: Hazard[]; matched: string[]; weak: string[] } {
+export type RuleResult = {
+  trade: Trade;
+  /** From life-safety phrases (and no hot water, no heating) only. */
+  urgency: Urgency;
+  hazards: Hazard[];
+  matched: string[];
+  /** Hazards from context phrases: they count only when the AI agrees, or when the AI is unavailable. */
+  context: Hazard[];
+  contextMatched: string[];
+  weak: string[];
+};
+
+export function ruleTriage(text: string, region?: Region): RuleResult {
   const t = ` ${text.toLowerCase().replace(/\s+/g, " ")} `;
   const hazards: Hazard[] = [];
   const matched: string[] = [];
+  const context: Hazard[] = [];
+  const contextMatched: string[] = [];
   const weak: string[] = [];
-  for (const [h, strong, soft] of HAZARDS) {
-    const m = hit(t, strong);
+  for (const [h, tier] of HAZARDS) {
+    const m = hit(t, tier.life);
     if (m) {
       hazards.push(h);
       matched.push(m.trim());
       continue;
     }
-    const w = hit(t, soft);
+    const c = hit(t, tier.context);
+    if (c) {
+      context.push(h);
+      contextMatched.push(c.trim());
+      continue;
+    }
+    const w = hit(t, tier.weak);
     if (w) weak.push(w.trim());
   }
   const extra = hit(t, URGENT_EXTRA);
@@ -422,7 +466,7 @@ export function ruleTriage(text: string, region?: Region): { trade: Trade; urgen
   }
   // England: hot water comes from the gas boiler, so it is a Gas Safe heating engineer's job.
   if (region === "UK" && trade === "plumber" && /\bhot water\b/.test(t)) trade = "hvac";
-  return { trade, urgency: hazards.length || extra ? "urgent" : "routine", hazards, matched, weak };
+  return { trade, urgency: hazards.length || extra ? "urgent" : "routine", hazards, matched, context, contextMatched, weak };
 }
 
 // ---------- fixed emergency text (verified numbers, 2026-10-31) ----------
@@ -459,6 +503,27 @@ export function emergencyText(region: Region, hazards: Hazard[]): string[] {
         : "If someone is still there or you are in danger, call 999. To report a break-in afterwards, call 101. If the home cannot be secured, keep valuables out of sight and stay with a neighbour or friend if you feel unsafe."
     );
   return out;
+}
+
+/**
+ * The reply a tenant should get for where the job is NOW: the morning confirm of a job the on-call contractor
+ * already booked or finished must not say "we're arranging a tradie" (G4 round 4).
+ */
+export function tenantReply(
+  region: Region,
+  agency: string,
+  first: string,
+  j: { stage: Stage; urgency: Urgency; trade: Trade },
+  booked?: { business: string; at?: number }
+) {
+  const who = TRADES[region][j.trade].who;
+  const thanks = j.urgency === "urgent" ? `Hi ${first}, thanks for letting us know.` : `Hi ${first}, thanks for reporting this.`;
+  let body: string;
+  if ((j.stage === "done" || j.stage === "billed") && booked) body = `${booked.business} came out and has done the repair. Please tell us if anything still isn't right.`;
+  else if (j.stage === "booked" && booked?.at) body = `${booked.business} is booked to come out ${when(region, booked.at)}.`;
+  else if (j.urgency === "urgent") body = `We're treating this as urgent and have contacted our on-call ${who}. We'll confirm the visit as soon as they accept.`;
+  else body = `We've sent it to a ${who} and will confirm a time with you.`;
+  return `${thanks} ${body}\n\n${agency}`;
 }
 
 export const CHARGE_LABEL = (r: Region): Record<ChargeTo, string> => ({

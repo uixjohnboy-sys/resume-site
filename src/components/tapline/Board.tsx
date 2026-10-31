@@ -46,6 +46,11 @@ export default function Board() {
     };
   }, [menu]);
 
+  // A dialog opening or closing starts clean: an old refusal never follows the user into another dialog.
+  useEffect(() => {
+    setError(null);
+  }, [openId, tenantOpen, setError]);
+
   const k = useMemo(() => (sb ? kpis(sb, now) : null), [sb, now]);
   const open = sb?.jobs.find((j) => j.id === openId) ?? null;
 
@@ -334,14 +339,15 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
   if (j.hold === "ownerDeclined") pills.push(`${terms(sb.region).owner[0].toUpperCase()}${terms(sb.region).owner.slice(1)} declined`);
   if (j.invoice?.overApproved && j.stage === "done") pills.push("Invoice over approval");
   // After hours the on-call contractor can be paged, book and even finish before a manager has sent the reply.
-  if (j.afterHours && j.triage && !j.triage.confirmedAt && j.stage !== "new") pills.push("Reply not sent");
+  if (j.afterHours && j.triage && !j.triage.confirmedAt && j.stage !== "new") pills.push("Reply to confirm");
+  if (j.hold === "strata") pills.push("With the strata");
   const timer = clock.state === "none" ? "" : `${clock.state === "late" ? "Overdue, " : clock.state === "soon" ? "Due soon, " : ""}${dur(clock.hours)} in this stage`;
   const label = [`${j.ref}, ${j.title}, ${p.address}, ${p.suburb}`, pills.join(", "), untriaged ? "" : tradeLabel(sb.region, j.trade), timer, `Manager ${m.name}`].filter(Boolean).join(". ") + ".";
   return (
     <button type="button" className={`tl-card tl-card-${clock.state}`} onClick={onOpen} aria-label={label} data-job={j.id}>
       <span className="tl-card-r1">
         <span className="tl-ref">{j.ref}</span>
-        {clock.state !== "none" && <TimerChip state={clock.state} hours={clock.hours} office={clock.office} />}
+        {clock.state !== "none" && <TimerChip state={clock.state} hours={clock.hours} office={clock.office} compact />}
       </span>
       <span className="tl-card-title">{j.title}</span>
       <span className="tl-card-addr">
@@ -353,7 +359,7 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
           {pills.map((x) => (
             <span
               key={x}
-              className={`tl-pill ${x === "Urgent" ? "tl-pill-urgent" : x === "Likely urgent" ? "tl-pill-likely" : x.includes("declined") || x.includes("over") || x === "Reply not sent" ? "tl-pill-warn" : "tl-pill-neutral"}`}
+              className={`tl-pill ${x === "Urgent" ? "tl-pill-urgent" : x === "Likely urgent" ? "tl-pill-likely" : x.includes("declined") || x.includes("over") || x === "Reply to confirm" ? "tl-pill-warn" : "tl-pill-neutral"}`}
             >
               {x === "Repeat fault" && <IconRepeat size={12} aria-hidden="true" />}
               {x}

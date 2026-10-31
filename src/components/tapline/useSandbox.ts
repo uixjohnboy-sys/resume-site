@@ -45,7 +45,13 @@ export function useSandbox(poll = true) {
   const [id, setId] = useState<string | null>(null);
   const [sb, setSb] = useState<Sandbox | null>(null);
   const [now, setNow] = useState(() => Date.now());
-  const [error, setError] = useState<string | null>(null);
+  const [error, setErrorState] = useState<string | null>(null);
+  // Bumped on every refusal, so the same message twice is still announced and focused twice.
+  const [errorSeq, setErrorSeq] = useState(0);
+  const setError = useCallback((e: string | null) => {
+    setErrorState(e);
+    if (e) setErrorSeq((n) => n + 1);
+  }, []);
   const [busy, setBusy] = useState(false);
   const skew = useRef(0);
   const ver = useRef(-1);
@@ -72,7 +78,7 @@ export function useSandbox(poll = true) {
         take(d);
       } else setError(d.error ?? "Could not load the demo.");
     },
-    [take]
+    [take, setError]
   );
 
   useEffect(() => {
@@ -101,6 +107,7 @@ export function useSandbox(poll = true) {
     async (path: string, body: object) => {
       if (!id) return null;
       setBusy(true);
+      setErrorState(null);
       const seq = ++writeSeq.current;
       try {
         const r = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sb: id, region: region.current, ...body }) });
@@ -121,7 +128,7 @@ export function useSandbox(poll = true) {
         setBusy(false);
       }
     },
-    [id, take, load]
+    [id, take, load, setError]
   );
 
   const act = useCallback((action: PublicAction) => post("/api/tapline", { action }), [post]);
@@ -129,5 +136,5 @@ export function useSandbox(poll = true) {
   const triage = useCallback((jobId: string) => post("/api/tapline/triage", { jobId }), [post]);
   const photoUrl = useCallback((ph?: string) => (ph && id ? `/api/tapline/photo?sb=${id}&ph=${ph}` : undefined), [id]);
 
-  return { id, sb, now, error, busy, act, reset, triage, setError, photoUrl };
+  return { id, sb, now, error, errorSeq, busy, act, reset, triage, setError, photoUrl };
 }

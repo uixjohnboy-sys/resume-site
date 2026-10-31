@@ -96,7 +96,7 @@ export default function TenantReport({
             {busy ? "Sending..." : "Send report"}
           </button>
           {title.trim().length < 3 && <p className="tl-hint">Describe the problem in a few words to send it.</p>}
-          <InlineError error={api.error} onDismiss={() => api.setError(null)} />
+          <InlineError error={api.error} seq={api.errorSeq} onDismiss={() => api.setError(null)} />
         </form>
         <TryOnPhone url={phoneLink(id, "tenant")} who="tenant" />
       </div>

@@ -14,10 +14,10 @@ const TTL = 60 * 60 * 48;
 const MAX_BYTES = 250_000;
 const NEW_PER_IP_PER_DAY = 30;
 // Site-wide ceilings sized for the shared free Upstash plan until the demo database is split out.
-const NEW_PER_SITE_PER_DAY = 150;
+const NEW_PER_SITE_PER_DAY = 100;
 const PHOTOS_PER_SANDBOX = 12;
 const PHOTOS_PER_IP_PER_DAY = 40;
-const PHOTOS_PER_SITE_PER_DAY = 300;
+const PHOTOS_PER_SITE_PER_DAY = 120;
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -73,16 +73,23 @@ export async function version(id: string): Promise<number> {
   return Number((await redis.get<number | string>(k.v(id))) ?? 0);
 }
 
+// The 48-hour expiry is set once, on the first save; later saves keep it (KEEPTTL), so a demo that keeps being
+// used still expires (G4 round 4: every save used to restart the clock).
 const CAS = `
 local cur = redis.call('GET', KEYS[2])
 if (cur or '0') ~= ARGV[1] then return 0 end
-redis.call('SET', KEYS[1], ARGV[2], 'EX', ARGV[3])
-redis.call('SET', KEYS[2], tostring(tonumber(ARGV[1]) + 1), 'EX', ARGV[3])
+if cur then
+  redis.call('SET', KEYS[1], ARGV[2], 'KEEPTTL')
+  redis.call('SET', KEYS[2], tostring(tonumber(ARGV[1]) + 1), 'KEEPTTL')
+else
+  redis.call('SET', KEYS[1], ARGV[2], 'EX', ARGV[3])
+  redis.call('SET', KEYS[2], tostring(tonumber(ARGV[1]) + 1), 'EX', ARGV[3])
+end
 return 1`;
 
 async function casSave(id: string, sb: Sandbox, expected: number): Promise<"ok" | "conflict" | "too-big"> {
   const json = JSON.stringify(sb);
-  if (json.length > MAX_BYTES) return "too-big";
+  if (Buffer.byteLength(json, "utf8") > MAX_BYTES) return "too-big";
   const redis = getRedis();
   if (!redis) {
     const cur = mem.sb.get(id)?.v ?? 0;

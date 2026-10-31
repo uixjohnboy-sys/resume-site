@@ -47,16 +47,28 @@ export function TradeIcon({ trade, size = 14 }: { trade: Trade; size?: number })
   return <I size={size} stroke={1.75} aria-hidden="true" />;
 }
 
-export function TimerChip({ state, hours, office = false }: { state: ClockState; hours: number; office?: boolean }) {
+/**
+ * Time in the current stage, with its status. The number is time already spent, never a due date, so it leads on
+ * cards ("4d · Overdue") and is spelled out in the drawer ("Overdue · 4d in stage").
+ */
+export function TimerChip({ state, hours, office = false, compact = false }: { state: ClockState; hours: number; office?: boolean; compact?: boolean }) {
   const word = state === "late" ? "Overdue" : state === "soon" ? "Due soon" : null;
   return (
     <span className={`tl-chip tl-chip-${state}`} title={office ? "Time in this stage. Routine targets count office hours only." : "Time in this stage"}>
-      {word ? (
+      {!word ? (
+        dur(hours)
+      ) : compact ? (
         <>
-          <span className="tl-chip-word">{word}</span>&nbsp;({dur(hours)})
+          <span className="tl-chip-age">{dur(hours)}</span>
+          {" · "}
+          <span className="tl-chip-word">{word}</span>
         </>
       ) : (
-        dur(hours)
+        <>
+          <span className="tl-chip-word">{word}</span>
+          {" · "}
+          <span className="tl-chip-age">{dur(hours)} in stage</span>
+        </>
       )}
     </span>
   );
@@ -150,16 +162,23 @@ export function ConfirmDialog({ title, body, confirm, onConfirm, onClose }: { ti
  * An error inside a dialog: announced, focused (so focus is never dropped on a refused action), and placed
  * next to what needs fixing instead of under a toast.
  */
-export function InlineError({ error, onDismiss }: { error: string | null; onDismiss: () => void }) {
+export function InlineError({ error, seq, onDismiss }: { error: string | null; seq: number; onDismiss: () => void }) {
   const ref = useRef<HTMLParagraphElement>(null);
   useEffect(() => {
     if (error) ref.current?.focus();
-  }, [error]);
+  }, [error, seq]);
   if (!error) return null;
   return (
-    <p className="tl-inline-error" role="alert" tabIndex={-1} ref={ref}>
+    <p className="tl-inline-error" role="alert" tabIndex={-1} ref={ref} key={seq}>
       {error}
-      <button type="button" onClick={onDismiss}>
+      <button
+        type="button"
+        onClick={(e) => {
+          // Dismiss hands focus back to the dialog's heading, never to the page.
+          (e.currentTarget.closest("[role=dialog]")?.querySelector<HTMLElement>("h2, h1") ?? null)?.focus();
+          onDismiss();
+        }}
+      >
         Dismiss
       </button>
     </p>

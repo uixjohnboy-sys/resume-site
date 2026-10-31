@@ -242,6 +242,27 @@ let last = { status: 200 };
 for (let n = 0; n < 32 && last.status === 200; n++) last = await act({ type: "ownerQuestion", jobId: oq, text: "Question " + n });
 check(last.status === 409 && /long history/.test(last.d?.error ?? ""), "owner questions stop at the history cap");
 
+// ---------- G4 round 4 ----------
+
+// Routine work charged to the strata is referred to the strata manager: no work order, no owner approval.
+g = await fetch(`${BASE}/api/tapline?sb=${sb}`).then((x) => x.json());
+const unit = g.sb.properties.find((p) => p.strata && p.id !== "p7");
+r = await act({ type: "report", propertyId: unit.id, title: "Cracked render on the balcony", description: "The render on the shared balcony wall is cracking." });
+const st = r.d.jobId;
+r = await act({ type: "confirm", jobId: st, trade: "handyman", urgency: "routine", reply: "Thanks, we've passed this to the strata.", safety: [], chargeTo: "strata", strataReferral: true, insuranceClaim: false });
+const stj = job(r.d, st);
+check(r.status === 200 && stj.hold === "strata" && !stj.contractorId && !stj.cap, "routine strata work: referred to the strata manager, no work order, nothing for the owner to approve");
+r = await act({ type: "strataResolved", jobId: st });
+check(job(r.d, st).stage === "done" && !job(r.d, st).hold, "the strata confirms the repair -> Completed");
+
+// The fixed reply never gives an instruction; the event log credits the keyword rules with any raise.
+r = await act({ type: "report", propertyId: "p22", title: "Water through the ceiling", description: "Water is pouring through the ceiling onto the bed." });
+const wr = r.d.jobId;
+r = await post("/api/tapline/triage", { jobId: wr });
+const wt = job(r.d, wr).triage;
+check(!/\b(turn (\w+ ){0,3}off|stay away|leave your)\b/i.test(wt.reply) && wt.urgency === "urgent", "reply to an urgent leak holds no instruction (the fixed text carries them)");
+check(!/not (sure|certain)/.test(job(r.d, wr).events.map((e) => e.text).join(" ")), "event log reads cleanly");
+
 // Reset to the UK agency.
 r = await post("/api/tapline", { reset: "UK" });
 check(r.d.sb.region === "UK" && r.d.sb.agency === "Northgate Lettings" && r.d.sb.jobs.length === 40, "reset to the UK agency");

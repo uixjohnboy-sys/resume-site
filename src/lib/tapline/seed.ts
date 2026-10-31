@@ -1,4 +1,4 @@
-import { REGION, SMOKE_ALARM, TARGET_HOURS, addBusinessDays, isAfterHours, isSmokeAlarm, money, nextOpen, officeBack, slots, terms, tradeWho } from "./rules";
+import { REGION, SMOKE_ALARM, TARGET_HOURS, addBusinessDays, emergencyText, isAfterHours, isSmokeAlarm, money, nextOpen, officeBack, ruleTriage, slots, tenantReply, terms, tradeWho } from "./rules";
 import type { ComplianceItem, Contractor, Job, Manager, Owner, Property, Region, Sandbox, Stage, Trade, Urgency } from "./types";
 
 // Deterministic fictional data that obeys the product's own rules: owner-stage
@@ -346,6 +346,8 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       const title = (!AU && t.uk ? t.uk : t.au)[0];
       const leak = t.trade === "gas" && t.urgency === "urgent";
       if (seen.has(title) || (leak && gasLeaks > 0)) continue;
+      // A booked NSW smoke alarm must sit inside its 2-business-day deadline, which a weekend can make impossible.
+      if (stage === "booked" && AU && isSmokeAlarm(title)) continue;
       if (leak) gasLeaks++;
       seen.add(title);
       return t;
@@ -377,9 +379,15 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
   const minutes = (a: number, b: number) => Math.round(between(a, b)) * M;
   const q15 = (t: number) => Math.ceil(t / (15 * M)) * 15 * M;
   const office = (t: number) => nextOpen(region, t, 510, 1020, ["Mon", "Tue", "Wed", "Thu", "Fri"]);
-  const tradeHours = (t: number) => nextOpen(region, t, 420, 1080, ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
-  const replyFor = (first: string, urgent: boolean) =>
-    `${urgent ? `Hi ${first}, thanks for letting us know. We're treating this as urgent and arranging a ${c.contractor} now.` : `Hi ${first}, thanks for reporting this. We've sent it to a ${c.contractor} and will confirm a time with you.`}\n\n${R.agency}`;
+  const tradeOpen = (t: number) => nextOpen(region, t, 420, 1080, ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
+  // A contractor replies some time into their day, not on the stroke of 7 (and never wraps past 6 pm to tomorrow).
+  const tradeHours = (t: number) => {
+    const x = tradeOpen(t);
+    const y = x + minutes(10, 100);
+    return tradeOpen(y) === y ? y : x;
+  };
+  // A manager's confirm lands inside office hours, never after 5 pm.
+  const officeAct = (t: number, a: number, b: number) => office(office(t) + minutes(a, b));
 
   type Clock = { after: boolean; suggest: number; confirm: number; dispatch: number; quote?: number; accept?: number; visit?: number; done?: number; invoice?: number; last: number };
   const takenSlots = new Set<number>();
@@ -392,9 +400,9 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
     let dispatch: number;
     if (urgent && after) {
       dispatch = createdAt + minutes(3, 8);
-      confirm = office(createdAt) + minutes(5, 25);
+      confirm = officeAct(createdAt, 5, 25);
     } else {
-      confirm = (urgent ? createdAt : office(createdAt)) + minutes(5, urgent ? 20 : 75);
+      confirm = urgent ? createdAt + minutes(5, 20) : officeAct(createdAt, 5, 75);
       dispatch = confirm;
     }
     // A night-time urgent job does not wait for the manager: the 8:30 confirm may still be ahead (a weekend), and
@@ -411,7 +419,8 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       k.last = Math.max(k.last, k.accept);
       return k; // the visit itself is in the future, chosen below
     }
-    k.visit = urgent ? q15(k.accept + between(0.5, 3) * H) : pick(slots(region, k.accept + notice * H, 6, 0));
+    // A smoke alarm (1 hour's notice) is visited within its 2 business days: one of the first slots.
+    k.visit = urgent ? q15(k.accept + between(0.5, 3) * H) : pick(slots(region, k.accept + notice * H, 6, 0).slice(0, notice === 1 ? 2 : 6));
     k.done = k.visit + Math.round(between(4, 8)) * 15 * M;
     k.last = Math.max(k.last, k.done);
     if (stage === "billed") {
@@ -436,6 +445,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
     const notice = urgent ? 0 : smoke ? SMOKE_ALARM.noticeHours : R.noticeHours;
     let ageH = between(AGE[stage][0], AGE[stage][1]) * (urgent && stage !== "billed" ? 0.12 : 1);
     if (urgent && stage === "booked") ageH = between(0.6, 2.2); // accepted moments ago, visit still to come
+    if (urgent && stage === "new") ageH = between(3, 12) / 60; // just in: an urgent report never sits untriaged
     if (smoke && stage !== "billed") ageH = Math.min(ageH, 30); // the law's 2 business days
     // Routine work runs on office hours: place the job at a spread of points through its stage's target (most well
     // inside it, a few due soon, one or two late), counted in office hours, so no day of the week paints the board
@@ -482,8 +492,8 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
         urgency: t.urgency,
         reason: "",
         safety: [],
-        emergency: [],
-        reply: replyFor(first, urgent),
+        emergency: urgent ? emergencyText(region, ruleTriage(`${title}. ${description}`, region).hazards) : [],
+        reply: "",
         chargeTo: t.chargeTo ?? "owner",
         strataReferral: false,
         insuranceClaim: false,
@@ -497,7 +507,11 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
         job.cap = R.urgentLimit;
         job.ownerDecision = { decision: "urgent", at: k.dispatch };
         if (k.after) {
-          ev(k.dispatch, "tapline", `After hours: the tenant was told the on-call ${c.contractor} has been contacted`);
+          ev(
+            k.dispatch,
+            "tapline",
+            job.triage.emergency.length ? "After hours: the tenant was sent the fixed safety steps automatically" : `After hours: the tenant was told the on-call ${c.contractor} has been contacted`
+          );
           ev(k.dispatch, "tapline", `After hours: on-call ${contractor.business} paged (up to ${money(region, R.urgentLimit)}), ${c.owner} notified. Waiting for a manager to confirm the reply.`);
         } else {
           ev(k.dispatch, "tapline", `Urgent: sent to on-call ${contractor.business} (up to ${money(region, R.urgentLimit)}), ${c.owner} notified`);
@@ -527,7 +541,9 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       }
       if (stage === "booked") {
         const free = slots(region, Math.max(now + H, k.accept! + notice * H), 14, 0).filter((x) => !takenSlots.has(x));
-        k.visit = urgent ? Math.max(q15(k.accept! + between(0.5, 3) * H), q15(now + 20 * M)) : pick(free.slice(0, 6));
+        // A smoke alarm visit sits before its legal due date.
+        const legal = free.filter((x) => !job.dueBy || x <= job.dueBy);
+        k.visit = urgent ? Math.max(q15(k.accept! + between(0.5, 3) * H), q15(now + 20 * M)) : legal.length ? pick(legal.slice(0, 6)) : free[0];
         takenSlots.add(k.visit);
       }
       job.bookedFor = k.visit;
@@ -547,6 +563,11 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       ev(k.invoice!, "tapline", `Bill entered in ${c.accounts}`);
       job.stageEnteredAt = k.invoice!;
     }
+    if (job.triage) {
+      const at = job.triage.confirmedAt ?? now;
+      const stageThen: Stage = k.done && at >= k.done ? "done" : k.accept && at >= k.accept ? "booked" : "sent";
+      job.triage.reply = tenantReply(region, R.agency, first, { stage: stageThen, urgency: t.urgency, trade }, { business: contractor.business, at: job.bookedFor });
+    }
     job.events.sort((a, b) => a.at - b.at);
     jobs.push(job);
   });
@@ -554,7 +575,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
   /** A finished routine job from the past, on the same clock (the history behind the repeat faults). */
   const pastJob = (at0: number, base: { id: string; ref: string; propertyId: string; title: string; description: string; trade: Trade; contractorId: string; cap: number; access?: Job["access"] }, inv: number): Job => {
     const con = contractors.find((x) => x.id === base.contractorId)!;
-    const confirm = office(at0) + minutes(10, 60);
+    const confirm = officeAct(at0, 10, 60);
     const accept = tradeHours(confirm + between(1, 8) * H);
     const visit = slots(region, accept + R.noticeHours * H, 1, 0)[0];
     const done = visit + 90 * M;
@@ -567,7 +588,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       urgency: "routine",
       stage: "billed",
       afterHours: isAfterHours(region, at0),
-      triage: { source: "ai", at: at0 + 2 * M, trade: base.trade, urgency: "routine", reason: "", safety: [], emergency: [], reply: replyFor(tenant, false), chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: confirm },
+      triage: { source: "ai", at: at0 + 2 * M, trade: base.trade, urgency: "routine", reason: "", safety: [], emergency: [], reply: tenantReply(region, R.agency, tenant, { stage: "sent", urgency: "routine", trade: base.trade }), chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: confirm },
       ownerDecision: { decision: "auto", at: accept },
       bookedFor: visit,
       completedAt: done,

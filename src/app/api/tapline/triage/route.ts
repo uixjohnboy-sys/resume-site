@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getRedis } from "@/lib/redis";
 import { apply, repeatOf } from "@/lib/tapline/actions";
-import { REGION, TRADE_IDS, emergencyText, isSmokeAlarm, ruleTriage, terms, tradeGlossary, tradeLabel, type Hazard } from "@/lib/tapline/rules";
+import { REGION, TRADE_IDS, emergencyText, isSmokeAlarm, ruleTriage, tenantReply, terms, tradeGlossary, tradeLabel, type Hazard } from "@/lib/tapline/rules";
 import { getPhoto, load, mutate, network, underLimit, validId } from "@/lib/tapline/store";
 import type { ChargeTo, Job, Sandbox, Trade, Triage, Urgency } from "@/lib/tapline/types";
 import { clientIp, hashKey } from "@/lib/twin/gate";
@@ -65,7 +65,7 @@ type Draft = Omit<Triage, "at" | "emergency" | "repeatOf" | "confirmedAt"> & { h
 // points "above" is replaced by the fixed reply. Safety steps live in the code-owned emergency text and the
 // manager-checked list, never in the reply, so the tenant reads each instruction once, in the region's words.
 const REPLY_RULES: [string, RegExp][] = [
-  ["instructions", /\b(turn (\w+ ){0,3}off|switch (\w+ )?off|isolat\w*|main valve|stopcock|main water tap|water main|consumer unit|switchboard|fuse ?box|evacuate|get out|leave the (house|flat|home|property))\b/i],
+  ["instructions", /\b(turn (\w+ ){0,3}off|switch (\w+ )?off|isolat\w*|main valve|stopcock|main water tap|water main|consumer unit|switchboard|fuse ?box|evacuate|get (everyone )?out|leave (the|your) (house|flat|home|property|unit)|stay (away|clear|out)|keep (away|clear|out)|(don'?t|do not|avoid) touch\w*)\b/i],
   ["time", /\b(\d{1,2}(:\d{2})?\s?(am|pm)|today|tonight|tomorrow|this (morning|afternoon|evening)|within \d+|straight away|right away|asap|shortly|soon|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i],
   ["number", /\d{3}[\s-]?\d{3}/],
   ["link", /https?:\/\/|www\.|\.(com|au|uk|net|org)\b/i],
@@ -76,7 +76,7 @@ const REPLY_RULES: [string, RegExp][] = [
 ];
 
 /** Strip sign-offs, then add the agency name on its own line. Replace replies that break a rule. */
-function finishReply(sb: Sandbox, raw: string, tenant: string, urgent: boolean, jobRef: string): string {
+function finishReply(sb: Sandbox, raw: string, tenant: string, urgent: boolean, jobRef: string, trade: Trade): string {
   const first = tenant.split(" ")[0];
   let r = noDash(raw).trim();
   r = r.replace(/\n*\s*(cheers|thanks|thank you|kind regards|regards|best wishes|warm regards)[,.!]?\s*$/i, "").trim();
@@ -84,16 +84,13 @@ function finishReply(sb: Sandbox, raw: string, tenant: string, urgent: boolean, 
   const broke = r ? REPLY_RULES.find(([, re]) => re.test(r))?.[0] : "empty";
   if (broke) {
     console.info(`[tapline] reply for ${jobRef} replaced with the fixed reply (${broke})`);
-    r = fallbackReply(sb, first, urgent);
+    r = fallbackReply(sb, first, urgent, trade);
   }
   return `${r}\n\n${sb.agency}`;
 }
 
-function fallbackReply(sb: Sandbox, first: string, urgent: boolean) {
-  const c = terms(sb.region);
-  return urgent
-    ? `Hi ${first}, thanks for letting us know. We're treating this as urgent and arranging a ${c.contractor} now. We'll confirm the visit as soon as they accept.`
-    : `Hi ${first}, thanks for reporting this. We've logged it and will be in touch once a ${c.contractor} has a time for you.`;
+function fallbackReply(sb: Sandbox, first: string, urgent: boolean, trade: Trade) {
+  return tenantReply(sb.region, sb.agency, first, { stage: "sent", urgency: urgent ? "urgent" : "routine", trade }).replace(/\n\n[^\n]*$/, "");
 }
 
 /**
@@ -110,6 +107,8 @@ function cleanSafety(steps: unknown, hazards: Hazard[]): string[] {
     .filter((s) => !(wet && /\b(bucket|towel|bowl|container)\b/i.test(s)))
     // Calling anyone is the fixed text's job (verified names and numbers); moving electrical things near water never.
     .filter((s) => !/\bcall\b/i.test(s) && !/\b(move|unplug|lift)\b.*\b(electric\w*|appliances?|power ?points?|plugs?|sockets?)\b/i.test(s))
+    // Gas is turned off at the meter, never at a water valve ("turn off the gas at the stopcock" is wrong and unsafe).
+    .filter((s) => !(/\bgas\b/i.test(s) && /\b(stopcock|main water tap|water main|water valve)\b/i.test(s)))
     .map((s) => {
       // "If it is safe" once, at the start: strip every copy the model wrote, then add one where it belongs.
       const bare = s.replace(/,?\s*if it(?:'s| is) safe( to do so)?,?\s*/gi, " ").replace(/\s+/g, " ").trim();
@@ -144,10 +143,11 @@ function rulesDraft(sb: Sandbox, job: Job): Draft {
   return {
     source: "rules",
     trade: r.trade,
-    urgency: r.urgency,
-    hazards: r.hazards,
+    // With no AI to judge context, context phrases count too: a person confirms before anything routine is sent.
+    urgency: r.urgency === "urgent" || r.context.length ? "urgent" : "routine",
+    hazards: [...r.hazards, ...r.context],
     reason:
-      (r.matched.length ? `Urgent words found: ${r.matched.join(", ")}.` : "No urgent words found, so it is treated as routine.") +
+      (r.matched.length || r.contextMatched.length ? `Urgent words found: ${[...r.matched, ...r.contextMatched].join(", ")}.` : "No urgent words found, so it is treated as routine.") +
       (r.weak.length ? ` Worth a check: ${r.weak.join(", ")}.` : ""),
     safety: [],
     reply: "",
@@ -267,7 +267,9 @@ export async function POST(req: Request) {
     // Safety net: keywords can raise urgency and add hazards, never lower them.
     const text = `${job.title}. ${job.description}`;
     const rules = ruleTriage(text, region);
-    const hazards = Array.from(new Set([...draft.hazards, ...rules.hazards]));
+    // Life-safety phrases always count; context phrases only when the AI saw the same hazard.
+    const agreed = rules.context.filter((h) => draft.hazards.includes(h));
+    const hazards = Array.from(new Set([...draft.hazards, ...rules.hazards, ...agreed]));
     let raised = false;
     if (rules.urgency === "urgent" && draft.urgency !== "urgent") {
       draft.urgency = "urgent";
@@ -301,7 +303,7 @@ export async function POST(req: Request) {
         safety: urgent ? draft.safety : [],
         emergency: emergencyText(loaded.sb.region, hazards),
         // A reply written for a routine job is not sent once the rules raise it to urgent.
-        reply: raised ? `${fallbackReply(loaded.sb, prop.tenant.split(" ")[0], true)}\n\n${loaded.sb.agency}` : finishReply(loaded.sb, draft.reply, prop.tenant, urgent, j.ref),
+        reply: raised ? `${fallbackReply(loaded.sb, prop.tenant.split(" ")[0], true, draft.trade)}\n\n${loaded.sb.agency}` : finishReply(loaded.sb, draft.reply, prop.tenant, urgent, j.ref, draft.trade),
         chargeTo: draft.chargeTo,
         strataReferral: draft.strataReferral,
         insuranceClaim: draft.insuranceClaim,

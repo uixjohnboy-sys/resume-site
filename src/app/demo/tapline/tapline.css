@@ -1634,3 +1634,13 @@
 :is(.tl-drawer-wrap, .tl-modal-wrap) dd {
   overflow-wrap: anywhere;
 }
+
+/* "Overdue · 2d in stage": the status word, then the time already spent (not a due date). */
+.tl-chip-age {
+  font-weight: 400;
+}
+
+.tl-card-r1 .tl-ref {
+  white-space: nowrap;
+  flex-shrink: 0;
+}

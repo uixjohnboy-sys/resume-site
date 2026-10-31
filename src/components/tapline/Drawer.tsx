@@ -4,7 +4,7 @@ import { IconAlertTriangle, IconBuilding, IconPaw, IconPlus, IconRepeat, IconShi
 import { useCallback, useEffect, useState } from "react";
 import { earliestVisit, noticeHours } from "@/lib/tapline/actions";
 import { stageClock } from "@/lib/tapline/metrics";
-import { CHARGE_LABEL, REGION, TRADE_IDS, TRADES, day, money, slots, taxIn, terms, tradeLabel, tradeWho, when } from "@/lib/tapline/rules";
+import { CHARGE_LABEL, REGION, TRADE_IDS, TRADES, day, money, slots, taxIn, tenantReply, terms, tradeLabel, tradeWho, when } from "@/lib/tapline/rules";
 import type { ChargeTo, Job, Sandbox, Trade, Urgency } from "@/lib/tapline/types";
 import { AmountInput, InlineError, StageChip, TimerChip, TradeIcon, TryOnPhone, parseAmount, phoneLink } from "./ui";
 import { useDialog } from "./useDialog";
@@ -75,6 +75,16 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
           </section>
 
           {((j.stage === "new" && !j.hold) || awaitingConfirm(j)) && <TriageEditor key={`${j.id}-${j.triage?.at ?? 0}`} s={s} j={j} />}
+
+          {j.hold === "strata" && (
+            <section className="tl-sec tl-callout">
+              <h3>With {p.strata?.manager ?? `the ${c.strataBody}`}</h3>
+              <p>
+                Common property: the {sb.region === "AU" ? "owners corporation" : "block's managing agent"} arranges and pays for this repair. Follow up if it isn&apos;t
+                fixed within 10 business days{p.strata ? ` (${p.strata.phone})` : ""}.
+              </p>
+            </section>
+          )}
 
           {j.hold === "ownerDeclined" && (
             <section className="tl-sec tl-callout tl-callout-warn">
@@ -161,7 +171,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
         </div>
 
         <div className="tl-drawer-err">
-          <InlineError error={s.error} onDismiss={() => s.setError(null)} />
+          <InlineError error={s.error} seq={s.errorSeq} onDismiss={() => s.setError(null)} />
         </div>
         <Footer key={`${j.id}-${j.stage}-${j.invoice?.at ?? 0}`} s={s} j={j} />
       </aside>
@@ -240,12 +250,13 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
   const t = j.triage;
   const [trade, setTrade] = useState<Trade>(t?.trade ?? j.trade);
   const [urg, setUrg] = useState<Urgency>(t?.urgency ?? "routine");
+  // The reply written at night describes the job as it was then. If the on-call contractor has since booked or
+  // finished it, the morning reply starts from where the job is now.
   const [reply, setReply] = useState(() => {
-    const r = t?.reply ?? "";
-    const booked = sb.contractors.find((x) => x.id === j.contractorId);
-    if (j.bookedFor && booked && /We'll confirm the visit as soon as they accept\./.test(r))
-      return r.replace(/We'll confirm the visit as soon as they accept\./, `${booked.business} is booked for ${when(sb.region, j.bookedFor)}.`);
-    return r;
+    const con = sb.contractors.find((x) => x.id === j.contractorId);
+    if (awaitingConfirm(j) && j.stage !== "sent" && con)
+      return tenantReply(sb.region, sb.agency, p.tenant.split(" ")[0], j, { business: con.business, at: j.bookedFor });
+    return t?.reply ?? "";
   });
   const [safety, setSafety] = useState<string[]>(t?.safety ?? []);
   const [charge, setCharge] = useState<ChargeTo>(t?.chargeTo ?? "owner");
@@ -496,6 +507,12 @@ function Footer({ s, j }: { s: S; j: Job }) {
         </div>
       </>
     );
+  } else if (j.hold === "strata") {
+    body = (
+      <button type="button" className="tl-btn tl-btn-primary" disabled={s.busy} onClick={() => s.act({ type: "strataResolved", jobId: j.id })}>
+        The strata has fixed it
+      </button>
+    );
   } else if (j.hold === "ownerDeclined") {
     body = (
       <button type="button" className="tl-btn tl-btn-primary" disabled={s.busy} onClick={() => s.act({ type: "requote", jobId: j.id })}>
@@ -511,6 +528,8 @@ function Footer({ s, j }: { s: S; j: Job }) {
         </button>
       </>
     );
+  } else if (j.stage === "done" && j.triage?.chargeTo === "strata" && !j.contractorId) {
+    body = <p className="tl-acting">Repaired by the strata. Nothing to bill.</p>;
   } else if (j.stage === "done" && !j.invoice) {
     body = (
       <>
