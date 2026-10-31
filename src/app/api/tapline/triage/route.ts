@@ -66,7 +66,9 @@ function finishReply(sb: Sandbox, raw: string, tenant: string, urgent: boolean):
   r = r.replace(new RegExp(`[\\s,.]*${sb.agency.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.?$`, "i"), "").trim();
   const promisesTime = /\b(\d{1,2}(:\d{2})?\s?(am|pm)|today|tonight|tomorrow|this (morning|afternoon|evening)|within \d+|straight away|right away|asap|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(r);
   const hasNumber = /\d{3}[\s-]?\d{3}/.test(r);
-  if (!r || promisesTime || hasNumber || /\babove\b/i.test(r)) r = fallbackReply(sb, first, urgent);
+  // History belongs in the manager's reason, never in the tenant's reply (it can read as admitting fault).
+  const mentionsHistory = /\b(earlier|previous|recent|last|prior)\s+(\w+\s+){0,2}(repair|leak|work|job|fix|visit|plumbing)\b/i.test(r);
+  if (!r || promisesTime || hasNumber || mentionsHistory || /\babove\b/i.test(r)) r = fallbackReply(sb, first, urgent);
   return `${r}\n\n${sb.agency}`;
 }
 
