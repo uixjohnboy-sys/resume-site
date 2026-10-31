@@ -12,7 +12,7 @@ import type { Region, Sandbox } from "./types";
 
 const TTL = 60 * 60 * 48;
 const MAX_BYTES = 250_000;
-const NEW_PER_IP_PER_DAY = 30;
+const NEW_PER_IP_PER_DAY = 60; // 30 after the review cycle (the panel shares one IP)
 // Site-wide ceilings sized for the shared free Upstash plan until the demo database is split out.
 const NEW_PER_SITE_PER_DAY = 100;
 const PHOTOS_PER_SANDBOX = 12;
