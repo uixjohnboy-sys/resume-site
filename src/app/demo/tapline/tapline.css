@@ -1466,3 +1466,8 @@
     padding: 0;
   }
 }
+
+/* Headings receive focus programmatically when a dialog opens; no ring for those. */
+:is(.tl, .tl-m, .tl-modal-wrap, .tl-drawer-wrap) :is(h1, h2, h3)[tabindex="-1"]:focus {
+  outline: none;
+}
