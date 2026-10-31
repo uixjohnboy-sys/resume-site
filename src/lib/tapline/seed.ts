@@ -1,4 +1,4 @@
-import { REGION, SMOKE_ALARM, addBusinessDays, isSmokeAlarm, money, slots, terms } from "./rules";
+import { REGION, SMOKE_ALARM, TARGET_HOURS, addBusinessDays, isAfterHours, isSmokeAlarm, money, nextOpen, officeBack, slots, terms, tradeWho } from "./rules";
 import type { ComplianceItem, Contractor, Job, Manager, Owner, Property, Region, Sandbox, Stage, Trade, Urgency } from "./types";
 
 // Deterministic fictional data that obeys the product's own rules: owner-stage
@@ -118,12 +118,12 @@ const TEMPLATES: Tpl[] = [
     trade: "plumber",
     urgency: "urgent",
     price: [450, 1500],
-    au: ["No hot water", ["The hot water system stopped this morning, only cold water now."]],
+    au: ["No hot water", ["The hot water system has stopped, only cold water now."]],
     uk: ["Boiler not giving hot water", ["The boiler fires up for the heating but there's no hot water from the taps."]],
     ukTrade: "hvac",
   },
   { trade: "plumber", urgency: "urgent", price: [250, 450], au: ["Only toilet blocked", ["Our only toilet is blocked and won't flush."]] },
-  { trade: "gas", urgency: "urgent", price: [200, 420], au: ["Smell of gas in the kitchen", ["Strong smell of gas near the cooktop since this afternoon."]], uk: ["Smell of gas in the kitchen", ["Strong smell of gas near the hob since this afternoon."]] },
+  { trade: "gas", urgency: "urgent", price: [200, 420], au: ["Smell of gas in the kitchen", ["Strong smell of gas near the cooktop and it's getting stronger."]], uk: ["Smell of gas in the kitchen", ["Strong smell of gas near the hob and it's getting stronger."]] },
   { trade: "gas", urgency: "routine", price: [180, 320], au: ["Cooktop burner won't light", ["One of the gas burners clicks but won't light."]], uk: ["Hob ring won't light", ["One of the gas rings clicks but won't light."]] },
   { trade: "electrician", urgency: "routine", price: [160, 260], au: ["Bathroom light not working", ["Changed the globe but the bathroom light still won't turn on."]], uk: ["Bathroom light not working", ["Changed the bulb but the bathroom light still won't turn on."]] },
   { trade: "electrician", urgency: "routine", price: [160, 280], au: ["Power point not working", ["The power point next to the bed has no power."]], uk: ["Plug socket not working", ["The socket next to the bed has no power."]] },
@@ -171,6 +171,7 @@ const OWNER_TEMPLATES: Tpl[] = [
     uk: ["Damp patch spreading on the back wall", ["A damp patch on the back wall is getting bigger and the paint is bubbling."]],
     ukTrade: "damp",
     ukPrice: [900, 1600],
+    house: true,
     note: ["Compressor has failed. Replace the 2.5 kW split system, includes removing the old unit", "Inject a damp-proof course along the 4 m back wall and re-plaster"],
   },
   {
@@ -190,6 +191,7 @@ const OWNER_TEMPLATES: Tpl[] = [
     au: ["Shower leaking into the next room", ["The wall next to the shower is damp and the skirting is swelling."]],
     uk: ["Shower leaking through to the kitchen", ["There's a damp patch on the kitchen ceiling under the shower."]],
     ukPrice: [1100, 1900],
+    house: true,
     note: ["Strip and re-waterproof the shower recess, then re-tile", "Remove the tray, re-seal and re-tile the shower enclosure"],
   },
   {
@@ -361,13 +363,65 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
     return p;
   };
 
-  // Ages (hours) at which each stage was reached. Routine work is slower; urgent work fast.
+  // Ages (hours) at which each stage was reached: where each report starts before its timeline is built.
   const AGE: Record<Stage, [number, number]> = AU
     ? { new: [0.1, 4], sent: [3, 60], owner: [10, 70], booked: [20, 140], done: [30, 200], billed: [60, 600] }
     : { new: [0.2, 5], sent: [2, 70], owner: [8, 60], booked: [24, 150], done: [36, 220], billed: [70, 640] };
 
-  const jobs: Job[] = [];
+  // Every seeded time sits on the agency's clock (G4 round 3): managers act in office hours (Mon to Fri 8:30 to
+  // 5 pm), contractors reply in trade hours (Mon to Sat 7 am to 6 pm), a night-time urgent report goes through the
+  // after-hours path (on-call paged in minutes, the manager confirms at 8:30), urgent visits come 30 minutes to 3
+  // hours after the contractor accepts, on the quarter hour, and routine visits sit on business-hour slots after
+  // the notice period.
+  const M = 60_000;
+  const minutes = (a: number, b: number) => Math.round(between(a, b)) * M;
+  const q15 = (t: number) => Math.ceil(t / (15 * M)) * 15 * M;
+  const office = (t: number) => nextOpen(region, t, 510, 1020, ["Mon", "Tue", "Wed", "Thu", "Fri"]);
+  const tradeHours = (t: number) => nextOpen(region, t, 420, 1080, ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
+  const replyFor = (first: string, urgent: boolean) =>
+    `${urgent ? `Hi ${first}, thanks for letting us know. We're treating this as urgent and arranging a ${c.contractor} now.` : `Hi ${first}, thanks for reporting this. We've sent it to a ${c.contractor} and will confirm a time with you.`}\n\n${R.agency}`;
+
+  type Clock = { after: boolean; suggest: number; confirm: number; dispatch: number; quote?: number; accept?: number; visit?: number; done?: number; invoice?: number; last: number };
   const takenSlots = new Set<number>();
+  /** The job's whole timeline, built forwards from the report. */
+  const clockFor = (createdAt: number, stage: Stage, urgent: boolean, notice: number): Clock => {
+    const after = isAfterHours(region, createdAt);
+    const suggest = createdAt + minutes(1, 3);
+    if (stage === "new") return { after, suggest, confirm: 0, dispatch: 0, last: createdAt };
+    let confirm: number;
+    let dispatch: number;
+    if (urgent && after) {
+      dispatch = createdAt + minutes(3, 8);
+      confirm = office(createdAt) + minutes(5, 25);
+    } else {
+      confirm = (urgent ? createdAt : office(createdAt)) + minutes(5, urgent ? 20 : 75);
+      dispatch = confirm;
+    }
+    // A night-time urgent job does not wait for the manager: the 8:30 confirm may still be ahead (a weekend), and
+    // then the job is on the board with its reply not sent yet, as it would be in real life.
+    const k: Clock = { after, suggest, confirm, dispatch, last: urgent && after ? dispatch : Math.max(confirm, dispatch) };
+    if (stage === "sent") return k;
+    if (stage === "owner") {
+      k.quote = tradeHours(dispatch + between(2, 30) * H);
+      k.last = Math.max(k.last, k.quote);
+      return k;
+    }
+    k.accept = urgent ? dispatch + minutes(4, 20) : tradeHours(dispatch + between(1, 20) * H);
+    if (stage === "booked") {
+      k.last = Math.max(k.last, k.accept);
+      return k; // the visit itself is in the future, chosen below
+    }
+    k.visit = urgent ? q15(k.accept + between(0.5, 3) * H) : pick(slots(region, k.accept + notice * H, 6, 0));
+    k.done = k.visit + Math.round(between(4, 8)) * 15 * M;
+    k.last = Math.max(k.last, k.done);
+    if (stage === "billed") {
+      k.invoice = tradeHours(k.done + between(1, 30) * H);
+      k.last = Math.max(k.last, k.invoice);
+    }
+    return k;
+  };
+
+  const jobs: Job[] = [];
   STAGE_MIX.forEach((stage, i) => {
     const t = deal(stage);
     const trade = (!AU && t.ukTrade) || t.trade;
@@ -379,12 +433,30 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
     const urgent = t.urgency === "urgent";
     const [title, variants] = !AU && t.uk ? t.uk : t.au;
     const smoke = AU && isSmokeAlarm(title);
-    const scale = urgent ? 0.12 : 1;
-    let ageH = between(AGE[stage][0], AGE[stage][1]) * (stage === "billed" ? 1 : scale);
+    const notice = urgent ? 0 : smoke ? SMOKE_ALARM.noticeHours : R.noticeHours;
+    let ageH = between(AGE[stage][0], AGE[stage][1]) * (urgent && stage !== "billed" ? 0.12 : 1);
+    if (urgent && stage === "booked") ageH = between(0.6, 2.2); // accepted moments ago, visit still to come
     if (smoke && stage !== "billed") ageH = Math.min(ageH, 30); // the law's 2 business days
-    const createdAt = now - ageH * H;
+    // Routine work runs on office hours: place the job at a spread of points through its stage's target (most well
+    // inside it, a few due soon, one or two late), counted in office hours, so no day of the week paints the board
+    // one colour. The report comes a few office hours before it entered the stage.
+    let createdAt = now - ageH * H;
+    const target = TARGET_HOURS.routine[stage];
+    if (!urgent && !smoke && target && stage !== "new") {
+      const u = r();
+      const frac = u < 0.08 ? between(1.05, 1.35) : u < 0.25 ? between(0.76, 0.95) : between(0.05, 0.7);
+      const entered = officeBack(region, now, frac * target);
+      createdAt = officeBack(region, entered, stage === "sent" ? between(0.2, 1.2) : between(3, 14));
+    }
+    // Build the timeline; if any step would land in the future, the report moves earlier and it is built again.
+    let k = clockFor(createdAt, stage, urgent, notice);
+    for (let n = 0; n < 8 && k.last > now - 2 * M; n++) {
+      createdAt -= k.last - (now - 2 * M) + between(0.5, 3) * H;
+      k = clockFor(createdAt, stage, urgent, notice);
+    }
     const description = pick(variants);
     const contractor = assign(trade, urgent);
+    const first = prop.tenant.split(" ")[0];
     const job: Job = {
       id: `j${i + 1}`,
       ref: `${AU ? "HL" : "NG"}-${4100 + i}`,
@@ -394,136 +466,145 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       title,
       description,
       access: { mode: prop.keysAtOffice ? "keys" : "home", note: "", pets: r() < 0.25 },
+      afterHours: k.after,
       trade,
       urgency: t.urgency,
       stage,
       events: [{ at: createdAt, by: "tenant", text: "Reported by the tenant" }],
     };
-    let at = createdAt;
-    const step = (frac: number) => (at = Math.min(now - 60_000, createdAt + ageH * H * frac));
+    const ev = (at: number, by: Job["events"][number]["by"], text: string) => job.events.push({ at, by, text });
 
     if (stage !== "new") {
-      step(0.08);
       job.triage = {
         source: "ai",
-        at,
+        at: k.suggest,
         trade,
         urgency: t.urgency,
         reason: "",
         safety: [],
         emergency: [],
-        reply: "",
+        reply: replyFor(first, urgent),
         chargeTo: t.chargeTo ?? "owner",
         strataReferral: false,
         insuranceClaim: false,
-        confirmedAt: at,
+        confirmedAt: k.confirm <= now - M ? k.confirm : undefined,
       };
-      job.events.push({ at, by: "manager", text: "Triage confirmed, reply sent to the tenant" });
+      ev(k.suggest, "tapline", `AI suggested: ${tradeWho(region, trade)}, ${t.urgency}`);
+      if (job.triage.confirmedAt) ev(k.confirm, "manager", "Triage confirmed, reply sent to the tenant");
       job.contractorId = contractor.id;
+      job.stageEnteredAt = k.dispatch;
       if (urgent) {
         job.cap = R.urgentLimit;
-        job.ownerDecision = { decision: "urgent", at };
-        job.events.push({ at, by: "tapline", text: `Urgent: sent to on-call ${contractor.business} (up to ${money(region, R.urgentLimit)}), ${c.owner} notified` });
+        job.ownerDecision = { decision: "urgent", at: k.dispatch };
+        if (k.after) {
+          ev(k.dispatch, "tapline", `After hours: the tenant was told the on-call ${c.contractor} has been contacted`);
+          ev(k.dispatch, "tapline", `After hours: on-call ${contractor.business} paged (up to ${money(region, R.urgentLimit)}), ${c.owner} notified. Waiting for a manager to confirm the reply.`);
+        } else {
+          ev(k.dispatch, "tapline", `Urgent: sent to on-call ${contractor.business} (up to ${money(region, R.urgentLimit)}), ${c.owner} notified`);
+        }
       } else if (smoke) {
         job.cap = R.urgentLimit;
         job.dueBy = addBusinessDays(region, createdAt, SMOKE_ALARM.businessDays);
-        job.ownerDecision = { decision: "auto", at };
-        job.events.push({ at, by: "tapline", text: `Smoke alarm repair sent to ${contractor.business}: due within 2 business days by NSW law, no ${c.owner} approval needed, ${c.owner} notified` });
+        job.ownerDecision = { decision: "auto", at: k.dispatch };
+        ev(k.dispatch, "tapline", `Smoke alarm repair sent to ${contractor.business}: due within 2 business days by NSW law, no ${c.owner} approval needed, ${c.owner} notified`);
       } else {
         job.cap = owner.approvalLimit;
-        job.events.push({ at, by: "tapline", text: `${WO} sent to ${contractor.business}, up to ${money(region, owner.approvalLimit)}` });
+        ev(k.dispatch, "tapline", `${WO} sent to ${contractor.business}, up to ${money(region, owner.approvalLimit)}`);
       }
-      job.stageEnteredAt = at;
     }
 
     if (stage === "owner") {
-      step(0.5);
-      job.quote = { amount, note: t.note ? t.note[AU ? 0 : 1] : "Labour and parts", at };
-      job.events.push({ at, by: "contractor", text: `Quote sent: ${money(region, amount)}` });
-      job.events.push({ at, by: "tapline", text: `Over the ${money(region, owner.approvalLimit)} limit, sent to the ${c.owner} for approval` });
-      job.stageEnteredAt = at;
+      job.quote = { amount, note: t.note ? t.note[AU ? 0 : 1] : "Labour and parts", at: k.quote! };
+      ev(k.quote!, "contractor", `Quote sent: ${money(region, amount)}`);
+      ev(k.quote!, "tapline", `Over the ${money(region, owner.approvalLimit)} limit, sent to the ${c.owner} for approval`);
+      job.stageEnteredAt = k.quote!;
     }
 
     if (["booked", "done", "billed"].includes(stage)) {
       if (!urgent) {
         amount = Math.min(amount, job.cap!);
-        if (!smoke) job.ownerDecision = { decision: "auto", at: step(0.25) };
+        if (!smoke) job.ownerDecision = { decision: "auto", at: k.accept! };
       }
-      step(0.3);
-      const notice = urgent ? 0 : smoke ? SMOKE_ALARM.noticeHours : R.noticeHours;
-      let agreedEarly = false;
-      let slot: number;
       if (stage === "booked") {
-        // Urgent visits happen within hours, any time; routine ones on business-hour slots after the notice period.
-        const free = slots(region, Math.max(now, at + notice * H), 14, 1).filter((x) => !takenSlots.has(x));
-        slot = urgent ? now + between(0.5, 3) * H : pick(free.slice(0, 6));
-        takenSlots.add(slot);
-      } else if (urgent) {
-        slot = Math.min(at + between(0.5, 2) * H, now - 2 * H);
-      } else {
-        // A finished routine visit sat on a business-hour slot, after the notice period where there was time for it.
-        const past = (from: number) => slots(region, from, 40, 0).filter((x) => x < now - 2 * H);
-        let options = past(at + Math.max(2, notice) * H);
-        if (!options.length) {
-          options = past(at + 2 * H);
-          agreedEarly = notice > 2;
-        }
-        slot = options.length ? pick(options.slice(0, 6)) : Math.min(at + 2 * H, now - 2 * H);
+        const free = slots(region, Math.max(now + H, k.accept! + notice * H), 14, 0).filter((x) => !takenSlots.has(x));
+        k.visit = urgent ? Math.max(q15(k.accept! + between(0.5, 3) * H), q15(now + 20 * M)) : pick(free.slice(0, 6));
+        takenSlots.add(k.visit);
       }
-      job.bookedFor = slot;
-      job.events.push({ at, by: "contractor", text: `${contractor.business} accepted and booked a visit` });
-      if (agreedEarly) job.events.push({ at, by: "contractor", text: "The tenant agreed to an earlier time than the notice period" });
-      job.stageEnteredAt = at;
+      job.bookedFor = k.visit;
+      ev(k.accept!, "contractor", `${contractor.business} accepted and booked a visit`);
+      job.stageEnteredAt = k.accept!;
     }
     if (["done", "billed"].includes(stage)) {
-      job.completedAt = Math.min(now - 30 * 60_000, job.bookedFor! + 1.5 * H);
-      at = job.completedAt;
-      job.events.push({ at, by: "contractor", text: "Marked complete with a photo" });
-      job.stageEnteredAt = at;
+      job.completedAt = k.done!;
+      ev(k.done!, "contractor", "Marked complete with a photo");
+      job.stageEnteredAt = k.done!;
     }
     if (stage === "billed") {
       const inv = round5(amount * between(0.9, 1.0));
-      at = Math.min(now - 60_000, at + between(4, 40) * H);
-      job.invoice = { amount: inv, at, overApproved: false };
-      job.billedAt = at;
-      job.events.push({ at, by: "contractor", text: `Invoice uploaded: ${money(region, inv)} incl. ${c.tax}` });
-      job.events.push({ at, by: "tapline", text: `Bill entered in ${c.accounts}` });
-      job.stageEnteredAt = at;
+      job.invoice = { amount: inv, at: k.invoice!, overApproved: false };
+      job.billedAt = k.invoice!;
+      ev(k.invoice!, "contractor", `Invoice uploaded: ${money(region, inv)} incl. ${c.tax}`);
+      ev(k.invoice!, "tapline", `Bill entered in ${c.accounts}`);
+      job.stageEnteredAt = k.invoice!;
     }
+    job.events.sort((a, b) => a.at - b.at);
     jobs.push(job);
   });
 
-  // The demo's repeat-fault story: the property the tenant demo reports from
-  // already had a plumbing job 45 days ago.
+  /** A finished routine job from the past, on the same clock (the history behind the repeat faults). */
+  const pastJob = (at0: number, base: { id: string; ref: string; propertyId: string; title: string; description: string; trade: Trade; contractorId: string; cap: number; access?: Job["access"] }, inv: number): Job => {
+    const con = contractors.find((x) => x.id === base.contractorId)!;
+    const confirm = office(at0) + minutes(10, 60);
+    const accept = tradeHours(confirm + between(1, 8) * H);
+    const visit = slots(region, accept + R.noticeHours * H, 1, 0)[0];
+    const done = visit + 90 * M;
+    const billed = tradeHours(done + between(2, 24) * H);
+    const tenant = properties.find((p) => p.id === base.propertyId)!.tenant.split(" ")[0];
+    return {
+      ...base,
+      createdAt: at0,
+      stageEnteredAt: billed,
+      urgency: "routine",
+      stage: "billed",
+      afterHours: isAfterHours(region, at0),
+      triage: { source: "ai", at: at0 + 2 * M, trade: base.trade, urgency: "routine", reason: "", safety: [], emergency: [], reply: replyFor(tenant, false), chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: confirm },
+      ownerDecision: { decision: "auto", at: accept },
+      bookedFor: visit,
+      completedAt: done,
+      invoice: { amount: inv, at: billed, overApproved: false },
+      billedAt: billed,
+      events: [
+        { at: at0, by: "tenant", text: "Reported by the tenant" },
+        { at: at0 + 2 * M, by: "tapline", text: `AI suggested: ${tradeWho(region, base.trade)}, routine` },
+        { at: confirm, by: "manager", text: "Triage confirmed, reply sent to the tenant" },
+        { at: confirm, by: "tapline", text: `${WO} sent to ${con.business}, up to ${money(region, base.cap)}` },
+        { at: accept, by: "contractor", text: `${con.business} accepted and booked a visit` },
+        { at: done, by: "contractor", text: "Marked complete with a photo" },
+        { at: billed, by: "contractor", text: `Invoice uploaded: ${money(region, inv)} incl. ${c.tax}` },
+        { at: billed, by: "tapline", text: `Bill entered in ${c.accounts}` },
+      ],
+    };
+  };
+
+  // The demo's repeat-fault story: the property the tenant demo reports from already had a plumbing job 45 days ago.
   const prior = jobs.filter((j) => j.stage === "billed").pop();
   if (prior) {
-    const at0 = now - 45 * D;
-    const plumber = assign("plumber", false);
-    prior.propertyId = DEMO_PROPERTY;
-    prior.trade = "plumber";
-    prior.urgency = "routine";
-    prior.title = AU ? "Leak under the bathroom basin" : "Leak under the bathroom sink";
-    prior.description = "Slow leak from the pipe joint under the basin.";
-    prior.createdAt = at0;
-    prior.contractorId = plumber.id;
-    prior.cap = owners.find((o) => o.id === properties[6].ownerId)!.approvalLimit;
-    prior.triage = { source: "ai", at: at0 + 2 * H, trade: "plumber", urgency: "routine", reason: "", safety: [], emergency: [], reply: "", chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: at0 + 2 * H };
-    prior.ownerDecision = { decision: "auto", at: at0 + 2 * H };
-    prior.bookedFor = slots(region, at0 + R.noticeHours * H, 1, 0)[0];
-    prior.completedAt = prior.bookedFor + 1.5 * H;
-    const inv = AU ? 245 : 135;
-    prior.invoice = { amount: inv, at: at0 + 50 * H, overApproved: false };
-    prior.billedAt = at0 + 50 * H;
-    prior.stageEnteredAt = at0 + 50 * H;
-    prior.events = [
-      { at: at0, by: "tenant", text: "Reported by the tenant" },
-      { at: at0 + 2 * H, by: "manager", text: "Triage confirmed, reply sent to the tenant" },
-      { at: at0 + 2 * H, by: "tapline", text: `${WO} sent to ${plumber.business}, up to ${money(region, prior.cap)}` },
-      { at: at0 + 3 * H, by: "contractor", text: `${plumber.business} accepted and booked a visit` },
-      { at: prior.completedAt, by: "contractor", text: "Marked complete with a photo" },
-      { at: at0 + 50 * H, by: "contractor", text: `Invoice uploaded: ${money(region, inv)} incl. ${c.tax}` },
-      { at: at0 + 50 * H, by: "tapline", text: `Bill entered in ${c.accounts}` },
-    ];
+    const idx = jobs.indexOf(prior);
+    jobs[idx] = pastJob(
+      now - 45 * D,
+      {
+        id: prior.id,
+        ref: prior.ref,
+        propertyId: DEMO_PROPERTY,
+        title: AU ? "Leak under the bathroom basin" : "Leak under the bathroom sink",
+        description: "Slow leak from the pipe joint under the basin.",
+        trade: "plumber",
+        contractorId: assign("plumber", false).id,
+        cap: ownerOf(properties[6]).approvalLimit,
+        access: prior.access,
+      },
+      AU ? 245 : 135
+    );
   }
 
   // Two open repeat faults: the same fault at the same property, fixed a few weeks ago and back again.
@@ -531,41 +612,14 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
   const candidates = (st: Stage) => jobs.find((j) => j.stage === st && j.urgency === "routine" && !j.dueBy && j.propertyId !== DEMO_PROPERTY && !billedTitles.has(j.title));
   [candidates("sent"), candidates("booked")].forEach((j, k) => {
     if (!j) return;
-    const at0 = j.createdAt - (k ? 38 : 24) * D;
-    const con = contractors.find((x) => x.id === j.contractorId)!;
-    const visit = slots(region, at0 + R.noticeHours * H, 1, 0)[0];
-    const done = visit + 1.5 * H;
-    const inv = round5(Math.min(j.cap ?? 300, (j.cap ?? 300) * 0.55 + 40));
-    jobs.push({
-      id: `jh${k + 1}`,
-      ref: `${AU ? "HL" : "NG"}-${4071 + k * 12}`,
-      propertyId: j.propertyId,
-      createdAt: at0,
-      stageEnteredAt: done + 20 * H,
-      title: j.title,
-      description: j.description,
-      access: j.access,
-      trade: j.trade,
-      urgency: "routine",
-      stage: "billed",
-      contractorId: con.id,
-      cap: j.cap,
-      triage: { source: "ai", at: at0 + 2 * H, trade: j.trade, urgency: "routine", reason: "", safety: [], emergency: [], reply: "", chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: at0 + 2 * H },
-      ownerDecision: { decision: "auto", at: at0 + 3 * H },
-      bookedFor: visit,
-      completedAt: done,
-      invoice: { amount: inv, at: done + 20 * H, overApproved: false },
-      billedAt: done + 20 * H,
-      events: [
-        { at: at0, by: "tenant", text: "Reported by the tenant" },
-        { at: at0 + 2 * H, by: "manager", text: "Triage confirmed, reply sent to the tenant" },
-        { at: at0 + 2 * H, by: "tapline", text: `${WO} sent to ${con.business}, up to ${money(region, j.cap ?? 0)}` },
-        { at: at0 + 3 * H, by: "contractor", text: `${con.business} accepted and booked a visit` },
-        { at: done, by: "contractor", text: "Marked complete with a photo" },
-        { at: done + 20 * H, by: "contractor", text: `Invoice uploaded: ${money(region, inv)} incl. ${c.tax}` },
-        { at: done + 20 * H, by: "tapline", text: `Bill entered in ${c.accounts}` },
-      ],
-    });
+    const cap = j.cap ?? 300;
+    jobs.push(
+      pastJob(
+        j.createdAt - (k ? 38 : 24) * D,
+        { id: `jh${k + 1}`, ref: `${AU ? "HL" : "NG"}-${4071 + k * 12}`, propertyId: j.propertyId, title: j.title, description: j.description, trade: j.trade, contractorId: j.contractorId!, cap, access: j.access },
+        round5(Math.min(cap, cap * 0.55 + 40))
+      )
+    );
   });
 
   // Repeat faults are flagged once, from the same rule the board uses.

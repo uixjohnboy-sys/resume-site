@@ -108,12 +108,36 @@ function cleanSafety(steps: unknown, hazards: Hazard[]): string[] {
     .map((s) => noDash(String(s)).replace(/\s+/g, " ").trim().slice(0, 180))
     .filter((s) => s && !/\d{3}[\s-]?\d{3}/.test(s) && !/https?:\/\/|www\./i.test(s))
     .filter((s) => !(wet && /\b(bucket|towel|bowl|container)\b/i.test(s)))
+    // Calling anyone is the fixed text's job (verified names and numbers); moving electrical things near water never.
+    .filter((s) => !/\bcall\b/i.test(s) && !/\b(move|unplug|lift)\b.*\b(electric\w*|appliances?|power ?points?|plugs?|sockets?)\b/i.test(s))
     .map((s) => {
-      const risky = /\b(turn|switch|shut)\b.*\b(off|power|gas|water|electric\w*)\b|\b(stopcock|main water tap|switchboard|consumer unit|meter)\b/i.test(s);
-      const out = risky && !/^if it is safe/i.test(s) ? `If it is safe, ${s[0].toLowerCase()}${s.slice(1)}` : s;
+      // "If it is safe" once, at the start: strip every copy the model wrote, then add one where it belongs.
+      const bare = s.replace(/,?\s*if it(?:'s| is) safe( to do so)?,?\s*/gi, " ").replace(/\s+/g, " ").trim();
+      const risky = /\b(turn|switch|shut)\b.*\b(off|power|gas|water|electric\w*)\b|\b(stopcock|main water tap|switchboard|consumer unit|meter)\b/i.test(bare);
+      const body = `${bare[0]?.toUpperCase() ?? ""}${bare.slice(1)}`;
+      const out = risky ? `If it is safe, ${bare[0]?.toLowerCase() ?? ""}${bare.slice(1)}` : body;
       return /[.!?]$/.test(out) ? out : `${out}.`;
-    });
+    })
+    .filter((s) => s.length > 3);
 }
+
+// What each fixed emergency text already says. An AI step on the same ground is dropped, so the tenant reads each
+// instruction once, in the verified wording (G4 round 3: the stopcock step appeared twice, once without "if dry").
+const COVERED: Partial<Record<Hazard, RegExp>> = {
+  flood: /\b(water (off|supply|main)|stopcock|main water tap|water main|turn (off )?the water|belongings|furniture|valuables)\b/i,
+  electric: /\b(switchboard|consumer unit|fuse ?box|power (off|supply)|turn (off )?the power|circuit breaker|main switch|(don'?t|do not|avoid) touch)\b/i,
+  electricWater: /\b(switchboard|consumer unit|fuse ?box|power (off|supply)|turn (off )?the power|circuit breaker|main switch|(don'?t|do not|avoid) touch)\b/i,
+  gas: /\b(gas (off|meter|supply)|meter|windows|doors|leave|naked flames?|light switch\w*|ignit\w*|sparks?)\b/i,
+  co: /\b(fresh air|outside|appliances? off)\b/i,
+  fire: /\b(get (everyone )?out|leave|evacuate)\b/i,
+  ceiling: /\b(stay out|keep (everyone|people|children|kids) (out|away)|stand|under (the|it))\b/i,
+  security: /\b(valuables|neighbou?r|friend|police)\b/i,
+};
+const notCovered = (steps: string[], hazards: Hazard[]) => steps.filter((s) => !hazards.some((h) => COVERED[h]?.test(s)));
+
+/** A related job the AI names counts only for the same trade, or water to water (a roof leak behind a stain). */
+const WATER: Trade[] = ["plumber", "roofer", "damp"];
+const related = (a: Trade, b: Trade) => a === b || (WATER.includes(a) && WATER.includes(b));
 
 function rulesDraft(sb: Sandbox, job: Job): Draft {
   const r = ruleTriage(`${job.title}. ${job.description}`, sb.region);
@@ -122,7 +146,9 @@ function rulesDraft(sb: Sandbox, job: Job): Draft {
     trade: r.trade,
     urgency: r.urgency,
     hazards: r.hazards,
-    reason: r.matched.length ? `Urgent words found: ${r.matched.join(", ")}.` : "No urgent words found, so it is treated as routine.",
+    reason:
+      (r.matched.length ? `Urgent words found: ${r.matched.join(", ")}.` : "No urgent words found, so it is treated as routine.") +
+      (r.weak.length ? ` Worth a check: ${r.weak.join(", ")}.` : ""),
     safety: [],
     reply: "",
     chargeTo: /lost (my |the )?keys|locked (myself )?out/i.test(`${job.title} ${job.description}`) ? "tenant" : "owner",
@@ -149,7 +175,7 @@ ${tradeGlossary(sb.region)}
 "hazards": an array with any of ${HAZARDS.map((h) => `"${h}"`).join(", ")} that clearly apply now (gas = gas smell or leak, co = carbon monoxide alarm or symptoms, fire = actual fire, flames, smoke or a burning smell (not a gas fire heater, a fire alarm chirp or a fire door), electricWater = water on or near lights or power, electric = sparks, exposed wires or shocks, ceiling = a ceiling that is sagging, bulging or has fallen, flood = water spreading now or coming through a ceiling, security = the home cannot be locked or was broken into). Empty if none.
 "reason": one sentence, at most 25 words, for the ${c.manager}. You may mention related earlier jobs here.
 "relatedRef": the ref of ONE earlier job from the repair history that is likely the same fault or its cause, or null. Only a ref listed in the history.
-"safety": 0 to 3 short practical steps the tenant can safely take now, for urgent jobs only (empty for routine). Use these words: "${c.waterMain}", "${c.switchboard}", "${c.powerPoint}". Begin any step about power, gas or water with "If it is safe,". End each step with a full stop. Never tell anyone to stand under or put anything under a sagging or wet ceiling or a dripping light. No phone numbers: the system adds verified emergency contacts itself.
+"safety": 0 to 3 short practical steps the tenant can safely take now, for urgent jobs only (empty for routine). Use these words: "${c.waterMain}", "${c.switchboard}", "${c.powerPoint}". Begin any step about power, gas or water with "If it is safe,". End each step with a full stop. Never tell anyone to stand under or put anything under a sagging or wet ceiling or a dripping light. The system adds fixed, verified emergency text for every hazard you list (turning off the gas, water or power, leaving, moving belongings, who to call): your steps must only add what that text does not cover (for example keeping children and pets away from the area, or taking photos for the record). An empty list is fine. Never tell the tenant to call anyone, and no phone numbers.
 "reply": a message to the tenant, at most 50 words, warm and plain, in ${AU ? "Australian" : "British"} English, starting "Hi ${tenant.split(" ")[0]},". Give no instructions or safety steps in the reply: the safety list and the fixed emergency text carry them. Do not guess the cause, do not admit fault, do not mention earlier repairs, do not promise any time or day (not "soon" or "shortly" either), do not include phone numbers, links or prices, do not refer to steps "above" or "below", and do not sign off.
 "chargeTo": "owner", "tenant" (only when the tenant clearly caused it, for example lost keys) or "strata" (only for common property in a strata scheme or managed block).
 "strataReferral": true if the cause is likely common property or another unit/flat (only possible when the property is in a strata scheme or managed block).
@@ -248,9 +274,11 @@ export async function POST(req: Request) {
       raised = true;
       draft.reason = `${draft.reason} Raised to urgent by keyword rules (${rules.matched.join(", ")}).`.trim();
     }
+    draft.safety = notCovered(draft.safety, hazards);
     // NSW smoke alarms have their own fixed path (an electrician within 2 business days, no owner approval, no
-    // after-hours page) unless there is smoke or fire.
-    if (region === "AU" && isSmokeAlarm(text) && !hazards.includes("fire")) {
+    // after-hours page), but only for the alarm itself: any hazard found by the AI or the rules (water pouring
+    // through the alarm, smoke) keeps the job on its emergency path.
+    if (region === "AU" && isSmokeAlarm(text) && hazards.length === 0) {
       draft.trade = "electrician";
       if (draft.urgency === "urgent") draft.reason = `${draft.reason} Smoke alarm fault with no smoke or fire: routine, but due within 2 business days by NSW law.`.trim();
       draft.urgency = "routine";
@@ -262,7 +290,7 @@ export async function POST(req: Request) {
       const j = loaded.sb.jobs.find((x) => x.id === jobId);
       if (!j || j.triage || j.stage !== "new") return { ok: true, sb: loaded.sb };
       // Only a ref the AI was shown counts as related; otherwise the narrow same-trade rule.
-      const named = draft.source === "ai" ? historyJobs.find((x) => x.ref === draft.relatedRef) : undefined;
+      const named = draft.source === "ai" ? historyJobs.find((x) => x.ref === draft.relatedRef && related(x.trade, draft.trade)) : undefined;
       const urgent = draft.urgency === "urgent";
       const triage: Triage = {
         source: draft.source,
@@ -277,6 +305,7 @@ export async function POST(req: Request) {
         chargeTo: draft.chargeTo,
         strataReferral: draft.strataReferral,
         insuranceClaim: draft.insuranceClaim,
+        raisedBy: raised ? rules.matched : undefined,
         repeatOf: named
           ? { ref: named.ref, title: named.title, trade: named.trade, daysAgo: Math.round((j.createdAt - named.createdAt) / 86400_000) }
           : draft.source === "ai"

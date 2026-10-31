@@ -1,4 +1,4 @@
-import { REGION, SMOKE_ALARM, TRADE_IDS, addBusinessDays, emergencyText, isAfterHours, isSmokeAlarm, money, ruleTriage, slots, terms, tradeWho } from "./rules";
+import { REGION, SMOKE_ALARM, TRADE_IDS, addBusinessDays, emergencyText, isAfterHours, isSmokeAlarm, money, ruleTriage, slots, terms, tradeWho, when } from "./rules";
 import { priorRelated } from "./seed";
 import type { Access, ChargeTo, Job, Sandbox, Stage, Trade, Triage, Urgency } from "./types";
 
@@ -40,13 +40,16 @@ type Result = { ok: true; sb: Sandbox; jobId?: string } | { ok: false; error: st
 
 const H = 3600_000;
 const D = 24 * H;
-const MAX_JOBS = 150;
+// Size limits keep a demo small (the database is shared until the demo one is split out).
+const MAX_JOBS = 100;
+const MAX_EVENTS = 30;
+const LONG = { ok: false as const, error: "This job has a long history now. Use Reset demo to start again." };
 
 // ---------- input checks ----------
 
 const BIDI = /[‪-‮⁦-⁩‎‏]/g;
 // Zero-width and other invisible format characters: a title of three of them is not a title.
-const INVISIBLE = /[\u00AD\u180E\u200B-\u200D\u2060-\u2064\uFEFF]/g;
+const INVISIBLE = /[\u00AD\u115F\u1160\u17B4\u17B5\u180E\u200B-\u200D\u2060-\u2064\u2800\u3164\uFEFF\uFFA0]/g;
 const CONTROL = /[\u0000-\u0008\u000B-\u001F\u007F]/g;
 
 /** Plain text: trimmed, control and bidi characters removed, newlines kept, cut by characters (not UTF-16 units). */
@@ -132,6 +135,8 @@ function dispatch(sb: Sandbox, j: Job, trade: Trade, urgency: Urgency, chargeTo:
     j.cap = R.urgentLimit;
     j.ownerDecision = { decision: "urgent", at: now };
     j.events.push({ at: now, by: "tapline", text: `Urgent: sent to on-call ${con.business} (up to ${money(sb.region, j.cap)}), ${c.owner} notified` });
+    // An urgent smoke alarm job (water or smoke at the alarm) still carries the law's 2-business-day deadline.
+    if (sb.region === "AU" && trade === "electrician" && isSmokeAlarm(`${j.title} ${j.description}`)) j.dueBy = addBusinessDays(sb.region, j.createdAt, SMOKE_ALARM.businessDays);
   } else if (sb.region === "AU" && trade === "electrician" && isSmokeAlarm(`${j.title} ${j.description}`)) {
     j.cap = R.urgentLimit;
     j.dueBy = addBusinessDays(sb.region, j.createdAt, SMOKE_ALARM.businessDays);
@@ -174,7 +179,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       const title = text(a.title, 80);
       const description = text(a.description, 600);
       if (!p) return { ok: false, error: "We couldn't find that property. Reload the page and try again." };
-      if (Array.from(title).length < 3) return { ok: false, error: "Please describe the problem in a few words." };
+      if (Array.from(title).length < 3 || (title.match(/[\p{L}\p{N}]/gu) ?? []).length < 2) return { ok: false, error: "Please describe the problem in a few words." };
       if (next.jobs.length >= MAX_JOBS) return { ok: false, error: "This demo is full. Use Reset demo to start again." };
       const j: Job = {
         id: newId(now),
@@ -203,10 +208,11 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       j.trade = a.triage.trade;
       j.urgency = a.triage.urgency;
       const who = a.triage.source === "ai" ? "AI" : "Keyword rules";
+      const level = a.triage.raisedBy?.length ? `routine, raised to urgent by keyword rules (${a.triage.raisedBy.join(", ")})` : a.triage.urgency;
       j.events.push({
         at: now,
         by: "tapline",
-        text: `${who} suggested: ${tradeWho(next.region, a.triage.trade)}, ${a.triage.urgency}${a.triage.repeatOf ? `, related to ${a.triage.repeatOf.ref}` : ""}`,
+        text: `${who} suggested: ${tradeWho(next.region, a.triage.trade)}, ${level}${a.triage.repeatOf ? `, related to ${a.triage.repeatOf.ref}` : ""}`,
       });
       return { ok: true, sb: next };
     }
@@ -238,11 +244,13 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
 
     case "confirm": {
       const j = job(a.jobId);
-      // After hours the on-call contractor may accept before a manager is in: the morning confirm still sends the reply.
-      const dispatched = !!j && j.afterHours === true && !j.triage?.confirmedAt && (j.stage === "sent" || j.stage === "booked");
+      // After hours the on-call contractor may accept, and even finish, before a manager is in: the morning
+      // confirm still sends the reply. Once the work is done it changes only the reply and the flags.
+      const dispatched = !!j && j.afterHours === true && !!j.triage && !j.triage.confirmedAt && j.stage !== "new";
       if (!j || !((j.stage === "new" && !j.hold) || dispatched)) return handled;
-      const trade = oneOf(a.trade, TRADE_IDS);
-      const urgency = oneOf(a.urgency, URGENCIES);
+      const workDone = j.stage === "done" || j.stage === "billed";
+      const trade = workDone ? j.trade : oneOf(a.trade, TRADE_IDS);
+      const urgency = workDone ? j.urgency : oneOf(a.urgency, URGENCIES);
       let chargeTo = oneOf(a.chargeTo, CHARGES) ?? "owner";
       if (chargeTo === "strata" && !prop(j).strata) chargeTo = "owner";
       if (!trade || !urgency) return { ok: false, error: "Choose a trade and an urgency before confirming." };
@@ -290,6 +298,10 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       enter(j, "booked", now);
       const con = next.contractors.find((x) => x.id === j.contractorId);
       j.events.push({ at: now, by: "contractor", text: `${con?.business ?? cap(c.contractor)} accepted and booked a visit` });
+      if (j.dueBy && now < j.dueBy && slot > j.dueBy) {
+        j.bookedFor = undefined;
+        return { ok: false, error: `This repair is due by ${when(next.region, j.dueBy)} (NSW law). Pick an earlier time.` };
+      }
       if (agreed && j.urgency !== "urgent" && slot < now + noticeHours(next, j) * H) j.events.push({ at: now, by: "contractor", text: "The tenant agreed to an earlier time than the notice period" });
       return { ok: true, sb: next };
     }
@@ -297,6 +309,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
     case "quote": {
       const j = job(a.jobId);
       if (!j || j.stage !== "sent" || j.urgency === "urgent") return handled;
+      if (j.events.length >= MAX_EVENTS) return LONG;
       const amount = amountOf(a.amount);
       if (amount === null) return { ok: false, error: "Enter the quote amount, for example 380 or 380.50." };
       const note = text(a.note, 200) || "Labour and parts";
@@ -342,6 +355,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       const q = text(a.text, 300);
       if (!j || j.stage !== "owner") return { ok: false, error: "This quote has already been approved or declined." };
       if (!q) return { ok: false, error: "Type your question first." };
+      if (j.events.length >= MAX_EVENTS) return LONG;
       j.ownerQuestion = q;
       j.events.push({ at: now, by: "owner", text: `Asked: "${q}"` });
       return { ok: true, sb: next };
@@ -350,6 +364,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
     case "requote": {
       const j = job(a.jobId);
       if (!j || j.hold !== "ownerDeclined") return handled;
+      if (j.events.length >= MAX_EVENTS) return LONG;
       j.hold = undefined;
       j.quote = undefined;
       j.ownerDecision = undefined;

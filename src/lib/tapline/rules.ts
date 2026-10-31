@@ -185,11 +185,16 @@ export function stageLabel(r: Region, s: Stage) {
 }
 export const STAGE_ORDER: Stage[] = ["new", "sent", "owner", "booked", "done", "billed"];
 
-// Agency service targets, hours in a stage. The demo agency's settings, not law.
+// Agency service targets, hours in a stage. The demo agency's settings, not law. Urgent work runs on the wall
+// clock; routine work on office hours (Mon to Fri 8:30 to 5 pm, 8.5 h a day), so a weekend never turns the board red:
+// 1 business day to triage, 2 to get a time or a quote, 2 for the owner, 5 to the visit.
 export const TARGET_HOURS: Record<Urgency, Partial<Record<Stage, number>>> = {
   urgent: { new: 1, sent: 1, owner: 2, booked: 4 },
-  routine: { new: 24, sent: 48, owner: 48, booked: 168 },
+  routine: { new: 8.5, sent: 17, owner: 17, booked: 42.5 },
 };
+export const OFFICE_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+export const OFFICE_OPEN = 510; // 8:30
+export const OFFICE_CLOSE = 1020; // 17:00
 
 // ---------- money and time ----------
 
@@ -224,15 +229,67 @@ export function day(region: Region, t: number) {
 }
 
 /** Hour and weekday in the agency's zone. */
+// One formatter per region: building an Intl.DateTimeFormat is slow, and the seed asks for local times often.
+const FORMATTERS: Partial<Record<Region, Intl.DateTimeFormat>> = {};
 function local(region: Region, t: number) {
-  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: REGION[region].tz, hour: "numeric", minute: "numeric", weekday: "short", hour12: false }).formatToParts(t);
+  const f = (FORMATTERS[region] ??= new Intl.DateTimeFormat("en-GB", { timeZone: REGION[region].tz, hour: "numeric", minute: "numeric", weekday: "short", hour12: false }));
+  const parts = f.formatToParts(t);
   const get = (k: string) => parts.find((p) => p.type === k)?.value ?? "";
   return { hour: Number(get("hour")) % 24, minute: Number(get("minute")), weekday: get("weekday") };
 }
 
 export function isAfterHours(region: Region, t: number) {
   const l = local(region, t);
-  return l.weekday === "Sat" || l.weekday === "Sun" || l.hour < 8 || l.hour >= 18;
+  const m = l.hour * 60 + l.minute;
+  // Outside office hours (Mon to Fri 8:30 to 5 pm): the on-call path takes over.
+  return !OFFICE_DAYS.includes(l.weekday) || m < OFFICE_OPEN || m >= OFFICE_CLOSE;
+}
+
+/** The first moment at or after `t` inside a daily window (minutes after midnight, agency zone) on the given weekdays. */
+export function nextOpen(region: Region, t: number, open: number, close: number, days: string[]) {
+  let x = Math.ceil(t / 60_000) * 60_000;
+  for (let guard = 0; guard < 10; guard++) {
+    const l = local(region, x);
+    const m = l.hour * 60 + l.minute;
+    const today = days.includes(l.weekday);
+    if (today && m >= open && m < close) return x;
+    x += (today && m < open ? open - m : 24 * 60 - m + open) * 60_000;
+  }
+  return x;
+}
+
+/** Office hours (Mon to Fri 8:30 to 5 pm, agency zone) between two moments. */
+export function officeHours(region: Region, a: number, b: number) {
+  let total = 0;
+  let x = a;
+  for (let guard = 0; guard < 120 && x < b; guard++) {
+    const open = nextOpen(region, x, OFFICE_OPEN, OFFICE_CLOSE, OFFICE_DAYS);
+    if (open >= b) break;
+    const l = local(region, open);
+    const close = open + (OFFICE_CLOSE - (l.hour * 60 + l.minute)) * 60_000;
+    total += Math.min(close, b) - open;
+    x = close;
+  }
+  return total / 3600_000;
+}
+
+/** The moment `hours` office hours before `t` (the inverse of officeHours). */
+export function officeBack(region: Region, t: number, hours: number) {
+  let x = t;
+  let left = hours * 60;
+  for (let guard = 0; guard < 200; guard++) {
+    const l = local(region, x);
+    const m = l.hour * 60 + l.minute;
+    if (OFFICE_DAYS.includes(l.weekday) && m > OFFICE_OPEN && m <= OFFICE_CLOSE) {
+      const avail = m - OFFICE_OPEN;
+      if (left <= avail) return x - left * 60_000;
+      left -= avail;
+      x -= (avail + 24 * 60 - OFFICE_CLOSE + OFFICE_OPEN) * 60_000; // back to the previous day's 5 pm
+    } else {
+      x -= (m > OFFICE_CLOSE ? m - OFFICE_CLOSE : m + 24 * 60 - OFFICE_CLOSE) * 60_000; // back to the last 5 pm
+    }
+  }
+  return x;
 }
 
 /** A deadline `n` business days (Mon to Fri) after `t`, at 5 pm that day in the agency's zone. */
@@ -266,16 +323,39 @@ export function slots(region: Region, from: number, count: number, leadHours: nu
 
 export type Hazard = "gas" | "co" | "fire" | "electricWater" | "electric" | "ceiling" | "flood" | "security";
 
-const HAZARDS: [Hazard, RegExp][] = [
-  ["co", /\b(carbon monoxide|co alarm|co detector)\b/],
-  ["gas", /\b(smell(s|ing)? (of )?gas|gas (leak|smell)|leaking gas|rotten eggs?|gas (bottle|cylinder) (is )?(leaking|hissing)|hissing (from|near) the gas)\b/],
+// Things that can smoke, spark or shock: "smoke from the oven" is a fire, "smoke from next door" is not.
+const THING = "(oven|stove|cooktop|hob|heater|power ?points?|sockets?|switch(board)?|outlets?|plugs?|walls?|ceiling|roof|meter|fuse ?box|wires?|wiring|dryer|washing machine|fridge|microwave|kettle|lights?|fan|air ?con|boiler|appliance|tap|taps)";
+const R = (s: string) => new RegExp(s);
+
+// Strong phrases raise urgency on their own. Weak words ("flame", "smoking", "won't lock", "sewage") are everyday
+// words that are only emergencies in context: they never raise anything by themselves (G4 round 3: "pilot flame",
+// "neighbour smoking", "flood light", "bathroom door won't lock" all paged the on-call contractor).
+const HAZARDS: [Hazard, RegExp, RegExp][] = [
+  ["co", /\b(carbon monoxide|co alarm|co detector)\b/, /$^/],
+  ["gas", /\b(smell(s|ing)? (of )?gas|gas (leak|smell)|leaking gas|rotten eggs?|gas (bottle|cylinder) (is )?(leaking|hissing)|hissing (from|near) the gas)\b/, /$^/],
   // Never the bare word "fire": "gas fire", "fire alarm" and "fire door" are everyday words, not emergencies.
-  ["fire", /\b(on fire|caught fire|catching fire|flames?|smoke (is )?(coming|pouring|filling)|smoking|burning smell|smell of burning|smells? (like |of )?burn(ing|t))\b/],
-  ["electricWater", /\b((water|dripping|leaking)( \w+){0,4} (light|lights|light fitting|downlights?|power ?points?|sockets?|switch(es)?)|wet (light|socket|power ?point))\b/],
-  ["electric", /\b(spark(s|ing|ed)?|exposed wires?|electric shock|shocked me|(a |an )?shock from|no power|power (is )?out|tripped (and|but) won't reset)\b/],
-  ["ceiling", /\b(sagging|bulging|collaps(e|ed|ing)) (the )?ceiling|ceiling (is |has )?(sagging|bulging|collaps(e|ed|ing)|fallen|come down|caved in)\b/],
-  ["flood", /\b(burst|flood(ed|ing)?|gushing|water (is )?pouring|through the ceiling|ceiling (is )?leaking|ceiling leak|sewage|toilet (is )?overflow(ing)?)\b/],
-  ["security", /\b(won'?t lock|will not lock|cannot lock|can'?t lock|broken lock|locked out|forced (entry|open)|break-?in|broke in|broken into|kicked (the |our )?(front |back )?door in|smashed (the )?(back |front )?(window|door|glass)(es)?)\b/],
+  [
+    "fire",
+    R(`\\b(on fire|caught fire|catching fire|flames? (are |is )?(coming|shooting|pouring|out of|from)|smoke (is )?(coming|pouring|billowing)( out)?( of| from)?|smoke from (the |a |our )?${THING}|${THING} (is |are )?(smoking|on fire|burning)|${THING}( \\w+){1,3} (is|are) (smoking|on fire|burning)|full of smoke|smoke everywhere|burning smell|smell of burning|smells? (like |of )?burn(ing|t))\\b`),
+    /\b(flames?|smok(e|ing))\b/,
+  ],
+  ["electricWater", /\b((water|dripping|leaking)( \w+){0,4} (light|lights|light fitting|downlights?|power ?points?|sockets?|switch(es)?)|wet (light|socket|power ?point))\b/, /$^/],
+  [
+    "electric",
+    R(`\\b(spark(s|ing|ed)?|exposed wires?|electric shock|shocked me|(?<!static )shock from (the |a )?(\\w+ ){0,2}${THING}|no power (in|to) (the )?(whole|entire|house|flat|unit|home|property)|no power (anywhere|at all)|power (is )?out|tripped (and|but) won'?t reset)\\b`),
+    /\b(shock|no power)\b/,
+  ],
+  ["ceiling", /\b(sagging|bulging|collaps(e|ed|ing)) (the )?ceiling|ceiling (is |has )?(sagging|bulging|collaps(e|ed|ing)|fallen|come down|caved in)\b/, /$^/],
+  [
+    "flood",
+    /\b(burst|flooded|flooding|(a|is a) flood(?! ?lights?)|gushing|water (is )?(pouring|spreading|everywhere)|through the ceiling|ceiling (is )?leaking|ceiling leak|sewage (is )?(coming|backing|overflowing|everywhere|on the floor|in the)|toilet (is )?overflow(ing)?|overflowing (onto|into|on) the)\b/,
+    /\b(sewage|flood|overflow\w*)\b/,
+  ],
+  [
+    "security",
+    /\b((front|back|main|entry|sliding|balcony|patio|garage|security)( \w+)? door (won'?t|will not|doesn'?t|does not|can'?t|cannot) (lock|close|shut)|(can'?t|cannot|unable to) (lock|secure) (the )?(house|flat|unit|home|property|front|back|place)|locked out|forced (entry|open)|break-?in|broke in|broken into|kicked (the |our )?(front |back )?door in|smashed (the )?(back |front )?(window|door|glass)(es)?|window (won'?t|will not) (lock|close|shut))\b/,
+    /\b(won'?t lock|will not lock|can'?t lock|broken lock)\b/,
+  ],
 ];
 
 const URGENT_EXTRA = /\b(no hot water|no heating|boiler (has )?(stopped|broken|not working)|no water at all)\b/;
@@ -312,16 +392,20 @@ export const isSmokeAlarm = (text: string) => /\b(smoke|heat|fire) (alarm|detect
  * approval, and the tenant needs only 1 hour's notice for the repair itself (NSW Fair Trading). */
 export const SMOKE_ALARM = { businessDays: 2, noticeHours: 1 };
 
-export function ruleTriage(text: string, region?: Region): { trade: Trade; urgency: Urgency; hazards: Hazard[]; matched: string[] } {
+export function ruleTriage(text: string, region?: Region): { trade: Trade; urgency: Urgency; hazards: Hazard[]; matched: string[]; weak: string[] } {
   const t = ` ${text.toLowerCase().replace(/\s+/g, " ")} `;
   const hazards: Hazard[] = [];
   const matched: string[] = [];
-  for (const [h, re] of HAZARDS) {
-    const m = hit(t, re);
+  const weak: string[] = [];
+  for (const [h, strong, soft] of HAZARDS) {
+    const m = hit(t, strong);
     if (m) {
       hazards.push(h);
       matched.push(m.trim());
+      continue;
     }
+    const w = hit(t, soft);
+    if (w) weak.push(w.trim());
   }
   const extra = hit(t, URGENT_EXTRA);
   if (extra) matched.push(extra.trim());
@@ -338,7 +422,7 @@ export function ruleTriage(text: string, region?: Region): { trade: Trade; urgen
   }
   // England: hot water comes from the gas boiler, so it is a Gas Safe heating engineer's job.
   if (region === "UK" && trade === "plumber" && /\bhot water\b/.test(t)) trade = "hvac";
-  return { trade, urgency: hazards.length || extra ? "urgent" : "routine", hazards, matched };
+  return { trade, urgency: hazards.length || extra ? "urgent" : "routine", hazards, matched, weak };
 }
 
 // ---------- fixed emergency text (verified numbers, 2026-10-31) ----------

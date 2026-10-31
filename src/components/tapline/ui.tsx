@@ -47,10 +47,10 @@ export function TradeIcon({ trade, size = 14 }: { trade: Trade; size?: number })
   return <I size={size} stroke={1.75} aria-hidden="true" />;
 }
 
-export function TimerChip({ state, hours }: { state: ClockState; hours: number }) {
+export function TimerChip({ state, hours, office = false }: { state: ClockState; hours: number; office?: boolean }) {
   const word = state === "late" ? "Overdue" : state === "soon" ? "Due soon" : null;
   return (
-    <span className={`tl-chip tl-chip-${state}`} title="Time in this stage">
+    <span className={`tl-chip tl-chip-${state}`} title={office ? "Office hours in this stage (routine work)" : "Time in this stage"}>
       {word ? (
         <>
           <span className="tl-chip-word">{word}</span>&nbsp;({dur(hours)})
@@ -143,6 +143,26 @@ export function ConfirmDialog({ title, body, confirm, onConfirm, onClose }: { ti
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * An error inside a dialog: announced, focused (so focus is never dropped on a refused action), and placed
+ * next to what needs fixing instead of under a toast.
+ */
+export function InlineError({ error, onDismiss }: { error: string | null; onDismiss: () => void }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (error) ref.current?.focus();
+  }, [error]);
+  if (!error) return null;
+  return (
+    <p className="tl-inline-error" role="alert" tabIndex={-1} ref={ref}>
+      {error}
+      <button type="button" onClick={onDismiss}>
+        Dismiss
+      </button>
+    </p>
   );
 }
 

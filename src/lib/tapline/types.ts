@@ -56,6 +56,8 @@ export type Triage = {
   insuranceClaim: boolean;
   repeatOf?: { ref: string; title: string; trade: Trade; daysAgo: number };
   confirmedAt?: number;
+  /** Words the keyword rules raised it on, when the AI said routine (shown in the log, never hidden). */
+  raisedBy?: string[];
 };
 
 export type JobEvent = { at: number; by: Actor; text: string };

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { DEMO_PROPERTY } from "@/lib/tapline/seed";
 import type { Access, Sandbox } from "@/lib/tapline/types";
 import { PhotoPick } from "./PhonePieces";
-import { TryOnPhone, phoneLink } from "./ui";
+import { InlineError, TryOnPhone, phoneLink } from "./ui";
 import { useDialog } from "./useDialog";
 import type { useSandbox } from "./useSandbox";
 
@@ -96,6 +96,7 @@ export default function TenantReport({
             {busy ? "Sending..." : "Send report"}
           </button>
           {title.trim().length < 3 && <p className="tl-hint">Describe the problem in a few words to send it.</p>}
+          <InlineError error={api.error} onDismiss={() => api.setError(null)} />
         </form>
         <TryOnPhone url={phoneLink(id, "tenant")} who="tenant" />
       </div>

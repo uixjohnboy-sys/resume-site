@@ -86,8 +86,8 @@ export default function PhoneView({ role }: { role: PhoneRole }) {
               }}
             />
           ))}
-        {role === "owner" && (job ? <OwnerView s={s} j={job} /> : <Missing />)}
-        {role === "tradie" && (job ? <ContractorView s={s} j={job} /> : <Missing />)}
+        {role === "owner" && (job ? <OwnerView key={`${job.id}-${job.stage}`} s={s} j={job} /> : <Missing />)}
+        {role === "tradie" && (job ? <ContractorView key={`${job.id}-${job.stage}`} s={s} j={job} /> : <Missing />)}
       </main>
       {status}
     </div>
@@ -181,7 +181,7 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
   const at = j.stage === "new" ? 0 : j.stage === "sent" || j.stage === "owner" ? 1 : j.stage === "booked" ? 2 : 3;
   const con = sb.contractors.find((t) => t.id === j.contractorId);
   const t = j.triage;
-  const autoSafety = j.afterHours && j.stage !== "new" && t && !t.confirmedAt;
+  const autoSafety = j.afterHours && t && t.urgency === "urgent" && !t.confirmedAt;
   return (
     <div className="tl-m-card">
       <h1 ref={h1} tabIndex={-1}>
@@ -238,7 +238,17 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
   );
 }
 
+/** A view re-mounted after an action moves focus to its heading, unless the user is already inside it. */
+function useRefocus() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (document.activeElement === document.body) ref.current?.querySelector<HTMLElement>("h1")?.focus();
+  }, []);
+  return ref;
+}
+
 function OwnerView({ s, j }: { s: S; j: Job }) {
+  const card = useRefocus();
   const sb = s.sb!;
   const c = terms(sb.region);
   const p = sb.properties.find((x) => x.id === j.propertyId)!;
@@ -247,9 +257,9 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
   const [ask, setAsk] = useState(false);
   const [question, setQuestion] = useState("");
   return (
-    <div className="tl-m-card">
+    <div className="tl-m-card" ref={card}>
       <p className="tl-m-sub">Hi {o.name.split(" ")[0]}, a repair at your property needs your OK.</p>
-      <h1>{j.title}</h1>
+      <h1 tabIndex={-1}>{j.title}</h1>
       <p className="tl-m-sub">
         {p.address}, {p.suburb}
       </p>
@@ -311,6 +321,7 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
 }
 
 function ContractorView({ s, j }: { s: S; j: Job }) {
+  const card = useRefocus();
   const sb = s.sb!;
   const c = terms(sb.region);
   const R = REGION[sb.region];
@@ -329,7 +340,7 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
   const access = j.access?.mode === "keys" ? "Collect keys from the office" : j.access?.mode === "times" ? `Tenant available: ${j.access.note || "call first"}` : "Tenant will be home";
 
   return (
-    <div className="tl-m-card">
+    <div className="tl-m-card" ref={card}>
       <p className="tl-m-sub">
         {con?.business}
         {urgent && (
@@ -339,7 +350,7 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
           </>
         )}
       </p>
-      <h1>{j.title}</h1>
+      <h1 tabIndex={-1}>{j.title}</h1>
       <p className="tl-m-sub">
         {p.address}, {p.suburb} · Tenant {p.tenant}
       </p>

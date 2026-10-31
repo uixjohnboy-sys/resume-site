@@ -1590,3 +1590,47 @@
   row-gap: 4px;
   overflow: visible;
 }
+
+/* v0.5: pills on their own row; the trade and the avatar share the last row. */
+.tl-card-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tl-card-r4 {
+  justify-content: space-between;
+}
+
+/* Errors inside a dialog sit next to the action that failed and take focus. */
+.tl-inline-error {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border: 1px solid var(--late);
+  border-radius: var(--r-card);
+  background: var(--late-soft);
+  color: var(--late);
+}
+.tl-inline-error:focus {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+.tl-inline-error button {
+  min-height: 24px;
+  margin-left: 12px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.tl-drawer-err:empty {
+  display: none;
+}
+.tl-drawer-err {
+  padding: 0 24px;
+}
+:is(.tl-drawer-wrap, .tl-modal-wrap) dd {
+  overflow-wrap: anywhere;
+}

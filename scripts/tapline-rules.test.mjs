@@ -51,6 +51,23 @@ const cases = [
   ["No power in the whole house, the switchboard has tripped.", "electrician", "urgent", "electric"],
   ["Mould around the bedroom window frame.", "damp", "routine"],
   ["Exhaust fan in the bathroom stopped working.", "electrician", "routine"],
+  // G4 round 3 (AI Quality Lead N-23 to N-34): weak words never raise an emergency on their own.
+  ["Boiler pilot light. The pilot flame on the boiler keeps going out, so the heating goes off now and then.", "hvac", "routine"],
+  ["Cooktop flame. The gas cooktop flame is yellow and orange instead of blue.", "gas", "routine"],
+  ["Smoke from next door. The neighbour keeps smoking on his balcony and it drifts into our unit through the window.", null, "routine"],
+  ["Flood light. The flood light above the garage has stopped working.", "electrician", "routine"],
+  ["Bathroom door. The bathroom door won't lock, the latch is loose.", null, "routine"],
+  ["Letterbox. The letterbox has a broken lock.", "locksmith", "routine"],
+  ["Drain smell. There is a faint sewage smell from the outside drain.", "plumber", "routine"],
+  ["Oven. Gas oven flame keeps going out after a few seconds.", "gas", "routine"],
+  ["Smoke alarm. The smoke alarm is going off and there is smoke coming from the oven.", null, "urgent", "fire"],
+  ["Socket. No power to one power point in the lounge, everything else works.", "electrician", "routine"],
+  ["Bathroom light. The bathroom light stopped working. No water anywhere near it.", "electrician", "routine"],
+  ["Static. I got a static shock from the carpet.", null, "routine"],
+  // Strong phrases still raise on their own.
+  ["The power point in the kitchen is smoking.", "electrician", "urgent", "fire"],
+  ["Sewage is coming up through the shower drain.", "plumber", "urgent", "flood"],
+  ["The sliding door won't lock and we're going away tomorrow.", "locksmith", "urgent", "security"],
 ];
 
 let fail = 0;

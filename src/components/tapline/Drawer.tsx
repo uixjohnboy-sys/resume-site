@@ -6,7 +6,7 @@ import { earliestVisit, noticeHours } from "@/lib/tapline/actions";
 import { stageClock } from "@/lib/tapline/metrics";
 import { CHARGE_LABEL, REGION, TRADE_IDS, TRADES, day, money, slots, taxIn, terms, tradeLabel, tradeWho, when } from "@/lib/tapline/rules";
 import type { ChargeTo, Job, Sandbox, Trade, Urgency } from "@/lib/tapline/types";
-import { AmountInput, StageChip, TimerChip, TradeIcon, TryOnPhone, parseAmount, phoneLink } from "./ui";
+import { AmountInput, InlineError, StageChip, TimerChip, TradeIcon, TryOnPhone, parseAmount, phoneLink } from "./ui";
 import { useDialog } from "./useDialog";
 import type { useSandbox } from "./useSandbox";
 
@@ -27,7 +27,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
   const owner = sb.owners.find((o) => o.id === p.ownerId)!;
   const manager = sb.managers.find((m) => m.id === p.managerId)!;
   const con = sb.contractors.find((x) => x.id === j.contractorId);
-  const clock = stageClock(j, s.now);
+  const clock = stageClock(j, s.now, sb.region);
   const photo = s.photoUrl(j.photo);
   const done = s.photoUrl(j.donePhoto);
 
@@ -39,7 +39,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
           <div className="tl-drawer-chips">
             <span className="tl-ref">{j.ref}</span>
             <StageChip region={sb.region} stage={j.stage} />
-            {clock.state !== "none" && <TimerChip state={clock.state} hours={clock.hours} />}
+            {clock.state !== "none" && <TimerChip state={clock.state} hours={clock.hours} office={clock.office} />}
             {j.urgency === "urgent" && j.triage && !["done", "billed"].includes(j.stage) && <span className="tl-pill tl-pill-urgent">Urgent</span>}
           </div>
           <button type="button" className="tl-icon-btn" onClick={onClose} aria-label="Close">
@@ -160,6 +160,9 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
           </section>
         </div>
 
+        <div className="tl-drawer-err">
+          <InlineError error={s.error} onDismiss={() => s.setError(null)} />
+        </div>
         <Footer key={`${j.id}-${j.stage}-${j.invoice?.at ?? 0}`} s={s} j={j} />
       </aside>
     </div>
@@ -169,7 +172,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
 const cap = (x: string) => x[0].toUpperCase() + x.slice(1);
 
 /** After hours the on-call contractor may have been paged (or have accepted) before a manager confirmed the reply. */
-const awaitingConfirm = (j: Job) => j.afterHours === true && !j.triage?.confirmedAt && !!j.triage && (j.stage === "sent" || j.stage === "booked");
+const awaitingConfirm = (j: Job) => j.afterHours === true && !j.triage?.confirmedAt && !!j.triage && j.stage !== "new";
 
 function Access({ sb, j }: { sb: Sandbox; j: Job }) {
   const p = sb.properties.find((x) => x.id === j.propertyId)!;
@@ -189,8 +192,8 @@ function Access({ sb, j }: { sb: Sandbox; j: Job }) {
       {p.strata && (
         <>
           <dt>Building</dt>
-          <dd className="tl-nowrap">
-            <IconBuilding size={14} aria-hidden="true" /> {p.strata.manager}, {p.strata.phone}
+          <dd>
+            <IconBuilding size={14} aria-hidden="true" /> {p.strata.manager}, <span className="tl-nowrap">{p.strata.phone}</span>
           </dd>
         </>
       )}
@@ -237,13 +240,20 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
   const t = j.triage;
   const [trade, setTrade] = useState<Trade>(t?.trade ?? j.trade);
   const [urg, setUrg] = useState<Urgency>(t?.urgency ?? "routine");
-  const [reply, setReply] = useState(t?.reply ?? "");
+  const [reply, setReply] = useState(() => {
+    const r = t?.reply ?? "";
+    const booked = sb.contractors.find((x) => x.id === j.contractorId);
+    if (j.bookedFor && booked && /We'll confirm the visit as soon as they accept\./.test(r))
+      return r.replace(/We'll confirm the visit as soon as they accept\./, `${booked.business} is booked for ${when(sb.region, j.bookedFor)}.`);
+    return r;
+  });
   const [safety, setSafety] = useState<string[]>(t?.safety ?? []);
   const [charge, setCharge] = useState<ChargeTo>(t?.chargeTo ?? "owner");
   const [strata, setStrata] = useState(!!t?.strataReferral);
   const [ins, setIns] = useState(!!t?.insuranceClaim);
   const dispatched = awaitingConfirm(j);
-  const restands = dispatched && (trade !== j.trade || urg !== j.urgency);
+  const workDone = j.stage === "done" || j.stage === "billed";
+  const restands = dispatched && !workDone && (trade !== j.trade || urg !== j.urgency);
 
   if (!t) {
     const fresh = s.now - j.createdAt < 10 * 60_000;
@@ -281,7 +291,7 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
       <div className="tl-grid2">
         <label className="tl-field">
           <span>Trade</span>
-          <select value={trade} onChange={(e) => setTrade(e.target.value as Trade)}>
+          <select value={trade} onChange={(e) => setTrade(e.target.value as Trade)} disabled={workDone && dispatched}>
             {TRADE_IDS.map((x) => (
               <option key={x} value={x}>
                 {tradeLabel(sb.region, x)}
@@ -297,6 +307,7 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
                 key={u}
                 type="button"
                 aria-pressed={urg === u}
+                disabled={workDone && dispatched}
                 onClick={() => {
                   setUrg(u);
                   if (u === "routine") setSafety([]);
@@ -370,7 +381,9 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
         <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={5} maxLength={900} />
       </label>
       <p className="tl-next">
-        {dispatched && !restands
+        {workDone && dispatched
+          ? `The on-call ${c.contractor} has already done the work. Confirming sends this reply to ${p.tenant.split(" ")[0]}.`
+          : dispatched && !restands
           ? `Confirming sends this reply to ${p.tenant.split(" ")[0]}. The on-call ${c.contractor} stays on the job.`
           : restands
             ? `Confirming sends this reply, stands down the on-call ${c.contractor} and sends the job again as ${urg === "urgent" ? `urgent to the on-call ${tradeWho(sb.region, trade)}` : `a ${c.workOrder} to ${TRADES[sb.region][trade].noun}`}.`

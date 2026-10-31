@@ -247,7 +247,7 @@ export default function Board() {
               {STAGE_ORDER.map((st) => {
                 const col = jobs
                   .filter((j) => j.stage === st)
-                  .sort((a, b) => likely(a) - likely(b) || rank[stageClock(a, now).state] - rank[stageClock(b, now).state] || (st === "billed" ? (b.billedAt ?? 0) - (a.billedAt ?? 0) : a.stageEnteredAt - b.stageEnteredAt))
+                  .sort((a, b) => likely(a) - likely(b) || rank[stageClock(a, now, sb.region).state] - rank[stageClock(b, now, sb.region).state] || (st === "billed" ? (b.billedAt ?? 0) - (a.billedAt ?? 0) : a.stageEnteredAt - b.stageEnteredAt))
                   .slice(0, st === "billed" ? 12 : 60);
                 const total = jobs.filter((j) => j.stage === st).length;
                 return (
@@ -279,7 +279,8 @@ export default function Board() {
       <p className="tl-sr" aria-live="polite">
         {announce}
       </p>
-      {error && (
+      {/* With a dialog open, the dialog shows the error itself, next to what needs fixing. */}
+      {error && !open && !tenantOpen && (
         <p className="tl-toast" role="alert">
           {error}
           <button type="button" onClick={() => setError(null)}>
@@ -322,7 +323,7 @@ function Kpi({ label, value, note, tone }: { label: string; value: string; note:
 function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen: () => void }) {
   const p = sb.properties.find((x) => x.id === j.propertyId)!;
   const m = sb.managers.find((x) => x.id === p.managerId)!;
-  const clock = stageClock(j, now);
+  const clock = stageClock(j, now, sb.region);
   const untriaged = j.stage === "new" && !j.triage;
   const pills: string[] = [];
   const open = !["done", "billed"].includes(j.stage);
@@ -332,19 +333,34 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
   if (untriaged && !pills.includes("Likely urgent")) pills.push("Needs triage");
   if (j.hold === "ownerDeclined") pills.push(`${terms(sb.region).owner[0].toUpperCase()}${terms(sb.region).owner.slice(1)} declined`);
   if (j.invoice?.overApproved && j.stage === "done") pills.push("Invoice over approval");
-  if (j.afterHours && j.stage === "sent" && !j.triage?.confirmedAt) pills.push("After hours");
-  const timer = clock.state === "none" ? "" : `${clock.state === "late" ? "Overdue, " : clock.state === "soon" ? "Due soon, " : ""}${dur(clock.hours)} in this stage`;
+  // After hours the on-call contractor can be paged, book and even finish before a manager has sent the reply.
+  if (j.afterHours && j.triage && !j.triage.confirmedAt && j.stage !== "new") pills.push("Reply not sent");
+  const timer = clock.state === "none" ? "" : `${clock.state === "late" ? "Overdue, " : clock.state === "soon" ? "Due soon, " : ""}${dur(clock.hours)} ${clock.office ? "of office hours " : ""}in this stage`;
   const label = [`${j.ref}, ${j.title}, ${p.address}, ${p.suburb}`, pills.join(", "), untriaged ? "" : tradeLabel(sb.region, j.trade), timer, `Manager ${m.name}`].filter(Boolean).join(". ") + ".";
   return (
     <button type="button" className={`tl-card tl-card-${clock.state}`} onClick={onOpen} aria-label={label} data-job={j.id}>
       <span className="tl-card-r1">
         <span className="tl-ref">{j.ref}</span>
-        {clock.state !== "none" && <TimerChip state={clock.state} hours={clock.hours} />}
+        {clock.state !== "none" && <TimerChip state={clock.state} hours={clock.hours} office={clock.office} />}
       </span>
       <span className="tl-card-title">{j.title}</span>
       <span className="tl-card-addr">
         {p.address}, {p.suburb}
       </span>
+      {/* Pills get their own row, so a wide one never runs under the avatar. */}
+      {pills.length > 0 && (
+        <span className="tl-card-pills">
+          {pills.map((x) => (
+            <span
+              key={x}
+              className={`tl-pill ${x === "Urgent" ? "tl-pill-urgent" : x === "Likely urgent" ? "tl-pill-likely" : x.includes("declined") || x.includes("over") || x === "Reply not sent" ? "tl-pill-warn" : "tl-pill-neutral"}`}
+            >
+              {x === "Repeat fault" && <IconRepeat size={12} aria-hidden="true" />}
+              {x}
+            </span>
+          ))}
+        </span>
+      )}
       <span className="tl-card-r4">
         <span className="tl-trade">
           {untriaged ? (
@@ -354,14 +370,6 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
               <TradeIcon trade={j.trade} /> {tradeLabel(sb.region, j.trade)}
             </>
           )}
-        </span>
-        <span className="tl-card-pills">
-          {pills.map((x) => (
-            <span key={x} className={`tl-pill ${x === "Urgent" ? "tl-pill-urgent" : x === "Likely urgent" ? "tl-pill-likely" : x === "Repeat fault" ? "tl-pill-neutral" : x.includes("declined") || x.includes("over") ? "tl-pill-warn" : "tl-pill-neutral"}`}>
-              {x === "Repeat fault" && <IconRepeat size={11} aria-hidden="true" />}
-              {x}
-            </span>
-          ))}
         </span>
         <Avatar initials={m.initials} name={m.name} />
       </span>

@@ -198,6 +198,50 @@ await act({ type: "owner", jobId: od, decision: "declined" });
 r = await act({ type: "confirm", jobId: od, trade: "electrician", urgency: "routine", reply: "x", safety: [], chargeTo: "strata", strataReferral: false, insuranceClaim: false });
 check(r.status === 409, "confirm on an owner-declined job is refused");
 
+// ---------- G4 round 3 ----------
+
+// After hours the on-call contractor accepts AND finishes before the manager is in: the confirm still sends the reply.
+r = await act({ type: "report", propertyId: "p17", title: "Burst pipe in the laundry", description: "Water pouring out behind the washing machine.", afterHours: true });
+const h3 = r.d.jobId;
+await post("/api/tapline/triage", { jobId: h3 });
+await act({ type: "accept", jobId: h3, slot: Date.now() + 31 * 60_000 });
+r = await act({ type: "complete", jobId: h3 });
+check(job(r.d, h3).stage === "done" && !job(r.d, h3).triage.confirmedAt, "on-call contractor finished overnight, reply not sent yet");
+r = await act({ type: "confirm", jobId: h3, trade: "electrician", urgency: "routine", reply: "Hi, sorry about the night you had.", safety: [], chargeTo: "owner", strataReferral: false, insuranceClaim: true });
+check(r.status === 200 && job(r.d, h3).triage.confirmedAt && job(r.d, h3).stage === "done" && job(r.d, h3).trade === "plumber", `morning confirm on finished work -> ${r.status}, reply sent, trade left as the work done`);
+
+// NSW smoke alarm with water pouring through it stays an emergency (the alarm rule only covers the alarm itself).
+r = await act({ type: "report", propertyId: "p18", title: "Water through the smoke alarm", description: "Water pouring through the ceiling from the unit above and dripping out of the smoke alarm.", afterHours: true });
+const sw = r.d.jobId;
+r = await post("/api/tapline/triage", { jobId: sw });
+check(job(r.d, sw).triage.urgency === "urgent" && job(r.d, sw).stage === "sent", "water through a smoke alarm: urgent, on-call paged");
+
+// An everyday word ("flame") never raises an emergency on its own.
+r = await act({ type: "report", propertyId: "p19", title: "Boiler pilot light", description: "The pilot flame keeps going out, so the heating goes off now and then.", afterHours: true });
+const pf = r.d.jobId;
+r = await post("/api/tapline/triage", { jobId: pf });
+check(!job(r.d, pf).triage.raisedBy && job(r.d, pf).triage.emergency.every((x) => !/fire or smoke/.test(x)), `"pilot flame": not raised by the keyword rules, no fire text (${job(r.d, pf).triage.urgency})`);
+
+// A smoke alarm repair cannot be booked after its NSW due date.
+r = await act({ type: "report", propertyId: "p20", title: "Smoke alarm beeping", description: "Chirps every minute." });
+const sd = r.d.jobId;
+await act({ type: "confirm", jobId: sd, trade: "electrician", urgency: "routine", reply: "Thanks", safety: [], chargeTo: "owner", strataReferral: false, insuranceClaim: false });
+r = await act({ type: "accept", jobId: sd, slot: Date.now() + 9 * 24 * H });
+check(r.status === 409 && /due by/.test(r.d.error ?? ""), "smoke alarm visit after its due date is refused");
+
+// Invisible characters are not a title.
+r = await act({ type: "report", propertyId: "p20", title: "\u3164\u3164\u3164\u2800", description: "x" });
+check(r.status === 409, "a title of invisible characters is refused");
+
+// A job's history is capped (the owner can't grow a demo without limit).
+r = await act({ type: "report", propertyId: "p21", title: "Oven not heating", description: "x" });
+const oq = r.d.jobId;
+await act({ type: "confirm", jobId: oq, trade: "electrician", urgency: "routine", reply: "Thanks", safety: [], chargeTo: "owner", strataReferral: false, insuranceClaim: false });
+await act({ type: "quote", jobId: oq, amount: 2000, note: "x", earliest: 0 });
+let last = { status: 200 };
+for (let n = 0; n < 32 && last.status === 200; n++) last = await act({ type: "ownerQuestion", jobId: oq, text: "Question " + n });
+check(last.status === 409 && /long history/.test(last.d?.error ?? ""), "owner questions stop at the history cap");
+
 // Reset to the UK agency.
 r = await post("/api/tapline", { reset: "UK" });
 check(r.d.sb.region === "UK" && r.d.sb.agency === "Northgate Lettings" && r.d.sb.jobs.length === 40, "reset to the UK agency");
