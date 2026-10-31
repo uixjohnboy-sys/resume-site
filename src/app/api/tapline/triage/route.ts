@@ -21,7 +21,9 @@ export const maxDuration = 25;
 
 const MODEL = "claude-haiku-4-5";
 const HAZARDS: Hazard[] = ["gas", "co", "fire", "electricWater", "electric", "ceiling", "flood", "security"];
-const CAPS = { sandbox: 25, ip: 12, site: 400 };
+// Per connection: generous enough for a reviewer or a keen prospect; the site cap
+// (400 a day, about $1.20 at Haiku prices) is the real ceiling on spend.
+const CAPS = { sandbox: 25, ip: 40, site: 400 };
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });

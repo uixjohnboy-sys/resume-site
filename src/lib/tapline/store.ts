@@ -12,7 +12,7 @@ import type { Region, Sandbox } from "./types";
 
 const TTL = 60 * 60 * 48;
 const MAX_BYTES = 450_000;
-const NEW_PER_IP_PER_DAY = 20;
+const NEW_PER_IP_PER_DAY = 30;
 const PHOTOS_PER_SANDBOX = 12;
 
 const k = {
