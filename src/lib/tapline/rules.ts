@@ -31,6 +31,7 @@ export const REGION = {
     currency: "AUD",
     symbol: "A$",
     locale: "en-AU",
+    tz: "Australia/Sydney",
     agency: "Harbourline Property",
     city: "Sydney",
     urgentNote:
@@ -42,6 +43,7 @@ export const REGION = {
     currency: "GBP",
     symbol: "£",
     locale: "en-GB",
+    tz: "Europe/London",
     agency: "Northgate Lettings",
     city: "Manchester",
     urgentNote:
@@ -119,4 +121,10 @@ export function ruleTriage(text: string): { trade: Trade; urgency: Urgency; matc
     }
   }
   return { trade, urgency: matched.length ? "urgent" : "routine", matched };
+}
+
+// Times are shown in the agency's own time zone, whoever is viewing.
+export function when(region: Region, t: number, withDay = true) {
+  const r = REGION[region];
+  return new Date(t).toLocaleString(r.locale, { timeZone: r.tz, ...(withDay ? { weekday: "short" as const } : {}), hour: "numeric", minute: "2-digit" });
 }

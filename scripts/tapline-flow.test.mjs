@@ -49,6 +49,21 @@ check(job(r.d, c).triage?.urgency === "urgent" && job(r.d, c).triage?.repeat ===
 r = await post("/api/tapline", { action: { type: "confirm", jobId: c, trade: "plumber", urgency: "urgent", reply: "Thanks" } });
 check(job(r.d, c).stage === "booked", "confirm urgent -> Booked straight away");
 
+// The manager's edited reply is what the tenant receives.
+r = await post("/api/tapline", { action: { type: "report", propertyId: "p5", title: "Bathroom light not working", description: "Globe changed, still off." } });
+const e = r.d.jobId;
+await post("/api/tapline/triage", { jobId: e });
+r = await post("/api/tapline", { action: { type: "confirm", jobId: e, trade: "electrician", urgency: "routine", reply: "Edited by Sarah: an electrician will call you today." } });
+check(job(r.d, e).triage?.reply === "Edited by Sarah: an electrician will call you today.", "edited reply is saved for the tenant");
+
+// Photos: only small JPEG data URLs are kept, and a sandbox keeps the newest 6.
+const tinyJpeg = "data:image/jpeg;base64," + "A".repeat(400);
+r = await post("/api/tapline", { action: { type: "report", propertyId: "p6", title: "Bad photo", description: "x", photo: "javascript:alert(1)" } });
+check(job(r.d, r.d.jobId).photo === undefined, "non-JPEG photo is dropped");
+for (let i = 0; i < 8; i++) r = await post("/api/tapline", { action: { type: "report", propertyId: "p8", title: `Photo ${i}`, description: "x", photo: tinyJpeg } });
+const withPhotos = r.d.sb.jobs.filter((j) => j.photo?.startsWith("data:")).length;
+check(withPhotos === 6, `sandbox keeps the newest 6 photos (kept ${withPhotos})`);
+
 // Guards.
 r = await post("/api/tapline", { action: { type: "invoice", jobId: c, amount: 100 } });
 check(r.status === 409, "cannot invoice a job that is not done");

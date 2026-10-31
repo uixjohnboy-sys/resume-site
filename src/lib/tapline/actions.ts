@@ -11,7 +11,7 @@ export type Action =
   | { type: "confirm"; jobId: string; trade: Trade; urgency: Urgency; reply: string }
   | { type: "quote"; jobId: string; amount: number; note: string; earliest: number }
   | { type: "owner"; jobId: string; decision: "approved" | "declined" }
-  | { type: "complete"; jobId: string }
+  | { type: "complete"; jobId: string; photo?: string }
   | { type: "invoice"; jobId: string; amount: number }
   | { type: "complianceJob"; complianceId: string };
 
@@ -24,6 +24,26 @@ function clean(s: unknown, max: number) {
     .replace(/[\u0000-\u001f]+/g, " ")
     .trim()
     .slice(0, max);
+}
+
+// Photos are small JPEG data URLs made in the browser (photo.ts). Anything
+// else is dropped. A sandbox keeps only the newest few, so it never grows past
+// what Redis comfortably stores.
+const PHOTO_MAX = 100_000;
+const PHOTOS_KEPT = 6;
+
+function okPhoto(p: unknown): string | undefined {
+  return typeof p === "string" && p.startsWith("data:image/jpeg;base64,") && p.length <= PHOTO_MAX && /^[A-Za-z0-9+/=]+$/.test(p.slice(23)) ? p : undefined;
+}
+
+function trimPhotos(sb: Sandbox) {
+  const slots: { j: Job; k: "photo" | "donePhoto"; at: number }[] = [];
+  for (const j of sb.jobs) {
+    if (j.photo?.startsWith("data:")) slots.push({ j, k: "photo", at: j.createdAt });
+    if (j.donePhoto?.startsWith("data:")) slots.push({ j, k: "donePhoto", at: j.completedAt ?? j.createdAt });
+  }
+  slots.sort((a, b) => b.at - a.at);
+  for (const s of slots.slice(PHOTOS_KEPT)) delete s.j[s.k];
 }
 
 function findJob(sb: Sandbox, id: string) {
@@ -62,13 +82,14 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
         createdAt: now,
         title,
         description,
-        photo: a.photo ? clean(a.photo, 20) : undefined,
+        photo: okPhoto(a.photo),
         trade: "handyman",
         urgency: "routine",
         stage: "new",
         events: [{ at: now, by: "tenant", text: "Reported by the tenant" }],
       };
       next.jobs.push(job);
+      trimPhotos(next);
       return { ok: true, sb: next, jobId: job.id };
     }
 
@@ -93,7 +114,12 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       j.trade = a.trade;
       j.urgency = a.urgency;
       j.tradieId = tradie.id;
-      if (j.triage) j.triage.confirmedAt = now;
+      if (j.triage) {
+        j.triage.confirmedAt = now;
+        // The manager may have edited the AI's draft: the tenant gets their version.
+        const reply = clean(a.reply, 600);
+        if (reply) j.triage.reply = reply;
+      }
       j.events.push({ at: now, by: "manager", text: "Triage confirmed, reply sent to the tenant" });
       if (a.urgency === "urgent") {
         j.stage = "booked";
@@ -148,7 +174,9 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       if (!j || j.stage !== "booked") return { ok: false, error: "Job is not booked." };
       j.stage = "done";
       j.completedAt = now;
-      j.events.push({ at: now, by: "tradie", text: "Marked complete with photos" });
+      j.donePhoto = okPhoto(a.photo);
+      j.events.push({ at: now, by: "tradie", text: j.donePhoto ? "Marked complete with a photo" : "Marked complete" });
+      trimPhotos(next);
       return { ok: true, sb: next };
     }
 

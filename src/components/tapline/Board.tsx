@@ -2,7 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { kpis, stageClock } from "@/lib/tapline/metrics";
-import { REGION, STAGES, TRADE_LABEL, money } from "@/lib/tapline/rules";
+import {
+  REGION,
+  STAGES,
+  TRADE_LABEL,
+  money,
+  when as agencyTime,
+} from "@/lib/tapline/rules";
+import Qr from "./Qr";
+import Compliance from "./Compliance";
+import OwnerReport from "./OwnerReport";
 import { DEMO_PROPERTY } from "@/lib/tapline/seed";
 import type { Job, Sandbox, Trade, Urgency } from "@/lib/tapline/types";
 import { useSandbox } from "./useSandbox";
@@ -20,15 +29,47 @@ export function dur(hours: number) {
 }
 
 function when(sb: Sandbox, t: number) {
-  return new Date(t).toLocaleString(REGION[sb.region].locale, { weekday: "short", hour: "numeric", minute: "2-digit" });
+  return agencyTime(sb.region, t);
+}
+
+// Link to a phone page for this visitor's sandbox (and job, for owner/tradie).
+export function phoneLink(
+  id: string,
+  role: "tenant" | "owner" | "tradie",
+  jobId?: string,
+) {
+  return `${window.location.origin}/demo/tapline/m/${role}?sb=${id}${jobId ? "&job=" + jobId : ""}`;
+}
+
+function TryOnPhone({ url, who }: { url: string; who: string }) {
+  return (
+    <div className="tl-try">
+      <Qr
+        value={url}
+        size={112}
+        label={`QR code to open the ${who} view on your phone`}
+      />
+      <div>
+        <p>
+          <b>Try it on your own phone.</b> Scan to open what the {who} sees from
+          their text message, then watch this board update.
+        </p>
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          Or open it in a new tab
+        </a>
+      </div>
+    </div>
+  );
 }
 
 export default function Board() {
-  const { sb, now, error, busy, act, reset, triage, setError } = useSandbox();
+  const { id, sb, now, error, busy, act, reset, triage, setError } =
+    useSandbox();
   const [openId, setOpenId] = useState<string | null>(null);
   const [tenantOpen, setTenantOpen] = useState(false);
   const [urgentOnly, setUrgentOnly] = useState(false);
   const [trade, setTrade] = useState<Trade | "all">("all");
+  const [tab, setTab] = useState<"board" | "compliance" | "owners">("board");
 
   const k = useMemo(() => (sb ? kpis(sb, now) : null), [sb, now]);
   const open = sb?.jobs.find((j) => j.id === openId) ?? null;
@@ -42,7 +83,11 @@ export default function Board() {
   }
 
   const R = REGION[sb.region];
-  const jobs = sb.jobs.filter((j) => (!urgentOnly || j.urgency === "urgent") && (trade === "all" || j.trade === trade));
+  const jobs = sb.jobs.filter(
+    (j) =>
+      (!urgentOnly || j.urgency === "urgent") &&
+      (trade === "all" || j.trade === trade),
+  );
   const rank = { late: 0, warn: 1, ok: 2, none: 3 } as const;
 
   async function openJob(j: Job) {
@@ -56,7 +101,10 @@ export default function Board() {
         <div className="tl-brand">
           <span className="tl-logo" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22">
-              <path d="M12 2.5c3 4 6 7.3 6 10.7a6 6 0 1 1-12 0c0-3.4 3-6.7 6-10.7Z" fill="currentColor" />
+              <path
+                d="M12 2.5c3 4 6 7.3 6 10.7a6 6 0 1 1-12 0c0-3.4 3-6.7 6-10.7Z"
+                fill="currentColor"
+              />
             </svg>
           </span>
           <div>
@@ -74,24 +122,42 @@ export default function Board() {
                 type="button"
                 aria-pressed={sb.region === r}
                 onClick={() => {
-                  if (sb.region !== r && confirm(`Switch to the ${r === "AU" ? "Australian" : "UK"} demo agency? This resets your demo.`)) reset(r);
+                  if (
+                    sb.region !== r &&
+                    confirm(
+                      `Switch to the ${r === "AU" ? "Australian" : "UK"} demo agency? This resets your demo.`,
+                    )
+                  )
+                    reset(r);
                 }}
               >
                 {r === "AU" ? "Australia" : "UK"}
               </button>
             ))}
           </div>
-          <button type="button" className="tl-btn tl-btn-quiet" onClick={() => confirm("Reset the demo to its starting data?") && reset(sb.region)}>
+          <button
+            type="button"
+            className="tl-btn tl-btn-quiet"
+            onClick={() =>
+              confirm("Reset the demo to its starting data?") &&
+              reset(sb.region)
+            }
+          >
             Reset demo
           </button>
-          <button type="button" className="tl-btn tl-btn-primary" onClick={() => setTenantOpen(true)}>
+          <button
+            type="button"
+            className="tl-btn tl-btn-primary"
+            onClick={() => setTenantOpen(true)}
+          >
             Report a repair as a tenant
           </button>
         </div>
       </header>
 
       <p className="tl-banner">
-        Demo data: a fictional agency, {sb.properties.length} fictional properties. Your changes are private to you and reset after 48 hours.
+        Demo data: a fictional agency, {sb.properties.length} fictional
+        properties. Your changes are private to you and reset after 48 hours.
       </p>
 
       {error && (
@@ -103,64 +169,160 @@ export default function Board() {
         </p>
       )}
 
-      <section className="tl-kpis" aria-label="This week at a glance">
-        <Kpi label="Open jobs" value={String(k.open)} note={k.late ? `${k.late} past target` : "All on target"} tone={k.late ? "late" : "ok"} />
-        <Kpi label="Median time to acknowledge" value={dur(k.medianAckHours)} note="Report to confirmed reply" />
-        <Kpi label="Urgent jobs on target" value={`${k.urgentOnTimePct}%`} note="Sent to a tradie within 1 hour" tone={k.urgentOnTimePct >= 90 ? "ok" : "warn"} />
-        <Kpi label="Waiting on owners" value={String(k.waitingOwner)} note={k.waitingOwner ? `Oldest ${dur(k.oldestOwnerHours)}` : "None"} tone={k.oldestOwnerHours > 48 ? "late" : undefined} />
-        <Kpi label="Repair spend, 30 days" value={money(sb.region, k.spend30)} note="From uploaded invoices" />
-        <Kpi label="Repeat faults" value={String(k.repeatProperties)} note="Properties, same trade within 90 days" />
-        <Kpi label="Manager hours saved" value={`~${k.hoursSaved}h`} note="Estimate: 25 min of calls and emails per routed job" />
-      </section>
+      <nav className="tl-tabs" aria-label="Views">
+        {(
+          [
+            ["board", "Repairs board"],
+            ["compliance", "Compliance"],
+            ["owners", "Owner reports"],
+          ] as const
+        ).map(([v, l]) => (
+          <button
+            key={v}
+            type="button"
+            aria-current={tab === v ? "page" : undefined}
+            onClick={() => setTab(v)}
+          >
+            {l}
+          </button>
+        ))}
+      </nav>
 
-      <div className="tl-filters">
-        <label className="tl-check">
-          <input type="checkbox" checked={urgentOnly} onChange={(e) => setUrgentOnly(e.target.checked)} /> Urgent only
-        </label>
-        <label>
-          <span className="tl-sr">Trade</span>
-          <select value={trade} onChange={(e) => setTrade(e.target.value as Trade | "all")}>
-            <option value="all">All trades</option>
-            {(Object.keys(TRADE_LABEL) as Trade[]).map((t) => (
-              <option key={t} value={t}>
-                {TRADE_LABEL[t]}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      {tab === "compliance" && (
+        <Compliance sb={sb} now={now} busy={busy} act={act} />
+      )}
+      {tab === "owners" && <OwnerReport sb={sb} now={now} />}
 
-      <div className="tl-board">
-        {STAGES.map((s) => {
-          const col = jobs
-            .filter((j) => j.stage === s.id)
-            .sort((a, b) => rank[stageClock(a, now).state] - rank[stageClock(b, now).state] || a.createdAt - b.createdAt);
-          return (
-            <section key={s.id} className="tl-col" aria-label={s.label}>
-              <h2>
-                {s.label} <span>{col.length}</span>
-              </h2>
-              <ul>
-                {col.map((j) => (
-                  <li key={j.id}>
-                    <Card sb={sb} j={j} now={now} onOpen={() => openJob(j)} />
-                  </li>
+      {tab === "board" && (
+        <>
+          <section className="tl-kpis" aria-label="This week at a glance">
+            <Kpi
+              label="Open jobs"
+              value={String(k.open)}
+              note={k.late ? `${k.late} past target` : "All on target"}
+              tone={k.late ? "late" : "ok"}
+            />
+            <Kpi
+              label="Median time to acknowledge"
+              value={dur(k.medianAckHours)}
+              note="Report to confirmed reply"
+            />
+            <Kpi
+              label="Urgent jobs on target"
+              value={`${k.urgentOnTimePct}%`}
+              note="Sent to a tradie within 1 hour"
+              tone={k.urgentOnTimePct >= 90 ? "ok" : "warn"}
+            />
+            <Kpi
+              label="Waiting on owners"
+              value={String(k.waitingOwner)}
+              note={
+                k.waitingOwner ? `Oldest ${dur(k.oldestOwnerHours)}` : "None"
+              }
+              tone={k.oldestOwnerHours > 48 ? "late" : undefined}
+            />
+            <Kpi
+              label="Repair spend, 30 days"
+              value={money(sb.region, k.spend30)}
+              note="From uploaded invoices"
+            />
+            <Kpi
+              label="Repeat faults"
+              value={String(k.repeatProperties)}
+              note="Properties with the same kind of fault within 90 days"
+            />
+            <Kpi
+              label="Manager hours saved"
+              value={`~${k.hoursSaved}h`}
+              note="Estimate: 25 min of calls and emails per routed job"
+            />
+          </section>
+
+          <div className="tl-filters">
+            <label className="tl-check">
+              <input
+                type="checkbox"
+                checked={urgentOnly}
+                onChange={(e) => setUrgentOnly(e.target.checked)}
+              />{" "}
+              Urgent only
+            </label>
+            <label>
+              <span className="tl-sr">Trade</span>
+              <select
+                value={trade}
+                onChange={(e) => setTrade(e.target.value as Trade | "all")}
+              >
+                <option value="all">All trades</option>
+                {(Object.keys(TRADE_LABEL) as Trade[]).map((t) => (
+                  <option key={t} value={t}>
+                    {TRADE_LABEL[t]}
+                  </option>
                 ))}
-              </ul>
-            </section>
-          );
-        })}
-      </div>
+              </select>
+            </label>
+          </div>
 
-      {open && <Drawer sb={sb} j={open} now={now} busy={busy} onClose={() => setOpenId(null)} act={act} triage={triage} />}
+          <div className="tl-board">
+            {STAGES.map((s) => {
+              const col = jobs
+                .filter((j) => j.stage === s.id)
+                .sort(
+                  (a, b) =>
+                    rank[stageClock(a, now).state] -
+                      rank[stageClock(b, now).state] ||
+                    a.createdAt - b.createdAt,
+                );
+              return (
+                <section key={s.id} className="tl-col" aria-label={s.label}>
+                  <h2>
+                    {s.label} <span>{col.length}</span>
+                  </h2>
+                  <ul>
+                    {col.map((j) => (
+                      <li key={j.id}>
+                        <Card
+                          sb={sb}
+                          j={j}
+                          now={now}
+                          onOpen={() => openJob(j)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              );
+            })}
+          </div>
+        </>
+      )}
 
-      {tenantOpen && (
+      {open && id && (
+        <Drawer
+          id={id}
+          sb={sb}
+          j={open}
+          now={now}
+          busy={busy}
+          onClose={() => setOpenId(null)}
+          act={act}
+          triage={triage}
+        />
+      )}
+
+      {tenantOpen && id && (
         <TenantReport
+          id={id}
           sb={sb}
           busy={busy}
           onClose={() => setTenantOpen(false)}
           onSubmit={async (propertyId, title, description) => {
-            const d = await act({ type: "report", propertyId, title, description });
+            const d = await act({
+              type: "report",
+              propertyId,
+              title,
+              description,
+            });
             if (d?.jobId) {
               setTenantOpen(false);
               setOpenId(d.jobId);
@@ -173,7 +335,17 @@ export default function Board() {
   );
 }
 
-function Kpi({ label, value, note, tone }: { label: string; value: string; note: string; tone?: "ok" | "warn" | "late" }) {
+function Kpi({
+  label,
+  value,
+  note,
+  tone,
+}: {
+  label: string;
+  value: string;
+  note: string;
+  tone?: "ok" | "warn" | "late";
+}) {
   return (
     <div className={`tl-kpi ${tone ? "tl-" + tone : ""}`}>
       <span>{label}</span>
@@ -183,7 +355,17 @@ function Kpi({ label, value, note, tone }: { label: string; value: string; note:
   );
 }
 
-function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen: () => void }) {
+function Card({
+  sb,
+  j,
+  now,
+  onOpen,
+}: {
+  sb: Sandbox;
+  j: Job;
+  now: number;
+  onOpen: () => void;
+}) {
   const p = sb.properties.find((x) => x.id === j.propertyId);
   const c = stageClock(j, now);
   const stage = STAGES.find((s) => s.id === j.stage)!;
@@ -192,17 +374,28 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
     <button type="button" className={`tl-card tl-${c.state}`} onClick={onOpen}>
       <span className="tl-card-top">
         <span className="tl-ref">{j.ref}</span>
-        {j.urgency === "urgent" && !(j.stage === "new" && !j.triage) && <span className="tl-pill tl-pill-urgent">Urgent</span>}
+        {j.urgency === "urgent" && !(j.stage === "new" && !j.triage) && (
+          <span className="tl-pill tl-pill-urgent">Urgent</span>
+        )}
         {repeat && <span className="tl-pill tl-pill-repeat">Repeat</span>}
-        {j.stage === "new" && !j.triage && <span className="tl-pill">Needs triage</span>}
+        {j.stage === "new" && !j.triage && (
+          <span className="tl-pill">Needs triage</span>
+        )}
       </span>
       <b className="tl-card-title">{j.title}</b>
       <span className="tl-card-addr">
         {p?.address}, {p?.suburb}
       </span>
       <span className="tl-card-foot">
-        <span>{j.stage === "new" && !j.triage ? "Open to triage" : TRADE_LABEL[j.trade]}</span>
-        <span className="tl-timer" title={c.target ? `Target ${c.target}h in this stage` : undefined}>
+        <span>
+          {j.stage === "new" && !j.triage
+            ? "Open to triage"
+            : TRADE_LABEL[j.trade]}
+        </span>
+        <span
+          className="tl-timer"
+          title={c.target ? `Target ${c.target}h in this stage` : undefined}
+        >
           {stage.waiting} · {dur(c.hours)}
         </span>
       </span>
@@ -211,6 +404,7 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
 }
 
 function Drawer({
+  id,
   sb,
   j,
   now,
@@ -219,6 +413,7 @@ function Drawer({
   act,
   triage,
 }: {
+  id: string;
   sb: Sandbox;
   j: Job;
   now: number;
@@ -246,8 +441,18 @@ function Drawer({
   }
 
   return (
-    <div className="tl-drawer-wrap" role="dialog" aria-modal="true" aria-label={`${j.ref} ${j.title}`}>
-      <button type="button" className="tl-scrim" aria-label="Close" onClick={onClose} />
+    <div
+      className="tl-drawer-wrap"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${j.ref} ${j.title}`}
+    >
+      <button
+        type="button"
+        className="tl-scrim"
+        aria-label="Close"
+        onClick={onClose}
+      />
       <aside className="tl-drawer">
         <header>
           <div>
@@ -257,39 +462,74 @@ function Drawer({
               {p.address}, {p.suburb} · Tenant {p.tenant} · Owner {owner.name}
             </p>
           </div>
-          <button type="button" className="tl-x" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="tl-x"
+            onClick={onClose}
+            aria-label="Close"
+          >
             ×
           </button>
         </header>
 
         <p className="tl-desc">&ldquo;{j.description}&rdquo;</p>
+        {j.photo?.startsWith("data:image/") && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className="tl-job-photo"
+            src={j.photo}
+            alt="Photo from the tenant"
+          />
+        )}
+        {j.donePhoto?.startsWith("data:image/") && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className="tl-job-photo"
+            src={j.donePhoto}
+            alt="Completion photo from the tradie"
+          />
+        )}
 
         {j.stage === "new" && (
           <section className="tl-triage">
             <h3>Triage</h3>
             {!j.triage ? (
               <div className="tl-thinking" role="status">
-                <span className="tl-dot" /> Reading the report, checking this property&apos;s history...
-                <button type="button" className="tl-btn tl-btn-quiet" disabled={busy} onClick={() => triage(j.id)}>
+                <span className="tl-dot" /> Reading the report, checking this
+                property&apos;s history...
+                <button
+                  type="button"
+                  className="tl-btn tl-btn-quiet"
+                  disabled={busy}
+                  onClick={() => triage(j.id)}
+                >
                   Run again
                 </button>
               </div>
             ) : (
               <>
                 <p className="tl-source">
-                  {j.triage.source === "ai" ? "Suggested by AI" : "Suggested by the keyword rules (AI unavailable)"} · you confirm before anything is sent
+                  {j.triage.source === "ai"
+                    ? "Suggested by AI"
+                    : "Suggested by the keyword rules (AI unavailable)"}{" "}
+                  · you confirm before anything is sent
                 </p>
                 {j.triage.repeat && (
                   <p className="tl-flag">
-                    Repeat fault: this property had a {TRADE_LABEL[j.triage.trade].toLowerCase()} job in the last 90 days. Worth asking the tradie to
-                    check the earlier repair.
+                    Repeat fault: this property had a{" "}
+                    {TRADE_LABEL[j.triage.trade].toLowerCase()} job in the last
+                    90 days. Worth asking the tradie to check the earlier
+                    repair.
                   </p>
                 )}
                 <p className="tl-reason">{j.triage.reason}</p>
                 <div className="tl-row">
                   <label>
                     Trade
-                    <select value={tradeSel} onChange={(e) => setTradeSel(e.target.value as Trade)}>
+                    <select
+                      value={tradeSel}
+                      onChange={(e) => setTradeSel(e.target.value as Trade)}
+                    >
                       {(Object.keys(TRADE_LABEL) as Trade[]).map((t) => (
                         <option key={t} value={t}>
                           {TRADE_LABEL[t]}
@@ -299,7 +539,12 @@ function Drawer({
                   </label>
                   <div className="tl-seg" role="group" aria-label="Urgency">
                     {(["urgent", "routine"] as const).map((u) => (
-                      <button key={u} type="button" aria-pressed={urg === u} onClick={() => setUrg(u)}>
+                      <button
+                        key={u}
+                        type="button"
+                        aria-pressed={urg === u}
+                        onClick={() => setUrg(u)}
+                      >
                         {u === "urgent" ? "Urgent" : "Routine"}
                       </button>
                     ))}
@@ -317,14 +562,31 @@ function Drawer({
                 )}
                 <label className="tl-reply">
                   Reply to the tenant
-                  <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={4} />
+                  <textarea
+                    value={reply}
+                    onChange={(e) => setReply(e.target.value)}
+                    rows={4}
+                  />
                 </label>
                 <p className="tl-next">
                   {urg === "urgent"
                     ? `Confirming sends this to the on-call ${TRADE_LABEL[tradeSel].toLowerCase()} straight away and notifies the owner.`
                     : `Confirming asks a ${TRADE_LABEL[tradeSel].toLowerCase()} for a quote. Quotes under ${money(sb.region, owner.approvalLimit)} are approved automatically.`}
                 </p>
-                <button type="button" className="tl-btn tl-btn-primary" disabled={busy} onClick={() => act({ type: "confirm", jobId: j.id, trade: tradeSel, urgency: urg, reply })}>
+                <button
+                  type="button"
+                  className="tl-btn tl-btn-primary"
+                  disabled={busy}
+                  onClick={() =>
+                    act({
+                      type: "confirm",
+                      jobId: j.id,
+                      trade: tradeSel,
+                      urgency: urg,
+                      reply,
+                    })
+                  }
+                >
                   Confirm and send
                 </button>
               </>
@@ -337,36 +599,82 @@ function Drawer({
             <p>Waiting for a quote from {tradie?.business}.</p>
             <label>
               Quote amount ({REGION[sb.region].currency})
-              <input inputMode="numeric" value={quote} onChange={(e) => setQuote(e.target.value.replace(/[^0-9]/g, ""))} />
+              <input
+                inputMode="numeric"
+                value={quote}
+                onChange={(e) =>
+                  setQuote(e.target.value.replace(/[^0-9]/g, ""))
+                }
+              />
             </label>
-            <button type="button" className="tl-btn tl-btn-primary" disabled={busy} onClick={() => act({ type: "quote", jobId: j.id, amount: Number(quote), note: "Labour and parts", earliest: now + 26 * H })}>
+            <button
+              type="button"
+              className="tl-btn tl-btn-primary"
+              disabled={busy}
+              onClick={() =>
+                act({
+                  type: "quote",
+                  jobId: j.id,
+                  amount: Number(quote),
+                  note: "Labour and parts",
+                  earliest: now + 26 * H,
+                })
+              }
+            >
               Send quote as the tradie
             </button>
+            <TryOnPhone url={phoneLink(id, "tradie", j.id)} who="tradie" />
           </Role>
         )}
 
         {j.stage === "owner" && (
           <Role who="owner" name={owner.name}>
             <p>
-              Quote {money(sb.region, j.quote?.amount ?? 0)} from {tradie?.business}, above the owner&apos;s {money(sb.region, owner.approvalLimit)} limit.
+              Quote {money(sb.region, j.quote?.amount ?? 0)} from{" "}
+              {tradie?.business}, above the owner&apos;s{" "}
+              {money(sb.region, owner.approvalLimit)} limit.
             </p>
             <div className="tl-row">
-              <button type="button" className="tl-btn tl-btn-primary" disabled={busy} onClick={() => act({ type: "owner", jobId: j.id, decision: "approved" })}>
+              <button
+                type="button"
+                className="tl-btn tl-btn-primary"
+                disabled={busy}
+                onClick={() =>
+                  act({ type: "owner", jobId: j.id, decision: "approved" })
+                }
+              >
                 Approve as the owner
               </button>
-              <button type="button" className="tl-btn tl-btn-quiet" disabled={busy} onClick={() => act({ type: "owner", jobId: j.id, decision: "declined" })}>
+              <button
+                type="button"
+                className="tl-btn tl-btn-quiet"
+                disabled={busy}
+                onClick={() =>
+                  act({ type: "owner", jobId: j.id, decision: "declined" })
+                }
+              >
                 Decline
               </button>
             </div>
+            <TryOnPhone url={phoneLink(id, "owner", j.id)} who="owner" />
           </Role>
         )}
 
         {j.stage === "booked" && (
           <Role who="tradie" name={tradie?.business}>
-            <p>Booked for {j.bookedFor ? when(sb, j.bookedFor) : "a time to be confirmed"}.</p>
-            <button type="button" className="tl-btn tl-btn-primary" disabled={busy} onClick={() => act({ type: "complete", jobId: j.id })}>
+            <p>
+              Booked for{" "}
+              {j.bookedFor ? when(sb, j.bookedFor) : "a time to be confirmed"}.
+            </p>
+            <button
+              type="button"
+              className="tl-btn tl-btn-primary"
+              disabled={busy}
+              onClick={() => act({ type: "complete", jobId: j.id })}
+            >
               Mark complete as the tradie
             </button>
+            <TryOnPhone url={phoneLink(id, "tradie", j.id)} who="tradie" />
           </Role>
         )}
 
@@ -374,11 +682,23 @@ function Drawer({
           <Role who="tradie" name={tradie?.business}>
             <label>
               Invoice amount ({REGION[sb.region].currency})
-              <input inputMode="numeric" value={inv} onChange={(e) => setInv(e.target.value.replace(/[^0-9]/g, ""))} />
+              <input
+                inputMode="numeric"
+                value={inv}
+                onChange={(e) => setInv(e.target.value.replace(/[^0-9]/g, ""))}
+              />
             </label>
-            <button type="button" className="tl-btn tl-btn-primary" disabled={busy} onClick={() => act({ type: "invoice", jobId: j.id, amount: Number(inv) })}>
+            <button
+              type="button"
+              className="tl-btn tl-btn-primary"
+              disabled={busy}
+              onClick={() =>
+                act({ type: "invoice", jobId: j.id, amount: Number(inv) })
+              }
+            >
               Upload invoice as the tradie
             </button>
+            <TryOnPhone url={phoneLink(id, "tradie", j.id)} who="tradie" />
           </Role>
         )}
 
@@ -398,12 +718,23 @@ function Drawer({
   );
 }
 
-function Role({ who, name, children }: { who: "tradie" | "owner"; name?: string; children: React.ReactNode }) {
+function Role({
+  who,
+  name,
+  children,
+}: {
+  who: "tradie" | "owner";
+  name?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="tl-role">
       <p className="tl-role-h">
         Acting as the {who}
-        {name ? `, ${name}` : ""} <span>(in real life this happens on their phone, from a text message link)</span>
+        {name ? `, ${name}` : ""}{" "}
+        <span>
+          (in real life this happens on their phone, from a text message link)
+        </span>
       </p>
       {children}
     </section>
@@ -411,11 +742,13 @@ function Role({ who, name, children }: { who: "tradie" | "owner"; name?: string;
 }
 
 function TenantReport({
+  id,
   sb,
   busy,
   onClose,
   onSubmit,
 }: {
+  id: string;
   sb: Sandbox;
   busy: boolean;
   onClose: () => void;
@@ -426,15 +759,30 @@ function TenantReport({
   const [desc, setDesc] = useState(
     sb.region === "UK"
       ? "There is a brown stain on the living room ceiling and water is dripping onto the floor. It started tonight and is getting worse."
-      : "There's a brown stain on the living room ceiling and water is dripping onto the floor. Started tonight and getting worse."
+      : "There's a brown stain on the living room ceiling and water is dripping onto the floor. Started tonight and getting worse.",
   );
   return (
-    <div className="tl-drawer-wrap" role="dialog" aria-modal="true" aria-label="Report a repair">
-      <button type="button" className="tl-scrim" aria-label="Close" onClick={onClose} />
+    <div
+      className="tl-drawer-wrap"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Report a repair"
+    >
+      <button
+        type="button"
+        className="tl-scrim"
+        aria-label="Close"
+        onClick={onClose}
+      />
       <div className="tl-phone">
         <div className="tl-phone-bar">
           <b>{sb.agency}</b>
-          <button type="button" className="tl-x" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="tl-x"
+            onClick={onClose}
+            aria-label="Close"
+          >
             ×
           </button>
         </div>
@@ -446,18 +794,35 @@ function TenantReport({
         </p>
         <label>
           What&apos;s the problem?
-          <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} />
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={80}
+          />
         </label>
         <label>
           Tell us more
-          <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={5} maxLength={600} />
+          <textarea
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            rows={5}
+            maxLength={600}
+          />
         </label>
         <p className="tl-hint">
-          Try your own wording too, for example a sparking {sb.region === "UK" ? "plug socket" : "power point"} or a lock that will not close.
+          Try your own wording too, for example a sparking{" "}
+          {sb.region === "UK" ? "plug socket" : "power point"} or a lock that
+          will not close.
         </p>
-        <button type="button" className="tl-btn tl-btn-primary tl-wide" disabled={busy} onClick={() => onSubmit(demo.id, title, desc)}>
+        <button
+          type="button"
+          className="tl-btn tl-btn-primary tl-wide"
+          disabled={busy}
+          onClick={() => onSubmit(demo.id, title, desc)}
+        >
           {busy ? "Sending..." : "Send report"}
         </button>
+        <TryOnPhone url={phoneLink(id, "tenant")} who="tenant" />
       </div>
     </div>
   );

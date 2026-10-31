@@ -39,7 +39,10 @@ export type Job = {
   createdAt: number;
   title: string;
   description: string;
+  /** Tenant's photo as a small JPEG data URL (demo uploads only). */
   photo?: string;
+  /** Tradie's completion photo, same format. */
+  donePhoto?: string;
   trade: Trade;
   urgency: Urgency;
   stage: Stage;
