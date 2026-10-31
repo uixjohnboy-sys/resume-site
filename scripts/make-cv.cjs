@@ -21,7 +21,7 @@ const ACC = rgb(0.6, 0.36, 0.0); // dark amber: the site's accent, readable on w
 
 const header = {
   name: "JOHN BOY BARTOLOME ROXAS",
-  title: "GoHighLevel Systems Builder  |  Automation & Custom App Development",
+  title: "GoHighLevel Specialist  |  Automation & Custom App Development",
   line1: [
     { t: "Paniqui, Tarlac, Philippines (UTC+8)" },
     { t: "uix.johnboy@gmail.com", url: "mailto:uix.johnboy@gmail.com" },
@@ -35,7 +35,7 @@ const header = {
 };
 
 const summary =
-  "GoHighLevel systems builder with 5 years of professional experience and 58 delivered client systems for businesses in the United States, Australia, and the United Kingdom. Beyond standard CRM implementation, I build the custom software most GHL contractors cannot: production web applications on Next.js, Firebase, Stripe, and the Anthropic Claude API, wired back into GoHighLevel by webhook so the CRM and the application stay in sync automatically. My flagship platform, Coach OS, is live and open to review before any interview, and my portfolio runs an AI twin that answers questions about my work.";
+  "HighLevel-certified GoHighLevel specialist with 5 years of professional experience and 58 client systems delivered across the roles and freelance work below, for businesses in the United States, Australia, and the United Kingdom. Beyond standard CRM implementation, I build the custom software most GHL contractors cannot: production web applications on Next.js, Firebase, Stripe, and the Anthropic Claude API, wired back into GoHighLevel by webhook so the CRM and the application stay in sync automatically. My flagship platform, Coach OS, is live and open to review before any interview, and my portfolio runs an AI twin that answers questions about my work.";
 
 const availability =
   "Available for remote part-time roles, contracts and fixed-scope builds, with flexible hours that overlap Australian business hours.";
@@ -114,7 +114,7 @@ const jobs = [
     where: "Remote, US, AU and UK clients",
     when: "Jan 2024 - Present",
     bullets: [
-      "Delivered 13+ GoHighLevel systems for med spas, real estate teams, coaches, and chiropractors.",
+      "Delivered 13+ of those systems as an independent consultant, in GoHighLevel, for med spas, real estate teams, coaches, and chiropractors.",
       "Specialised in full GHL migrations, snapshot creation, and SaaS-mode setup for scaling agencies.",
     ],
   },
@@ -269,6 +269,17 @@ for (const b of banned) if (b.test(allText)) throw new Error("CV text breaks a r
   y -= 19;
   contactLine(header.line1);
   contactLine(header.line2);
+  // Certifications sit in the header so a screener sees them in the first glance.
+  {
+    const lab = "HighLevel certified:  ";
+    const val = "Workflow Automation Expert  ·  Funnel Building Expert  ·  AI Employee Specialist  ·  Course & Community Expert";
+    const fs8 = 8.2;
+    const total = B.widthOfTextAtSize(lab, fs8) + R.widthOfTextAtSize(val, fs8);
+    if (total > CW) throw new Error("Certifications line overflows by " + (total - CW).toFixed(1) + "pt");
+    page.drawText(lab, { x: M, y: y - fs8, size: fs8, font: B, color: ACC });
+    page.drawText(val, { x: M + B.widthOfTextAtSize(lab, fs8), y: y - fs8, size: fs8, font: R, color: INK });
+    y -= fs8 + 5;
+  }
   y -= 4;
   page.drawLine({ start: { x: M, y }, end: { x: W - M, y }, thickness: 1.2, color: ACC });
   y -= 4;

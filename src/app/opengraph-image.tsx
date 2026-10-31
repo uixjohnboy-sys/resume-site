@@ -6,7 +6,7 @@ import { join } from "path";
 // near-black ink, amber accent, mono data strip along the bottom.
 
 export const runtime = "nodejs";
-export const alt = "John Boy Roxas · GoHighLevel Systems Builder";
+export const alt = "John Boy Roxas · GoHighLevel Specialist";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

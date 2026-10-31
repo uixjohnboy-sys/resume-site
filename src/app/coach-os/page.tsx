@@ -192,7 +192,7 @@ export default function CoachOsCaseStudy() {
       <header className="jb-top">
         <div className="jb-cap jb-top-in">
           <Link className="jb-mark" href="/">
-            Johnboy Roxas
+            John Boy Roxas
           </Link>
           <span className="jb-status">
             <span className="jb-dot" aria-hidden="true" />

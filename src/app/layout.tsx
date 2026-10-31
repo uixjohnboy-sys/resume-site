@@ -12,9 +12,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteTitle = "John Boy Roxas · GoHighLevel Systems Builder";
+const siteTitle = "John Boy Roxas · GoHighLevel Specialist";
 const siteDescription =
-  "GoHighLevel systems builder who also ships the custom software beside the CRM: Next.js, Firebase, Stripe, and the Claude API. 5 years, 58 client builds, and one flagship platform you can open right now.";
+  "GoHighLevel specialist who also ships the custom software beside the CRM: Next.js, Firebase, Stripe, and the Claude API. 5 years, 58 client builds, and one flagship platform you can open right now.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.johnboydesign.com"),
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     "Sales Funnel Builder",
     "Manila Philippines",
   ],
-  authors: [{ name: "Johnboy Roxas" }],
+  authors: [{ name: "John Boy Roxas" }],
   robots: { index: true, follow: true },
   alternates: { canonical: "https://www.johnboydesign.com" },
   openGraph: {
     title: siteTitle,
     description: "GoHighLevel specialist. And the part that leaves GoHighLevel.",
     url: "https://www.johnboydesign.com",
-    siteName: "Johnboy Roxas",
+    siteName: "John Boy Roxas",
     type: "website",
   },
   twitter: {
@@ -52,8 +52,9 @@ export const metadata: Metadata = {
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Johnboy Roxas",
-  jobTitle: "GoHighLevel Systems Builder",
+  name: "John Boy Roxas",
+  alternateName: "Johnboy Roxas",
+  jobTitle: "GoHighLevel Specialist",
   description: siteDescription,
   url: "https://www.johnboydesign.com",
   image: "https://www.johnboydesign.com/johnboy.png",

@@ -85,7 +85,7 @@ const capabilities = [
   "Booking calendars with confirmations, reminders and no-show follow-up",
   "Pipelines your team can actually read, with clean reporting",
   "Email nurture sequences and list migrations (for example Mailchimp to GHL)",
-  "A2P 10DLC registration for SMS in the US",
+  "SMS set up properly, including the A2P 10DLC registration US carriers require",
   "Integrations: webhooks, the GHL API, Stripe, Zapier, Make, n8n",
   "Client portals and internal dashboards connected to the tools you already use",
   "AI assistants that answer only from facts you approve",
@@ -106,7 +106,7 @@ const faqs = [
   },
   {
     q: "How do invoices and payment work?",
-    a: "I invoice monthly in AUD (or GBP for UK clients) as an overseas contractor, payable by bank transfer through Wise. I do not charge GST, and I can provide a Statement by a Supplier for your records.",
+    a: "I invoice monthly in AUD (or GBP for UK clients) as an overseas contractor, payable by bank transfer through Wise. Australian clients: I do not charge GST, and I can provide a Statement by a Supplier for your records. UK clients: I am not VAT registered, so no VAT is added; VAT-registered businesses account for it under the reverse charge.",
   },
   {
     q: "Will you sign an NDA or a data processing agreement?",
@@ -169,7 +169,7 @@ export default function V4() {
               </li>
               <li>
                 <b>From AUD 15/hr</b>
-                <span>Or a fixed quote</span>
+                <span>About £8, or a fixed quote</span>
               </li>
               <li>
                 <b>Australian business hours</b>
@@ -314,7 +314,7 @@ export default function V4() {
                 </p>
                 <p>
                   <b>What I built.</b> Multi-channel nurture across SMS, email and voicemail drop, A2P 10DLC
-                  registration to protect SMS delivery, and booking triggers that turned enquiries into confirmed
+                  registration (the sign-up US carriers require before a business can text customers), and booking triggers that turned enquiries into confirmed
                   appointments.
                 </p>
               </div>
@@ -420,14 +420,14 @@ export default function V4() {
               <article className="v4-plan" data-rv>
                 <h3>Hourly</h3>
                 <p className="v4-plan-price">
-                  AUD 15<small>/hr</small>
+                  AUD 15<small>/hr · about £8</small>
                 </p>
                 <p>For agencies and ongoing support. Time tracked in your tool or mine, invoiced monthly.</p>
               </article>
               <article className="v4-plan" data-rv>
                 <h3>Monthly hours</h3>
                 <p className="v4-plan-price">
-                  AUD 15<small>/hr</small>
+                  AUD 15<small>/hr · about £8</small>
                 </p>
                 <p>A set block of hours each month, so your work has a reserved place in my week.</p>
               </article>
@@ -478,6 +478,8 @@ export default function V4() {
               <li>Test contacts for testing, never your real customers</li>
               <li>NDA or data processing agreement signed before you share anything</li>
               <li>Access removed and handed back when the work ends</li>
+              <li>For clinics: patient health information stays in your practice software, not the CRM, in line with the Australian Privacy Principles</li>
+              <li>For UK clients: a UK GDPR data processing agreement on request</li>
             </ul>
           </div>
         </section>

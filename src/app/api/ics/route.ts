@@ -6,7 +6,7 @@ function escapeIcsText(value: string) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const title = escapeIcsText(searchParams.get("title") || "Call with Johnboy Roxas");
+  const title = escapeIcsText(searchParams.get("title") || "Call with John Boy Roxas");
   const start = searchParams.get("start") || "";
   const end = searchParams.get("end") || "";
   const location = escapeIcsText(searchParams.get("location") || "");
