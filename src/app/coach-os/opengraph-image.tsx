@@ -11,10 +11,10 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const stats = [
-  ["29,474", "lines of code"],
-  ["24", "GHL webhook events"],
-  ["83", "automated emails"],
-  ["8", "scheduled jobs"],
+  ["30,275", "lines of code"],
+  ["26", "GHL webhook events"],
+  ["84", "automated emails"],
+  ["10", "scheduled jobs"],
 ];
 
 export default function Image() {

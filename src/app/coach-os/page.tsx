@@ -11,7 +11,7 @@ import "../home.css";
 
 const title = "Coach OS · Case Study";
 const description =
-  "A case study on Coach OS, a client-management platform built from zero: 29,474 lines of production code, 24 GoHighLevel webhook events in both directions, 83 automated emails, Stripe subscription billing, and an AI companion trained on each client's own history.";
+  "A case study on Coach OS, a client-management platform built from zero: 30,275 lines of code, 26 GoHighLevel webhook events, 84 automated email templates, Stripe subscription billing, and an AI companion trained on each client's own history.";
 
 export const metadata: Metadata = {
   title,
@@ -73,12 +73,12 @@ const shots = [
 ];
 
 const stats = [
-  { v: "29,474", count: "29,474", l: "Lines of production code" },
-  { v: "24", count: "24", l: "GoHighLevel webhook events" },
-  { v: "83", count: "83", l: "Automated email templates" },
+  { v: "30,275", count: "30,275", l: "Lines of code" },
+  { v: "26", count: "26", l: "GoHighLevel webhook events sent" },
+  { v: "84", count: "84", l: "Automated email templates" },
   { v: "26", count: "26", l: "Page routes" },
-  { v: "34", count: "34", l: "API endpoints" },
-  { v: "8", count: "8", l: "Scheduled background jobs" },
+  { v: "36", count: "36", l: "API endpoints" },
+  { v: "10", count: "10", l: "Scheduled background jobs" },
 ];
 
 const modules = [
@@ -108,9 +108,9 @@ const modules = [
     k: "The automation layer",
     t: "What runs by itself",
     items: [
-      "24 distinct webhook events moving in both directions: app to GoHighLevel, and GoHighLevel back to the app.",
-      "8 scheduled jobs handling onboarding weeks, check-in reminders, access expiry, no-show recovery, and a weekly digest.",
-      "83 email templates, including follow-up sequences that escalate on day 2 and again on day 5 instead of firing once.",
+      "26 distinct webhook events sent from the app into GoHighLevel, plus handlers that take GoHighLevel's booking, payment and pipeline updates back into the app.",
+      "10 scheduled jobs, including onboarding weeks, check-in reminders, access expiry, no-show recovery, and a weekly digest.",
+      "84 email templates, including follow-up sequences that escalate on day 2 and again on day 5 instead of firing once.",
       "Booking and pipeline stage changes sync back from the CRM, so nobody keeps two systems in their head.",
     ],
   },
