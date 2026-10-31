@@ -294,14 +294,28 @@ export default function Board() {
         </p>
       )}
 
-      {open && id && <Drawer id={id} s={s} j={open} onClose={() => setOpenId(null)} />}
+      {/* Closing a dialog clears its error in the same update, so it never flashes up as a board alert. */}
+      {open && id && (
+        <Drawer
+          id={id}
+          s={s}
+          j={open}
+          onClose={() => {
+            setError(null);
+            setOpenId(null);
+          }}
+        />
+      )}
       {tenantOpen && id && (
         <TenantReport
           id={id}
           sb={sb}
           busy={busy}
           api={s}
-          onClose={() => setTenantOpen(false)}
+          onClose={() => {
+            setError(null);
+            setTenantOpen(false);
+          }}
           onSent={(jobId) => {
             setTenantOpen(false);
             setTab("board");
@@ -340,7 +354,7 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
   if (j.invoice?.overApproved && j.stage === "done") pills.push("Invoice over approval");
   // After hours the on-call contractor can be paged, book and even finish before a manager has sent the reply.
   if (j.afterHours && j.triage && !j.triage.confirmedAt && j.stage !== "new") pills.push("Reply to confirm");
-  if (j.hold === "strata") pills.push("With the strata");
+  if (j.hold === "strata") pills.push(sb.region === "AU" ? "With the strata" : "With the block agent");
   const timer = clock.state === "none" ? "" : `${clock.state === "late" ? "Overdue, " : clock.state === "soon" ? "Due soon, " : ""}${dur(clock.hours)} in this stage`;
   const label = [`${j.ref}, ${j.title}, ${p.address}, ${p.suburb}`, pills.join(", "), untriaged ? "" : tradeLabel(sb.region, j.trade), timer, `Manager ${m.name}`].filter(Boolean).join(". ") + ".";
   return (

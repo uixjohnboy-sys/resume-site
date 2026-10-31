@@ -1,4 +1,4 @@
-import { REGION, SMOKE_ALARM, TARGET_HOURS, addBusinessDays, emergencyText, isAfterHours, isSmokeAlarm, money, nextOpen, officeBack, ruleTriage, slots, tenantReply, terms, tradeWho } from "./rules";
+import { REGION, SMOKE_ALARM, TARGET_HOURS, TRADES, addBusinessDays, emergencyText, isAfterHours, isSmokeAlarm, money, nextOpen, officeBack, ruleTriage, slots, tenantReply, terms, tradeWho } from "./rules";
 import type { ComplianceItem, Contractor, Job, Manager, Owner, Property, Region, Sandbox, Stage, Trade, Urgency } from "./types";
 
 // Deterministic fictional data that obeys the product's own rules: owner-stage
@@ -490,7 +490,12 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
         at: k.suggest,
         trade,
         urgency: t.urgency,
-        reason: "",
+        // The manager sees why: the same kind of one-line reason the live AI writes.
+        reason: urgent
+          ? `Urgent: ${(ruleTriage(`${title}. ${description}`, region).matched[0] ?? title.toLowerCase())}. Needs ${TRADES[region][trade].noun} today.`
+          : smoke
+            ? "Smoke alarm fault: NSW law needs it repaired within 2 business days."
+            : `Routine ${TRADES[region][trade].work}; no safety risk described.`,
         safety: [],
         emergency: urgent ? emergencyText(region, ruleTriage(`${title}. ${description}`, region).hazards) : [],
         reply: "",
@@ -566,7 +571,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
     if (job.triage) {
       const at = job.triage.confirmedAt ?? now;
       const stageThen: Stage = k.done && at >= k.done ? "done" : k.accept && at >= k.accept ? "booked" : "sent";
-      job.triage.reply = tenantReply(region, R.agency, first, { stage: stageThen, urgency: t.urgency, trade }, { business: contractor.business, at: job.bookedFor });
+      job.triage.reply = tenantReply(region, R.agency, first, { stage: stageThen, urgency: t.urgency, trade }, { business: contractor.business, at: job.bookedFor, now: job.triage.confirmedAt ?? now });
     }
     job.events.sort((a, b) => a.at - b.at);
     jobs.push(job);
@@ -588,7 +593,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       urgency: "routine",
       stage: "billed",
       afterHours: isAfterHours(region, at0),
-      triage: { source: "ai", at: at0 + 2 * M, trade: base.trade, urgency: "routine", reason: "", safety: [], emergency: [], reply: tenantReply(region, R.agency, tenant, { stage: "sent", urgency: "routine", trade: base.trade }), chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: confirm },
+      triage: { source: "ai", at: at0 + 2 * M, trade: base.trade, urgency: "routine", reason: `Routine ${TRADES[region][base.trade].work}; no safety risk described.`, safety: [], emergency: [], reply: tenantReply(region, R.agency, tenant, { stage: "sent", urgency: "routine", trade: base.trade }), chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: confirm },
       ownerDecision: { decision: "auto", at: accept },
       bookedFor: visit,
       completedAt: done,

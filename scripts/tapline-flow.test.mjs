@@ -254,6 +254,18 @@ const stj = job(r.d, st);
 check(r.status === 200 && stj.hold === "strata" && !stj.contractorId && !stj.cap, "routine strata work: referred to the strata manager, no work order, nothing for the owner to approve");
 r = await act({ type: "strataResolved", jobId: st });
 check(job(r.d, st).stage === "done" && !job(r.d, st).hold, "the strata confirms the repair -> Completed");
+r = await act({ type: "invoice", jobId: st, amount: 1500 });
+check(r.status === 409, "a job the strata fixed cannot be invoiced to the owner");
+
+// A night job paged to the on-call contractor, then re-confirmed in the morning as strata work: back to New with the
+// strata, and no quote can reach the lot owner (G4 round 5, Security).
+r = await act({ type: "report", propertyId: unit.id, title: "Water pouring through the ceiling", description: "Water is pouring through the ceiling from the flat above.", afterHours: true });
+const sn = r.d.jobId;
+await post("/api/tapline/triage", { jobId: sn });
+r = await act({ type: "confirm", jobId: sn, trade: "plumber", urgency: "routine", reply: "Thanks, we've passed this to the building.", safety: [], chargeTo: "strata", strataReferral: true, insuranceClaim: false });
+check(job(r.d, sn).stage === "new" && job(r.d, sn).hold === "strata" && !job(r.d, sn).contractorId, "after-hours job re-confirmed as strata work: back to New, with the strata, no contractor");
+r = await act({ type: "quote", jobId: sn, amount: 900, note: "x", earliest: 0 });
+check(r.status === 409, "no quote can be sent on a strata referral");
 
 // The fixed reply never gives an instruction; the event log credits the keyword rules with any raise.
 r = await act({ type: "report", propertyId: "p22", title: "Water through the ceiling", description: "Water is pouring through the ceiling onto the bed." });

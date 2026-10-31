@@ -108,6 +108,12 @@ for (const region of ["AU", "UK"]) {
   const sevenOClock = sb.jobs.flatMap((j) => j.events.filter((e) => e.by === "contractor")).filter((e) => local(e.at).h === 7 && local(e.at).m === 0).length;
   check(sevenOClock <= 2, `${region}: contractor replies are not all on the stroke of 7 (${sevenOClock})`);
 
+  // Grammar in everything a person reads: never "a electrician".
+  const texts = sb.jobs.flatMap((j) => [j.triage?.reply ?? "", j.triage?.reason ?? "", ...j.events.map((e) => e.text)]);
+  const aVowel = texts.filter((x) => /\ba [aeiouAEIOU]/.test(x));
+  check(aVowel.length === 0, `${region}: no "a" before a vowel (${aVowel.slice(0, 2).join(" | ")})`);
+  check(sb.jobs.every((j) => !j.triage || j.triage.reason), `${region}: every triaged job says why`);
+
   const k = kpis(sb, now);
   check(k.late <= 6, `${region}: the board is not a wall of red (${k.late} of ${k.open} open jobs late)`);
   check(k.repeatOpen >= 2, `${region}: at least 2 open repeat faults on load (${k.repeatOpen})`);

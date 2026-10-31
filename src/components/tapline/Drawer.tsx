@@ -1,7 +1,7 @@
 "use client";
 
 import { IconAlertTriangle, IconBuilding, IconPaw, IconPlus, IconRepeat, IconShieldCheck, IconTrash, IconX } from "@tabler/icons-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { earliestVisit, noticeHours } from "@/lib/tapline/actions";
 import { stageClock } from "@/lib/tapline/metrics";
 import { CHARGE_LABEL, REGION, TRADE_IDS, TRADES, day, money, slots, taxIn, tenantReply, terms, tradeLabel, tradeWho, when } from "@/lib/tapline/rules";
@@ -80,8 +80,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
             <section className="tl-sec tl-callout">
               <h3>With {p.strata?.manager ?? `the ${c.strataBody}`}</h3>
               <p>
-                Common property: the {sb.region === "AU" ? "owners corporation" : "block's managing agent"} arranges and pays for this repair. Follow up if it isn&apos;t
-                fixed within 10 business days{p.strata ? ` (${p.strata.phone})` : ""}.
+                {`${sb.region === "AU" ? "Common property: the owners corporation" : "Part of the building: the block's managing agent"} arranges and pays for this repair. Follow up if it isn't fixed within 10 business days${p.strata ? ` (${p.strata.phone})` : ""}.`}
               </p>
             </section>
           )}
@@ -255,10 +254,13 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
   const [reply, setReply] = useState(() => {
     const con = sb.contractors.find((x) => x.id === j.contractorId);
     if (awaitingConfirm(j) && j.stage !== "sent" && con)
-      return tenantReply(sb.region, sb.agency, p.tenant.split(" ")[0], j, { business: con.business, at: j.bookedFor });
+      return tenantReply(sb.region, sb.agency, p.tenant.split(" ")[0], j, { business: con.business, at: j.bookedFor, now: s.now });
     return t?.reply ?? "";
   });
   const [safety, setSafety] = useState<string[]>(t?.safety ?? []);
+  // The suggestion as first shown, so a change of payer can swap it while the manager has not edited it.
+  const suggested = useRef(reply);
+  const strataReply = `Hi ${p.tenant.split(" ")[0]}, thanks for reporting this. It's part of the building's shared property, so we've passed it to ${p.strata?.manager ?? `the ${c.strataBody}`}, who will arrange the repair. We'll keep you updated.\n\n${sb.agency}`;
   const [charge, setCharge] = useState<ChargeTo>(t?.chargeTo ?? "owner");
   const [strata, setStrata] = useState(!!t?.strataReferral);
   const [ins, setIns] = useState(!!t?.insuranceClaim);
@@ -332,7 +334,15 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
         </div>
         <label className="tl-field">
           <span>Who pays</span>
-          <select value={charge} onChange={(e) => setCharge(e.target.value as ChargeTo)}>
+          <select
+            value={charge}
+            onChange={(e) => {
+              const next = e.target.value as ChargeTo;
+              setCharge(next);
+              // An untouched suggestion follows the payer: strata work is passed to the building, not to a tradie.
+              if (reply === suggested.current || reply === strataReply) setReply(next === "strata" && urg === "routine" ? strataReply : suggested.current);
+            }}
+          >
             {(["owner", "tenant", ...(p.strata ? ["strata"] : [])] as ChargeTo[]).map((x) => (
               <option key={x} value={x}>
                 {CHARGE_LABEL(sb.region)[x]}
@@ -392,7 +402,9 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
         <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={5} maxLength={900} />
       </label>
       <p className="tl-next">
-        {workDone && dispatched
+        {charge === "strata" && urg === "routine" && !workDone
+          ? `Confirming refers this to ${p.strata?.manager ?? `the ${c.strataBody}`}: ${sb.region === "AU" ? "common property, so the owners corporation" : "part of the building, so the block's managing agent"} arranges and pays. No ${c.workOrder} is sent and the ${c.owner} is not asked to approve.`
+          : workDone && dispatched
           ? `The on-call ${c.contractor} has already done the work. Confirming sends this reply to ${p.tenant.split(" ")[0]}.`
           : dispatched && !restands
           ? `Confirming sends this reply to ${p.tenant.split(" ")[0]}. The on-call ${c.contractor} stays on the job.`
@@ -510,7 +522,7 @@ function Footer({ s, j }: { s: S; j: Job }) {
   } else if (j.hold === "strata") {
     body = (
       <button type="button" className="tl-btn tl-btn-primary" disabled={s.busy} onClick={() => s.act({ type: "strataResolved", jobId: j.id })}>
-        The strata has fixed it
+        {sb.region === "AU" ? "The strata has fixed it" : "The block agent has fixed it"}
       </button>
     );
   } else if (j.hold === "ownerDeclined") {
@@ -529,7 +541,7 @@ function Footer({ s, j }: { s: S; j: Job }) {
       </>
     );
   } else if (j.stage === "done" && j.triage?.chargeTo === "strata" && !j.contractorId) {
-    body = <p className="tl-acting">Repaired by the strata. Nothing to bill.</p>;
+    body = <p className="tl-acting">{sb.region === "AU" ? "Repaired by the strata." : "Repaired by the block agent."} Nothing to bill.</p>;
   } else if (j.stage === "done" && !j.invoice) {
     body = (
       <>

@@ -177,7 +177,9 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
   // The form has just been replaced by this view: move focus to its heading.
   useEffect(() => h1.current?.focus(), []);
   const booked = ["booked", "done", "billed"].includes(j.stage);
-  const steps = ["Received", `${cap(c.contractor)} ${booked ? "arranged" : "contacted"}`, "Visit booked", "Fixed"];
+  const steps = ["Received", j.hold === "strata" ? "Passed to the building" : `${cap(c.contractor)} ${booked ? "arranged" : "contacted"}`, "Visit booked", "Fixed"];
+  // Safety steps are for while the problem is live: once the work is done they would only alarm.
+  const live = !["done", "billed"].includes(j.stage);
   const at = j.stage === "new" ? 0 : j.stage === "sent" || j.stage === "owner" ? 1 : j.stage === "booked" ? 2 : 3;
   const con = sb.contractors.find((t) => t.id === j.contractorId);
   const t = j.triage;
@@ -198,7 +200,7 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
           </li>
         ))}
       </ol>
-      {t && (t.confirmedAt || autoSafety) && t.emergency.length > 0 && t.urgency === "urgent" && (
+      {live && t && (t.confirmedAt || autoSafety) && t.emergency.length > 0 && t.urgency === "urgent" && (
         <div className="tl-emergency" role="status">
           <p className="tl-emergency-h">Safety first</p>
           <ul>
@@ -212,7 +214,7 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
         <div className="tl-m-msg">
           <b>Message from {sb.agency}</b>
           <p className="tl-pre">{t.reply}</p>
-          {t.safety.length > 0 && (
+          {live && t.safety.length > 0 && (
             <>
               <b>While you wait</b>
               <ul>
@@ -228,7 +230,7 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
       ) : (
         <p className="tl-m-wait">Thanks, your {c.manager} has your report. You&apos;ll get a reply here and by text.</p>
       )}
-      {j.bookedFor && j.stage === "booked" && (
+      {j.bookedFor && j.stage === "booked" && !(con && t?.reply.includes(con.business)) && (
         <p>
           {con?.business} is booked for <b>{when(sb.region, j.bookedFor)}</b>.
         </p>
@@ -376,7 +378,7 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
         )}
       </dl>
 
-      {j.stage === "sent" && (
+      {j.stage === "sent" && j.contractorId && (
         <>
           {!urgent && (
             <div className="tl-seg tl-wide-seg" role="group" aria-label="Your response">
@@ -443,7 +445,7 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
 
       {j.stage === "owner" && <p className="tl-m-wait">Quote sent. Waiting for the {c.owner} to approve.</p>}
 
-      {j.stage === "booked" && (
+      {j.stage === "booked" && j.contractorId && (
         <div>
           <p>
             Booked for <b>{j.bookedFor ? when(sb.region, j.bookedFor) : "a time to confirm"}</b>.
@@ -455,7 +457,7 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
         </div>
       )}
 
-      {j.stage === "done" && !j.invoice && (
+      {j.stage === "done" && !j.invoice && j.contractorId && (
         <form
           onSubmit={(e) => {
             e.preventDefault();

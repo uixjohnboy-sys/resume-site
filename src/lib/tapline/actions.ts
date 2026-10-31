@@ -140,7 +140,8 @@ function dispatch(sb: Sandbox, j: Job, trade: Trade, urgency: Urgency, chargeTo:
     j.hold = "strata";
     j.ownerDecision = undefined;
     j.events.push({ at: now, by: "tapline", text: `Referred to ${p.strata?.manager ?? `the ${c.strataBody}`} to arrange and pay (common property). The ${c.owner} is told; no approval needed from them.` });
-    j.stageEnteredAt = now;
+    // Back to New with the hold, even when an on-call contractor had been paged first.
+    enter(j, "new", now);
     return null;
   }
   if (urgency === "urgent") {
@@ -310,7 +311,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
 
     case "accept": {
       const j = job(a.jobId);
-      if (!j || j.stage !== "sent") return handled;
+      if (!j || j.stage !== "sent" || j.hold || !j.contractorId) return handled;
       const agreed = a.tenantAgreed === true;
       const allowed = j.urgency === "urgent" ? [now + 30 * 60_000, now + 4 * H] : [earliestVisit(next, j, now, agreed), now + 30 * D];
       const slot = typeof a.slot === "number" && Number.isFinite(a.slot) ? a.slot : NaN;
@@ -330,7 +331,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
 
     case "quote": {
       const j = job(a.jobId);
-      if (!j || j.stage !== "sent" || j.urgency === "urgent") return handled;
+      if (!j || j.stage !== "sent" || j.urgency === "urgent" || j.hold || !j.contractorId) return handled;
       if (j.events.length >= MAX_EVENTS) return LONG;
       const amount = amountOf(a.amount);
       if (amount === null) return { ok: false, error: "Enter the quote amount, for example 380 or 380.50." };
@@ -398,7 +399,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
 
     case "complete": {
       const j = job(a.jobId);
-      if (!j || j.stage !== "booked") return handled;
+      if (!j || j.stage !== "booked" || !j.contractorId) return handled;
       j.donePhoto = typeof a.photo === "string" && /^ph[a-z0-9]{6,20}$/.test(a.photo) ? a.photo : undefined;
       j.completedAt = now;
       enter(j, "done", now);
@@ -408,7 +409,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
 
     case "invoice": {
       const j = job(a.jobId);
-      if (!j || j.stage !== "done" || j.invoice) return handled;
+      if (!j || j.stage !== "done" || j.invoice || !j.contractorId) return handled;
       const amount = amountOf(a.amount);
       if (amount === null) return { ok: false, error: "Enter the invoice amount, for example 380 or 380.50." };
       // Every invoice is checked: against the approved quote, or the work order's not-to-exceed amount

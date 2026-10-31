@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getRedis } from "@/lib/redis";
 import { apply, repeatOf } from "@/lib/tapline/actions";
-import { REGION, TRADE_IDS, emergencyText, isSmokeAlarm, ruleTriage, tenantReply, terms, tradeGlossary, tradeLabel, type Hazard } from "@/lib/tapline/rules";
+import { REGION, TRADE_IDS, emergencyText, isSmokeAlarm, ruleTriage, rulesOnlyUrgency, tenantReply, terms, tradeGlossary, tradeLabel, type Hazard } from "@/lib/tapline/rules";
 import { getPhoto, load, mutate, network, underLimit, validId } from "@/lib/tapline/store";
 import type { ChargeTo, Job, Sandbox, Trade, Triage, Urgency } from "@/lib/tapline/types";
 import { clientIp, hashKey } from "@/lib/twin/gate";
@@ -23,7 +23,7 @@ export const maxDuration = 25;
 const MODEL = "claude-haiku-4-5";
 const HAZARDS: Hazard[] = ["gas", "co", "fire", "electricWater", "electric", "ceiling", "flood", "security"];
 // Per connection: generous enough for a review panel sharing one IP; the site cap
-// (400 a day, about $1.70 at Haiku prices with a photo) is the real ceiling on spend.
+// (400 a day; a few dollars a day at Haiku prices even with photos and a full history) is the real ceiling on spend.
 const CAPS = { sandbox: 25, ip: 250, site: 400 };
 
 const json = (body: unknown, status = 200) =>
@@ -143,12 +143,12 @@ function rulesDraft(sb: Sandbox, job: Job): Draft {
   return {
     source: "rules",
     trade: r.trade,
-    // With no AI to judge context, context phrases count too: a person confirms before anything routine is sent.
-    urgency: r.urgency === "urgent" || r.context.length ? "urgent" : "routine",
-    hazards: [...r.hazards, ...r.context],
+    // With no AI to judge, core and check phrases both raise: a person confirms before anything routine is sent.
+    urgency: rulesOnlyUrgency(r),
+    hazards: [...r.hazards, ...r.check],
     reason:
-      (r.matched.length || r.contextMatched.length ? `Urgent words found: ${[...r.matched, ...r.contextMatched].join(", ")}.` : "No urgent words found, so it is treated as routine.") +
-      (r.weak.length ? ` Worth a check: ${r.weak.join(", ")}.` : ""),
+      (r.matched.length || r.checkMatched.length ? `Urgent words found: ${[...r.matched, ...r.checkMatched].join(", ")}.` : "No urgent words found, so it is treated as routine.") +
+      ([...r.contextMatched, ...r.weak].length ? ` Worth a check: ${[...r.contextMatched, ...r.weak].join(", ")}.` : ""),
     safety: [],
     reply: "",
     chargeTo: /lost (my |the )?keys|locked (myself )?out/i.test(`${job.title} ${job.description}`) ? "tenant" : "owner",
@@ -267,9 +267,12 @@ export async function POST(req: Request) {
     // Safety net: keywords can raise urgency and add hazards, never lower them.
     const text = `${job.title}. ${job.description}`;
     const rules = ruleTriage(text, region);
-    // Life-safety phrases always count; context phrases only when the AI saw the same hazard.
-    const agreed = rules.context.filter((h) => draft.hazards.includes(h));
+    // Core phrases always count; check and context phrases only when the AI saw the same hazard. A check phrase the
+    // AI did not agree with is shown to the manager, never sent to the tenant on its own.
+    const agreed = [...rules.check, ...rules.context].filter((h) => draft.hazards.includes(h));
     const hazards = Array.from(new Set([...draft.hazards, ...rules.hazards, ...agreed]));
+    const unconfirmed = draft.source === "ai" ? rules.checkMatched.filter((_, i) => !draft.hazards.includes(rules.check[i])) : [];
+    if (unconfirmed.length) draft.reason = `${draft.reason} Keyword rules flagged "${unconfirmed.join('", "')}": check the urgency.`.trim();
     let raised = false;
     if (rules.urgency === "urgent" && draft.urgency !== "urgent") {
       draft.urgency = "urgent";

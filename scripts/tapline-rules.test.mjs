@@ -1,7 +1,7 @@
 // Run: node --experimental-strip-types scripts/tapline-rules.test.mjs
 // The keyword rules are the fallback when the AI is unavailable and the safety
 // net that can only raise urgency. These cases include the G4 review's misses.
-import { emergencyText, isSmokeAlarm, ruleTriage } from "../src/lib/tapline/rules.ts";
+import { emergencyText, isSmokeAlarm, ruleTriage, rulesOnlyUrgency } from "../src/lib/tapline/rules.ts";
 
 const cases = [
   // [text, trade (null = any), urgency, hazard that must be found (optional)]
@@ -70,18 +70,18 @@ const cases = [
   ["The sliding door won't lock and we're going away tomorrow.", "locksmith", "urgent", "security"],
   // G4 round 4 (AI Quality Lead): E = everyday reports that must not raise on their own; S = real emergencies the
   // life-safety tier must still catch with no AI at all.
-  ["Aircon. The split system gives a burst of cold air then stops.", null, "routine"], // E-01
-  ["Patio door. The patio door won't close smoothly, it sticks at the bottom but it does lock.", null, "routine"], // E-02
-  ["Shower screen. The kids smashed the glass on the shower screen, nobody is hurt and it is taped up.", null, "routine"], // E-03
-  ["Garage remote. The garage door won't close with the remote, we close it by hand.", null, "routine"], // E-04
-  ["Smell. There's a burning smell from the neighbour's barbecue most evenings.", null, "routine"], // E-05
-  ["Heater. The heater smells like burning dust the first time we turn it on each winter.", null, "routine"], // E-06
-  ["Shed. The power is out in the garden shed, the house is fine.", null, "routine"], // E-07
-  ["Bathroom. Water everywhere on the bathroom floor after every shower because the screen seal has gone.", null, "routine"], // E-08
-  ["Toast. Burnt toast set off the smoke alarm again, can it be moved away from the kitchen door?", null, "routine"], // E-09
-  ["Cat flap. The cat flap won't lock any more.", null, "routine"], // E-10
-  ["Candle. Soot marks above where we light candles, can the wall be repainted?", null, "routine"], // E-11
-  ["Downpipe. The downpipe is gushing onto the path when it rains.", null, "routine"], // E-12
+  ["Aircon. The split system gives a burst of cold air then stops.", null, "routine", undefined, "ai"], // E-01
+  ["Patio door. The patio door won't close smoothly, it sticks at the bottom but it does lock.", null, "routine", undefined, "ai"], // E-02
+  ["Shower screen. The kids smashed the glass on the shower screen, nobody is hurt and it is taped up.", null, "routine", undefined, "ai"], // E-03
+  ["Garage remote. The garage door won't close with the remote, we close it by hand.", null, "routine", undefined, "ai"], // E-04
+  ["Smell. There's a burning smell from the neighbour's barbecue most evenings.", null, "routine", undefined, "ai"], // E-05
+  ["Heater. The heater smells like burning dust the first time we turn it on each winter.", null, "routine", undefined, "ai"], // E-06
+  ["Shed. The power is out in the garden shed, the house is fine.", null, "routine", undefined, "ai"], // E-07
+  ["Bathroom. Water everywhere on the bathroom floor after every shower because the screen seal has gone.", null, "routine", undefined, "ai"], // E-08
+  ["Toast. Burnt toast set off the smoke alarm again, can it be moved away from the kitchen door?", null, "routine", undefined, "ai"], // E-09
+  ["Cat flap. The cat flap won't lock any more.", null, "routine", undefined, "ai"], // E-10
+  ["Candle. Soot marks above where we light candles, can the wall be repainted?", null, "routine", undefined, "ai"], // E-11
+  ["Downpipe. The downpipe is gushing onto the path when it rains.", null, "routine", undefined, "ai"], // E-12
   ["Fan. There's smoke in the bedroom coming from the ceiling fan.", null, "urgent", "fire"], // S-01
   ["Front door. The lock on the front door is broken and it won't lock.", null, "urgent", "security"], // S-02
   ["Kitchen light. Water is coming out of the kitchen light fitting.", null, "urgent", "electricWater"], // S-03
@@ -98,12 +98,44 @@ const cases = [
   ["Alarm. CO alarm keeps going off in the kitchen.", null, "urgent", "co"], // S-14
   ["Shock. I got an electric shock from the oven door.", null, "urgent", "electric"], // S-15
   ["Kitchen. Flames came out of the back of the cooker when I turned it on.", null, "urgent", "fire"], // S-16
+  // G4 round 5 (AI Quality Lead): round-4 probes reworded. E = everyday, judged with the AI saying routine; S = real
+  // emergencies the rules alone must catch.
+  ["Wardrobe. The wardrobe sliding door won't close, it has come off its track.", null, "routine", undefined, "ai"], // E-13
+  ["Cooktop. The igniter on the gas cooktop sparks but the burner won't light.", null, "routine", undefined, "ai"], // E-14
+  ["Garden tap. Water is dripping from the outside tap near the garden lights.", null, "routine", undefined, "ai"], // E-15
+  ["Chimney. Smoke is coming from the neighbour's chimney into our bedroom window.", null, "routine", undefined, "ai"], // E-16
+  ["Oven. The oven smells like burnt food every time we use it, I think it needs a deep clean.", null, "routine", undefined, "ai"], // E-17
+  ["Backyard. The backyard is flooded after heavy rain because the lawn drains slowly.", null, "routine", undefined, "ai"], // E-18
+  ["Bath. The bathroom floor gets flooded when the kids splash in the bath.", null, "routine", undefined, "ai"], // E-19
+  ["Gutter. Water is pouring from the gutter over the front door when it rains.", null, "routine", undefined, "ai"], // E-20
+  ["Downpipe. Water is gushing out of the downpipe onto the driveway in heavy rain.", null, "routine", undefined, "ai"], // E-21
+  ["Shed. We're locked out of the garden shed, the padlock key snapped.", null, "routine", undefined, "ai"], // E-22
+  ["Garage. There is no power to the whole garage, the house is fine.", null, "routine", undefined, "ai"], // E-23
+  ["Outage. Power is out across the whole street, Ausgrid says it's a planned outage until 3pm.", null, "routine", undefined, "ai"], // E-24
+  ["Front door. The front door won't shut quietly, it slams in the wind but it locks fine.", null, "routine", undefined, "ai"], // E-25
+  ["Ensuite. The ensuite tap is dripping and keeps the light sleeper in the next room awake.", null, "routine", undefined, "ai"], // E-26
+  ["Kitchen. The kitchen reeks of gas.", null, "urgent", "gas"], // S-17
+  ["Cooktop. Gas is leaking from the cooktop connection, we can hear it hiss.", null, "urgent", "gas"], // S-18
+  ["Alarm. Our CO monitor is beeping and my daughter feels dizzy.", null, "urgent", "co"], // S-19
+  ["Hallway. The hallway is filling with smoke and the smoke alarm is going off.", null, "urgent", "fire"], // S-20
+  ["Kitchen. There's a fire in the kitchen, the extractor hood is alight.", null, "urgent", "fire"], // S-21
+  ["Switchboard. Rain is getting into the switchboard and it's wet inside.", null, "urgent", "electricWater"], // S-22
+  ["Lounge. The plasterboard ceiling in the lounge has dropped about 5cm and is cracking.", null, "urgent", "ceiling"], // S-23
+  ["Pipe. A pipe has split under the stairs and water is spraying out.", null, "urgent", "flood"], // S-24
+  ["Front door. Our front door was jemmied open last night and the lock is wrecked.", null, "urgent", "security"], // S-25
+  ["Power point. The power point behind the fridge has melted and is scorched black.", null, "urgent", "fire"], // S-26
+  ["Shower. We get a tingle when we touch the shower tap.", null, "urgent", "electric"], // S-27
+  ["Laundry. The washing machine hose came off and the laundry is under water.", null, "urgent", "flood"], // S-28
 ];
 
 let fail = 0;
-for (const [text, trade, urgency, hazard] of cases) {
+// Two ways to read a case. Default (rules only, the AI unavailable): core and check phrases raise. "ai" cases are
+// everyday reports judged with the AI saying routine: only core phrases may override it, so they must find none.
+for (const [text, trade, urgency, hazard, mode] of cases) {
   const r = ruleTriage(text);
-  const ok = (trade === null || r.trade === trade) && r.urgency === urgency && (!hazard || r.hazards.includes(hazard));
+  const u = mode === "ai" ? r.urgency : rulesOnlyUrgency(r);
+  const found = [...r.hazards, ...(mode === "ai" ? [] : r.check)];
+  const ok = (trade === null || r.trade === trade) && u === urgency && (!hazard || found.includes(hazard));
   if (!ok) fail++;
   console.log(`${ok ? "PASS" : "FAIL"}  ${r.trade}/${r.urgency} [${r.hazards.join(",")}]  (want ${trade ?? "any"}/${urgency}${hazard ? " +" + hazard : ""})  ${text.slice(0, 54)}`);
 }
