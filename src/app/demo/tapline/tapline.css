@@ -1583,3 +1583,10 @@
     min-width: 44px;
   }
 }
+
+/* Pills wrap under each other on narrow cards instead of being cut off. */
+.tl-card-pills {
+  flex-wrap: wrap;
+  row-gap: 4px;
+  overflow: visible;
+}

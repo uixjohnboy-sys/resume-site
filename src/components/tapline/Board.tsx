@@ -329,7 +329,7 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
   if (j.urgency === "urgent" && !untriaged && open) pills.push("Urgent");
   if (untriaged && ruleTriage(`${j.title}. ${j.description}`, sb.region).urgency === "urgent") pills.push("Likely urgent");
   if (j.triage?.repeatOf) pills.push("Repeat fault");
-  if (untriaged) pills.push("Needs triage");
+  if (untriaged && !pills.includes("Likely urgent")) pills.push("Needs triage");
   if (j.hold === "ownerDeclined") pills.push(`${terms(sb.region).owner[0].toUpperCase()}${terms(sb.region).owner.slice(1)} declined`);
   if (j.invoice?.overApproved && j.stage === "done") pills.push("Invoice over approval");
   if (j.afterHours && j.stage === "sent" && !j.triage?.confirmedAt) pills.push("After hours");
