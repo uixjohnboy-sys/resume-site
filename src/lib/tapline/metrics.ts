@@ -1,5 +1,5 @@
 import { TARGET_HOURS } from "./rules";
-import type { Job, Sandbox } from "./types";
+import type { Job, Sandbox, Trade } from "./types";
 
 // Everything on the KPI strip is computed from the sandbox, never typed in.
 
@@ -16,8 +16,27 @@ export function stageClock(j: Job, now: number) {
   return { since, hours, target, state };
 }
 
+// Faults that often share a cause: water through a ceiling can be the roof or
+// the plumbing, so a roofer job after a plumber job still counts as a repeat.
+const FAMILY: Record<Trade, string> = {
+  plumber: "water",
+  roofer: "water",
+  electrician: "power",
+  locksmith: "security",
+  glazier: "security",
+  handyman: "general",
+  hvac: "heating",
+  pest: "pest",
+};
+
+export function priorJobs(sb: Sandbox, j: Job) {
+  return sb.jobs
+    .filter((x) => x.id !== j.id && x.propertyId === j.propertyId && j.createdAt > x.createdAt && j.createdAt - x.createdAt < 90 * D)
+    .sort((a, b) => b.createdAt - a.createdAt);
+}
+
 export function isRepeat(sb: Sandbox, j: Job, trade = j.trade) {
-  return sb.jobs.some((x) => x.id !== j.id && x.propertyId === j.propertyId && x.trade === trade && j.createdAt - x.createdAt < 90 * D && j.createdAt > x.createdAt);
+  return priorJobs(sb, j).some((x) => FAMILY[x.trade] === FAMILY[trade]);
 }
 
 function median(xs: number[]) {
