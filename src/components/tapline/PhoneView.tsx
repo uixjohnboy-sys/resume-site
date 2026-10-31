@@ -1,19 +1,22 @@
 "use client";
 
+import { IconMoon } from "@tabler/icons-react";
 import { useState } from "react";
-import { REGION, STAGES, TRADE_LABEL, money, when } from "@/lib/tapline/rules";
+import { REGION, money, slots, stageLabel, taxIn, terms, tradeLabel, when } from "@/lib/tapline/rules";
 import { DEMO_PROPERTY } from "@/lib/tapline/seed";
-import type { Job, Sandbox } from "@/lib/tapline/types";
-import { shrinkPhoto } from "./photo";
+import type { Access, Job, Sandbox } from "@/lib/tapline/types";
+import { PhotoPick } from "./PhonePieces";
+import { AmountInput, parseAmount } from "./ui";
 import { useSandbox } from "./useSandbox";
 
-// What the tenant, the owner and the tradie see on their own phones, opened
-// from a text-message link. No logins: the link itself is the key (here, the
+// What the tenant, the owner and the contractor see on their own phones,
+// opened from a text-message link. No logins: the link is the key (here, the
 // demo id plus the job id). The desktop board polls, so every tap here moves
 // the card there within a few seconds.
 
 export type PhoneRole = "tenant" | "owner" | "tradie";
 const H = 3600_000;
+type S = ReturnType<typeof useSandbox>;
 
 function jobFromUrl(sb: Sandbox | null): Job | null {
   if (!sb || typeof window === "undefined") return null;
@@ -22,18 +25,23 @@ function jobFromUrl(sb: Sandbox | null): Job | null {
 }
 
 export default function PhoneView({ role }: { role: PhoneRole }) {
-  const { sb, now, error, busy, act, triage } = useSandbox();
+  const s = useSandbox();
   const [jobId, setJobId] = useState<string | null>(null);
+  const sb = s.sb;
 
   if (!sb) {
     return (
       <div className="tl-m">
-        <p className="tl-m-wait">{error ?? "Opening..."}</p>
+        <p className="tl-m-wait" role="status">
+          {s.error ?? "Opening..."}
+        </p>
       </div>
     );
   }
 
+  const c = terms(sb.region);
   const job = (jobId && sb.jobs.find((j) => j.id === jobId)) || jobFromUrl(sb);
+  const who = role === "tenant" ? "Repairs" : role === "owner" ? `${cap(c.owner)} approvals` : `Job for you`;
 
   return (
     <div className="tl-m">
@@ -45,169 +53,185 @@ export default function PhoneView({ role }: { role: PhoneRole }) {
         </span>
         <div>
           <b>{sb.agency}</b>
-          <span>{role === "tenant" ? "Repairs" : role === "owner" ? "Owner approvals" : "Job for you"}</span>
+          <span>{who}</span>
         </div>
       </header>
-      <p className="tl-m-demo">Demo: fictional agency and data.</p>
-      {error && (
+      <p className="tl-m-demo">Demo with fictional data.</p>
+      {s.error && (
         <p className="tl-m-error" role="alert">
-          {error}
+          {s.error}
         </p>
       )}
-
-      {role === "tenant" &&
-        (job ? (
-          <TenantStatus sb={sb} j={job} />
-        ) : (
-          <TenantForm
-            sb={sb}
-            busy={busy}
-            onSend={async (title, description, photo) => {
-              const d = await act({ type: "report", propertyId: DEMO_PROPERTY, title, description, photo });
-              if (d?.jobId) {
-                setJobId(d.jobId);
+      <main>
+        {role === "tenant" &&
+          (job ? (
+            <TenantStatus s={s} j={job} />
+          ) : (
+            <TenantForm
+              s={s}
+              onSent={(id) => {
+                setJobId(id);
                 const u = new URL(window.location.href);
-                u.searchParams.set("job", d.jobId);
+                u.searchParams.set("job", id);
                 window.history.replaceState(null, "", u);
-                triage(d.jobId);
-              }
-            }}
-          />
-        ))}
-
-      {role === "owner" && (job ? <OwnerView sb={sb} j={job} busy={busy} act={act} /> : <Missing />)}
-      {role === "tradie" && (job ? <TradieView sb={sb} j={job} now={now} busy={busy} act={act} /> : <Missing />)}
+                s.triage(id);
+              }}
+            />
+          ))}
+        {role === "owner" && (job ? <OwnerView s={s} j={job} /> : <Missing />)}
+        {role === "tradie" && (job ? <ContractorView s={s} j={job} /> : <Missing />)}
+      </main>
     </div>
   );
 }
+
+const cap = (x: string) => x[0].toUpperCase() + x.slice(1);
 
 function Missing() {
   return <p className="tl-m-card">This link has no job attached. Open it from the board.</p>;
 }
 
 function Photo({ src, alt }: { src?: string; alt: string }) {
-  if (!src?.startsWith("data:image/")) return null;
+  if (!src) return null;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img className="tl-m-photo" src={src} alt={alt} />;
+  return <img className="tl-job-photo" src={src} alt={alt} />;
 }
 
-function PhotoPick({ onPick, label }: { onPick: (url: string | undefined) => void; label: string }) {
-  const [note, setNote] = useState<string | null>(null);
-  const [preview, setPreview] = useState<string | undefined>();
-  return (
-    <div className="tl-m-photopick">
-      <label className="tl-m-filebtn">
-        {preview ? "Change photo" : label}
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={async (e) => {
-            const f = e.target.files?.[0];
-            if (!f) return;
-            try {
-              setNote("Preparing photo...");
-              const url = await shrinkPhoto(f);
-              setPreview(url);
-              onPick(url);
-              setNote(null);
-            } catch (err) {
-              setNote(err instanceof Error ? err.message : "Could not use that photo.");
-            }
-          }}
-        />
-      </label>
-      {note && <span className="tl-m-note">{note}</span>}
-      <Photo src={preview} alt="Your photo" />
-    </div>
-  );
-}
-
-function TenantForm({ sb, busy, onSend }: { sb: Sandbox; busy: boolean; onSend: (t: string, d: string, p?: string) => void }) {
+function TenantForm({ s, onSent }: { s: S; onSent: (id: string) => void }) {
+  const sb = s.sb!;
   const p = sb.properties.find((x) => x.id === DEMO_PROPERTY)!;
+  const c = terms(sb.region);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [photo, setPhoto] = useState<string | undefined>();
+  const [access, setAccess] = useState<Access>({ mode: "home", note: "", pets: false });
+  const [afterHours, setAfterHours] = useState(true);
   return (
     <form
       className="tl-m-card"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        onSend(title, desc, photo);
+        const d = await s.act({ type: "report", propertyId: p.id, title, description: desc, photo, access, afterHours });
+        if (d?.jobId) onSent(d.jobId);
       }}
     >
       <h1>Report a repair</h1>
       <p className="tl-m-sub">
         {p.address}, {p.suburb}
         <br />
-        Hi {p.tenant.split(" ")[0]}, tell us what is wrong. A photo helps us send the right tradie.
+        Hi {p.tenant.split(" ")[0]}, tell us what&apos;s wrong. A photo helps us send the right {c.contractor}.
       </p>
-      <label>
-        What&apos;s the problem?
+      <label className="tl-field">
+        <span>What&apos;s the problem?</span>
         <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} placeholder="For example: water through the ceiling" required />
       </label>
-      <label>
-        Tell us more
+      <label className="tl-field">
+        <span>Tell us more</span>
         <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={4} maxLength={600} placeholder="Where is it, when did it start, is it getting worse?" />
       </label>
+      <fieldset className="tl-field tl-radios">
+        <legend>Access</legend>
+        {(
+          [
+            ["home", "I'll be home"],
+            ["keys", "Use the office keys"],
+            ["times", "Only at certain times"],
+          ] as const
+        ).map(([m, l]) => (
+          <label key={m} className="tl-radio">
+            <input type="radio" name="tl-m-access" checked={access.mode === m} onChange={() => setAccess({ ...access, mode: m })} /> {l}
+          </label>
+        ))}
+        {access.mode === "times" && <input aria-label="When are you available?" placeholder="For example weekday mornings" value={access.note} onChange={(e) => setAccess({ ...access, note: e.target.value })} maxLength={160} />}
+        <label className="tl-check">
+          <input type="checkbox" checked={access.pets} onChange={(e) => setAccess({ ...access, pets: e.target.checked })} /> There are pets at home
+        </label>
+      </fieldset>
       <PhotoPick label="Add a photo" onPick={setPhoto} />
-      <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={busy || title.trim().length < 3}>
-        {busy ? "Sending..." : "Send report"}
+      <label className="tl-check tl-afterhours">
+        <input type="checkbox" checked={afterHours} onChange={(e) => setAfterHours(e.target.checked)} />
+        <IconMoon size={15} aria-hidden="true" /> Demo: pretend it&apos;s 9:47 pm
+      </label>
+      <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy || title.trim().length < 3}>
+        {s.busy ? "Sending..." : "Send report"}
       </button>
-      <p className="tl-m-fine">If anyone is in danger, call emergency services first.</p>
+      {title.trim().length < 3 && <p className="tl-hint">Describe the problem in a few words to send it.</p>}
+      <p className="tl-m-fine">If anyone is in danger, call {sb.region === "AU" ? "000" : "999"} first.</p>
     </form>
   );
 }
 
-function TenantStatus({ sb, j }: { sb: Sandbox; j: Job }) {
-  const steps: { id: string; label: string }[] = [
-    { id: "new", label: "Received" },
-    { id: "assigned", label: "Tradie arranged" },
-    { id: "booked", label: "Visit booked" },
-    { id: "done", label: "Fixed" },
-  ];
-  const at = j.stage === "new" ? 0 : j.stage === "quote" || j.stage === "owner" ? 1 : j.stage === "booked" ? 2 : 3;
-  const tradie = sb.tradies.find((t) => t.id === j.tradieId);
+function TenantStatus({ s, j }: { s: S; j: Job }) {
+  const sb = s.sb!;
+  const c = terms(sb.region);
+  const steps = ["Received", `${cap(c.contractor)} arranged`, "Visit booked", "Fixed"];
+  const at = j.stage === "new" ? 0 : j.stage === "sent" || j.stage === "owner" ? 1 : j.stage === "booked" ? 2 : 3;
+  const con = sb.contractors.find((t) => t.id === j.contractorId);
+  const t = j.triage;
+  const autoSafety = j.afterHours && j.stage !== "new" && t && !t.confirmedAt;
   return (
     <div className="tl-m-card">
       <h1>{j.title}</h1>
       <p className="tl-m-sub">Reference {j.ref}</p>
-      <ol className="tl-m-steps">
-        {steps.map((s, i) => (
-          <li key={s.id} className={i <= at ? "on" : ""}>
-            {s.label}
+      <p className="tl-sr">
+        Step {at + 1} of 4: {steps[at]}.
+      </p>
+      <ol className="tl-m-steps" aria-hidden="true">
+        {steps.map((x, i) => (
+          <li key={x} className={i <= at ? "on" : ""}>
+            {i < at ? "✓ " : ""}
+            {x}
           </li>
         ))}
       </ol>
-      {j.triage?.confirmedAt ? (
+      {t && (t.confirmedAt || autoSafety) && t.emergency.length > 0 && t.urgency === "urgent" && (
+        <div className="tl-emergency" role="status">
+          <p className="tl-emergency-h">Safety first</p>
+          <ul>
+            {t.emergency.map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {t?.confirmedAt ? (
         <div className="tl-m-msg">
           <b>Message from {sb.agency}</b>
-          <p>{j.triage.reply || "Thanks, we have this in hand."}</p>
-          {j.triage.safety.length > 0 && (
-            <ul>
-              {j.triage.safety.map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ul>
+          <p className="tl-pre">{t.reply}</p>
+          {t.safety.length > 0 && (
+            <>
+              <b>While you wait</b>
+              <ul>
+                {t.safety.map((x) => (
+                  <li key={x}>{x}</li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
+      ) : autoSafety ? (
+        <p className="tl-m-wait">We&apos;ve contacted our on-call {c.contractor}. Your {c.manager} will be in touch first thing.</p>
       ) : (
-        <p className="tl-m-wait">Thanks, your property manager has your report. You will get a reply here and by text.</p>
+        <p className="tl-m-wait">Thanks, your {c.manager} has your report. You&apos;ll get a reply here and by text.</p>
       )}
       {j.bookedFor && j.stage === "booked" && (
         <p>
-          {tradie?.business} is booked for <b>{when(sb.region, j.bookedFor)}</b>.
+          {con?.business} is booked for <b>{when(sb.region, j.bookedFor)}</b>.
         </p>
       )}
-      <Photo src={j.photo} alt="The photo you sent" />
+      <Photo src={s.photoUrl(j.photo)} alt="The photo you sent" />
     </div>
   );
 }
 
-function OwnerView({ sb, j, busy, act }: { sb: Sandbox; j: Job; busy: boolean; act: ReturnType<typeof useSandbox>["act"] }) {
+function OwnerView({ s, j }: { s: S; j: Job }) {
+  const sb = s.sb!;
+  const c = terms(sb.region);
   const p = sb.properties.find((x) => x.id === j.propertyId)!;
   const o = sb.owners.find((x) => x.id === p.ownerId)!;
-  const tradie = sb.tradies.find((t) => t.id === j.tradieId);
+  const con = sb.contractors.find((t) => t.id === j.contractorId);
+  const [ask, setAsk] = useState(false);
+  const [question, setQuestion] = useState("");
   return (
     <div className="tl-m-card">
       <p className="tl-m-sub">Hi {o.name.split(" ")[0]}, a repair at your property needs your OK.</p>
@@ -215,46 +239,84 @@ function OwnerView({ sb, j, busy, act }: { sb: Sandbox; j: Job; busy: boolean; a
       <p className="tl-m-sub">
         {p.address}, {p.suburb}
       </p>
-      <Photo src={j.photo} alt="Tenant's photo" />
+      <Photo src={s.photoUrl(j.photo)} alt="The tenant's photo" />
       <dl className="tl-m-dl">
         <dt>Quote</dt>
-        <dd>{j.quote ? money(sb.region, j.quote.amount) : "Not yet received"}</dd>
-        <dt>Tradie</dt>
+        <dd>{j.quote ? `${money(sb.region, j.quote.amount)} incl. ${c.tax}` : "Not yet received"}</dd>
+        {j.quote?.note && (
+          <>
+            <dt>Details</dt>
+            <dd>{j.quote.note}</dd>
+          </>
+        )}
+        <dt>{cap(c.contractor)}</dt>
         <dd>
-          {tradie?.business} ({TRADE_LABEL[j.trade]})
+          {con?.business} ({tradeLabel(sb.region, j.trade)})
         </dd>
-        <dt>Your auto-approve limit</dt>
+        <dt>Your approval limit</dt>
         <dd>{money(sb.region, o.approvalLimit)}</dd>
       </dl>
       {j.stage === "owner" ? (
         <div className="tl-m-actions">
-          <button type="button" className="tl-btn tl-btn-primary tl-wide" disabled={busy} onClick={() => act({ type: "owner", jobId: j.id, decision: "approved" })}>
+          <button type="button" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy} onClick={() => s.act({ type: "owner", jobId: j.id, decision: "approved" })}>
             Approve {j.quote ? money(sb.region, j.quote.amount) : ""}
           </button>
-          <button type="button" className="tl-btn tl-btn-quiet tl-wide" disabled={busy} onClick={() => act({ type: "owner", jobId: j.id, decision: "declined" })}>
-            Decline and talk to my manager
+          <button type="button" className="tl-btn tl-btn-quiet tl-wide" disabled={s.busy} onClick={() => s.act({ type: "owner", jobId: j.id, decision: "declined", note: "Please call me first" })}>
+            Decline
           </button>
+          {!ask ? (
+            <button type="button" className="tl-btn tl-btn-ghost tl-wide" onClick={() => setAsk(true)}>
+              Ask a question
+            </button>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                s.act({ type: "ownerQuestion", jobId: j.id, text: question }).then((d) => d && setAsk(false));
+              }}
+            >
+              <label className="tl-field">
+                <span>Your question for the {c.manager}</span>
+                <textarea rows={3} value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={300} />
+              </label>
+              <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy || !question.trim()}>
+                Send question
+              </button>
+            </form>
+          )}
+          <p className="tl-m-fine">If you decline, your {c.manager} will call you: the repair still needs doing.</p>
         </div>
       ) : (
-        <p className="tl-m-done">{j.ownerDecision ? `Thanks, ${j.ownerDecision.decision === "declined" ? "declined" : "approved"}.` : `Status: ${STAGES.find((s) => s.id === j.stage)?.label}.`}</p>
+        <p className="tl-m-done" role="status">
+          {j.ownerDecision?.decision === "declined" ? "Declined. Your property manager will call you." : j.ownerDecision ? "Thanks, approved." : `Status: ${stageLabel(sb.region, j.stage)}.`}
+        </p>
       )}
+      {j.ownerQuestion && j.stage === "owner" && <p className="tl-m-fine">You asked: &ldquo;{j.ownerQuestion}&rdquo;</p>}
     </div>
   );
 }
 
-function TradieView({ sb, j, now, busy, act }: { sb: Sandbox; j: Job; now: number; busy: boolean; act: ReturnType<typeof useSandbox>["act"] }) {
+function ContractorView({ s, j }: { s: S; j: Job }) {
+  const sb = s.sb!;
+  const c = terms(sb.region);
+  const R = REGION[sb.region];
   const p = sb.properties.find((x) => x.id === j.propertyId)!;
-  const tradie = sb.tradies.find((t) => t.id === j.tradieId);
-  const [amount, setAmount] = useState("380");
+  const con = sb.contractors.find((t) => t.id === j.contractorId);
+  const urgent = j.urgency === "urgent";
+  const options = urgent ? [0.5, 1, 2].map((h) => s.now + h * H) : slots(sb.region, s.now, 3, 2);
   const [slot, setSlot] = useState(0);
-  const [inv, setInv] = useState(String(j.quote?.amount ?? 380));
+  const [mode, setMode] = useState<"accept" | "quote">("accept");
+  const [amount, setAmount] = useState(String(j.cap ? Math.round(j.cap * 1.4) : 520));
+  const [note, setNote] = useState("");
+  const [inv, setInv] = useState(String(j.quote?.amount ?? Math.min(j.cap ?? 380, 380)));
   const [photo, setPhoto] = useState<string | undefined>();
-  const slots = [18, 24, 42].map((h) => now + h * H);
+  const access = j.access?.mode === "keys" ? "Collect keys from the office" : j.access?.mode === "times" ? `Tenant available: ${j.access.note || "call first"}` : "Tenant will be home";
+
   return (
     <div className="tl-m-card">
       <p className="tl-m-sub">
-        {tradie?.business}
-        {j.urgency === "urgent" && (
+        {con?.business}
+        {urgent && (
           <>
             {" "}
             <span className="tl-pill tl-pill-urgent">Urgent</span>
@@ -265,35 +327,81 @@ function TradieView({ sb, j, now, busy, act }: { sb: Sandbox; j: Job; now: numbe
       <p className="tl-m-sub">
         {p.address}, {p.suburb} · Tenant {p.tenant}
       </p>
-      <p>&ldquo;{j.description}&rdquo;</p>
-      <Photo src={j.photo} alt="Tenant's photo" />
+      <p className="tl-pre">&ldquo;{j.description}&rdquo;</p>
+      <Photo src={s.photoUrl(j.photo)} alt="The tenant's photo" />
+      <dl className="tl-m-dl">
+        <dt>Access</dt>
+        <dd>
+          {access}
+          {j.access?.pets ? ". Pets at home." : ""}
+        </dd>
+        {j.cap && !urgent && (
+          <>
+            <dt>{cap(c.workOrder)} limit</dt>
+            <dd>{money(sb.region, j.cap)} incl. {c.tax}. Quote first if it will cost more.</dd>
+          </>
+        )}
+        {j.triage?.chargeTo === "tenant" && (
+          <>
+            <dt>Charge to</dt>
+            <dd>The tenant</dd>
+          </>
+        )}
+      </dl>
 
-      {j.stage === "quote" && (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            act({ type: "quote", jobId: j.id, amount: Number(amount), note: "Labour and parts", earliest: slots[slot] });
-          }}
-        >
-          <label>
-            Your quote ({REGION[sb.region].currency})
-            <input inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ""))} />
-          </label>
-          <fieldset className="tl-m-slots">
-            <legend>Earliest time you can attend</legend>
-            {slots.map((t, i) => (
-              <label key={t} className="tl-m-radio">
-                <input type="radio" name="slot" checked={slot === i} onChange={() => setSlot(i)} /> {when(sb.region, t)}
+      {j.stage === "sent" && (
+        <>
+          {!urgent && (
+            <div className="tl-seg tl-wide-seg" role="group" aria-label="Your response">
+              <button type="button" aria-pressed={mode === "accept"} onClick={() => setMode("accept")}>
+                Accept and book
+              </button>
+              <button type="button" aria-pressed={mode === "quote"} onClick={() => setMode("quote")}>
+                It will cost more
+              </button>
+            </div>
+          )}
+          {mode === "accept" || urgent ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                s.act({ type: "accept", jobId: j.id, slot: options[slot] });
+              }}
+            >
+              <fieldset className="tl-field tl-radios">
+                <legend>{urgent ? "How soon can you be there?" : "Pick a visit time"}</legend>
+                {options.map((t, i) => (
+                  <label key={t} className="tl-radio">
+                    <input type="radio" name="tl-slot" checked={slot === i} onChange={() => setSlot(i)} /> {urgent ? `Within ${[30, 60, 120][i]} minutes` : when(sb.region, t)}
+                  </label>
+                ))}
+              </fieldset>
+              <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy}>
+                Accept and book
+              </button>
+              {!urgent && <p className="tl-m-fine">{R.entryNote} The tenant is told the time once you accept.</p>}
+            </form>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                s.act({ type: "quote", jobId: j.id, amount: parseAmount(amount), note: note || "Labour and parts", earliest: options[0] });
+              }}
+            >
+              <AmountInput label="Your quote" value={amount} onChange={setAmount} currency={R.currency} />
+              <label className="tl-field">
+                <span>What it covers</span>
+                <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} placeholder="For example: replace the cartridge, 2 hours labour" />
               </label>
-            ))}
-          </fieldset>
-          <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={busy}>
-            Send quote
-          </button>
-        </form>
+              <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy || Number.isNaN(parseAmount(amount))}>
+                Send quote
+              </button>
+            </form>
+          )}
+        </>
       )}
 
-      {j.stage === "owner" && <p className="tl-m-wait">Quote sent. Waiting for the owner to approve.</p>}
+      {j.stage === "owner" && <p className="tl-m-wait">Quote sent. Waiting for the {c.owner} to approve.</p>}
 
       {j.stage === "booked" && (
         <div>
@@ -301,30 +409,36 @@ function TradieView({ sb, j, now, busy, act }: { sb: Sandbox; j: Job; now: numbe
             Booked for <b>{j.bookedFor ? when(sb.region, j.bookedFor) : "a time to confirm"}</b>.
           </p>
           <PhotoPick label="Add a completion photo" onPick={setPhoto} />
-          <button type="button" className="tl-btn tl-btn-primary tl-wide" disabled={busy} onClick={() => act({ type: "complete", jobId: j.id, photo })}>
+          <button type="button" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy} onClick={() => s.act({ type: "complete", jobId: j.id, photo })}>
             Mark job complete
           </button>
         </div>
       )}
 
-      {j.stage === "done" && (
+      {j.stage === "done" && !j.invoice && (
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            act({ type: "invoice", jobId: j.id, amount: Number(inv) });
+            s.act({ type: "invoice", jobId: j.id, amount: parseAmount(inv) });
           }}
         >
-          <label>
-            Invoice amount ({REGION[sb.region].currency})
-            <input inputMode="numeric" value={inv} onChange={(e) => setInv(e.target.value.replace(/[^0-9]/g, ""))} />
-          </label>
-          <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={busy}>
-            Send invoice
+          <AmountInput label="Invoice amount" value={inv} onChange={setInv} currency={R.currency} />
+          {!Number.isNaN(parseAmount(inv)) && (
+            <p className="tl-m-fine">
+              Includes {money(sb.region, taxIn(sb.region, parseAmount(inv)))} {c.tax}.
+            </p>
+          )}
+          <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy || Number.isNaN(parseAmount(inv))}>
+            Upload invoice
           </button>
         </form>
       )}
-
-      {(j.stage === "invoiced" || j.stage === "new") && <p className="tl-m-done">{j.stage === "invoiced" ? "Invoiced. Thanks for the job." : "This job is back with the property manager."}</p>}
+      {j.stage === "done" && j.invoice?.overApproved && <p className="tl-m-wait">Invoice received. It is above the approved amount, so the {c.manager} will check it with you.</p>}
+      {(j.stage === "billed" || j.stage === "new") && (
+        <p className="tl-m-done" role="status">
+          {j.stage === "billed" ? "Invoice received and entered. Thanks for the job." : `This job is back with the ${c.manager}.`}
+        </p>
+      )}
     </div>
   );
 }

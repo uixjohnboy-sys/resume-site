@@ -7,6 +7,25 @@ const nextConfig: NextConfig = {
     // visibly softening his face; it asks for 90.
     qualities: [75, 90],
   },
+  async headers() {
+    // The Tapline demo (and any future /demo product): no framing, no sniffing,
+    // a tight referrer policy, and a CSP that blocks plugins, framing and
+    // foreign form posts. Scripts stay governed by Next's own bundling.
+    const demo = [
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
+      {
+        key: "Content-Security-Policy",
+        value: "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; img-src 'self' data: blob:; connect-src 'self'",
+      },
+    ];
+    return [
+      { source: "/demo/:path*", headers: demo },
+      { source: "/api/tapline/:path*", headers: demo },
+    ];
+  },
   async rewrites() {
     return [
       // The Front Door Check, the page linked from cold outreach to martial

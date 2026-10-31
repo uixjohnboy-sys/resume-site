@@ -1,49 +1,69 @@
-import { apply, type Action } from "@/lib/tapline/actions";
-import { getOrCreate, loadSandbox, resetSandbox, saveSandbox, validId } from "@/lib/tapline/store";
+import { apply, PUBLIC_TYPES, type PublicAction } from "@/lib/tapline/actions";
+import { load, mutate, putPhoto, reset, validId, version } from "@/lib/tapline/store";
 import type { Region } from "@/lib/tapline/types";
+import { clientIp, hashKey } from "@/lib/twin/gate";
 
-// Tapline demo API. One endpoint, three verbs:
-//   GET  ?sb=<id>&region=AU|UK      the sandbox (created from seed on first use)
-//   POST { sb, action }             apply one action, return the new sandbox
-//   POST { sb, reset: "AU"|"UK" }   reseed the sandbox
+// Tapline demo API.
+//   GET  ?sb=<id>&region=AU|UK&v=<version>   the sandbox, or {unchanged} if the version matches
+//   POST { sb, action }                       apply one public action (validated in actions.ts)
+//   POST { sb, reset: "AU"|"UK" }             reseed the sandbox
 // Sandboxes are private to the visitor's random id; nothing here is real data.
 
 export const runtime = "nodejs";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
-
-const region = (r: unknown): Region => (r === "UK" ? "UK" : "AU");
+const OOPS = "Something went wrong. Reload the page and try again.";
+const regionOf = (r: unknown): Region => (r === "UK" ? "UK" : "AU");
 
 export async function GET(req: Request) {
   const u = new URL(req.url);
   const id = u.searchParams.get("sb");
-  if (!validId(id)) return json({ error: "Missing demo id." }, 400);
-  const sb = await getOrCreate(id, region(u.searchParams.get("region")));
-  return json({ sb, now: Date.now() });
+  if (!validId(id)) return json({ error: OOPS }, 400);
+  const have = Number(u.searchParams.get("v") ?? "-1");
+  if (have > 0 && (await version(id)) === have) return json({ unchanged: true, v: have, now: Date.now() });
+  const loaded = await load(id, regionOf(u.searchParams.get("region")));
+  return json({ sb: loaded.sb, v: loaded.v, now: Date.now() });
 }
 
 export async function POST(req: Request) {
-  let body: { sb?: string; action?: Action; reset?: Region };
+  let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return json({ error: "Bad request." }, 400);
+    return json({ error: OOPS }, 400);
   }
-  if (!validId(body.sb)) return json({ error: "Missing demo id." }, 400);
-
-  if (body.reset) {
-    const sb = await resetSandbox(body.sb, region(body.reset));
-    return json({ sb, now: Date.now() });
-  }
-
-  const current = await loadSandbox(body.sb);
-  if (!current) return json({ error: "This demo has expired. Reload to start a fresh one." }, 404);
-  if (!body.action || typeof body.action !== "object") return json({ error: "Bad request." }, 400);
-
+  if (!body || typeof body !== "object") return json({ error: OOPS }, 400);
+  const b = body as { sb?: unknown; action?: unknown; reset?: unknown; region?: unknown };
+  if (!validId(b.sb)) return json({ error: OOPS }, 400);
+  const ipKey = hashKey(clientIp(req));
   const now = Date.now();
-  const result = apply(current, body.action, now);
-  if (!result.ok) return json({ error: result.error }, 409);
-  await saveSandbox(result.sb);
-  return json({ sb: result.sb, jobId: result.jobId, now });
+
+  if (b.reset === "AU" || b.reset === "UK") {
+    const r = await reset(b.sb, b.reset, ipKey);
+    return r.ok ? json({ sb: r.sb, v: r.v, now }) : json({ error: r.error }, r.status);
+  }
+
+  const action = b.action as PublicAction | undefined;
+  if (!action || typeof action !== "object" || Array.isArray(action) || !PUBLIC_TYPES.has((action as { type?: string }).type ?? "")) {
+    return json({ error: OOPS }, 400);
+  }
+
+  // Photos are checked and stored first; the job only keeps the photo's id.
+  if ((action.type === "report" || action.type === "complete") && action.photo !== undefined) {
+    if (typeof action.photo === "string" && action.photo.startsWith("data:")) {
+      const ph = await putPhoto(b.sb, action.photo);
+      if (typeof ph !== "string") return json({ error: ph.error }, 400);
+      action.photo = ph;
+    } else {
+      action.photo = undefined;
+    }
+  }
+
+  const r = await mutate<string | undefined>(b.sb, regionOf(b.region), ipKey, (loaded) => {
+    const res = apply(loaded.sb, action, now);
+    return res.ok ? { ok: true, sb: res.sb, out: res.jobId } : { ok: false, error: res.error };
+  });
+  if (!r.ok) return json({ error: r.error }, r.status);
+  return json({ sb: r.sb, v: r.v, jobId: r.out, now });
 }
