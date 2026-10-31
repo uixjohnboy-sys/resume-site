@@ -17,6 +17,7 @@ export type Contractor = {
   business: string;
   trade: Trade;
   onCall: boolean;
+  /** Empty when the trade needs no licence (most UK trades); the card then shows insurance only. */
   licence: string;
   licenceExpires: number;
   insuranceExpires: number;
@@ -77,8 +78,10 @@ export type Job = {
   stage: Stage;
   triage?: Triage;
   contractorId?: string;
-  /** Not-to-exceed amount on the work order (the owner's limit for routine work). */
+  /** Not-to-exceed amount: the owner's limit for routine work, the agency's urgent limit for urgent or tenant-charged work. */
   cap?: number;
+  /** A deadline set by law (NSW smoke alarms: 2 business days); the timer counts against it. */
+  dueBy?: number;
   quote?: { amount: number; note: string; at: number };
   ownerDecision?: { decision: "approved" | "declined" | "auto" | "urgent"; at: number; note?: string };
   ownerQuestion?: string;

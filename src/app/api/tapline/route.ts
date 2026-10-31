@@ -1,5 +1,5 @@
 import { apply, PUBLIC_TYPES, type PublicAction } from "@/lib/tapline/actions";
-import { load, mutate, putPhoto, reset, validId, version } from "@/lib/tapline/store";
+import { claimNew, load, mutate, network, putPhoto, reset, validId, version } from "@/lib/tapline/store";
 import type { Region } from "@/lib/tapline/types";
 import { clientIp, hashKey } from "@/lib/twin/gate";
 
@@ -21,7 +21,8 @@ export async function GET(req: Request) {
   const id = u.searchParams.get("sb");
   if (!validId(id)) return json({ error: OOPS }, 400);
   const have = Number(u.searchParams.get("v") ?? "-1");
-  if (have > 0 && (await version(id)) === have) return json({ unchanged: true, v: have, now: Date.now() });
+  // v 0 is a sandbox that is not saved yet: nothing to send until its first change.
+  if (have >= 0 && (await version(id)) === have) return json({ unchanged: true, v: have, now: Date.now() });
   const loaded = await load(id, regionOf(u.searchParams.get("region")));
   return json({ sb: loaded.sb, v: loaded.v, now: Date.now() });
 }
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
   if (!body || typeof body !== "object") return json({ error: OOPS }, 400);
   const b = body as { sb?: unknown; action?: unknown; reset?: unknown; region?: unknown };
   if (!validId(b.sb)) return json({ error: OOPS }, 400);
-  const ipKey = hashKey(clientIp(req));
+  const ipKey = hashKey(network(clientIp(req)));
   const now = Date.now();
 
   if (b.reset === "AU" || b.reset === "UK") {
@@ -49,10 +50,19 @@ export async function POST(req: Request) {
     return json({ error: OOPS }, 400);
   }
 
-  // Photos are checked and stored first; the job only keeps the photo's id.
+  // A photo is stored only once the action it belongs to has passed a dry run and a brand-new sandbox has
+  // been counted against the daily limit; the job only keeps the photo's id.
+  let counted = false;
   if ((action.type === "report" || action.type === "complete") && action.photo !== undefined) {
     if (typeof action.photo === "string" && action.photo.startsWith("data:")) {
-      const ph = await putPhoto(b.sb, action.photo);
+      const loaded = await load(b.sb, regionOf(b.region));
+      const dry = apply(loaded.sb, { ...action, photo: undefined }, now);
+      if (!dry.ok) return json({ error: dry.error }, 409);
+      if (!loaded.persisted) {
+        if (!(await claimNew(ipKey))) return json({ error: "You've started a lot of demos today. Please come back tomorrow, or reuse the one you have." }, 429);
+        counted = true;
+      }
+      const ph = await putPhoto(b.sb, action.photo, ipKey);
       if (typeof ph !== "string") return json({ error: ph.error }, 400);
       action.photo = ph;
     } else {
@@ -60,10 +70,16 @@ export async function POST(req: Request) {
     }
   }
 
-  const r = await mutate<string | undefined>(b.sb, regionOf(b.region), ipKey, (loaded) => {
-    const res = apply(loaded.sb, action, now);
-    return res.ok ? { ok: true, sb: res.sb, out: res.jobId } : { ok: false, error: res.error };
-  });
+  const r = await mutate<string | undefined>(
+    b.sb,
+    regionOf(b.region),
+    ipKey,
+    (loaded) => {
+      const res = apply(loaded.sb, action, now);
+      return res.ok ? { ok: true, sb: res.sb, out: res.jobId } : { ok: false, error: res.error };
+    },
+    { counted }
+  );
   if (!r.ok) return json({ error: r.error }, r.status);
   return json({ sb: r.sb, v: r.v, jobId: r.out, now });
 }

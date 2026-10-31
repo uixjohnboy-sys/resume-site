@@ -1,9 +1,11 @@
-import { REGION, money, slots, terms } from "./rules";
+import { REGION, SMOKE_ALARM, addBusinessDays, isSmokeAlarm, money, slots, terms } from "./rules";
 import type { ComplianceItem, Contractor, Job, Manager, Owner, Property, Region, Sandbox, Stage, Trade, Urgency } from "./types";
 
 // Deterministic fictional data that obeys the product's own rules: owner-stage
-// quotes are over the owner's limit, work orders are capped at it, bookings sit
-// on business-hour slots, compliance follows each region's rules, and every
+// quotes are big-ticket work priced inside the fault's own band and over that
+// owner's limit, work orders are capped at it, bookings sit on business-hour
+// slots after the notice period, titles never repeat in a column, compliance
+// follows each region's rules, and every
 // number on the board comes from these records. Timestamps are relative to the
 // moment the sandbox is made, so the timers always look like a live morning.
 // Phone numbers are from the ranges reserved for fiction (ACMA 02 5550 xxxx,
@@ -87,14 +89,21 @@ const BUSINESSES: Record<Region, Record<Trade, string[]>> = {
   },
 };
 
+type Band = [number, number];
 type Tpl = {
   trade: Trade;
   urgency: Urgency;
-  /** AUD price band; GBP uses 0.55 of it. */
-  price: [number, number];
+  /** AUD price band; GBP uses 0.55 of it unless ukPrice is set. */
+  price: Band;
   au: [string, string[]];
   uk?: [string, string[]];
+  ukTrade?: Trade;
+  ukPrice?: Band;
   chargeTo?: "tenant";
+  /** Roofs, gutters, fences and decks: houses only (in a strata scheme or a block they are common property). */
+  house?: boolean;
+  /** What the contractor's quote covers, AU then UK (owner-stage templates). */
+  note?: [string, string];
 };
 
 const TEMPLATES: Tpl[] = [
@@ -105,7 +114,14 @@ const TEMPLATES: Tpl[] = [
   { trade: "plumber", urgency: "routine", price: [180, 300], au: ["Leak under the bathroom basin", ["Small puddle under the vanity every morning."]], uk: ["Leak under the bathroom sink", ["Small puddle under the sink every morning."]] },
   { trade: "plumber", urgency: "urgent", price: [380, 900], au: ["Water coming through the ceiling", ["Brown stain on the living room ceiling and it's dripping into a bucket."]] },
   { trade: "plumber", urgency: "urgent", price: [420, 1100], au: ["Burst pipe in the laundry", ["A pipe behind the washing machine burst and water is everywhere."]], uk: ["Burst pipe in the kitchen", ["A pipe under the kitchen sink has burst and water is everywhere."]] },
-  { trade: "plumber", urgency: "urgent", price: [450, 1500], au: ["No hot water", ["The hot water system stopped this morning, only cold water now."]] },
+  {
+    trade: "plumber",
+    urgency: "urgent",
+    price: [450, 1500],
+    au: ["No hot water", ["The hot water system stopped this morning, only cold water now."]],
+    uk: ["Boiler not giving hot water", ["The boiler fires up for the heating but there's no hot water from the taps."]],
+    ukTrade: "hvac",
+  },
   { trade: "plumber", urgency: "urgent", price: [250, 450], au: ["Only toilet blocked", ["Our only toilet is blocked and won't flush."]] },
   { trade: "gas", urgency: "urgent", price: [200, 420], au: ["Smell of gas in the kitchen", ["Strong smell of gas near the cooktop since this afternoon."]], uk: ["Smell of gas in the kitchen", ["Strong smell of gas near the hob since this afternoon."]] },
   { trade: "gas", urgency: "routine", price: [180, 320], au: ["Cooktop burner won't light", ["One of the gas burners clicks but won't light."]], uk: ["Hob ring won't light", ["One of the gas rings clicks but won't light."]] },
@@ -119,10 +135,10 @@ const TEMPLATES: Tpl[] = [
   { trade: "locksmith", urgency: "routine", price: [150, 260], au: ["Sliding door lock stiff", ["The back sliding door lock is very stiff and hard to turn."]], uk: ["Back door lock stiff", ["The back door lock is very stiff and hard to turn."]] },
   { trade: "handyman", urgency: "routine", price: [120, 220], au: ["Wardrobe door off its track", ["The sliding wardrobe door has come off the bottom track."]] },
   { trade: "handyman", urgency: "routine", price: [150, 280], au: ["Loose stair handrail", ["The handrail on the stairs is coming away from the wall."]], uk: ["Loose bannister", ["The bannister is coming away from the wall."]] },
-  { trade: "handyman", urgency: "routine", price: [200, 450], au: ["Fence palings down", ["A few palings blew off the side fence in the wind."]], uk: ["Fence panel down", ["A fence panel blew down in the wind."]] },
+  { trade: "handyman", urgency: "routine", price: [200, 450], au: ["Fence palings down", ["A few palings blew off the side fence in the wind."]], uk: ["Fence panel down", ["A fence panel blew down in the wind."]], house: true },
   { trade: "handyman", urgency: "routine", price: [90, 180], au: ["Flyscreen torn", ["The bedroom flyscreen has a big tear."]], uk: ["Kitchen cupboard door hanging off", ["A hinge has come out of a kitchen cupboard door."]] },
-  { trade: "roofer", urgency: "routine", price: [200, 450], au: ["Gutter overflowing", ["The back gutter overflows every time it rains and water runs down the wall."]] },
-  { trade: "roofer", urgency: "routine", price: [300, 700], au: ["Roof tiles slipped", ["A few roof tiles look like they've slipped after the storm."]], uk: ["Slates slipped", ["A few slates look like they've slipped after the storm."]] },
+  { trade: "roofer", urgency: "routine", price: [200, 450], au: ["Gutter overflowing", ["The back gutter overflows every time it rains and water runs down the wall."]], house: true },
+  { trade: "roofer", urgency: "routine", price: [300, 700], au: ["Roof tiles slipped", ["A few roof tiles look like they've slipped after the storm."]], uk: ["Slates slipped", ["A few slates look like they've slipped after the storm."]], house: true },
   { trade: "hvac", urgency: "routine", price: [220, 480], au: ["Air con not cooling", ["The split system runs but only blows warm air."]], uk: ["Boiler losing pressure", ["Boiler pressure drops below 1 bar every couple of days and the radiators go cold."]] },
   { trade: "hvac", urgency: "routine", price: [160, 320], au: ["Air con dripping inside", ["Water drips from the indoor unit onto the floor."]], uk: ["Radiator cold at the top", ["The bedroom radiator is cold at the top and warm at the bottom."]] },
   { trade: "pest", urgency: "routine", price: [180, 300], au: ["Mice in the kitchen", ["Droppings in the pantry and scratching at night."]] },
@@ -130,6 +146,72 @@ const TEMPLATES: Tpl[] = [
   { trade: "glazier", urgency: "routine", price: [250, 600], au: ["Cracked window pane", ["Crack across the bottom pane of the bedroom window."]] },
   { trade: "glazier", urgency: "urgent", price: [300, 700], au: ["Smashed back window", ["Someone smashed the back window overnight, it's wide open."]] },
   { trade: "damp", urgency: "routine", price: [250, 700], au: ["Mould in the bathroom", ["Black mould keeps coming back on the bathroom ceiling."]], uk: ["Black mould in the bedroom", ["Black mould on the bedroom wall behind the wardrobe."]] },
+];
+
+// Work that genuinely costs more than most owners' limits: the jobs that wait on the owner.
+const OWNER_TEMPLATES: Tpl[] = [
+  {
+    trade: "plumber",
+    urgency: "routine",
+    price: [1400, 2300],
+    au: ["Hot water system leaking at the base", ["There's a puddle under the hot water system and rust on the tank."]],
+    uk: ["Boiler keeps cutting out", ["The boiler cuts out a few times a day and shows a fault code."]],
+    ukTrade: "hvac",
+    ukPrice: [1900, 2800],
+    note: [
+      "Replace the 250 L electric hot water unit; the tank has rusted through",
+      "The boiler is 17 years old and the heat exchanger has failed. Replace with a new combi, includes flue and Gas Safe certificate",
+    ],
+  },
+  {
+    trade: "hvac",
+    urgency: "routine",
+    price: [1600, 2600],
+    au: ["Split system not working", ["The living room split system won't start at all now."]],
+    uk: ["Damp patch spreading on the back wall", ["A damp patch on the back wall is getting bigger and the paint is bubbling."]],
+    ukTrade: "damp",
+    ukPrice: [900, 1600],
+    note: ["Compressor has failed. Replace the 2.5 kW split system, includes removing the old unit", "Inject a damp-proof course along the 4 m back wall and re-plaster"],
+  },
+  {
+    trade: "handyman",
+    urgency: "routine",
+    price: [1100, 2000],
+    au: ["Fence leaning after the storm", ["The back fence is leaning badly after the storm and two posts are loose."]],
+    uk: ["Fence panels down after the storm", ["Four fence panels and a post came down in the storm."]],
+    ukPrice: [480, 900],
+    house: true,
+    note: ["Replace 6 m of paling fence and two rotten posts", "Replace four fence panels and two concrete posts"],
+  },
+  {
+    trade: "plumber",
+    urgency: "routine",
+    price: [1600, 3200],
+    au: ["Shower leaking into the next room", ["The wall next to the shower is damp and the skirting is swelling."]],
+    uk: ["Shower leaking through to the kitchen", ["There's a damp patch on the kitchen ceiling under the shower."]],
+    ukPrice: [1100, 1900],
+    note: ["Strip and re-waterproof the shower recess, then re-tile", "Remove the tray, re-seal and re-tile the shower enclosure"],
+  },
+  {
+    trade: "electrician",
+    urgency: "routine",
+    price: [480, 900],
+    au: ["Oven not heating", ["The oven light comes on but it doesn't heat up."]],
+    uk: ["Oven not heating", ["The oven light comes on but it doesn't heat up."]],
+    ukPrice: [300, 520],
+    note: ["Replace the oven element and thermostat, parts ordered", "Replace the oven element and thermostat, parts ordered"],
+  },
+  {
+    trade: "handyman",
+    urgency: "routine",
+    price: [900, 1800],
+    au: ["Rotten deck boards", ["Several deck boards are soft and one has cracked through."]],
+    uk: ["Window won't close properly", ["The bedroom window won't close and there's a draught and condensation between the panes."]],
+    ukTrade: "glazier",
+    ukPrice: [420, 780],
+    house: true,
+    note: ["Replace 12 rotten deck boards and two joists", "Replace the failed double-glazed unit and both hinges"],
+  },
 ];
 
 // Stage mix: 38 jobs. Every column has work; a few timers are already late.
@@ -150,8 +232,8 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
   const R = REGION[region];
   const c = terms(region);
   const AU = region === "AU";
-  const priceScale = AU ? 1 : 0.55;
   const round5 = (n: number) => Math.round(n / 5) * 5;
+  const WO = c.workOrder[0].toUpperCase() + c.workOrder.slice(1);
 
   const managers: Manager[] = AU
     ? [
@@ -174,15 +256,17 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
   for (const [trade, bizs] of Object.entries(BUSINESSES[region]) as [Trade, string[]][]) {
     bizs.forEach((business, i) => {
       const n = contractors.length + 1;
+      // UK: gas and heating work needs a Gas Safe registration; most other UK trades hold no licence.
       const licence = AU
         ? trade === "pest"
           ? `Pest licence ${5100 + n * 37}`
           : `NSW licence ${(320000 + n * 4111).toString()}C`
-        : trade === "gas"
+        : trade === "gas" || trade === "hvac"
           ? `Gas Safe ${(512000 + n * 917).toString()}`
           : trade === "electrician"
             ? `NICEIC ${(60000 + n * 311).toString()}`
-            : "Public liability verified";
+            : "";
+      const licenceDays = between(60, 700);
       contractors.push({
         id: `t${n}`,
         name: person(),
@@ -190,7 +274,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
         trade,
         onCall: i === 0,
         licence,
-        licenceExpires: now + between(60, 700) * D,
+        licenceExpires: now + (licence ? licenceDays : 3650) * D,
         // One contractor's insurance has lapsed, so the block on dispatch can be seen.
         insuranceExpires: trade === "handyman" && i === 1 ? now - 9 * D : now + between(40, 360) * D,
       });
@@ -222,6 +306,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       keysAtOffice: r() < 0.7,
     };
   });
+  const ownerOf = (p: Property) => owners.find((o) => o.id === p.ownerId)!;
 
   const byTrade = (t: Trade) => contractors.filter((x) => x.trade === t && x.insuranceExpires > now);
   let rr = 0;
@@ -231,27 +316,75 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
     return list[rr++ % list.length];
   };
 
+  // Templates are dealt like cards: shuffled, without replacement, never the same title twice in one column,
+  // and at most one gas leak on the board.
+  const deck = (pool: Tpl[]) => {
+    let cards: Tpl[] = [];
+    return () => {
+      if (!cards.length) {
+        cards = [...pool];
+        for (let i = cards.length - 1; i > 0; i--) {
+          const k = Math.floor(r() * (i + 1));
+          [cards[i], cards[k]] = [cards[k], cards[i]];
+        }
+      }
+      return cards.pop()!;
+    };
+  };
+  const decks = { open: deck(TEMPLATES), routine: deck(TEMPLATES.filter((t) => t.urgency === "routine")), owner: deck(OWNER_TEMPLATES) };
+  // The demo property's earlier basin leak becomes a billed job below, so its title is taken in that column.
+  const columns = new Map<Stage, Set<string>>([["billed", new Set([AU ? "Leak under the bathroom basin" : "Leak under the bathroom sink"])]]);
+  let gasLeaks = 0;
+  const deal = (stage: Stage): Tpl => {
+    const draw = stage === "owner" ? decks.owner : stage === "sent" ? decks.routine : decks.open;
+    const seen = columns.get(stage) ?? new Set<string>();
+    columns.set(stage, seen);
+    for (let guard = 0; guard < 200; guard++) {
+      const t = draw();
+      const title = (!AU && t.uk ? t.uk : t.au)[0];
+      const leak = t.trade === "gas" && t.urgency === "urgent";
+      if (seen.has(title) || (leak && gasLeaks > 0)) continue;
+      if (leak) gasLeaks++;
+      seen.add(title);
+      return t;
+    }
+    throw new Error("seed: ran out of templates");
+  };
+
+  // One job per property, so no two seeded jobs look like a repeat by accident.
+  const used = new Set<string>([DEMO_PROPERTY]);
+  const propFor = (t: Tpl, limitBelow?: number) => {
+    const fits = (p: Property) => !used.has(p.id) && (!t.house || !p.strata) && (limitBelow === undefined || ownerOf(p).approvalLimit < limitBelow);
+    const ok = properties.filter(fits);
+    const p = ok.length ? pick(ok) : pick(properties.filter((x) => !used.has(x.id)));
+    used.add(p.id);
+    return p;
+  };
+
   // Ages (hours) at which each stage was reached. Routine work is slower; urgent work fast.
   const AGE: Record<Stage, [number, number]> = AU
     ? { new: [0.1, 4], sent: [3, 60], owner: [10, 70], booked: [20, 140], done: [30, 200], billed: [60, 600] }
     : { new: [0.2, 5], sent: [2, 70], owner: [8, 60], booked: [24, 150], done: [36, 220], billed: [70, 640] };
 
   const jobs: Job[] = [];
+  const takenSlots = new Set<number>();
   STAGE_MIX.forEach((stage, i) => {
-    // Owner-stage work is always routine and always over the owner's limit.
-    const pool = stage === "owner" || stage === "sent" ? TEMPLATES.filter((t) => t.urgency === "routine") : TEMPLATES;
-    const t = pool[Math.floor(r() * pool.length)];
-    let prop = properties[Math.floor(r() * properties.length)];
-    if (prop.id === DEMO_PROPERTY) prop = properties[0];
+    const t = deal(stage);
+    const trade = (!AU && t.ukTrade) || t.trade;
+    const band: Band = !AU && t.ukPrice ? t.ukPrice : AU ? t.price : [t.price[0] * 0.55, t.price[1] * 0.55];
+    let amount = round5(between(band[0], band[1]));
+    // Owner-stage work goes to a property whose owner's limit is below the quote: that is why it waits.
+    const prop = propFor(t, stage === "owner" ? amount : undefined);
+    const owner = ownerOf(prop);
     const urgent = t.urgency === "urgent";
-    const scale = urgent ? 0.12 : 1;
-    const ageH = between(AGE[stage][0], AGE[stage][1]) * (stage === "billed" ? 1 : scale);
-    const createdAt = now - ageH * H;
     const [title, variants] = !AU && t.uk ? t.uk : t.au;
+    const smoke = AU && isSmokeAlarm(title);
+    const scale = urgent ? 0.12 : 1;
+    let ageH = between(AGE[stage][0], AGE[stage][1]) * (stage === "billed" ? 1 : scale);
+    if (smoke && stage !== "billed") ageH = Math.min(ageH, 30); // the law's 2 business days
+    const createdAt = now - ageH * H;
     const description = pick(variants);
-    const owner = owners.find((o) => o.id === prop.ownerId)!;
-    const contractor = assign(t.trade, urgent);
-    const base = between(t.price[0], t.price[1]) * priceScale;
+    const contractor = assign(trade, urgent);
     const job: Job = {
       id: `j${i + 1}`,
       ref: `${AU ? "HL" : "NG"}-${4100 + i}`,
@@ -261,7 +394,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       title,
       description,
       access: { mode: prop.keysAtOffice ? "keys" : "home", note: "", pets: r() < 0.25 },
-      trade: t.trade,
+      trade,
       urgency: t.urgency,
       stage,
       events: [{ at: createdAt, by: "tenant", text: "Reported by the tenant" }],
@@ -274,7 +407,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       job.triage = {
         source: "ai",
         at,
-        trade: t.trade,
+        trade,
         urgency: t.urgency,
         reason: "",
         safety: [],
@@ -288,40 +421,62 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       job.events.push({ at, by: "manager", text: "Triage confirmed, reply sent to the tenant" });
       job.contractorId = contractor.id;
       if (urgent) {
+        job.cap = R.urgentLimit;
         job.ownerDecision = { decision: "urgent", at };
-        job.events.push({ at, by: "tapline", text: `Urgent: sent to on-call ${contractor.business}, ${c.owner} notified` });
+        job.events.push({ at, by: "tapline", text: `Urgent: sent to on-call ${contractor.business} (up to ${money(region, R.urgentLimit)}), ${c.owner} notified` });
+      } else if (smoke) {
+        job.cap = R.urgentLimit;
+        job.dueBy = addBusinessDays(region, createdAt, SMOKE_ALARM.businessDays);
+        job.ownerDecision = { decision: "auto", at };
+        job.events.push({ at, by: "tapline", text: `Smoke alarm repair sent to ${contractor.business}: due within 2 business days by NSW law, no ${c.owner} approval needed, ${c.owner} notified` });
       } else {
         job.cap = owner.approvalLimit;
-        job.events.push({ at, by: "tapline", text: `${c.workOrder[0].toUpperCase() + c.workOrder.slice(1)} sent to ${contractor.business}, up to ${money(region, owner.approvalLimit)}` });
+        job.events.push({ at, by: "tapline", text: `${WO} sent to ${contractor.business}, up to ${money(region, owner.approvalLimit)}` });
       }
       job.stageEnteredAt = at;
     }
 
-    let amount = round5(base);
     if (stage === "owner") {
-      // Over the limit by a realistic margin, so it genuinely needs the owner.
-      amount = round5(owner.approvalLimit * between(1.15, 1.9));
       step(0.5);
-      job.quote = { amount, note: pick(["Labour and parts, includes a new cartridge", "Two hours labour plus materials", "Replace the unit, old one is not repairable", "Includes after-hours call-out"]), at };
-      job.events.push({ at, by: "contractor", text: `Quote sent: ${money(region, amount)}, over the ${money(region, owner.approvalLimit)} limit` });
-      job.events.push({ at, by: "tapline", text: `Sent to the ${c.owner} for approval` });
+      job.quote = { amount, note: t.note ? t.note[AU ? 0 : 1] : "Labour and parts", at };
+      job.events.push({ at, by: "contractor", text: `Quote sent: ${money(region, amount)}` });
+      job.events.push({ at, by: "tapline", text: `Over the ${money(region, owner.approvalLimit)} limit, sent to the ${c.owner} for approval` });
       job.stageEnteredAt = at;
     }
 
     if (["booked", "done", "billed"].includes(stage)) {
       if (!urgent) {
-        amount = Math.min(amount, owner.approvalLimit);
-        job.ownerDecision = { decision: "auto", at: step(0.25) };
+        amount = Math.min(amount, job.cap!);
+        if (!smoke) job.ownerDecision = { decision: "auto", at: step(0.25) };
       }
       step(0.3);
-      // Urgent visits happen within hours, any time; routine ones on business-hour slots.
-      const slot = stage === "booked" ? (urgent ? now + between(0.5, 3) * H : slots(region, now, 1, between(4, 60))[0]) : at + between(2, 30) * H;
+      const notice = urgent ? 0 : smoke ? SMOKE_ALARM.noticeHours : R.noticeHours;
+      let agreedEarly = false;
+      let slot: number;
+      if (stage === "booked") {
+        // Urgent visits happen within hours, any time; routine ones on business-hour slots after the notice period.
+        const free = slots(region, Math.max(now, at + notice * H), 14, 1).filter((x) => !takenSlots.has(x));
+        slot = urgent ? now + between(0.5, 3) * H : pick(free.slice(0, 6));
+        takenSlots.add(slot);
+      } else if (urgent) {
+        slot = Math.min(at + between(0.5, 2) * H, now - 2 * H);
+      } else {
+        // A finished routine visit sat on a business-hour slot, after the notice period where there was time for it.
+        const past = (from: number) => slots(region, from, 40, 0).filter((x) => x < now - 2 * H);
+        let options = past(at + Math.max(2, notice) * H);
+        if (!options.length) {
+          options = past(at + 2 * H);
+          agreedEarly = notice > 2;
+        }
+        slot = options.length ? pick(options.slice(0, 6)) : Math.min(at + 2 * H, now - 2 * H);
+      }
       job.bookedFor = slot;
-      job.events.push({ at, by: "contractor", text: `Accepted and booked for ${new Date(slot).toLocaleString(R.locale, { timeZone: R.tz, weekday: "short", hour: "numeric", minute: "2-digit" })}` });
+      job.events.push({ at, by: "contractor", text: `${contractor.business} accepted and booked a visit` });
+      if (agreedEarly) job.events.push({ at, by: "contractor", text: "The tenant agreed to an earlier time than the notice period" });
       job.stageEnteredAt = at;
     }
     if (["done", "billed"].includes(stage)) {
-      job.completedAt = Math.min(now - 30 * 60_000, (job.bookedFor ?? at) + 1.5 * H);
+      job.completedAt = Math.min(now - 30 * 60_000, job.bookedFor! + 1.5 * H);
       at = job.completedAt;
       job.events.push({ at, by: "contractor", text: "Marked complete with a photo" });
       job.stageEnteredAt = at;
@@ -331,7 +486,7 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
       at = Math.min(now - 60_000, at + between(4, 40) * H);
       job.invoice = { amount: inv, at, overApproved: false };
       job.billedAt = at;
-      job.events.push({ at, by: "contractor", text: `Invoice uploaded: ${money(region, inv)}` });
+      job.events.push({ at, by: "contractor", text: `Invoice uploaded: ${money(region, inv)} incl. ${c.tax}` });
       job.events.push({ at, by: "tapline", text: `Bill entered in ${c.accounts}` });
       job.stageEnteredAt = at;
     }
@@ -354,8 +509,8 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
     prior.cap = owners.find((o) => o.id === properties[6].ownerId)!.approvalLimit;
     prior.triage = { source: "ai", at: at0 + 2 * H, trade: "plumber", urgency: "routine", reason: "", safety: [], emergency: [], reply: "", chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: at0 + 2 * H };
     prior.ownerDecision = { decision: "auto", at: at0 + 2 * H };
-    prior.bookedFor = at0 + 26 * H;
-    prior.completedAt = at0 + 27.5 * H;
+    prior.bookedFor = slots(region, at0 + R.noticeHours * H, 1, 0)[0];
+    prior.completedAt = prior.bookedFor + 1.5 * H;
     const inv = AU ? 245 : 135;
     prior.invoice = { amount: inv, at: at0 + 50 * H, overApproved: false };
     prior.billedAt = at0 + 50 * H;
@@ -363,13 +518,55 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
     prior.events = [
       { at: at0, by: "tenant", text: "Reported by the tenant" },
       { at: at0 + 2 * H, by: "manager", text: "Triage confirmed, reply sent to the tenant" },
-      { at: at0 + 2 * H, by: "tapline", text: `${c.workOrder[0].toUpperCase() + c.workOrder.slice(1)} sent to ${plumber.business}` },
-      { at: at0 + 3 * H, by: "contractor", text: "Accepted and booked" },
-      { at: at0 + 27.5 * H, by: "contractor", text: "Marked complete with a photo" },
-      { at: at0 + 50 * H, by: "contractor", text: `Invoice uploaded: ${money(region, inv)}` },
+      { at: at0 + 2 * H, by: "tapline", text: `${WO} sent to ${plumber.business}, up to ${money(region, prior.cap)}` },
+      { at: at0 + 3 * H, by: "contractor", text: `${plumber.business} accepted and booked a visit` },
+      { at: prior.completedAt, by: "contractor", text: "Marked complete with a photo" },
+      { at: at0 + 50 * H, by: "contractor", text: `Invoice uploaded: ${money(region, inv)} incl. ${c.tax}` },
       { at: at0 + 50 * H, by: "tapline", text: `Bill entered in ${c.accounts}` },
     ];
   }
+
+  // Two open repeat faults: the same fault at the same property, fixed a few weeks ago and back again.
+  const billedTitles = new Set(jobs.filter((j) => j.stage === "billed").map((j) => j.title));
+  const candidates = (st: Stage) => jobs.find((j) => j.stage === st && j.urgency === "routine" && !j.dueBy && j.propertyId !== DEMO_PROPERTY && !billedTitles.has(j.title));
+  [candidates("sent"), candidates("booked")].forEach((j, k) => {
+    if (!j) return;
+    const at0 = j.createdAt - (k ? 38 : 24) * D;
+    const con = contractors.find((x) => x.id === j.contractorId)!;
+    const visit = slots(region, at0 + R.noticeHours * H, 1, 0)[0];
+    const done = visit + 1.5 * H;
+    const inv = round5(Math.min(j.cap ?? 300, (j.cap ?? 300) * 0.55 + 40));
+    jobs.push({
+      id: `jh${k + 1}`,
+      ref: `${AU ? "HL" : "NG"}-${4071 + k * 12}`,
+      propertyId: j.propertyId,
+      createdAt: at0,
+      stageEnteredAt: done + 20 * H,
+      title: j.title,
+      description: j.description,
+      access: j.access,
+      trade: j.trade,
+      urgency: "routine",
+      stage: "billed",
+      contractorId: con.id,
+      cap: j.cap,
+      triage: { source: "ai", at: at0 + 2 * H, trade: j.trade, urgency: "routine", reason: "", safety: [], emergency: [], reply: "", chargeTo: "owner", strataReferral: false, insuranceClaim: false, confirmedAt: at0 + 2 * H },
+      ownerDecision: { decision: "auto", at: at0 + 3 * H },
+      bookedFor: visit,
+      completedAt: done,
+      invoice: { amount: inv, at: done + 20 * H, overApproved: false },
+      billedAt: done + 20 * H,
+      events: [
+        { at: at0, by: "tenant", text: "Reported by the tenant" },
+        { at: at0 + 2 * H, by: "manager", text: "Triage confirmed, reply sent to the tenant" },
+        { at: at0 + 2 * H, by: "tapline", text: `${WO} sent to ${con.business}, up to ${money(region, j.cap ?? 0)}` },
+        { at: at0 + 3 * H, by: "contractor", text: `${con.business} accepted and booked a visit` },
+        { at: done, by: "contractor", text: "Marked complete with a photo" },
+        { at: done + 20 * H, by: "contractor", text: `Invoice uploaded: ${money(region, inv)} incl. ${c.tax}` },
+        { at: done + 20 * H, by: "tapline", text: `Bill entered in ${c.accounts}` },
+      ],
+    });
+  });
 
   // Repeat faults are flagged once, from the same rule the board uses.
   for (const j of jobs) {
@@ -394,23 +591,11 @@ export function seedSandbox(id: string, region: Region, now = Date.now()): Sandb
   return { id, region, createdAt: now, agency: R.agency, managers, owners, contractors, properties, jobs, compliance };
 }
 
-const FAMILY: Record<Trade, string> = {
-  plumber: "water",
-  roofer: "water",
-  damp: "water",
-  gas: "gas",
-  hvac: "heating",
-  electrician: "power",
-  locksmith: "security",
-  glazier: "security",
-  handyman: "general",
-  pest: "pest",
-};
-
-/** The most recent earlier job at the same property, in the same fault family, within 90 days. */
+/** The most recent earlier job at the same property, for the same trade, within 90 days. The AI can name a
+ * related job in another trade (a roof leak behind a ceiling stain); the rule stays narrow on purpose. */
 export function priorRelated(jobs: Job[], j: Job, trade: Trade = j.trade) {
   return jobs
-    .filter((x) => x.id !== j.id && x.propertyId === j.propertyId && x.createdAt < j.createdAt && j.createdAt - x.createdAt < 90 * D && FAMILY[x.trade] === FAMILY[trade] && !x.complianceId)
+    .filter((x) => x.id !== j.id && x.propertyId === j.propertyId && x.createdAt < j.createdAt && j.createdAt - x.createdAt < 90 * D && x.trade === trade && !x.complianceId)
     .sort((a, b) => b.createdAt - a.createdAt)[0];
 }
 

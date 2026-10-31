@@ -1,7 +1,10 @@
 // Run against a running server: node scripts/tapline-flow.test.mjs [baseUrl]
-// Walks jobs through every stage of v0.3, then checks the G4 review's
-// blockers and majors: concurrent writes, double triage, bad input, decimals,
-// unchanged polls, compliance roll-forward, after-hours dispatch.
+// Walks jobs through every stage, then checks the G4 reviews' blockers and
+// majors: concurrent writes, double triage, bad input, decimals, unchanged
+// polls, compliance roll-forward, after-hours dispatch (v0.3), and from round 2:
+// triage on a never-saved demo, contractor accepting before the manager, a
+// morning re-dispatch, the entry notice, photos stored only after the action
+// passes, the NSW smoke alarm path and urgent invoices checked.
 const BASE = process.argv[2] || "http://localhost:3200";
 const sb = "flow" + Math.random().toString(36).slice(2, 10);
 let fail = 0;
@@ -23,7 +26,9 @@ const H = 3600_000;
 
 // Seed (not saved until the first change).
 let g = await fetch(`${BASE}/api/tapline?sb=${sb}&region=AU`).then((r) => r.json());
-check(g.sb.jobs.length === 38 && g.sb.properties.length === 120 && g.v === 0, "seed: 38 jobs, 120 properties, not saved yet (v0)");
+check(g.sb.jobs.length === 40 && g.sb.properties.length === 120 && g.v === 0, "seed: 40 jobs (2 of them history), 120 properties, not saved yet (v0)");
+const unsavedPoll = await fetch(`${BASE}/api/tapline?sb=${sb}&region=AU&v=0`).then((x) => x.json());
+check(unsavedPoll.unchanged === true, "poll of a never-saved demo -> unchanged, not the full 100 KB");
 const ownerJobs = g.sb.jobs.filter((j) => j.stage === "owner");
 const limitOf = (j) => g.sb.owners.find((o) => o.id === g.sb.properties.find((p) => p.id === j.propertyId).ownerId).approvalLimit;
 check(ownerJobs.length > 0 && ownerJobs.every((j) => j.quote.amount > limitOf(j)), "seed: every owner-stage quote is over the owner's limit");
@@ -55,6 +60,10 @@ const b = r.d.jobId;
 await post("/api/tapline/triage", { jobId: b });
 r = await act({ type: "confirm", jobId: b, trade: "plumber", urgency: "routine", reply: "Thanks", safety: [], chargeTo: "owner", strataReferral: false, insuranceClaim: false });
 r = await act({ type: "accept", jobId: b, slot: Date.now() + 26 * H });
+check(r.status === 409, "routine visit inside the 2-day NSW notice is refused");
+r = await act({ type: "accept", jobId: b, slot: Date.now() + 26 * H, tenantAgreed: true });
+check(job(r.d, b).stage === "booked" && job(r.d, b).events.some((e) => /agreed to an earlier time/.test(e.text)), "with the tenant's agreement it books, and the log says so");
+
 check(job(r.d, b).stage === "booked" && job(r.d, b).ownerDecision.decision === "auto", "work order accepted -> booked, within the owner's limit");
 r = await act({ type: "complete", jobId: b });
 r = await act({ type: "invoice", jobId: b, amount: job(r.d, b).cap * 2 });
@@ -73,6 +82,9 @@ r = await act({ type: "confirm", jobId: c, trade: "plumber", urgency: "urgent", 
 check(job(r.d, c).triage.confirmedAt && job(r.d, c).triage.safety.length === 1 && job(r.d, c).triage.insuranceClaim, "morning confirm: edited safety saved, insurance flag set");
 r = await act({ type: "accept", jobId: c, slot: Date.now() + 31 * 60_000 });
 check(job(r.d, c).stage === "booked", "on-call contractor accepts -> booked within the hour");
+r = await act({ type: "complete", jobId: c });
+r = await act({ type: "invoice", jobId: c, amount: 4900 });
+check(job(r.d, c).stage === "done" && job(r.d, c).invoice.overApproved && job(r.d, c).cap === 1500, "urgent invoice of $4,900 is held against the $1,500 urgent limit");
 
 // Owner declines -> hold -> second quote.
 r = await act({ type: "report", propertyId: "p9", title: "Kitchen tap dripping", description: "Constant drip." });
@@ -123,15 +135,72 @@ check(pollR.unchanged === true, "poll with the current version -> unchanged");
 const item = g.sb.compliance.find((x) => x.dueAt < Date.now()) ?? g.sb.compliance[0];
 r = await act({ type: "complianceJob", complianceId: item.id });
 const cj = r.d.jobId;
-r = await act({ type: "accept", jobId: cj, slot: Date.now() + 26 * H });
+r = await act({ type: "accept", jobId: cj, slot: Date.now() + 50 * H });
 r = await act({ type: "complete", jobId: cj });
 r = await act({ type: "invoice", jobId: cj, amount: 120 });
 const rolled = r.d.sb.compliance.find((x) => x.id === item.id);
 check(job(r.d, cj).stage === "billed" && rolled.dueAt > Date.now() + 300 * 24 * H, "compliance job billed -> next due date rolled forward");
 
+// ---------- G4 round 2 ----------
+
+// A first-time visitor's first click is "Suggest triage" on a seeded report: it works and saves the demo.
+const fresh = "flowfresh" + Math.random().toString(36).slice(2, 8);
+const ft = await fetch(BASE + "/api/tapline/triage", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sb: fresh, region: "AU", jobId: "j1" }) });
+const ftd = await ft.json();
+check(ft.status === 200 && ftd.v === 1 && ftd.sb.jobs.find((j) => j.id === "j1").triage, `triage on a never-saved demo -> ${ft.status}, saved at v${ftd.v}`);
+
+// After hours, the on-call contractor accepts before the manager is in; the morning confirm still sends the reply.
+r = await act({ type: "report", propertyId: "p12", title: "Burst pipe under the sink", description: "Water everywhere, pouring out.", afterHours: true });
+const h1 = r.d.jobId;
+r = await post("/api/tapline/triage", { jobId: h1 });
+check(job(r.d, h1).stage === "sent" && job(r.d, h1).cap === 1500, "after hours: auto-dispatched under the urgent limit");
+const sentLine = job(r.d, h1).events.find((e) => /After hours: the tenant was/.test(e.text))?.text ?? "";
+check(job(r.d, h1).triage.emergency.length ? /fixed safety steps/.test(sentLine) : /has been contacted/.test(sentLine), `log says only what was sent: "${sentLine}"`);
+r = await act({ type: "accept", jobId: h1, slot: Date.now() + 31 * 60_000 });
+check(job(r.d, h1).stage === "booked", "on-call contractor accepts first");
+r = await act({ type: "confirm", jobId: h1, trade: "plumber", urgency: "urgent", reply: "Hi, we're on it.", safety: [], chargeTo: "owner", strataReferral: false, insuranceClaim: false });
+check(r.status === 200 && job(r.d, h1).triage.confirmedAt && job(r.d, h1).stage === "booked", `then the manager confirms -> ${r.status}, reply sent, visit kept`);
+
+// The morning confirm changes the trade: the on-call contractor is stood down and the job re-sent with a cap.
+r = await act({ type: "report", propertyId: "p13", title: "Roof leaking into the bedroom", description: "Water coming through the ceiling when it rains.", afterHours: true });
+const h2 = r.d.jobId;
+r = await post("/api/tapline/triage", { jobId: h2 });
+const conBefore = job(r.d, h2).contractorId;
+r = await act({ type: "confirm", jobId: h2, trade: "electrician", urgency: "routine", reply: "Hi, thanks.", safety: [], chargeTo: "owner", strataReferral: false, insuranceClaim: false });
+const j2 = job(r.d, h2);
+const conAfter = r.d.sb.contractors.find((x) => x.id === j2.contractorId);
+check(j2.stage === "sent" && conAfter.trade === "electrician" && j2.contractorId !== conBefore && j2.cap === limitOf(j2) && j2.events.some((e) => /Stood down/.test(e.text)), "morning confirm with a new trade: stood down, re-sent to an electrician, capped at the owner's limit");
+
+// Photos are stored only once the action passes: 13 bad reports with a photo cost nothing.
+const jpeg = "data:image/jpeg;base64," + Buffer.from([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x10, 0x00, 0x10, 0x03, 0x01, 0x22, 0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01, 0xff, 0xd9]).toString("base64");
+const badOnes = await Promise.all(Array.from({ length: 13 }, () => act({ type: "report", propertyId: "nope", title: "Bad report", description: "x", photo: jpeg })));
+check(badOnes.every((x) => x.status === 409), "13 reports with a photo and a bad property -> 409, nothing stored");
+r = await act({ type: "report", propertyId: "p14", title: "Cracked tile with photo", description: "x", photo: jpeg });
+check(r.status === 200 && /^ph/.test(job(r.d, r.d.jobId).photo ?? ""), `a good report with a photo still stores it (${r.status})`);
+
+// NSW smoke alarm: electrician, 2 business days, no owner approval, 1 hour's notice.
+r = await act({ type: "report", propertyId: "p15", title: "Smoke alarm beeping", description: "The hallway smoke alarm chirps every minute." });
+const sm = r.d.jobId;
+r = await post("/api/tapline/triage", { jobId: sm });
+check(job(r.d, sm).triage.urgency === "routine" && job(r.d, sm).triage.trade === "electrician", "smoke alarm chirp -> electrician, routine (never an after-hours page)");
+r = await act({ type: "confirm", jobId: sm, trade: "electrician", urgency: "routine", reply: "Thanks", safety: [], chargeTo: "owner", strataReferral: false, insuranceClaim: false });
+const smj = job(r.d, sm);
+check(smj.dueBy && smj.dueBy - Date.now() <= 4.5 * 24 * H && smj.ownerDecision?.decision === "auto", "smoke alarm: due within 2 business days, no owner approval");
+r = await act({ type: "accept", jobId: sm, slot: Date.now() + 2 * H });
+check(job(r.d, sm).stage === "booked", "smoke alarm repair can be booked with 1 hour's notice");
+
+// Confirm on an owner-declined job is refused (it goes through "Ask for a second quote").
+r = await act({ type: "report", propertyId: "p16", title: "Oven not heating", description: "Element gone." });
+const od = r.d.jobId;
+await act({ type: "confirm", jobId: od, trade: "electrician", urgency: "routine", reply: "Thanks", safety: [], chargeTo: "owner", strataReferral: false, insuranceClaim: false });
+await act({ type: "quote", jobId: od, amount: 2000, note: "x", earliest: 0 });
+await act({ type: "owner", jobId: od, decision: "declined" });
+r = await act({ type: "confirm", jobId: od, trade: "electrician", urgency: "routine", reply: "x", safety: [], chargeTo: "strata", strataReferral: false, insuranceClaim: false });
+check(r.status === 409, "confirm on an owner-declined job is refused");
+
 // Reset to the UK agency.
 r = await post("/api/tapline", { reset: "UK" });
-check(r.d.sb.region === "UK" && r.d.sb.agency === "Northgate Lettings" && r.d.sb.jobs.length === 38, "reset to the UK agency");
+check(r.d.sb.region === "UK" && r.d.sb.agency === "Northgate Lettings" && r.d.sb.jobs.length === 40, "reset to the UK agency");
 const ukAddr = r.d.sb.properties.filter((p) => p.address.startsWith("Flat ")).length;
 check(ukAddr > 20 && !r.d.sb.properties.some((p) => /^\d+\/\d+ /.test(p.address)), `UK addresses use "Flat n, ..." (${ukAddr}), never AU slashes`);
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { IconMoon } from "@tabler/icons-react";
-import { useState } from "react";
+import { IconCheck, IconMoon } from "@tabler/icons-react";
+import { useEffect, useRef, useState } from "react";
+import { earliestVisit, noticeHours } from "@/lib/tapline/actions";
 import { REGION, money, slots, stageLabel, taxIn, terms, tradeLabel, when } from "@/lib/tapline/rules";
 import { DEMO_PROPERTY } from "@/lib/tapline/seed";
 import type { Access, Job, Sandbox } from "@/lib/tapline/types";
 import { PhotoPick } from "./PhonePieces";
-import { AmountInput, parseAmount } from "./ui";
+import { AmountInput, parseAmount, useAnnouncer } from "./ui";
 import { useSandbox } from "./useSandbox";
 
 // What the tenant, the owner and the contractor see on their own phones,
@@ -28,6 +29,7 @@ export default function PhoneView({ role }: { role: PhoneRole }) {
   const s = useSandbox();
   const [jobId, setJobId] = useState<string | null>(null);
   const sb = s.sb;
+  const announce = useAnnouncer(sb);
 
   if (!sb) {
     return (
@@ -38,6 +40,12 @@ export default function PhoneView({ role }: { role: PhoneRole }) {
       </div>
     );
   }
+  // One status region, mounted from the first render, so every change after a tap is announced.
+  const status = (
+    <p className="tl-sr" role="status">
+      {announce}
+    </p>
+  );
 
   const c = terms(sb.region);
   const job = (jobId && sb.jobs.find((j) => j.id === jobId)) || jobFromUrl(sb);
@@ -81,6 +89,7 @@ export default function PhoneView({ role }: { role: PhoneRole }) {
         {role === "owner" && (job ? <OwnerView s={s} j={job} /> : <Missing />)}
         {role === "tradie" && (job ? <ContractorView s={s} j={job} /> : <Missing />)}
       </main>
+      {status}
     </div>
   );
 }
@@ -164,14 +173,20 @@ function TenantForm({ s, onSent }: { s: S; onSent: (id: string) => void }) {
 function TenantStatus({ s, j }: { s: S; j: Job }) {
   const sb = s.sb!;
   const c = terms(sb.region);
-  const steps = ["Received", `${cap(c.contractor)} arranged`, "Visit booked", "Fixed"];
+  const h1 = useRef<HTMLHeadingElement>(null);
+  // The form has just been replaced by this view: move focus to its heading.
+  useEffect(() => h1.current?.focus(), []);
+  const booked = ["booked", "done", "billed"].includes(j.stage);
+  const steps = ["Received", `${cap(c.contractor)} ${booked ? "arranged" : "contacted"}`, "Visit booked", "Fixed"];
   const at = j.stage === "new" ? 0 : j.stage === "sent" || j.stage === "owner" ? 1 : j.stage === "booked" ? 2 : 3;
   const con = sb.contractors.find((t) => t.id === j.contractorId);
   const t = j.triage;
   const autoSafety = j.afterHours && j.stage !== "new" && t && !t.confirmedAt;
   return (
     <div className="tl-m-card">
-      <h1>{j.title}</h1>
+      <h1 ref={h1} tabIndex={-1}>
+        {j.title}
+      </h1>
       <p className="tl-m-sub">Reference {j.ref}</p>
       <p className="tl-sr">
         Step {at + 1} of 4: {steps[at]}.
@@ -179,8 +194,7 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
       <ol className="tl-m-steps" aria-hidden="true">
         {steps.map((x, i) => (
           <li key={x} className={i <= at ? "on" : ""}>
-            {i < at ? "✓ " : ""}
-            {x}
+            {i < at && <IconCheck size={14} aria-hidden="true" />} {x}
           </li>
         ))}
       </ol>
@@ -210,7 +224,7 @@ function TenantStatus({ s, j }: { s: S; j: Job }) {
           )}
         </div>
       ) : autoSafety ? (
-        <p className="tl-m-wait">We&apos;ve contacted our on-call {c.contractor}. Your {c.manager} will be in touch first thing.</p>
+        <p className="tl-m-wait">We&apos;ve contacted our on-call {c.contractor}. Your {c.manager} will follow up during office hours.</p>
       ) : (
         <p className="tl-m-wait">Thanks, your {c.manager} has your report. You&apos;ll get a reply here and by text.</p>
       )}
@@ -277,7 +291,7 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
             >
               <label className="tl-field">
                 <span>Your question for the {c.manager}</span>
-                <textarea rows={3} value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={300} />
+                <textarea rows={3} value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={300} autoFocus />
               </label>
               <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy || !question.trim()}>
                 Send question
@@ -288,7 +302,7 @@ function OwnerView({ s, j }: { s: S; j: Job }) {
         </div>
       ) : (
         <p className="tl-m-done" role="status">
-          {j.ownerDecision?.decision === "declined" ? "Declined. Your property manager will call you." : j.ownerDecision ? "Thanks, approved." : `Status: ${stageLabel(sb.region, j.stage)}.`}
+          {j.ownerDecision?.decision === "declined" ? `Declined. Your ${c.manager} will call you.` : j.ownerDecision ? "Thanks, approved." : `Status: ${stageLabel(sb.region, j.stage)}.`}
         </p>
       )}
       {j.ownerQuestion && j.stage === "owner" && <p className="tl-m-fine">You asked: &ldquo;{j.ownerQuestion}&rdquo;</p>}
@@ -303,7 +317,9 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
   const p = sb.properties.find((x) => x.id === j.propertyId)!;
   const con = sb.contractors.find((t) => t.id === j.contractorId);
   const urgent = j.urgency === "urgent";
-  const options = urgent ? [0.5, 1, 2].map((h) => s.now + h * H) : slots(sb.region, s.now, 3, 2);
+  const [agreed, setAgreed] = useState(false);
+  const notice = noticeHours(sb, j);
+  const options = urgent ? [0.5, 1, 2].map((h) => s.now + h * H) : slots(sb.region, earliestVisit(sb, j, s.now, agreed), 3, 0);
   const [slot, setSlot] = useState(0);
   const [mode, setMode] = useState<"accept" | "quote">("accept");
   const [amount, setAmount] = useState(String(j.cap ? Math.round(j.cap * 1.4) : 520));
@@ -365,7 +381,7 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                s.act({ type: "accept", jobId: j.id, slot: options[slot] });
+                s.act({ type: "accept", jobId: j.id, slot: options[slot], tenantAgreed: agreed });
               }}
             >
               <fieldset className="tl-field tl-radios">
@@ -376,6 +392,19 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
                   </label>
                 ))}
               </fieldset>
+              {!urgent && notice > 1 && (
+                <label className="tl-check tl-agree">
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => {
+                      setAgreed(e.target.checked);
+                      setSlot(0);
+                    }}
+                  />{" "}
+                  The tenant agreed to an earlier time
+                </label>
+              )}
               <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={s.busy}>
                 Accept and book
               </button>
@@ -388,7 +417,7 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
                 s.act({ type: "quote", jobId: j.id, amount: parseAmount(amount), note: note || "Labour and parts", earliest: options[0] });
               }}
             >
-              <AmountInput label="Your quote" value={amount} onChange={setAmount} currency={R.currency} />
+              <AmountInput label="Your quote" value={amount} onChange={setAmount} currency={R.currency} tax={c.tax} />
               <label className="tl-field">
                 <span>What it covers</span>
                 <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} placeholder="For example: replace the cartridge, 2 hours labour" />
@@ -422,7 +451,7 @@ function ContractorView({ s, j }: { s: S; j: Job }) {
             s.act({ type: "invoice", jobId: j.id, amount: parseAmount(inv) });
           }}
         >
-          <AmountInput label="Invoice amount" value={inv} onChange={setInv} currency={R.currency} />
+          <AmountInput label="Invoice amount" value={inv} onChange={setInv} currency={R.currency} tax={c.tax} />
           {!Number.isNaN(parseAmount(inv)) && (
             <p className="tl-m-fine">
               Includes {money(sb.region, taxIn(sb.region, parseAmount(inv)))} {c.tax}.

@@ -96,11 +96,11 @@ export function TryOnPhone({ url, who }: { url: string; who: string }) {
 }
 
 /** Money entry that keeps decimals: "380", "380.5", "380.50". */
-export function AmountInput({ label, value, onChange, currency }: { label: string; value: string; onChange: (v: string) => void; currency: string }) {
+export function AmountInput({ label, value, onChange, currency, tax }: { label: string; value: string; onChange: (v: string) => void; currency: string; tax: string }) {
   return (
     <label className="tl-field">
       <span>
-        {label} ({currency}, incl. tax)
+        {label} ({currency}, incl. {tax})
       </span>
       <input
         inputMode="decimal"

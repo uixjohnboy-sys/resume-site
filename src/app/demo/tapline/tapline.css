@@ -1,7 +1,9 @@
-/* Tapline design system (v0.3, after the G4 review).
+/* Tapline design system (v0.4, after G4 round 2).
    Brand: navy ink and teal action. Status colour contract (SPEC.md):
-   red = past target only, orange = due soon, green = summaries only,
-   urgent = solid red pill, repeat = neutral pill. No violet. System fonts.
+   red = past target, safety instructions (with a warning icon) and urgency
+   (solid red pill; outlined "Likely urgent" before triage), orange = due soon,
+   green = summaries only, repeat and information = neutral pill. No violet.
+   System fonts.
    Type 12/16 13/18 14/20 16/24 20/28 24/32 · spacing 4/8/12/16/24/32 ·
    radius 6 (controls) 8 (cards) 12 (drawer, modal, report) 999 (pills). */
 
@@ -12,7 +14,8 @@
 .tl,
 .tl-m,
 .tl-modal-wrap,
-.tl-drawer-wrap {
+.tl-drawer-wrap,
+.tl-toast {
   --bg: #f4f6f8;
   --surface: #ffffff;
   --col: #e9edf2;
@@ -30,6 +33,10 @@
   --soon-soft: #fff4e5;
   --ok: #067647;
   --neutral-soft: #eef2f6;
+  --safety-ink: #7a271a;
+  --line-strong: #cbd5e1;
+  --faint: #94a3b8;
+  --surface-2: #f8fafc;
   --r-ctl: 6px;
   --r-card: 8px;
   --r-big: 12px;
@@ -577,7 +584,7 @@
 /* ---------- board ---------- */
 .tl-board {
   display: grid;
-  grid-template-columns: repeat(6, minmax(232px, 1fr));
+  grid-template-columns: repeat(6, minmax(216px, 1fr));
   gap: 8px;
   padding: 4px 24px 16px;
   overflow-x: auto;
@@ -804,7 +811,12 @@
   align-items: center;
   gap: 4px;
   margin-left: 8px;
-  color: var(--soon);
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--neutral-soft);
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 20px;
 }
 .tl-source {
   font-size: 12px;
@@ -845,7 +857,7 @@
   align-items: center;
   gap: 6px;
   margin: 0 0 6px !important;
-  font-weight: 700;
+  font-weight: 600;
 }
 .tl-emergency ul,
 .tl-m-msg ul {
@@ -1470,4 +1482,104 @@
 /* Headings receive focus programmatically when a dialog opens; no ring for those. */
 :is(.tl, .tl-m, .tl-modal-wrap, .tl-drawer-wrap) :is(h1, h2, h3)[tabindex="-1"]:focus {
   outline: none;
+}
+
+/* ---------- v0.4 (G4 round 2) ---------- */
+
+/* Tailwind's preflight makes every svg a block; icons here sit in the line of text. */
+:is(.tl, .tl-m, .tl-modal-wrap, .tl-drawer-wrap, .tl-toast) svg {
+  display: inline-block;
+  vertical-align: -2px;
+}
+.tl-nowrap {
+  white-space: nowrap;
+}
+
+/* The phone menu is white: it takes the teal ring, not the light one used on the navy bar. */
+.tl-top .tl-menu :is(button, a):focus-visible {
+  outline-color: var(--teal);
+}
+.tl-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tl-menu button[aria-pressed="true"] {
+  background: var(--neutral-soft);
+  font-weight: 600;
+}
+
+/* Errors sit outside the app, so they are announced and seen even while a dialog is open. */
+.tl-toast {
+  position: fixed;
+  z-index: 80;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(560px, calc(100vw - 32px));
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--late);
+  border-radius: var(--r-card);
+  background: var(--late-soft);
+  color: var(--late);
+  box-shadow: var(--sh-2);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+.tl-toast button {
+  min-height: 24px;
+  margin-left: 12px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tl-pill-likely {
+  background: var(--surface);
+  color: var(--late);
+  box-shadow: inset 0 0 0 1px var(--late);
+}
+
+.tl-agree {
+  align-items: flex-start;
+  margin: 4px 0 8px;
+  color: var(--ink-2);
+}
+
+/* Lists inside messages keep their bullets (preflight removes them). */
+.tl-emergency ul,
+.tl-m-msg ul {
+  list-style: disc;
+}
+.tl-m .tl-emergency {
+  font-size: 16px;
+  line-height: 24px;
+}
+.tl-m-steps li svg {
+  color: var(--teal);
+}
+
+/* The Action header is visually hidden inside the scroller: keep it clipped there at 320px. */
+.tl-table-wrap {
+  position: relative;
+}
+
+/* Touch screens: 44px targets for every control on the board. */
+@media (pointer: coarse) {
+  .tl :is(.tl-icon-btn, .tl-seg button, .tl-filters select, .tl-btn-sm, .tl-table button, .tl-tabs button),
+  .tl-drawer-wrap :is(.tl-icon-btn, .tl-seg button, .tl-btn-sm) {
+    min-height: 44px;
+  }
+  .tl .tl-icon-btn,
+  .tl-drawer-wrap .tl-icon-btn {
+    min-width: 44px;
+  }
 }

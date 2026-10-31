@@ -1,9 +1,10 @@
 "use client";
 
 import { IconAlertTriangle, IconBuilding, IconPaw, IconPlus, IconRepeat, IconShieldCheck, IconTrash, IconX } from "@tabler/icons-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { earliestVisit, noticeHours } from "@/lib/tapline/actions";
 import { stageClock } from "@/lib/tapline/metrics";
-import { CHARGE_LABEL, REGION, TRADE_IDS, TRADES, day, money, slots, taxIn, terms, tradeLabel, when } from "@/lib/tapline/rules";
+import { CHARGE_LABEL, REGION, TRADE_IDS, TRADES, day, money, slots, taxIn, terms, tradeLabel, tradeWho, when } from "@/lib/tapline/rules";
 import type { ChargeTo, Job, Sandbox, Trade, Urgency } from "@/lib/tapline/types";
 import { AmountInput, StageChip, TimerChip, TradeIcon, TryOnPhone, parseAmount, phoneLink } from "./ui";
 import { useDialog } from "./useDialog";
@@ -14,8 +15,14 @@ const H = 3600_000;
 
 export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job; onClose: () => void }) {
   const sb = s.sb!;
-  const ref = useDialog(true, onClose);
+  const backToCard = useCallback(() => document.querySelector<HTMLElement>(`[data-job="${j.id}"]`), [j.id]);
+  const ref = useDialog(true, onClose, backToCard);
   const c = terms(sb.region);
+  // After an action the button that was pressed is often gone: put focus back on the drawer's heading.
+  useEffect(() => {
+    const el = ref.current;
+    if (el && !el.contains(document.activeElement)) el.querySelector<HTMLElement>("#tl-drawer-h")?.focus();
+  }, [ref, j.stage, j.hold, j.triage?.confirmedAt, j.triage?.at, j.invoice?.at, j.ownerQuestion]);
   const p = sb.properties.find((x) => x.id === j.propertyId)!;
   const owner = sb.owners.find((o) => o.id === p.ownerId)!;
   const manager = sb.managers.find((m) => m.id === p.managerId)!;
@@ -33,15 +40,27 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
             <span className="tl-ref">{j.ref}</span>
             <StageChip region={sb.region} stage={j.stage} />
             {clock.state !== "none" && <TimerChip state={clock.state} hours={clock.hours} />}
-            {j.urgency === "urgent" && j.triage && <span className="tl-pill tl-pill-urgent">Urgent</span>}
+            {j.urgency === "urgent" && j.triage && !["done", "billed"].includes(j.stage) && <span className="tl-pill tl-pill-urgent">Urgent</span>}
           </div>
           <button type="button" className="tl-icon-btn" onClick={onClose} aria-label="Close">
             <IconX size={18} aria-hidden="true" />
           </button>
           <h2 id="tl-drawer-h">{j.title}</h2>
           <p className="tl-meta">
-            {p.address}, {p.suburb} {p.postcode} · Tenant {p.tenant} · {cap(c.owner)} {owner.name} · Manager {manager.name}
-            {con ? ` · ${con.business}` : ""}
+            <span className="tl-nowrap">
+              {p.address}, {p.suburb} {p.postcode}
+            </span>{" "}
+            · <span className="tl-nowrap">Tenant {p.tenant}</span> ·{" "}
+            <span className="tl-nowrap">
+              {cap(c.owner)} {owner.name}
+            </span>{" "}
+            · <span className="tl-nowrap">Manager {manager.name}</span>
+            {con && (
+              <>
+                {" "}
+                · <span className="tl-nowrap">{con.business}</span>
+              </>
+            )}
           </p>
         </header>
 
@@ -55,9 +74,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
             <Access sb={sb} j={j} />
           </section>
 
-          {((j.stage === "new" && !j.hold) || (j.stage === "sent" && j.afterHours && !j.triage?.confirmedAt)) && (
-            <TriageEditor key={`${j.id}-${j.triage?.at ?? 0}`} s={s} j={j} />
-          )}
+          {((j.stage === "new" && !j.hold) || awaitingConfirm(j)) && <TriageEditor key={`${j.id}-${j.triage?.at ?? 0}`} s={s} j={j} />}
 
           {j.hold === "ownerDeclined" && (
             <section className="tl-sec tl-callout tl-callout-warn">
@@ -122,6 +139,11 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
               {j.stage === "booked" && <TryOnPhone url={phoneLink(id, "tradie", j.id)} who={c.contractor} />}
             </section>
           )}
+          {j.dueBy && !["done", "billed"].includes(j.stage) && (
+            <p className="tl-callout">
+              Smoke alarm repair: due by {when(sb.region, j.dueBy)} (NSW law, 2 business days). No {c.owner} approval needed.
+            </p>
+          )}
 
           <section className="tl-sec tl-timeline">
             <h3>Activity</h3>
@@ -138,13 +160,16 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
           </section>
         </div>
 
-        <Footer s={s} j={j} />
+        <Footer key={`${j.id}-${j.stage}-${j.invoice?.at ?? 0}`} s={s} j={j} />
       </aside>
     </div>
   );
 }
 
 const cap = (x: string) => x[0].toUpperCase() + x.slice(1);
+
+/** After hours the on-call contractor may have been paged (or have accepted) before a manager confirmed the reply. */
+const awaitingConfirm = (j: Job) => j.afterHours === true && !j.triage?.confirmedAt && !!j.triage && (j.stage === "sent" || j.stage === "booked");
 
 function Access({ sb, j }: { sb: Sandbox; j: Job }) {
   const p = sb.properties.find((x) => x.id === j.propertyId)!;
@@ -157,20 +182,26 @@ function Access({ sb, j }: { sb: Sandbox; j: Job }) {
         {a?.mode === "keys" ? "Use the office keys" : a?.mode === "times" ? `Tenant available: ${a.note || "times to confirm"}` : "Tenant will be home"}
         {a?.pets && (
           <span className="tl-inline-note">
-            <IconPaw size={13} aria-hidden="true" /> Pets at the property
+            <IconPaw size={14} aria-hidden="true" /> Pets at the property
           </span>
         )}
       </dd>
       {p.strata && (
         <>
           <dt>Building</dt>
-          <dd>
-            <IconBuilding size={13} aria-hidden="true" /> {p.strata.manager}, {p.strata.phone}
+          <dd className="tl-nowrap">
+            <IconBuilding size={14} aria-hidden="true" /> {p.strata.manager}, {p.strata.phone}
           </dd>
         </>
       )}
       <dt>Entry</dt>
-      <dd>{j.urgency === "urgent" ? "Urgent repair: entry without the usual notice" : R.entryNote}</dd>
+      <dd>
+        {j.urgency === "urgent"
+          ? "Urgent repair: entry without the usual notice"
+          : sb.region === "AU" && j.dueBy
+            ? "Smoke alarm repair: at least 1 hour's notice to the tenant."
+            : R.entryNote}
+      </dd>
     </dl>
   );
 }
@@ -185,11 +216,13 @@ function ContractorCard({ sb, conId, now }: { sb: Sandbox; conId: string; now: n
         <TradeIcon trade={con.trade} size={16} /> {con.business}
       </h3>
       <p className="tl-meta">
-        {con.name} · {con.licence}
+        {con.name}
+        {con.licence ? ` · ${con.licence}` : ""}
         {con.onCall ? " · On call" : ""}
       </p>
       <p className={insuranceOk && licenceOk ? "tl-ok-t" : "tl-late-t"}>
-        <IconShieldCheck size={14} aria-hidden="true" /> {licenceOk ? "Licence current" : "Licence expired"} · {insuranceOk ? `Insured until ${day(sb.region, con.insuranceExpires)}` : "Insurance expired"}
+        <IconShieldCheck size={14} aria-hidden="true" /> {con.licence ? (licenceOk ? `${con.licence.startsWith("Gas Safe") ? "Gas Safe registration" : "Licence"} current · ` : "Licence expired · ") : ""}
+        {insuranceOk ? `Insured until ${day(sb.region, con.insuranceExpires)}` : "Insurance expired"}
       </p>
     </section>
   );
@@ -209,6 +242,8 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
   const [charge, setCharge] = useState<ChargeTo>(t?.chargeTo ?? "owner");
   const [strata, setStrata] = useState(!!t?.strataReferral);
   const [ins, setIns] = useState(!!t?.insuranceClaim);
+  const dispatched = awaitingConfirm(j);
+  const restands = dispatched && (trade !== j.trade || urg !== j.urgency);
 
   if (!t) {
     const fresh = s.now - j.createdAt < 10 * 60_000;
@@ -335,8 +370,12 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
         <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={5} maxLength={900} />
       </label>
       <p className="tl-next">
-        {urg === "urgent"
-          ? `Confirming sends this to the on-call ${tradeLabel(sb.region, trade).toLowerCase()} straight away and tells the ${c.owner}.`
+        {dispatched && !restands
+          ? `Confirming sends this reply to ${p.tenant.split(" ")[0]}. The on-call ${c.contractor} stays on the job.`
+          : restands
+            ? `Confirming sends this reply, stands down the on-call ${c.contractor} and sends the job again as ${urg === "urgent" ? `urgent to the on-call ${tradeWho(sb.region, trade)}` : `a ${c.workOrder} to ${TRADES[sb.region][trade].noun}`}.`
+            : urg === "urgent"
+          ? `Confirming sends this to the on-call ${tradeWho(sb.region, trade)} straight away and tells the ${c.owner}.`
           : charge === "tenant"
             ? `Confirming sends a ${c.workOrder} to ${TRADES[sb.region][trade].noun}, charged to the tenant.`
             : `Confirming sends a ${c.workOrder} to ${TRADES[sb.region][trade].noun} for up to ${money(sb.region, owner.approvalLimit)}, the ${c.owner}'s limit. Anything above it comes back as a quote.`}
@@ -361,14 +400,16 @@ function Footer({ s, j }: { s: S; j: Job }) {
   const sb = s.sb!;
   const c = terms(sb.region);
   const R = REGION[sb.region];
-  const options = j.urgency === "urgent" ? [0.5, 1, 2].map((h) => s.now + h * H) : slots(sb.region, s.now, 3, 2);
+  const [agreed, setAgreed] = useState(false);
+  const options = j.urgency === "urgent" ? [0.5, 1, 2].map((h) => s.now + h * H) : slots(sb.region, earliestVisit(sb, j, s.now, agreed), 3, 0);
+  const notice = noticeHours(sb, j);
   const [slot, setSlot] = useState(0);
   const [mode, setMode] = useState<"accept" | "quote">("accept");
-  const [amount, setAmount] = useState(String(j.quote?.amount ?? j.cap ?? 380));
+  const [amount, setAmount] = useState(String(j.cap ? Math.round(j.cap * 1.4) : 520));
   const [inv, setInv] = useState(String(j.quote?.amount ?? Math.min(j.cap ?? 380, 380)));
 
   let body: React.ReactNode = null;
-  if (j.stage === "sent" && (j.triage?.confirmedAt || !j.afterHours)) {
+  if (j.stage === "sent" && !awaitingConfirm(j)) {
     body = (
       <>
         <p className="tl-acting">Acting as the {c.contractor}. In real life this happens on their phone from a text message.</p>
@@ -382,6 +423,19 @@ function Footer({ s, j }: { s: S; j: Job }) {
             </button>
           </div>
         )}
+        {(mode === "accept" || j.urgency === "urgent") && j.urgency !== "urgent" && notice > 1 && (
+          <label className="tl-check tl-agree">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => {
+                setAgreed(e.target.checked);
+                setSlot(0);
+              }}
+            />{" "}
+            The tenant agreed to a visit sooner than the {notice === 48 ? "2 days'" : `${notice} hours'`} notice
+          </label>
+        )}
         {mode === "accept" || j.urgency === "urgent" ? (
           <div className="tl-row">
             <label className="tl-field">
@@ -394,13 +448,13 @@ function Footer({ s, j }: { s: S; j: Job }) {
                 ))}
               </select>
             </label>
-            <button type="button" className="tl-btn tl-btn-primary" disabled={s.busy} onClick={() => s.act({ type: "accept", jobId: j.id, slot: options[slot] })}>
+            <button type="button" className="tl-btn tl-btn-primary" disabled={s.busy} onClick={() => s.act({ type: "accept", jobId: j.id, slot: options[slot], tenantAgreed: agreed })}>
               Accept and book
             </button>
           </div>
         ) : (
           <div className="tl-row">
-            <AmountInput label="Quote" value={amount} onChange={setAmount} currency={R.currency} />
+            <AmountInput label="Quote" value={amount} onChange={setAmount} currency={R.currency} tax={c.tax} />
             <button
               type="button"
               className="tl-btn tl-btn-primary"
@@ -414,7 +468,7 @@ function Footer({ s, j }: { s: S; j: Job }) {
       </>
     );
   } else if (j.stage === "sent") {
-    body = <p className="tl-acting">After-hours dispatch: confirm the reply above in the morning. The on-call {c.contractor} has been paged.</p>;
+    body = <p className="tl-acting">After hours: the on-call {c.contractor} has been paged. Check the reply above and send it.</p>;
   } else if (j.stage === "owner") {
     body = (
       <>
@@ -449,7 +503,7 @@ function Footer({ s, j }: { s: S; j: Job }) {
       <>
         <p className="tl-acting">Acting as the {c.contractor}.</p>
         <div className="tl-row">
-          <AmountInput label="Invoice" value={inv} onChange={setInv} currency={R.currency} />
+          <AmountInput label="Invoice" value={inv} onChange={setInv} currency={R.currency} tax={c.tax} />
           <button type="button" className="tl-btn tl-btn-primary" disabled={s.busy || Number.isNaN(parseAmount(inv))} onClick={() => s.act({ type: "invoice", jobId: j.id, amount: parseAmount(inv) })}>
             Upload invoice
           </button>
@@ -468,7 +522,8 @@ function Footer({ s, j }: { s: S; j: Job }) {
   } else if (j.stage === "billed") {
     body = (
       <p className="tl-acting">
-        Bill entered in {c.accounts} (simulated){j.triage?.chargeTo === "tenant" ? ", charged to the tenant" : `, paid from trust and shown on the ${c.owner}'s statement`}.
+        Bill entered in {c.accounts} (simulated)
+        {j.triage?.chargeTo === "tenant" ? ", charged to the tenant" : `, paid from ${sb.region === "AU" ? "trust" : "the client account"} and shown on the ${c.owner}'s statement`}.
       </p>
     );
   }

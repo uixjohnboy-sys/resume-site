@@ -1,7 +1,7 @@
 // Run: node --experimental-strip-types scripts/tapline-rules.test.mjs
 // The keyword rules are the fallback when the AI is unavailable and the safety
 // net that can only raise urgency. These cases include the G4 review's misses.
-import { emergencyText, ruleTriage } from "../src/lib/tapline/rules.ts";
+import { emergencyText, isSmokeAlarm, ruleTriage } from "../src/lib/tapline/rules.ts";
 
 const cases = [
   // [text, trade (null = any), urgency, hazard that must be found (optional)]
@@ -35,6 +35,22 @@ const cases = [
   ["Gas Safety certificate due next month.", "gas", "routine"],
   ["Someone broke in overnight and smashed the back door glass.", null, "urgent", "security"],
   ["Black mould on the bedroom wall behind the wardrobe.", "damp", "routine"],
+  // G4 round 2 (AI Quality Lead N-13 to N-22): everyday "fire" words are not emergencies; missed phrases.
+  ["Gas fire won't light in the lounge.", "gas", "routine"],
+  ["The fire alarm keeps chirping every minute.", "electrician", "routine"],
+  ["Fire door in the hallway won't close by itself.", null, "routine"],
+  ["Electric fire in the bedroom stopped working.", "electrician", "routine"],
+  ["There's a smell of burning from the power point.", "electrician", "urgent", "fire"],
+  ["Flames coming out of the oven.", null, "urgent", "fire"],
+  ["Water dripping out of the ceiling light in the kitchen.", null, "urgent", "electricWater"],
+  ["I got a shock from the kitchen tap.", null, "urgent", "electric"],
+  ["Part of the bathroom ceiling has fallen in.", null, "urgent", "ceiling"],
+  ["Someone kicked the door in while we were out.", null, "urgent", "security"],
+  ["Not sure if it's a gas leak but there's a smell of gas.", "gas", "urgent", "gas"],
+  ["Gas bottle hissing by the barbecue.", "gas", "urgent", "gas"],
+  ["No power in the whole house, the switchboard has tripped.", "electrician", "urgent", "electric"],
+  ["Mould around the bedroom window frame.", "damp", "routine"],
+  ["Exhaust fan in the bathroom stopped working.", "electrician", "routine"],
 ];
 
 let fail = 0;
@@ -54,6 +70,15 @@ const checks = [
   [!emergencyText("UK", ["electric"]).join(" ").includes("switchboard"), "UK electric text says consumer unit, not switchboard"],
   [!/—/.test(au + uk), "no em dashes in emergency text"],
 ];
+// UK: hot water comes from the boiler, a Gas Safe heating engineer's job.
+const ukHot = ruleTriage("No hot water. The taps only run cold this morning.", "UK");
+checks.push([ukHot.trade === "hvac" && ukHot.urgency === "urgent", `UK no hot water goes to the heating engineer, urgent (got ${ukHot.trade}/${ukHot.urgency})`]);
+checks.push([isSmokeAlarm("Smoke alarm beeping in the hallway") && !isSmokeAlarm("CO alarm going off"), "smoke alarm faults are recognised, carbon monoxide alarms are not"]);
+const auSec = emergencyText("AU", ["security"]).join(" ");
+const ukSec = emergencyText("UK", ["security"]).join(" ");
+checks.push([auSec.includes("131 444") && auSec.includes("000") && ukSec.includes("101") && ukSec.includes("999"), "break-in text names the police: AU 000 and 131 444, UK 999 and 101"]);
+checks.push([emergencyText("UK", ["gas"]).join(" ").includes("call 999"), "UK gas text also names 999"]);
+checks.push([/only if they and you are dry/.test(emergencyText("AU", ["flood"]).join(" ")), "flood text: move belongings only if dry"]);
 for (const [ok, msg] of checks) {
   if (!ok) fail++;
   console.log(`${ok ? "PASS" : "FAIL"}  ${msg}`);

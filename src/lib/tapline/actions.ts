@@ -1,4 +1,4 @@
-import { REGION, TRADE_IDS, emergencyText, isAfterHours, money, ruleTriage, slots, terms, tradeLabel } from "./rules";
+import { REGION, SMOKE_ALARM, TRADE_IDS, addBusinessDays, emergencyText, isAfterHours, isSmokeAlarm, money, ruleTriage, slots, terms, tradeWho } from "./rules";
 import { priorRelated } from "./seed";
 import type { Access, ChargeTo, Job, Sandbox, Stage, Trade, Triage, Urgency } from "./types";
 
@@ -20,7 +20,7 @@ export type PublicAction =
       strataReferral: boolean;
       insuranceClaim: boolean;
     }
-  | { type: "accept"; jobId: string; slot: number }
+  | { type: "accept"; jobId: string; slot: number; tenantAgreed?: boolean }
   | { type: "quote"; jobId: string; amount: number; note: string; earliest: number }
   | { type: "owner"; jobId: string; decision: "approved" | "declined"; note?: string }
   | { type: "ownerQuestion"; jobId: string; text: string }
@@ -45,12 +45,14 @@ const MAX_JOBS = 150;
 // ---------- input checks ----------
 
 const BIDI = /[‪-‮⁦-⁩‎‏]/g;
+// Zero-width and other invisible format characters: a title of three of them is not a title.
+const INVISIBLE = /[\u00AD\u180E\u200B-\u200D\u2060-\u2064\uFEFF]/g;
 const CONTROL = /[\u0000-\u0008\u000B-\u001F\u007F]/g;
 
 /** Plain text: trimmed, control and bidi characters removed, newlines kept, cut by characters (not UTF-16 units). */
 export function text(v: unknown, max: number): string {
   if (typeof v !== "string") return "";
-  const s = v.replace(BIDI, "").replace(CONTROL, " ").replace(/\r\n?/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  const s = v.replace(BIDI, "").replace(INVISIBLE, "").replace(CONTROL, " ").replace(/\r\n?/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   return Array.from(s).slice(0, max).join("").trim();
 }
 
@@ -96,6 +98,58 @@ function contractorFor(sb: Sandbox, trade: Trade, urgent: boolean, now: number) 
   return [...ok].sort((a, b) => open(a.id) - open(b.id))[0];
 }
 
+/** Hours of notice the tenant needs before a routine visit. */
+export function noticeHours(sb: Sandbox, j: Job) {
+  if (j.urgency === "urgent") return 0;
+  if (sb.region === "AU" && j.dueBy) return SMOKE_ALARM.noticeHours;
+  return REGION[sb.region].noticeHours;
+}
+
+/** Earliest visit time for a job: an hour away, or the notice period unless the tenant agreed to earlier. */
+export function earliestVisit(sb: Sandbox, j: Job, now: number, tenantAgreed = false) {
+  return now + Math.max(1, tenantAgreed ? 1 : noticeHours(sb, j)) * H;
+}
+
+/**
+ * Send a confirmed job to the right contractor with the right not-to-exceed amount. Urgent work goes to the
+ * on-call contractor under the agency's urgent limit; NSW smoke alarms go to an electrician with a 2-business-day
+ * deadline and no owner approval; everything else is a work order capped at the owner's limit.
+ */
+function dispatch(sb: Sandbox, j: Job, trade: Trade, urgency: Urgency, chargeTo: ChargeTo, now: number): string | null {
+  const c = terms(sb.region);
+  const R = REGION[sb.region];
+  const con = contractorFor(sb, trade, urgency === "urgent", now);
+  if (!con) return `No ${tradeWho(sb.region, trade)} with current licence and insurance. Add one before sending.`;
+  const p = sb.properties.find((x) => x.id === j.propertyId)!;
+  const o = sb.owners.find((x) => x.id === p.ownerId)!;
+  j.contractorId = con.id;
+  j.trade = trade;
+  j.urgency = urgency;
+  j.bookedFor = undefined;
+  j.quote = undefined;
+  j.dueBy = undefined;
+  if (urgency === "urgent") {
+    j.cap = R.urgentLimit;
+    j.ownerDecision = { decision: "urgent", at: now };
+    j.events.push({ at: now, by: "tapline", text: `Urgent: sent to on-call ${con.business} (up to ${money(sb.region, j.cap)}), ${c.owner} notified` });
+  } else if (sb.region === "AU" && trade === "electrician" && isSmokeAlarm(`${j.title} ${j.description}`)) {
+    j.cap = R.urgentLimit;
+    j.dueBy = addBusinessDays(sb.region, j.createdAt, SMOKE_ALARM.businessDays);
+    j.ownerDecision = { decision: "auto", at: now };
+    j.events.push({ at: now, by: "tapline", text: `Smoke alarm repair sent to ${con.business}: due within 2 business days by NSW law, no ${c.owner} approval needed, ${c.owner} notified` });
+  } else if (chargeTo === "tenant") {
+    j.cap = R.urgentLimit;
+    j.ownerDecision = undefined;
+    j.events.push({ at: now, by: "tapline", text: `${cap(c.workOrder)} sent to ${con.business}, charged to the tenant` });
+  } else {
+    j.cap = o.approvalLimit;
+    j.ownerDecision = undefined;
+    j.events.push({ at: now, by: "tapline", text: `${cap(c.workOrder)} sent to ${con.business}, up to ${money(sb.region, j.cap)}` });
+  }
+  enter(j, "sent", now);
+  return null;
+}
+
 function enter(j: Job, stage: Stage, now: number) {
   j.stage = stage;
   j.stageEnteredAt = now;
@@ -112,7 +166,6 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
   const R = REGION[next.region];
   const job = (id: unknown) => (typeof id === "string" ? next.jobs.find((j) => j.id === id) : undefined);
   const prop = (j: Job) => next.properties.find((p) => p.id === j.propertyId)!;
-  const owner = (j: Job) => next.owners.find((o) => o.id === prop(j).ownerId)!;
   const handled = { ok: false as const, error: "Someone has already dealt with this. The board has been refreshed." };
 
   switch (a.type) {
@@ -137,7 +190,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
         trade: "handyman",
         urgency: "routine",
         stage: "new",
-        events: [{ at: now, by: "tenant", text: "Reported by the tenant" }],
+        events: [{ at: now, by: "tenant", text: a.afterHours === true && !isAfterHours(next.region, now) ? "Reported by the tenant (demo: treated as 9:47 pm)" : "Reported by the tenant" }],
       };
       next.jobs.push(j);
       return { ok: true, sb: next, jobId: j.id };
@@ -153,7 +206,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       j.events.push({
         at: now,
         by: "tapline",
-        text: `${who} suggested: ${tradeLabel(next.region, a.triage.trade).toLowerCase()}, ${a.triage.urgency}${a.triage.repeatOf ? `, repeat of ${a.triage.repeatOf.ref}` : ""}`,
+        text: `${who} suggested: ${tradeWho(next.region, a.triage.trade)}, ${a.triage.urgency}${a.triage.repeatOf ? `, related to ${a.triage.repeatOf.ref}` : ""}`,
       });
       return { ok: true, sb: next };
     }
@@ -164,32 +217,44 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       const j = job(a.jobId);
       if (!j || j.stage !== "new" || !j.triage || j.triage.urgency !== "urgent") return { ok: false, error: "Not eligible." };
       const con = contractorFor(next, j.triage.trade, true, now);
-      if (!con) return { ok: false, error: "No on-call contractor." };
+      if (!con) return { ok: false, error: `No on-call ${c.contractor}.` };
       j.contractorId = con.id;
       j.trade = j.triage.trade;
       j.urgency = "urgent";
+      j.cap = R.urgentLimit;
       j.ownerDecision = { decision: "urgent", at: now };
       enter(j, "sent", now);
-      j.events.push({ at: now, by: "tapline", text: "After hours: the tenant was sent the safety steps automatically" });
-      j.events.push({ at: now, by: "tapline", text: `After hours: on-call ${con.business} paged, ${c.owner} notified. Waiting for a manager to confirm the reply.` });
+      // Log only what was really sent: the fixed emergency text exists only when a hazard was found.
+      j.events.push({
+        at: now,
+        by: "tapline",
+        text: j.triage.emergency.length
+          ? "After hours: the tenant was sent the fixed safety steps automatically"
+          : `After hours: the tenant was told the on-call ${c.contractor} has been contacted`,
+      });
+      j.events.push({ at: now, by: "tapline", text: `After hours: on-call ${con.business} paged (up to ${money(next.region, j.cap)}), ${c.owner} notified. Waiting for a manager to confirm the reply.` });
       return { ok: true, sb: next };
     }
 
     case "confirm": {
       const j = job(a.jobId);
-      if (!j || !(j.stage === "new" || (j.stage === "sent" && j.afterHours && !j.triage?.confirmedAt))) return handled;
+      // After hours the on-call contractor may accept before a manager is in: the morning confirm still sends the reply.
+      const dispatched = !!j && j.afterHours === true && !j.triage?.confirmedAt && (j.stage === "sent" || j.stage === "booked");
+      if (!j || !((j.stage === "new" && !j.hold) || dispatched)) return handled;
       const trade = oneOf(a.trade, TRADE_IDS);
       const urgency = oneOf(a.urgency, URGENCIES);
-      const chargeTo = oneOf(a.chargeTo, CHARGES) ?? "owner";
+      let chargeTo = oneOf(a.chargeTo, CHARGES) ?? "owner";
+      if (chargeTo === "strata" && !prop(j).strata) chargeTo = "owner";
       if (!trade || !urgency) return { ok: false, error: "Choose a trade and an urgency before confirming." };
       const reply = text(a.reply, 900);
       if (!reply) return { ok: false, error: "Write a reply to the tenant before confirming." };
       const safety = Array.isArray(a.safety) ? a.safety.map((s) => text(s, 200)).filter(Boolean).slice(0, 4) : [];
       if (!j.triage) {
-        const rules = ruleTriage(`${j.title}. ${j.description}`);
+        const rules = ruleTriage(`${j.title}. ${j.description}`, next.region);
         j.triage = { source: "rules", at: now, trade, urgency, reason: "Triaged by hand.", safety: [], emergency: emergencyText(next.region, rules.hazards), reply: "", chargeTo, strataReferral: false, insuranceClaim: false };
       }
       const t = j.triage;
+      const changed = dispatched && (trade !== j.trade || urgency !== j.urgency);
       t.trade = trade;
       t.urgency = urgency;
       t.reply = reply;
@@ -199,42 +264,33 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       t.insuranceClaim = a.insuranceClaim === true;
       // Keep the first confirmation time: it is the acknowledgement time.
       t.confirmedAt = t.confirmedAt ?? now;
-      j.trade = trade;
-      j.urgency = urgency;
-      j.hold = undefined;
       j.events.push({ at: now, by: "manager", text: "Triage confirmed, reply sent to the tenant" });
       if (t.strataReferral) j.events.push({ at: now, by: "manager", text: `Referred to the ${c.strataBody}, ${prop(j).strata!.manager}` });
       if (t.insuranceClaim) j.events.push({ at: now, by: "manager", text: "Flagged as a possible insurance claim" });
-      if (j.stage === "sent") return { ok: true, sb: next }; // already dispatched after hours
+      if (dispatched && !changed) return { ok: true, sb: next }; // the on-call contractor stays on it
+      // A changed trade or urgency stands the on-call contractor down and sends the job again by the normal rule.
+      const before = next.contractors.find((x) => x.id === j.contractorId);
       // A strata referral still sends a contractor to make the home safe; the
       // cause and the cost go to the building manager when it is common property.
-      const con = contractorFor(next, trade, urgency === "urgent", now);
-      if (!con) return { ok: false, error: `No ${tradeLabel(next.region, trade).toLowerCase()} with current licence and insurance. Add one before sending.` };
-      j.contractorId = con.id;
-      if (urgency === "urgent") {
-        j.ownerDecision = { decision: "urgent", at: now };
-        j.events.push({ at: now, by: "tapline", text: `Urgent: sent to on-call ${con.business}, ${c.owner} notified` });
-      } else if (chargeTo === "tenant") {
-        j.events.push({ at: now, by: "tapline", text: `${cap(c.workOrder)} sent to ${con.business}, charged to the tenant` });
-      } else {
-        j.cap = owner(j).approvalLimit;
-        j.events.push({ at: now, by: "tapline", text: `${cap(c.workOrder)} sent to ${con.business}, up to ${money(next.region, j.cap)}` });
-      }
-      enter(j, "sent", now);
+      const err = dispatch(next, j, trade, urgency, chargeTo, now);
+      if (err) return { ok: false, error: err };
+      if (dispatched && before) j.events.splice(j.events.length - 1, 0, { at: now, by: "manager", text: `Stood down ${before.business} (trade or urgency changed)` });
       return { ok: true, sb: next };
     }
 
     case "accept": {
       const j = job(a.jobId);
       if (!j || j.stage !== "sent") return handled;
-      const allowed = j.urgency === "urgent" ? [now + 30 * 60_000, now + 4 * H] : [now + H, now + 30 * D];
+      const agreed = a.tenantAgreed === true;
+      const allowed = j.urgency === "urgent" ? [now + 30 * 60_000, now + 4 * H] : [earliestVisit(next, j, now, agreed), now + 30 * D];
       const slot = typeof a.slot === "number" && Number.isFinite(a.slot) ? a.slot : NaN;
       if (!(slot >= allowed[0] - 60_000 && slot <= allowed[1])) return { ok: false, error: "Pick one of the times offered." };
       j.bookedFor = slot;
       if (!j.ownerDecision) j.ownerDecision = { decision: "auto", at: now };
       enter(j, "booked", now);
       const con = next.contractors.find((x) => x.id === j.contractorId);
-      j.events.push({ at: now, by: "contractor", text: `${con?.business ?? "Contractor"} accepted and booked a visit` });
+      j.events.push({ at: now, by: "contractor", text: `${con?.business ?? cap(c.contractor)} accepted and booked a visit` });
+      if (agreed && j.urgency !== "urgent" && slot < now + noticeHours(next, j) * H) j.events.push({ at: now, by: "contractor", text: "The tenant agreed to an earlier time than the notice period" });
       return { ok: true, sb: next };
     }
 
@@ -245,7 +301,8 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       if (amount === null) return { ok: false, error: "Enter the quote amount, for example 380 or 380.50." };
       const note = text(a.note, 200) || "Labour and parts";
       j.quote = { amount, note, at: now };
-      const earliest = typeof a.earliest === "number" && a.earliest > now && a.earliest < now + 30 * D ? a.earliest : slots(next.region, now, 1, 24)[0];
+      const min = earliestVisit(next, j, now);
+      const earliest = typeof a.earliest === "number" && a.earliest >= min && a.earliest < now + 30 * D ? a.earliest : slots(next.region, min, 1, 0)[0];
       j.bookedFor = earliest;
       j.events.push({ at: now, by: "contractor", text: `Quote sent: ${money(next.region, amount)}` });
       if (j.cap && amount <= j.cap) {
@@ -268,7 +325,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       j.ownerDecision = { decision, at: now, note: note || undefined };
       if (decision === "approved") {
         // Never book a time that has already passed.
-        const lead = slots(next.region, now, 1, 4)[0];
+        const lead = slots(next.region, earliestVisit(next, j, now), 1, 0)[0];
         if (!j.bookedFor || j.bookedFor < lead) j.bookedFor = lead;
         enter(j, "booked", now);
         j.events.push({ at: now, by: "owner", text: `Approved by the ${c.owner}, visit booked` });
@@ -316,12 +373,14 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       if (!j || j.stage !== "done" || j.invoice) return handled;
       const amount = amountOf(a.amount);
       if (amount === null) return { ok: false, error: "Enter the invoice amount, for example 380 or 380.50." };
-      const approved = j.quote?.amount ?? j.cap;
-      const over = approved !== undefined && amount > approved * 1.1 + 0.005;
+      // Every invoice is checked: against the approved quote, or the work order's not-to-exceed amount
+      // (the owner's limit, or the agency's urgent limit for urgent and tenant-charged work).
+      const approved = j.quote?.amount ?? j.cap ?? R.urgentLimit;
+      const over = amount > approved * 1.1 + 0.005;
       j.invoice = { amount, at: now, overApproved: over };
       j.events.push({ at: now, by: "contractor", text: `Invoice uploaded: ${money(next.region, amount)} incl. ${c.tax}` });
       if (over) {
-        j.events.push({ at: now, by: "tapline", text: `Held: the invoice is more than the approved ${money(next.region, approved!)}. A manager needs to check it.` });
+        j.events.push({ at: now, by: "tapline", text: `Held: the invoice is more than 10% over the approved ${money(next.region, approved)}. A manager needs to check it.` });
         return { ok: true, sb: next };
       }
       return bill(next, j, now);
@@ -341,7 +400,7 @@ export function apply(sb: Sandbox, a: Action, now = Date.now()): Result {
       if (next.jobs.length >= MAX_JOBS) return { ok: false, error: "This demo is full. Use Reset demo to start again." };
       const rule = R.compliance.find((x) => x.kind === item.kind)!;
       const con = contractorFor(next, rule.trade, false, now);
-      if (!con) return { ok: false, error: "No contractor with current licence and insurance for this check." };
+      if (!con) return { ok: false, error: `No ${c.contractor} with current licence and insurance for this check.` };
       const p = next.properties.find((x) => x.id === item.propertyId)!;
       const o = next.owners.find((x) => x.id === p.ownerId)!;
       const j: Job = {

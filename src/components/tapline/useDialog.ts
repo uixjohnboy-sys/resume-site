@@ -5,13 +5,16 @@ import { useEffect, useRef } from "react";
 // Dialog behaviour for the drawer, the tenant modal and confirmations: focus
 // moves to the dialog's heading on open, Tab stays inside, Escape closes, the
 // rest of the page is inert while it is open, and focus returns to whatever
-// opened it.
-export function useDialog(open: boolean, onClose: () => void) {
+// opened it, or to `returnTo()` when the opener is gone (a card that moved
+// column, a menu that closed).
+export function useDialog(open: boolean, onClose: () => void, returnTo?: () => HTMLElement | null) {
   const ref = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
+  const returnRef = useRef(returnTo);
   useEffect(() => {
     closeRef.current = onClose;
-  }, [onClose]);
+    returnRef.current = returnTo;
+  }, [onClose, returnTo]);
 
   useEffect(() => {
     if (!open) return;
@@ -50,7 +53,8 @@ export function useDialog(open: boolean, onClose: () => void) {
     return () => {
       document.removeEventListener("keydown", onKey);
       root?.removeAttribute("inert");
-      if (opener && document.contains(opener)) opener.focus();
+      if (opener && document.contains(opener) && opener !== document.body) opener.focus();
+      else returnRef.current?.()?.focus();
     };
   }, [open]);
 

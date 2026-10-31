@@ -1,9 +1,9 @@
 "use client";
 
-import { IconDots, IconRepeat, IconSearch } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { IconCheck, IconDots, IconRepeat, IconSearch } from "@tabler/icons-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { kpis, stageClock } from "@/lib/tapline/metrics";
-import { REGION, STAGE_ORDER, TRADE_IDS, money, stageLabel, terms, tradeLabel } from "@/lib/tapline/rules";
+import { REGION, STAGE_ORDER, TRADE_IDS, money, ruleTriage, stageLabel, terms, tradeLabel } from "@/lib/tapline/rules";
 import type { Job, Region, Sandbox, Trade } from "@/lib/tapline/types";
 import Compliance from "./Compliance";
 import Drawer from "./Drawer";
@@ -27,6 +27,24 @@ export default function Board() {
   const [q, setQ] = useState("");
   const [tab, setTab] = useState<Tab>("board");
   const announce = useAnnouncer(sb);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // The phone menu is a disclosure: Escape or a click outside closes it and returns focus to its button.
+  useEffect(() => {
+    if (!menu) return;
+    const close = (focus: boolean) => {
+      setMenu(false);
+      if (focus) menuRef.current?.querySelector<HTMLElement>("button")?.focus();
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close(true);
+    const onDown = (e: MouseEvent) => !menuRef.current?.contains(e.target as Node) && close(false);
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [menu]);
 
   const k = useMemo(() => (sb ? kpis(sb, now) : null), [sb, now]);
   const open = sb?.jobs.find((j) => j.id === openId) ?? null;
@@ -52,6 +70,8 @@ export default function Board() {
     return true;
   });
   const rank = { late: 0, soon: 1, ok: 2, none: 3 } as const;
+  // New reports the keyword rules think are urgent go first in New, flagged "Likely urgent" until triaged.
+  const likely = (j: Job) => (j.stage === "new" && !j.triage && ruleTriage(`${j.title}. ${j.description}`, sb.region).urgency === "urgent" ? 0 : 1);
 
   const askSwitch = (r: Region) =>
     setConfirm({
@@ -112,30 +132,31 @@ export default function Board() {
               <span className="tl-desk">Report a repair as a tenant</span>
               <span className="tl-mob">Report a repair</span>
             </button>
-            <div className="tl-mob tl-menu-wrap">
-              <button type="button" className="tl-icon-btn" aria-label="More options" aria-expanded={menu} onClick={() => setMenu((m) => !m)}>
+            <div className="tl-mob tl-menu-wrap" ref={menuRef}>
+              <button type="button" className="tl-icon-btn" aria-label="More options" aria-expanded={menu} aria-controls="tl-menu" onClick={() => setMenu((m) => !m)}>
                 <IconDots size={20} aria-hidden="true" />
               </button>
               {menu && (
-                <div className="tl-menu" role="menu">
-                  <p className="tl-menu-h">Agency</p>
+                <div className="tl-menu" id="tl-menu">
+                  <p className="tl-menu-h" id="tl-menu-h">
+                    Agency
+                  </p>
                   {(["AU", "UK"] as const).map((r) => (
                     <button
                       key={r}
                       type="button"
-                      role="menuitemradio"
-                      aria-checked={sb.region === r}
+                      aria-pressed={sb.region === r}
                       onClick={() => {
                         setMenu(false);
                         if (sb.region !== r) askSwitch(r);
                       }}
                     >
                       {r === "AU" ? "Australia, Sydney" : "UK, Manchester"}
+                      {sb.region === r && <IconCheck size={16} aria-hidden="true" />}
                     </button>
                   ))}
                   <button
                     type="button"
-                    role="menuitem"
                     onClick={() => {
                       setMenu(false);
                       askReset();
@@ -150,15 +171,6 @@ export default function Board() {
         </header>
 
         <p className="tl-banner">Demo data: a fictional agency with {sb.properties.length} properties. Your changes are private to you and reset after 48 hours.</p>
-
-        {error && (
-          <p className="tl-error" role="alert">
-            {error}{" "}
-            <button type="button" onClick={() => setError(null)}>
-              Dismiss
-            </button>
-          </p>
-        )}
 
         <h1 className="tl-sr">Tapline repairs desk, {sb.agency}</h1>
         <nav className="tl-tabs" aria-label="Views">
@@ -186,11 +198,16 @@ export default function Board() {
             <section className="tl-kpis" aria-label="At a glance">
               <Kpi label="Open jobs" value={String(k.open)} note={k.late ? `${k.late} past target` : "All on target"} tone={k.late ? "late" : undefined} />
               <Kpi label="Median time to acknowledge" value={dur(k.medianAckHours)} note="Report to confirmed reply" />
-              <Kpi label="Urgent jobs on target" value={`${k.urgentOnTime} of ${k.urgentTotal}`} note="Sent to a contractor within 2 hours" tone={k.urgentOnTime < k.urgentTotal ? "soon" : undefined} />
+              <Kpi
+                label="Urgent jobs on target"
+                value={`${k.urgentOnTime} of ${k.urgentTotal}`}
+                note={k.urgentOnTime < k.urgentTotal ? `${k.urgentTotal - k.urgentOnTime} missed target` : `Sent to a ${c.contractor} in 2 hours`}
+                tone={k.urgentOnTime < k.urgentTotal ? "late" : undefined}
+              />
               <Kpi label={`Waiting on ${c.owners}`} value={String(k.waitingOwner)} note={k.waitingOwner ? `Oldest ${dur(k.oldestOwnerHours)}` : "None"} tone={k.oldestOwnerHours > 48 ? "late" : undefined} />
               <Kpi label="Repair spend, 30 days" value={money(sb.region, k.spend30)} note={`Bills entered, incl. ${c.tax}`} />
-              <Kpi label="Open repeat faults" value={String(k.repeatOpen)} note="Same kind of fault within 90 days" />
-              <Kpi label="Manager hours saved" value={`~${k.hoursSaved}h`} note="Estimate: 25 min per routed job" />
+              <Kpi label="Open repeat faults" value={String(k.repeatOpen)} note="Same fault within 90 days" />
+              <Kpi label="Manager hours saved" value={`~${k.hoursSaved}h`} note="Estimate: 25 min a job" />
             </section>
 
             <div className="tl-filters">
@@ -230,7 +247,7 @@ export default function Board() {
               {STAGE_ORDER.map((st) => {
                 const col = jobs
                   .filter((j) => j.stage === st)
-                  .sort((a, b) => rank[stageClock(a, now).state] - rank[stageClock(b, now).state] || (st === "billed" ? (b.billedAt ?? 0) - (a.billedAt ?? 0) : a.stageEnteredAt - b.stageEnteredAt))
+                  .sort((a, b) => likely(a) - likely(b) || rank[stageClock(a, now).state] - rank[stageClock(b, now).state] || (st === "billed" ? (b.billedAt ?? 0) - (a.billedAt ?? 0) : a.stageEnteredAt - b.stageEnteredAt))
                   .slice(0, st === "billed" ? 12 : 60);
                 const total = jobs.filter((j) => j.stage === st).length;
                 return (
@@ -256,10 +273,20 @@ export default function Board() {
             </div>
           </>
         )}
-        <p className="tl-sr" aria-live="polite">
-          {announce}
-        </p>
       </div>
+
+      {/* Outside #tl-app: a dialog makes the app inert, and inert content is never announced. */}
+      <p className="tl-sr" aria-live="polite">
+        {announce}
+      </p>
+      {error && (
+        <p className="tl-toast" role="alert">
+          {error}
+          <button type="button" onClick={() => setError(null)}>
+            Dismiss
+          </button>
+        </p>
+      )}
 
       {open && id && <Drawer id={id} s={s} j={open} onClose={() => setOpenId(null)} />}
       {tenantOpen && id && (
@@ -298,16 +325,18 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
   const clock = stageClock(j, now);
   const untriaged = j.stage === "new" && !j.triage;
   const pills: string[] = [];
-  if (j.urgency === "urgent" && !untriaged) pills.push("Urgent");
+  const open = !["done", "billed"].includes(j.stage);
+  if (j.urgency === "urgent" && !untriaged && open) pills.push("Urgent");
+  if (untriaged && ruleTriage(`${j.title}. ${j.description}`, sb.region).urgency === "urgent") pills.push("Likely urgent");
   if (j.triage?.repeatOf) pills.push("Repeat fault");
   if (untriaged) pills.push("Needs triage");
   if (j.hold === "ownerDeclined") pills.push(`${terms(sb.region).owner[0].toUpperCase()}${terms(sb.region).owner.slice(1)} declined`);
   if (j.invoice?.overApproved && j.stage === "done") pills.push("Invoice over approval");
   if (j.afterHours && j.stage === "sent" && !j.triage?.confirmedAt) pills.push("After hours");
-  const timeWord = clock.state === "late" ? "overdue" : clock.state === "soon" ? "due soon" : "in this stage";
-  const label = `${j.ref}, ${j.title}, ${p.address}, ${p.suburb}. ${pills.join(", ")}. ${untriaged ? "" : tradeLabel(sb.region, j.trade) + "."} ${dur(clock.hours)} ${timeWord}. Manager ${m.name}.`;
+  const timer = clock.state === "none" ? "" : `${clock.state === "late" ? "Overdue, " : clock.state === "soon" ? "Due soon, " : ""}${dur(clock.hours)} in this stage`;
+  const label = [`${j.ref}, ${j.title}, ${p.address}, ${p.suburb}`, pills.join(", "), untriaged ? "" : tradeLabel(sb.region, j.trade), timer, `Manager ${m.name}`].filter(Boolean).join(". ") + ".";
   return (
-    <button type="button" className={`tl-card tl-card-${clock.state}`} onClick={onOpen} aria-label={label}>
+    <button type="button" className={`tl-card tl-card-${clock.state}`} onClick={onOpen} aria-label={label} data-job={j.id}>
       <span className="tl-card-r1">
         <span className="tl-ref">{j.ref}</span>
         {clock.state !== "none" && <TimerChip state={clock.state} hours={clock.hours} />}
@@ -328,7 +357,7 @@ function Card({ sb, j, now, onOpen }: { sb: Sandbox; j: Job; now: number; onOpen
         </span>
         <span className="tl-card-pills">
           {pills.map((x) => (
-            <span key={x} className={`tl-pill ${x === "Urgent" ? "tl-pill-urgent" : x === "Repeat fault" ? "tl-pill-neutral" : x.includes("declined") || x.includes("over") ? "tl-pill-warn" : "tl-pill-neutral"}`}>
+            <span key={x} className={`tl-pill ${x === "Urgent" ? "tl-pill-urgent" : x === "Likely urgent" ? "tl-pill-likely" : x === "Repeat fault" ? "tl-pill-neutral" : x.includes("declined") || x.includes("over") ? "tl-pill-warn" : "tl-pill-neutral"}`}>
               {x === "Repeat fault" && <IconRepeat size={11} aria-hidden="true" />}
               {x}
             </span>

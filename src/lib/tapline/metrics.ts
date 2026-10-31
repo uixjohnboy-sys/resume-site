@@ -11,6 +11,13 @@ export type ClockState = "ok" | "soon" | "late" | "none";
 
 /** Time in the current stage, against the agency's target for it. */
 export function stageClock(j: Job, now: number) {
+  // A legal deadline (NSW smoke alarms) runs from the report, across stages, until the work is done.
+  if (j.dueBy && !["done", "billed"].includes(j.stage)) {
+    const hours = Math.max(0, (now - j.createdAt) / H);
+    const target = (j.dueBy - j.createdAt) / H;
+    const state: ClockState = now > j.dueBy ? "late" : hours > target * 0.75 ? "soon" : "ok";
+    return { since: j.createdAt, hours, target, state };
+  }
   const since = j.stageEnteredAt ?? j.createdAt;
   // Before triage nobody knows the urgency, so a new report is held to the urgent target.
   const urgency = j.stage === "new" && !j.triage ? "urgent" : j.urgency;

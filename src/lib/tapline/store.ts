@@ -13,7 +13,29 @@ import type { Region, Sandbox } from "./types";
 const TTL = 60 * 60 * 48;
 const MAX_BYTES = 450_000;
 const NEW_PER_IP_PER_DAY = 30;
+const NEW_PER_SITE_PER_DAY = 1500;
 const PHOTOS_PER_SANDBOX = 12;
+const PHOTOS_PER_IP_PER_DAY = 40;
+const PHOTOS_PER_SITE_PER_DAY = 2000;
+
+const today = () => new Date().toISOString().slice(0, 10);
+
+/** The network a request comes from: the whole address for IPv4, the /64 for IPv6 (one home rotates inside it). */
+export function network(ip: string): string {
+  if (!ip.includes(":")) return ip;
+  const [head, tail = ""] = ip.split("::");
+  const a = head ? head.split(":") : [];
+  const b = tail ? tail.split(":") : [];
+  const full = ip.includes("::") ? [...a, ...Array(Math.max(0, 8 - a.length - b.length)).fill("0"), ...b] : a;
+  return full.slice(0, 4).map((x) => x.toLowerCase().replace(/^0+(?=.)/, "")).join(":") + "::/64";
+}
+
+/** Count one new sandbox against the connection's and the site's daily limits. Fails closed. */
+export async function claimNew(ipKey: string): Promise<boolean> {
+  const day = today();
+  return (await underLimit(`tapline:new:${ipKey}:${day}`, NEW_PER_IP_PER_DAY)) && (await underLimit(`tapline:new:site:${day}`, NEW_PER_SITE_PER_DAY));
+}
+const TOO_MANY = "You've started a lot of demos today. Please come back tomorrow, or reuse the one you have.";
 
 const k = {
   sb: (id: string) => `tapline:sb:${id}`,
@@ -92,20 +114,27 @@ export type Mutation<T> = (loaded: Loaded) => { ok: true; sb: Sandbox; out?: T }
 
 /**
  * Load, change and save with a version check, retrying on conflict so
- * concurrent writes are never lost. `ipKey` limits how many NEW sandboxes one
- * connection may create per day.
+ * concurrent writes are never lost. Saving a sandbox for the first time counts
+ * against the connection's and the site's daily limits on new sandboxes (only
+ * once the change has passed, so a typo costs nothing). `counted`: the caller
+ * already claimed it (the photo path claims before it stores anything).
  */
-export async function mutate<T>(id: string, region: Region, ipKey: string, fn: Mutation<T>): Promise<{ ok: true; sb: Sandbox; v: number; out?: T } | { ok: false; error: string; status: number }> {
+export async function mutate<T>(
+  id: string,
+  region: Region,
+  ipKey: string,
+  fn: Mutation<T>,
+  opts: { counted?: boolean } = {}
+): Promise<{ ok: true; sb: Sandbox; v: number; out?: T } | { ok: false; error: string; status: number }> {
+  let counted = opts.counted === true;
   for (let attempt = 0; attempt < 6; attempt++) {
     const loaded = await load(id, region);
-    if (!loaded.persisted && attempt === 0) {
-      const day = new Date().toISOString().slice(0, 10);
-      if (!(await underLimit(`tapline:new:${ipKey}:${day}`, NEW_PER_IP_PER_DAY))) {
-        return { ok: false, error: "You've started a lot of demos today. Please come back tomorrow, or reuse the one you have.", status: 429 };
-      }
-    }
     const r = fn(loaded);
     if (!r.ok) return { ok: false, error: r.error, status: r.status ?? 409 };
+    if (!loaded.persisted && !counted) {
+      if (!(await claimNew(ipKey))) return { ok: false, error: TOO_MANY, status: 429 };
+      counted = true;
+    }
     const saved = await casSave(id, r.sb, loaded.v);
     if (saved === "ok") return { ok: true, sb: r.sb, v: loaded.v + 1, out: r.out };
     if (saved === "too-big") return { ok: false, error: "This demo is full. Use Reset demo to start again.", status: 413 };
@@ -122,8 +151,9 @@ export async function reset(id: string, region: Region, ipKey: string) {
 
 const JPEG = /^data:image\/jpeg;base64,([A-Za-z0-9+/]+={0,2})$/;
 
-/** Checks a small browser-made JPEG (size, base64, JPEG magic bytes and dimensions) and stores it. */
-export async function putPhoto(id: string, dataUrl: unknown): Promise<string | { error: string }> {
+/** Checks a small browser-made JPEG (size, base64, JPEG magic bytes and dimensions) and stores it, within the
+ * sandbox's, the connection's and the site's photo limits (all fail closed). Call only after the action has passed. */
+export async function putPhoto(id: string, dataUrl: unknown, ipKey: string): Promise<string | { error: string }> {
   if (typeof dataUrl !== "string" || dataUrl.length > 100_000) return { error: "That photo is too large. Try another one." };
   const m = JPEG.exec(dataUrl);
   if (!m) return { error: "Please send the photo as a JPEG." };
@@ -132,6 +162,10 @@ export async function putPhoto(id: string, dataUrl: unknown): Promise<string | {
   const dims = jpegSize(bytes);
   if (!dims || dims.w > 1600 || dims.h > 1600 || dims.w < 16 || dims.h < 16) return { error: "That photo's size isn't supported. Try another one." };
   if (!(await underLimit(k.photos(id), PHOTOS_PER_SANDBOX, 172800))) return { error: "This demo already has the most photos it can hold." };
+  const day = today();
+  if (!(await underLimit(`tapline:phip:${ipKey}:${day}`, PHOTOS_PER_IP_PER_DAY)) || !(await underLimit(`tapline:phsite:${day}`, PHOTOS_PER_SITE_PER_DAY))) {
+    return { error: "That's a lot of photos today. Send the report without one, or try again tomorrow." };
+  }
   const ph = "ph" + Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(36)).join("").slice(0, 12);
   const redis = getRedis();
   if (!redis) mem.photo.set(k.photo(id, ph), dataUrl);
