@@ -640,7 +640,6 @@ export default function V3() {
         <footer className="v3-foot">
           <span>&copy; 2026 John Boy Roxas &middot; Tarlac, Philippines</span>
           <LocalTime />
-          <span>Built by hand, AI twin included.</span>
         </footer>
       </main>
     </div>

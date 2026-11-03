@@ -220,7 +220,7 @@ export default function CoachOsCaseStudy() {
             <p className="jb-sub" data-reveal="160">
               A complete client-management platform, designed and built from zero, wired into GoHighLevel in both
               directions. <b>Not a template, a snapshot, or a funnel.</b> A running product, and you can click
-              through every page of it before you read another word about me.
+              through the demo before you read another word about me.
             </p>
 
             <div className="jb-board" data-reveal="240">
@@ -285,7 +285,7 @@ export default function CoachOsCaseStudy() {
             </h2>
             <p className="jb-lede" style={{ marginBottom: "34px" }}>
               Every screen below is the running Harper Quinn demo practice, captured live: the four lead
-              generation tools, the client portal, and the owner's dashboard. The public ones are one click away
+              generation tools, the client portal, and the owner&apos;s dashboard. The public ones are one click away
               in section /06.
             </p>
             <div className="jb-shots" data-reveal="140">
@@ -423,7 +423,6 @@ export default function CoachOsCaseStudy() {
       <footer className="jb-foot">
         <div className="jb-cap" style={{ display: "flex", flexWrap: "wrap", gap: "8px 18px", justifyContent: "space-between" }}>
           <span>© 2026 John Boy Roxas · Tarlac, Philippines</span>
-          <span>Built by hand, like everything else here</span>
         </div>
       </footer>
     </div>

@@ -46,6 +46,38 @@ export default function V5() {
           </div>
         </header>
 
+        <p className="r-promise r-no-print">
+          GoHighLevel builds and fixes for Australian and UK agencies and small businesses, tested before handover and documented so your team can run them.
+        </p>
+
+        <section className="r-sec r-no-print" aria-labelledby="r-who">
+          <h2 id="r-who">Who I help</h2>
+          <div className="r-doors">
+            <article>
+              <h3>For agencies</h3>
+              <p className="r-door-lede">An extra pair of hands inside your GoHighLevel, white-label.</p>
+              <ul>
+                <li>Client sub-accounts built from your snapshot and your standards</li>
+                <li>Workflow builds, fixes and clean-ups when your team is full</li>
+                <li>Your tools and your process: Slack, ClickUp, Asana, time tracking</li>
+                <li>Loom updates and handover notes your clients never see me in</li>
+              </ul>
+              <p className="r-door-price">From AUD 15/hr, or a monthly block of hours.</p>
+            </article>
+            <article>
+              <h3>For business owners</h3>
+              <p className="r-door-lede">Clinics, coaches, trades and real estate: every enquiry captured and followed up.</p>
+              <ul>
+                <li>Website and form enquiries that land in your CRM, not an inbox</li>
+                <li>Online booking with confirmations and reminders</li>
+                <li>Follow-up emails that stop the moment someone books</li>
+                <li>A pipeline that shows where every lead is, at a glance</li>
+              </ul>
+              <p className="r-door-price">A fixed quote after a free 15-minute call.</p>
+            </article>
+          </div>
+        </section>
+
         <section className="r-sec">
           <h2>Summary</h2>
           <div>
@@ -113,7 +145,7 @@ export default function V5() {
           <dl className="r-skills">
             <div>
               <dt>Rate</dt>
-              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start and invoiced monthly in AUD.</dd>
+              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start.</dd>
             </div>
             <div>
               <dt>Hours</dt>

@@ -423,3 +423,68 @@
 .r-links a:hover {
   text-decoration-color: var(--ink);
 }
+
+/* The plain promise and the two doors: what a buyer needs before the resume. */
+.r-promise {
+  padding-top: 28px;
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.r-doors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+}
+.r-door-lede {
+  margin-top: 2px !important;
+  color: var(--ink-2);
+}
+.r-door-price {
+  margin-top: 10px !important;
+  font-weight: 600;
+}
+
+/* /book */
+.r-book-head {
+  padding-bottom: 24px;
+}
+.r-book-back {
+  font-size: 13px;
+  text-underline-offset: 3px;
+}
+.r-book-head h1 {
+  margin-top: 12px;
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.r-book-head p {
+  margin-top: 4px;
+  color: var(--ink-2);
+}
+.r-cal {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.r-cal iframe {
+  display: block;
+  width: 100%;
+  min-height: 1200px;
+  border: 0;
+  background: #fff;
+}
+@media screen and (max-width: 760px) {
+  .r-promise {
+    padding-top: 20px;
+    font-size: 19px;
+    line-height: 26px;
+  }
+  .r-doors {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}

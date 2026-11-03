@@ -1,201 +1,93 @@
-"use client";
-
-// Client intake page, in the same neon design system as the homepage
-// (home.css, scoped under .jb). Keeps everything the old page did: the
-// quick answers an employer always asks, the availability flag, and the
-// live GHL booking calendar, restyled so the whole site reads as one build.
-
+import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import Fx from "@/components/home/Fx";
-import { archivo, jetmono } from "../fonts";
-import { useAvailability } from "@/lib/useAvailability";
-import "../home.css";
+import { archivo } from "../fonts";
+import "../v5/v5.css";
 
-const complexBuilds = [
-  "Scalable GoHighLevel infrastructure that lets agencies onboard unlimited clients with zero technical friction.",
-  "A complete client platform (Coach OS) wired into GHL in both directions: AI companion, e-signature, Stripe subscriptions, courses, and a coach dashboard.",
-  "Always-on multi-channel nurture automations across SMS, email, and voicemail drop, with A2P 10DLC compliance for deliverability.",
-  "End-to-end lead tracking system from first click to close, so no opportunity slips through.",
-  "Automated booking system with calendar sync, reminders, and cancellation handling.",
-  "Full GHL account migrations and SaaS-mode/snapshot setup for scaling agencies.",
-];
+// Booking page, in the same black and white as the resume at /v5. The calendar comes first, because that is what the
+// visitor came for; the answers people usually want sit underneath it. The calendar itself is a GoHighLevel widget.
+
+export const metadata: Metadata = {
+  title: "Book a call · John Boy Roxas",
+  description: "Book a free 15-minute call with John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines.",
+};
 
 const nextSteps = [
-  { title: "Discovery call", description: "We talk through what you need, your current setup, and whether it's a good fit." },
-  { title: "Proposal", description: "You get a clear scope, timeline, and rate for the work, no surprises." },
-  { title: "Kickoff", description: "We start building, with regular updates so you always know where things stand." },
+  ["We talk", "We go through what you need and your current setup, and whether I am the right fit."],
+  ["You get a written scope", "A clear scope, timeline and price for the work, agreed before I start."],
+  ["I build", "With regular updates, tested before handover and documented so your team can run it."],
 ];
 
 const faqs = [
-  {
-    q: "What if I'm not sure GoHighLevel is the right fit for my business?",
-    a: "That's exactly what the discovery call is for. We'll walk through your current setup together and I'll tell you honestly if GHL is the right tool, no pressure either way.",
-  },
-  {
-    q: "Do you sign NDAs or confidentiality agreements?",
-    a: "Yes, happy to sign an NDA before we dive into any specifics about your business.",
-  },
-  {
-    q: "What if the project takes longer than expected?",
-    a: "I always scope the work upfront and flag early if timelines shift, so there are no surprises on your end.",
-  },
-  {
-    q: "Can I hire you for a one-off task instead of an ongoing engagement?",
-    a: "Yes, hourly work is available for smaller, one-off builds. Monthly retainers are for clients who want ongoing support.",
-  },
+  ["What if I'm not sure GoHighLevel is right for my business?", "That is what the call is for. I will tell you honestly if it is the right tool, with no pressure either way."],
+  ["Do you sign NDAs?", "Yes. I am happy to sign one before you share anything about your business."],
+  ["What if the work takes longer than expected?", "I scope the work upfront and tell you early if a timeline shifts."],
+  ["Can I hire you for a one-off task?", "Yes. Hourly work suits smaller jobs, and a monthly block of hours suits ongoing support."],
 ];
 
 export default function BookPage() {
-  const available = useAvailability();
-
   return (
-    <div className={`jb ${archivo.variable} ${jetmono.variable}`}>
-      <Fx />
-      <header className="jb-top">
-        <div className="jb-cap jb-top-in">
-          <Link className="jb-mark" href="/">
+    <div className={`r ${archivo.variable}`}>
+      <main className="r-sheet">
+        <header className="r-book-head">
+          <Link className="r-book-back" href="/v5">
             John Boy Roxas
           </Link>
-          <span className="jb-status">
-            <span className="jb-dot" aria-hidden="true" />
-            Client intake
-          </span>
-        </div>
-      </header>
+          <h1>Book a call</h1>
+          <p>A free 15-minute call. Pick a time below and tell me a little about what you need.</p>
+        </header>
 
-      <main>
-        <section className="jb-hero" style={{ paddingBottom: "40px" }}>
-          <div className="jb-hero-bg" aria-hidden="true" />
-          <div className="jb-cap" style={{ position: "relative", maxWidth: "820px" }}>
-            <Link className="jb-back" href="/">
-              ← Back to portfolio
-            </Link>
-            <h1 className="jb-h1" data-reveal="0" style={{ fontSize: "clamp(32px, 6vw, 54px)" }}>
-              Client <em>intake</em>
-            </h1>
-            <p className="jb-sub" data-reveal="90">
-              A quick intro, the answers clients usually ask about, and a calendar to lock in a call, all in one
-              place.
-            </p>
-          </div>
+        <div className="r-cal">
+          <iframe src="https://link.funnelgenie.io/widget/booking/LOYqIv9mae8XbBhBarr5" scrolling="yes" id="LOYqIv9mae8XbBhBarr5_1" title="Book a call with John Boy Roxas" />
+        </div>
+
+        <section className="r-sec">
+          <h2>After you book</h2>
+          <dl className="r-skills">
+            {nextSteps.map(([k, v]) => (
+              <div key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
-        <section className="jb-sec" style={{ paddingTop: "40px" }}>
-          <div className="jb-cap" style={{ maxWidth: "820px" }}>
-            {/* availability */}
-            <div className="jb-panel" data-reveal="0">
-              <div className="jb-cap-k">Availability</div>
-              <p className="jb-lede" style={{ fontSize: "14px" }}>
-                <b style={{ color: "var(--text)" }}>Part-time, 4 hours a day</b>, starting at 8 AM in your
-                timezone, whether you are working with me from Australia or the UK. I keep the schedule flexible
-                and adjust it to what a project actually needs: a launch date, a live event, an urgent request. If
-                you need me outside my usual window, say so and I will make it work.
-              </p>
+        <section className="r-sec">
+          <h2>Hours and rate</h2>
+          <dl className="r-skills">
+            <div>
+              <dt>Hours</dt>
+              <dd>Part-time, 4 hours a day, starting at 8 AM in your timezone. If a launch or an urgent job needs me outside that, say so and we will work it out.</dd>
             </div>
-
-            {/* rate */}
-            <div className="jb-panel" data-reveal="0">
-              <div className="jb-cap-k">Rates and engagement</div>
-              <p className="jb-lede" style={{ fontSize: "14px", marginBottom: "12px" }}>
-                <b style={{ color: "var(--neon)" }}>Scoped on the call</b>, because a two-week integration and a
-                full platform build are not the same job. Hourly or monthly; monthly clients are billed
-                fortnightly rather than all at once. Payment goes through Wise, the easiest way for clients
-                anywhere to send payment directly.
-              </p>
-              <p className="jb-lede" style={{ fontSize: "14px" }}>
-                What you are paying for is that the work does not stop once something is built. I set up a proper
-                client handover, stay on for ongoing support, and make sure you fully understand what was built
-                for you. I am not a typical VA: I work as a strategist who helps figure out what should actually
-                get built, not just execute a list of tasks.
-              </p>
+            <div>
+              <dt>Rate</dt>
+              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start.</dd>
             </div>
+          </dl>
+        </section>
 
-            {/* complex builds */}
-            <div className="jb-panel" data-reveal="0">
-              <div className="jb-cap-k">Most complex systems built</div>
-              <ul className="jb-ul">
-                {complexBuilds.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-              <p className="jb-note">
-                The first one on that list is public:{" "}
-                <Link href="/coach-os" style={{ color: "var(--neon)" }}>
-                  read the Coach OS case study
-                </Link>{" "}
-                or{" "}
-                <a
-                  href="https://coachos.johnboydesign.com/tour"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "var(--neon)" }}
-                >
-                  click through it live
-                </a>
-                .
-              </p>
-            </div>
-
-            {/* steps */}
-            <div className="jb-panel" data-reveal="0">
-              <div className="jb-cap-k">What happens after you book</div>
-              <ol className="jb-steps">
-                {nextSteps.map((s) => (
-                  <li className="jb-step" key={s.title}>
-                    <div>
-                      <b>{s.title}</b>
-                      <span>{s.description}</span>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* faq */}
-            <div className="jb-panel" data-reveal="0">
-              <div className="jb-cap-k">Common questions</div>
-              <div style={{ display: "grid", gap: "16px" }}>
-                {faqs.map((f) => (
-                  <div key={f.q}>
-                    <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text)", marginBottom: "4px" }}>
-                      {f.q}
-                    </div>
-                    <div style={{ fontSize: "13px", lineHeight: 1.65, color: "var(--text-2)" }}>{f.a}</div>
-                  </div>
-                ))}
+        <section className="r-sec">
+          <h2>Questions</h2>
+          <dl className="r-skills">
+            {faqs.map(([q, a]) => (
+              <div key={q}>
+                <dt>{q}</dt>
+                <dd>{a}</dd>
               </div>
-            </div>
+            ))}
+          </dl>
+        </section>
 
-            {available === true && (
-              <div
-                className="jb-avail"
-                style={{ display: "flex", justifyContent: "center", marginTop: "22px", marginBottom: 0 }}
-              >
-                <span className="jb-dot" aria-hidden="true" />
-                Currently accepting 1 new client this month
-              </div>
-            )}
-
-            {/* calendar */}
-            <div className="jb-cal" style={{ marginTop: "22px" }} data-reveal="0">
-              <iframe
-                src="https://link.funnelgenie.io/widget/booking/LOYqIv9mae8XbBhBarr5"
-                scrolling="yes"
-                id="LOYqIv9mae8XbBhBarr5_1"
-                title="Book a call with John Boy Roxas"
-              />
-            </div>
-          </div>
+        <section className="r-sec">
+          <h2>See the work</h2>
+          <p className="r-links">
+            <Link href="/projects/tapline">Tapline, a repairs desk you can try</Link>
+            <Link href="/coach-os">Coach OS case study</Link>
+            <Link href="/v5">Resume</Link>
+          </p>
         </section>
       </main>
-
-      <footer className="jb-foot">
-        <div className="jb-cap" style={{ display: "flex", flexWrap: "wrap", gap: "8px 18px", justifyContent: "space-between" }}>
-          <span>© 2026 John Boy Roxas · Tarlac, Philippines</span>
-          <span>Built by hand, like everything else here</span>
-        </div>
-      </footer>
 
       <Script src="https://link.funnelgenie.io/js/form_embed.js" strategy="afterInteractive" />
     </div>
