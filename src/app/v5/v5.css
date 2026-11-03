@@ -1,0 +1,425 @@
+/* Portfolio v5: the resume you can click. Black on white, one sheet, hairline rules, a label column like a printed
+   resume. Colour only comes from the live products when you hover them. The print rules below make the PDF. */
+
+:root:has(.r) body {
+  background: #fff;
+}
+.r {
+  --ink: #0a0a0a;
+  --ink-2: #404040;
+  --muted: #666;
+  --line: #e5e5e5;
+  width: 100%;
+  min-width: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--font-archivo), "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 23px;
+  -webkit-font-smoothing: antialiased;
+}
+.r *,
+.r *::before {
+  box-sizing: border-box;
+}
+.r-sheet {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 56px 32px 72px;
+}
+.r :is(h1, h2, h3, p, ul, dl, dd) {
+  margin: 0;
+}
+.r a {
+  color: inherit;
+}
+.r a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Header */
+.r-head {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding-bottom: 28px;
+  border-bottom: 2px solid var(--ink);
+}
+.r-photo {
+  display: block;
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05);
+  background: #0a0a0a;
+}
+.r-head h1 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.r-title {
+  margin-top: 2px !important;
+  color: var(--ink-2);
+}
+.r-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin-top: 8px !important;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--muted);
+}
+.r-contact a {
+  color: var(--ink);
+}
+.r-print-only {
+  display: none;
+}
+.r-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.r-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  background: var(--ink);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.r-btn:hover {
+  background: #333;
+}
+.r-quiet {
+  background: #fff;
+  color: var(--ink) !important;
+}
+.r-quiet:hover {
+  background: #f5f5f5;
+}
+
+/* Sections: a label column, like a printed resume */
+.r-sec {
+  display: grid;
+  grid-template-columns: 136px minmax(0, 1fr);
+  gap: 24px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+}
+.r-sec h2 {
+  font-size: 13px;
+  line-height: 23px;
+  font-weight: 600;
+}
+.r-muted {
+  margin-top: 8px !important;
+  color: var(--muted);
+}
+.r-hook {
+  margin-bottom: 20px !important;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Live projects */
+.r-project {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 24px;
+  align-items: start;
+}
+.r-project + .r-project {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.r h3 {
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 700;
+}
+.r-kind {
+  color: var(--muted);
+}
+.r ul {
+  margin-top: 6px;
+  padding-left: 16px;
+  list-style: disc;
+  color: var(--ink-2);
+}
+.r li + li {
+  margin-top: 2px;
+}
+.r-stats {
+  margin-top: 6px !important;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--muted);
+}
+.r-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 10px !important;
+}
+.r-links a {
+  text-underline-offset: 3px;
+}
+.r-try {
+  font-weight: 700;
+}
+.r-thumb {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  line-height: 0;
+}
+.r-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: grayscale(1);
+  transition: filter 0.2s ease;
+}
+.r-thumb:hover img,
+.r-thumb:focus-visible img {
+  filter: none;
+}
+
+/* Experience */
+.r-job + .r-job {
+  margin-top: 20px;
+}
+.r-job-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.r-job-head h3 span {
+  font-weight: 500;
+}
+.r-when {
+  flex: none;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Skills */
+.r-skills div + div {
+  margin-top: 8px;
+}
+.r-skills dt {
+  font-weight: 600;
+}
+.r-skills dd {
+  color: var(--ink-2);
+}
+
+/* The close */
+.r-end {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 36px;
+  padding: 28px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+}
+.r-end p {
+  max-width: 340px;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+}
+.r-end .r-actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.r-end .r-btn {
+  border-color: #fff;
+  background: #fff;
+  color: var(--ink) !important;
+}
+.r-end .r-btn:hover {
+  background: #e5e5e5;
+}
+.r-end .r-quiet {
+  border-color: #a3a3a3;
+  background: transparent;
+  color: #fff !important;
+}
+.r-end .r-quiet:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.r-end a:focus-visible {
+  outline-color: #fff;
+}
+
+@media screen and (max-width: 760px) {
+  .r-sheet {
+    padding: 32px 16px 48px;
+  }
+  .r-head {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 14px;
+  }
+  .r-photo {
+    width: 64px;
+    height: 64px;
+  }
+  .r-head h1 {
+    font-size: 26px;
+    line-height: 32px;
+  }
+  .r-head .r-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+  .r-head .r-btn {
+    flex: 1;
+    min-height: 44px;
+  }
+  .r-sec {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .r-project {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .r-job-head {
+    flex-direction: column;
+    gap: 0;
+  }
+  .r-end {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 24px;
+  }
+  .r-end .r-btn {
+    flex: 1;
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .r-thumb img {
+    transition: none;
+  }
+}
+
+/* The PDF: this page, printed. Links stay clickable. */
+@page {
+  size: A4;
+  margin: 14mm 15mm;
+}
+@media print {
+  .r {
+    font-size: 10pt;
+    line-height: 14.5pt;
+  }
+  .r-sheet {
+    max-width: none;
+    padding: 0;
+  }
+  .r-no-print {
+    display: none !important;
+  }
+  .r-print-only {
+    display: inline;
+  }
+  .r-head {
+    grid-template-columns: 62px minmax(0, 1fr);
+    gap: 14px;
+    padding-bottom: 12px;
+  }
+  .r-photo {
+    width: 62px;
+    height: 62px;
+  }
+  .r-head h1 {
+    font-size: 22pt;
+    line-height: 26pt;
+  }
+  .r-contact {
+    font-size: 8.5pt;
+    line-height: 12pt;
+  }
+  .r-sec {
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10pt 0;
+  }
+  .r-sec h2 {
+    font-size: 9pt;
+    line-height: 14.5pt;
+  }
+  .r h3 {
+    font-size: 10pt;
+    line-height: 14.5pt;
+  }
+  .r-project {
+    display: block;
+    break-inside: avoid;
+  }
+  .r-project + .r-project {
+    margin-top: 8pt;
+    padding-top: 8pt;
+  }
+  .r-links {
+    margin-top: 3pt !important;
+    font-size: 9pt;
+  }
+  .r-stats,
+  .r-when {
+    font-size: 8.5pt;
+    line-height: 12pt;
+  }
+  .r-job {
+    break-inside: avoid;
+  }
+  .r-job + .r-job {
+    margin-top: 7pt;
+  }
+  .r ul {
+    margin-top: 2pt;
+  }
+  .r-skills div + div {
+    margin-top: 3pt;
+  }
+  .r-skills div {
+    break-inside: avoid;
+  }
+}
+
+/* Links read as links, quietly: the page is black and white, so colour can't say it. */
+.r-contact a,
+.r-links a {
+  text-decoration: underline;
+  text-decoration-color: #a3a3a3;
+  text-underline-offset: 3px;
+}
+.r-contact a:hover,
+.r-links a:hover {
+  text-decoration-color: var(--ink);
+}
