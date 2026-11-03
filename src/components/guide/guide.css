@@ -285,3 +285,32 @@
 .gd-ring {
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.55);
 }
+
+.gd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* A short screen (200% zoom, a landscape phone): the card shrinks so it never hides what it asks you to press. */
+.gd-compact {
+  padding: 8px 12px;
+}
+.gd-compact .gd-text {
+  display: none;
+}
+.gd-compact .gd-do {
+  margin-top: 4px;
+  padding: 4px 8px;
+}
+.gd-compact .gd-row {
+  margin-top: 8px;
+}
+.gd-compact .gd-h {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+}

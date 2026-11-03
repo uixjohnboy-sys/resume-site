@@ -83,6 +83,8 @@ export function useSandbox(poll = true) {
 
   useEffect(() => {
     const sid = resolveId();
+    // A ?region=UK link opens a demo nobody has changed yet in that region.
+    if (new URL(window.location.href).searchParams.get("region") === "UK") region.current = "UK";
     Promise.resolve().then(() => {
       setId(sid);
       load(sid);

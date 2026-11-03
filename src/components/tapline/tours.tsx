@@ -61,8 +61,8 @@ const endCard = (id: string, title: string, text: string): Step => ({
       </dl>
       <p className="gd-note">From this fictional agency&apos;s board. The hours saved are an estimate of 25 minutes a job.</p>
       <div className="gd-cta">
-        <a className="gd-btn" href={c.contact.mail}>
-          Talk to John Boy about your agency
+        <a className="gd-btn" href="/book">
+          Book a call with John Boy
         </a>
         <a className="gd-btn gd-quiet" href={c.contact.whatsapp} target="_blank" rel="noopener noreferrer">
           Message on WhatsApp
@@ -71,6 +71,9 @@ const endCard = (id: string, title: string, text: string): Step => ({
           Email this demo to myself
         </a>
       </div>
+      <p className="gd-note">
+        Or email <a href={c.contact.mail}>uix.johnboy@gmail.com</a>
+      </p>
     </>
   ),
 });
@@ -92,7 +95,7 @@ const compliance: Step = {
 const managerSteps: Step[] = [
   {
     id: "welcome",
-    title: () => "One repair, start to finish",
+    title: () => "One repair, from the first report",
     text: (c) => `This is ${c.sb.agency}, a fictional agency with ${c.sb.properties.length} properties. Everything works and your changes are private to you. Two minutes.`,
     enter: (c) => c.go.board(),
   },
@@ -112,10 +115,12 @@ const managerSteps: Step[] = [
   },
   {
     id: "send",
-    spot: "tenant-send",
+    // If the visitor closed the form, point back at the button that opens it.
+    spot: (c) => (c.tenantOpen || c.job ? "tenant-send" : "report"),
     title: () => "The report is filled in for you",
     text: () => "A real tenant types this on their phone from a text-message link, with no app and no login.",
-    doIt: () => "Press Send report.",
+    doIt: (c) => (c.tenantOpen ? "Press Send report." : "Press Report a repair, then Send report."),
+    ready: (c) => !!c.job,
     enter: (c) => {
       if (!c.job && !c.tenantOpen) c.go.tenant();
     },
@@ -165,14 +170,14 @@ const managerSteps: Step[] = [
     id: "owner",
     spot: "col-owner",
     title: (c) => `Over the ${words(c).owner}'s limit`,
-    text: (c) => `Routine work goes out capped at each ${words(c).owner}'s limit. A quote above it waits here for one tap from the ${words(c).owner}, and reminders chase it for you.`,
+    text: (c) => `Routine work goes out capped at each ${words(c).owner}'s limit. A quote above it waits here for one tap from the ${words(c).owner}.`,
     enter: (c) => {
       c.go.open(null);
       c.go.board();
     },
   },
   compliance,
-  endCard("end", "That's one repair, start to finish", "This desk can be built around your agency's rules, your trades and your accounting software."),
+  endCard("end", "That's one repair under way", "From here the visit is booked, the invoice is checked against what was approved, and the bill reaches the statement. This desk can be built around your agency's rules, your trades and your accounting software."),
 ];
 
 const ownerSteps: Step[] = [

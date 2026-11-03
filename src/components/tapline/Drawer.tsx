@@ -302,9 +302,13 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
   }
 
   return (
-    <section className="tl-sec tl-triage" aria-labelledby="tl-triage-h" data-spot="triage">
+    <section className="tl-sec tl-triage" aria-labelledby="tl-triage-h">
+      <div data-spot="triage">
       <h3 id="tl-triage-h">Triage</h3>
-      <p className="tl-source">{t.source === "ai" ? "Suggested by AI." : "Suggested by keyword rules (AI unavailable)."} You confirm before anything is sent.</p>
+      <p className="tl-source">
+        {t.source === "ai" ? "Suggested by AI." : "Suggested by keyword rules (AI unavailable)."}{" "}
+        {awaitingConfirm(j) ? "After hours, only the fixed safety steps and the on-call page have gone out. The reply waits for you." : "You confirm before anything is sent."}
+      </p>
       {t.repeatOf && (
         <p className="tl-callout">
           <IconRepeat size={14} aria-hidden="true" /> Repeat fault: {t.repeatOf.ref} {t.repeatOf.title} ({TRADES[sb.region][t.repeatOf.trade].work}), {t.repeatOf.daysAgo} days ago. Ask the{" "}
@@ -381,6 +385,7 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
             <input type="checkbox" checked={ins} onChange={(e) => setIns(e.target.checked)} /> Possible insurance claim
           </label>
         </div>
+      </div>
       </div>
 
       {urg === "urgent" && t.emergency.length > 0 && (

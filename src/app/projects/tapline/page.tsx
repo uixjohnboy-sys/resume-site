@@ -3,8 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import "../project.css";
 
-// The "Know more" page for Tapline. With no client testimonials yet, the live demo
-// and how it was tested are the proof, so every claim here can be checked in the demo.
+// The "Know more" page for Tapline. With no client testimonials yet, the proof is what a
+// visitor can try for themselves and what testing really caught.
 // Reviewed at Studio gate G5. Noindex until the portfolio launch.
 
 export const metadata: Metadata = {
@@ -94,22 +94,29 @@ const regions = [
   ["Emergency numbers", "000, Jemena 131 909, Police 131 444", "999, gas emergency 0800 111 999, Police 101"],
 ];
 
-const tests = [
-  ["121", "emergency and everyday reports run through the keyword rules"],
-  ["168", "hours of the week the sample data is checked at, against the product's own rules"],
-  ["62", "steps through the live system, end to end, in every order that matters"],
-  ["8", "specialist review roles, each run as a separate AI reviewer with no knowledge of the build"],
+const tryIt = [
+  ["Report a leak at 9:47 pm", "See who gets contacted, what the tenant is told, and what waits for a person."],
+  ["Accept the job on your own phone", "Scan the code in the job and press accept. The board moves by itself."],
+  ["Report something harmless", "Try a pilot light that keeps going out. Nobody gets paged and no emergency text goes out."],
+  ["Switch to Manchester", "Watch the trades, words, notice periods and emergency numbers change."],
+];
+
+const caught = [
+  "A report about a pilot flame told the tenant to call 999 and paged a contractor. An everyday word now can't do that unless the AI sees the same danger.",
+  "A job the contractor finished overnight still told the tenant \"we're arranging a tradie\" the next morning. Replies now follow where the job is.",
+  "Work on a strata building's common property was going to the lot owner to approve. It now goes to the strata manager.",
+  "A sample smoke alarm visit was booked after its legal due date. The sample data is now checked against the product's own rules, at every hour of the week.",
 ];
 
 export default function TaplineProject() {
   return (
     <main className="pj">
       <nav className="pj-nav">
-        <Link href="/">John Boy Roxas</Link>
+        <Link href="/v4">John Boy Roxas</Link>
       </nav>
 
       <header className="pj-hero">
-        <p className="pj-kicker">Property management · Australia and UK</p>
+        <p className="pj-kicker">Property managers in Australia · Letting agents in the UK</p>
         <h1>A repairs desk that keeps moving after the office closes</h1>
         <p className="pj-lead">
           Tapline takes a repair from the tenant&apos;s report to the bill: triage, after-hours dispatch, owner approval, contractor visit and invoice check, all on one board. I built it as a live demo with a fictional agency, so you can try it instead of reading about it.
@@ -117,6 +124,9 @@ export default function TaplineProject() {
         <div className="pj-cta">
           <a className="pj-btn" href="/demo/tapline?tour=manager">
             Take the 2-minute guided tour
+          </a>
+          <a className="pj-btn pj-btn-quiet" href="/demo/tapline?tour=manager&region=UK">
+            UK tour for letting agents
           </a>
           <a className="pj-btn pj-btn-quiet" href="/demo/tapline">
             Open the live demo
@@ -192,16 +202,31 @@ export default function TaplineProject() {
       </section>
 
       <section className="pj-sec">
-        <h2>How it was tested</h2>
-        <p className="pj-measure">I don&apos;t have a client quote for this one yet, because it&apos;s a demo I built to show how I work. So here is the testing behind it, which you can check against the demo itself.</p>
-        <dl className="pj-tests">
-          {tests.map(([n, t]) => (
-            <div key={t}>
-              <dt>{n}</dt>
-              <dd>{t}</dd>
+        <h2>Don&apos;t take my word for it</h2>
+        <p className="pj-measure">I don&apos;t have a client testimonial for this one, because it&apos;s a demo I built to show how I work. So here are four things you can check yourself in a few minutes.</p>
+        <div className="pj-grid">
+          {tryIt.map(([t, b]) => (
+            <div key={t} className="pj-card">
+              <h3>{t}</h3>
+              <p>{b}</p>
             </div>
           ))}
-        </dl>
+        </div>
+        <div className="pj-cta">
+          <a className="pj-btn pj-btn-quiet" href="/demo/tapline">
+            Try them in the demo
+          </a>
+        </div>
+      </section>
+
+      <section className="pj-sec">
+        <h2>What testing caught</h2>
+        <p className="pj-measure">I build with AI coding tools and I check the results. Automated tests run through the live system, and eight separate AI reviewers, each with no hand in the build, went through it as a property manager, a designer, a security engineer and so on. Some of what they found:</p>
+        <ul className="pj-list">
+          {caught.map((x) => (
+            <li key={x}>{x}</li>
+          ))}
+        </ul>
       </section>
 
       <section className="pj-sec">
@@ -209,12 +234,22 @@ export default function TaplineProject() {
         <p className="pj-measure">The agency, the people and the jobs are fictional. Text messages appear on the phone pages rather than being sent. Bills are marked as entered in PropertyMe or Alto but aren&apos;t connected to either. A real build connects to your own systems and your own rules.</p>
       </section>
 
+      <section className="pj-sec pj-who">
+        <Image src="/v3/jb-hero.webp" alt="John Boy Roxas" width={160} height={160} />
+        <div>
+          <h2>Who built this</h2>
+          <p className="pj-measure">
+            I&apos;m John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines (UTC+8). I&apos;ve spent five years building workflows, funnels and client portals for Australian and UK agencies and small businesses. I work Australian business hours, with overlap into the UK morning.
+          </p>
+        </div>
+      </section>
+
       <section className="pj-end">
         <h2>Could your agency use something like this?</h2>
         <p>Tell me how repairs run at your agency today. I&apos;ll tell you what I&apos;d build first and what I wouldn&apos;t.</p>
         <div className="pj-cta">
-          <a className="pj-btn" href={MAIL}>
-            Email John Boy
+          <a className="pj-btn" href="/book">
+            Book a call
           </a>
           <a className="pj-btn pj-btn-quiet" href={WHATSAPP} target="_blank" rel="noopener noreferrer">
             Message on WhatsApp
@@ -223,6 +258,9 @@ export default function TaplineProject() {
             Tour for agency owners
           </a>
         </div>
+        <p className="pj-end-mail">
+          Or email <a href={MAIL}>{EMAIL}</a>
+        </p>
       </section>
     </main>
   );

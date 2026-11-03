@@ -88,7 +88,7 @@ export default function BookPage() {
               <div className="jb-cap-k">Availability</div>
               <p className="jb-lede" style={{ fontSize: "14px" }}>
                 <b style={{ color: "var(--text)" }}>Part-time, 4 hours a day</b>, starting at 8 AM in your
-                timezone, whether you are working with me from the US or Australia. I keep the schedule flexible
+                timezone, whether you are working with me from Australia or the UK. I keep the schedule flexible
                 and adjust it to what a project actually needs: a launch date, a live event, an urgent request. If
                 you need me outside my usual window, say so and I will make it work.
               </p>

@@ -13,6 +13,9 @@
   --bg-2: #f4f6f8;
   --teal: #0f766e;
   --teal-2: #115e59;
+  /* The page's parent is a flex row: without these it grows to fit its widest child on a phone. */
+  width: 100%;
+  min-width: 0;
   max-width: 1088px;
   margin: 0 auto;
   padding: 0 24px 72px;
@@ -315,5 +318,48 @@
   }
   .pj-end {
     padding: 32px 24px;
+  }
+}
+
+.pj-list {
+  max-width: 680px;
+  margin: 16px 0 0;
+  padding-left: 20px;
+  list-style: disc;
+  color: var(--ink-2);
+}
+.pj-list li + li {
+  margin-top: 8px;
+}
+.pj-who {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.pj-who img {
+  flex: none;
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+.pj-end-mail {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.pj-end-mail a {
+  color: #fff;
+}
+.pj-step-crop {
+  grid-template-columns: minmax(0, 1fr) 460px;
+}
+@media (max-width: 860px) {
+  .pj-step-crop {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pj-who {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

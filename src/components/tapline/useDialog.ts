@@ -40,15 +40,11 @@ export function useDialog(open: boolean, onClose: () => void, returnTo?: () => H
       const guide = document.querySelector("[data-guide-card]");
       const items = [...Array.from(el.querySelectorAll<HTMLElement>(focusable)), ...(guide ? Array.from(guide.querySelectorAll<HTMLElement>(focusable)) : [])].filter((x) => x.offsetParent !== null);
       if (!items.length) return;
-      const a = items[0];
-      const b = items[items.length - 1];
-      if (e.shiftKey && (document.activeElement === a || !el.contains(document.activeElement))) {
-        e.preventDefault();
-        b.focus();
-      } else if (!e.shiftKey && document.activeElement === b) {
-        e.preventDefault();
-        a.focus();
-      }
+      // Tab moves through the dialog and the tour's card as one loop, in both directions.
+      const at = items.indexOf(document.activeElement as HTMLElement);
+      const to = at === -1 ? (e.shiftKey ? items.length - 1 : 0) : (at + (e.shiftKey ? -1 : 1) + items.length) % items.length;
+      e.preventDefault();
+      items[to].focus();
     };
     document.addEventListener("keydown", onKey);
     return () => {

@@ -43,6 +43,29 @@ export default function Board() {
   const [tourFrom, setTourFrom] = useState(0);
   const [offer, setOffer] = useState(false);
   const hasDemo = !!sb;
+  const offerHead = useRef<HTMLHeadingElement>(null);
+  const offerAsked = useRef(false);
+
+  // Escape closes the offer from anywhere, unless a dialog is using it.
+  useEffect(() => {
+    if (!offer) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || document.querySelector('[aria-modal="true"]')) return;
+      setOffer(false);
+      try {
+        localStorage.setItem(TOUR_SEEN, "1");
+      } catch {}
+      Array.from(document.querySelectorAll<HTMLElement>("[data-guide-return]")).find((x) => x.offsetParent !== null)?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [offer]);
+
+  // Asked for with the button or menu: focus moves to the offer. The first-visit offer doesn't steal focus.
+  useEffect(() => {
+    if (offer && offerAsked.current) offerHead.current?.focus();
+    offerAsked.current = false;
+  }, [offer]);
 
   // The guided tour: offered once to a first-time visitor, opened straight by a ?tour= link.
   useEffect(() => {
@@ -170,6 +193,34 @@ export default function Board() {
 
   return (
     <>
+      {offer && !tour && (
+        <section className="gd-start" aria-labelledby="gd-start-h">
+          <h2 className="gd-h" id="gd-start-h" tabIndex={-1} ref={offerHead}>
+            Take the guided tour?
+          </h2>
+          <p className="gd-text">Use the real product while it shows you around. No sign-up, and the data is fictional.</p>
+          <div className="gd-paths">
+            <button type="button" className="gd-path" onClick={() => startTour("manager")}>
+              <b>I&apos;m {sb.region === "AU" ? "a property manager" : "a letting agent"}</b>
+              <span>Follow one repair from the tenant&apos;s report to the {terms(sb.region).contractor}&apos;s phone. 2 minutes.</span>
+            </button>
+            <button type="button" className="gd-path" onClick={() => startTour("owner")}>
+              <b>I run the agency</b>
+              <span>See control, proof and risk across the desk. 1 minute.</span>
+            </button>
+          </div>
+          <button
+            type="button"
+            className="gd-later"
+            onClick={() => {
+              setOffer(false);
+              markSeen();
+            }}
+          >
+            I&apos;ll explore on my own
+          </button>
+        </section>
+      )}
       <div id="tl-app" className="tl">
         <header className="tl-top">
           <div className="tl-brand">
@@ -186,7 +237,15 @@ export default function Board() {
             </div>
           </div>
           <div className="tl-top-actions">
-            <button type="button" className="tl-btn tl-btn-onink tl-desk" onClick={() => setOffer(true)}>
+            <button
+              type="button"
+              className="tl-btn tl-btn-onink tl-desk"
+              data-guide-return
+              onClick={() => {
+                offerAsked.current = true;
+                setOffer(true);
+              }}
+            >
               <IconRoute size={16} aria-hidden="true" /> Guided tour
             </button>
             <div className="tl-seg tl-desk" role="group" aria-label="Agency region" data-spot="regions">
@@ -204,7 +263,7 @@ export default function Board() {
               <span className="tl-mob">Report a repair</span>
             </button>
             <div className="tl-mob tl-menu-wrap" ref={menuRef}>
-              <button type="button" className="tl-icon-btn" aria-label="More options" aria-expanded={menu} aria-controls="tl-menu" onClick={() => setMenu((m) => !m)}>
+              <button type="button" className="tl-icon-btn" data-guide-return aria-label="More options" aria-expanded={menu} aria-controls="tl-menu" onClick={() => setMenu((m) => !m)}>
                 <IconDots size={20} aria-hidden="true" />
               </button>
               {menu && (
@@ -212,6 +271,7 @@ export default function Board() {
                   <button
                     type="button"
                     onClick={() => {
+                      offerAsked.current = true;
                       setMenu(false);
                       setOffer(true);
                     }}
@@ -400,34 +460,6 @@ export default function Board() {
         />
       )}
       {confirm && <ConfirmDialog title={confirm.title} body={confirm.body} confirm={confirm.confirm} onConfirm={confirm.run} onClose={() => setConfirm(null)} />}
-      {offer && !tour && (
-        <section className="gd-start" aria-labelledby="gd-start-h">
-          <h2 className="gd-h" id="gd-start-h">
-            Take the guided tour?
-          </h2>
-          <p className="gd-text">Use the real product while it shows you around. No sign-up, and the data is fictional.</p>
-          <div className="gd-paths">
-            <button type="button" className="gd-path" onClick={() => startTour("manager")}>
-              <b>I&apos;m {sb.region === "AU" ? "a property manager" : "a letting agent"}</b>
-              <span>Follow one repair from the report to the bill. 2 minutes.</span>
-            </button>
-            <button type="button" className="gd-path" onClick={() => startTour("owner")}>
-              <b>I run the agency</b>
-              <span>See control, proof and risk across the desk. 1 minute.</span>
-            </button>
-          </div>
-          <button
-            type="button"
-            className="gd-later"
-            onClick={() => {
-              setOffer(false);
-              markSeen();
-            }}
-          >
-            I&apos;ll explore on my own
-          </button>
-        </section>
-      )}
       {tour && <Guide key={tour} tour={TOURS[tour]} ctx={tourCtx} onClose={() => setTour(null)} />}
     </>
   );

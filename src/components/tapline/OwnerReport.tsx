@@ -41,7 +41,11 @@ const cap = (x: string) => x[0].toUpperCase() + x.slice(1);
 export default function OwnerReport({ sb, now }: { sb: Sandbox; now: number }) {
   const R = REGION[sb.region];
   const c = terms(sb.region);
-  const [back, setBack] = useState<0 | 1>(0);
+  // Early in a month there may be nothing billed yet: open on last month rather than an empty page.
+  const [back, setBack] = useState<0 | 1>(() => {
+    const p = monthBounds(sb.region, now, 0);
+    return sb.jobs.some((j) => j.billedAt && j.billedAt >= p.start && j.billedAt < p.end && j.triage?.chargeTo === "owner") ? 0 : 1;
+  });
   const [ownerId, setOwnerId] = useState<string>("");
   const period = monthBounds(sb.region, now, back);
   const inPeriod = (t?: number) => !!t && t >= period.start && t < period.end;

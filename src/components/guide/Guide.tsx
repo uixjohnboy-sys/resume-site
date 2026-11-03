@@ -2,6 +2,7 @@
 
 import { IconHandFinger, IconX } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import "./guide.css";
 
 // The Guided Demo engine, shared by every portfolio project. A tour is plain data.
@@ -15,7 +16,7 @@ export type GuideStep<C> = {
   title: (c: C) => string;
   text: (c: C) => string;
   /** The data-spot to light up. No spot: the card sits alone. */
-  spot?: string;
+  spot?: string | ((c: C) => string | undefined);
   /** Prepare the screen when the step opens (switch a view, open or close a dialog). */
   enter?: (c: C) => void;
   /** "Your turn": the instruction, shown apart from the text. */
@@ -46,12 +47,20 @@ function findSpot(name: string): HTMLElement | null {
   }) ?? null;
 }
 
-/** Where the card goes: beside the spot if it fits, else above or below; a bottom sheet on a phone. */
+const COMPACT_H = 500;
+
+/** Where the card goes: beside the spot if it fits, else above or below; a sheet on a phone or a short screen (zoom). */
 function placeCard(box: Box | null, cardH: number, vw: number, vh: number): { left: number; top: number; width: number } {
   const width = Math.min(CARD_W, vw - MARGIN * 2);
-  if (vw < 640) {
-    const inLowerHalf = box && box.y + box.h / 2 > vh / 2;
-    return { left: MARGIN, width, top: inLowerHalf ? MARGIN : Math.max(MARGIN, vh - cardH - MARGIN) };
+  if (vw < 640 || vh < COMPACT_H) {
+    if (vw >= 640 && box) {
+      // A short, wide screen: beside the target, whichever side has room.
+      const roomRight = vw - (box.x + box.w);
+      return { left: roomRight >= box.x ? vw - width - MARGIN : MARGIN, width, top: MARGIN };
+    }
+    // A bottom sheet, unless the spot starts in the lower half of the screen.
+    const spotLow = box && box.y > vh / 2;
+    return { left: MARGIN, width, top: spotLow ? MARGIN : Math.max(MARGIN, vh - cardH - MARGIN) };
   }
   if (!box) return { left: MARGIN * 2, width, top: Math.max(MARGIN, vh - cardH - MARGIN * 2) };
   const gap = 16;
@@ -87,15 +96,24 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
   const last = n === tour.steps.length - 1;
   const counted = tour.steps.filter((s) => !s.end).length;
 
-  const next = useCallback(() => setN((x) => Math.min(x + 1, tour.steps.length - 1)), [tour.steps.length]);
-  const back = useCallback(() => setN((x) => Math.max(x - 1, 0)), []);
+  // Going back to a step already done must stay there, not bounce forward again.
+  const cameBack = useRef(false);
+  const next = useCallback(() => {
+    cameBack.current = false;
+    setN((x) => Math.min(x + 1, tour.steps.length - 1));
+  }, [tour.steps.length]);
+  const back = useCallback(() => {
+    cameBack.current = true;
+    setN((x) => Math.max(x - 1, 0));
+  }, []);
 
   // Open the step: prepare the screen, then keep the spotlight on its target while the page moves underneath.
   useEffect(() => {
     tour.steps[n].enter?.(ctxRef.current);
-    let scrolled = false;
-    const name = tour.steps[n].spot;
+    let scrolledTo: string | null = null;
     const measure = () => {
+      const spot = tour.steps[n].spot;
+      const name = typeof spot === "function" ? spot(ctxRef.current) : spot;
       const cardH = cardRef.current?.offsetHeight ?? 240;
       setSize((s) => (s.vw === window.innerWidth && s.vh === window.innerHeight && s.cardH === cardH ? s : { vw: window.innerWidth, vh: window.innerHeight, cardH }));
       const el = name ? findSpot(name) : null;
@@ -103,9 +121,12 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
         setBox((b) => (b ? null : b));
         return;
       }
-      if (!scrolled) {
-        scrolled = true;
-        el.scrollIntoView({ block: "center", inline: "nearest", behavior: reduced() ? "auto" : "smooth" });
+      if (scrolledTo !== name) {
+        scrolledTo = name ?? null;
+        // A tall target or a phone: show its top, where the words are. Clear of any sticky bar.
+        const tall = el.getBoundingClientRect().height > window.innerHeight * 0.55 || window.innerWidth < 640;
+        el.style.scrollMarginTop = "72px";
+        el.scrollIntoView({ block: tall ? "start" : "center", inline: "nearest", behavior: reduced() ? "auto" : "smooth" });
       }
       const r = el.getBoundingClientRect();
       const nextBox = { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) };
@@ -125,7 +146,7 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
   // A step the visitor has really done moves on by itself, after a beat so they see it happen.
   const isDone = !!step.done?.(ctx);
   useEffect(() => {
-    if (!isDone) return;
+    if (!isDone || cameBack.current) return;
     const t = setTimeout(next, 900);
     return () => clearTimeout(t);
   }, [isDone, n, next]);
@@ -140,25 +161,54 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
       if (e.key === "Escape" && !modalOpen()) closeRef.current();
     };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      // Ending the tour hands focus back to whatever can start it again.
+      const a = document.activeElement;
+      if (!a || a === document.body || a.closest("[data-guide-card]")) {
+        const home = Array.from(document.querySelectorAll<HTMLElement>("[data-guide-return]")).find((x) => x.offsetParent !== null);
+        setTimeout(() => home?.focus(), 0);
+      }
+    };
+  }, []);
+
+  // Announced where a screen reader is listening: a dialog that holds the focus hides everything outside it.
+  const [liveHost, setLiveHost] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const t = setInterval(() => {
+      const host = document.querySelector<HTMLElement>('[aria-modal="true"]');
+      setLiveHost((h) => (h === host ? h : host));
+    }, 300);
+    return () => clearInterval(t);
   }, []);
 
   const pos = placeCard(box, size.cardH, size.vw, size.vh);
-  const hole = box && { x: box.x - PAD, y: box.y - PAD, w: box.w + PAD * 2, h: box.h + PAD * 2, r: 12 };
+  // The hole stays on screen even when its target is taller than the screen.
+  const holeTop = box ? Math.max(4, box.y - PAD) : 0;
+  const holeBottom = box ? Math.min(size.vh - 4, box.y + box.h + PAD) : 0;
+  const hole = box && holeBottom - holeTop > 24 ? { x: box.x - PAD, y: holeTop, w: box.w + PAD * 2, h: holeBottom - holeTop, r: 12 } : null;
   const path =
     `M0 0H${size.vw}V${size.vh}H0Z` +
     (hole
       ? ` M${hole.x + hole.r} ${hole.y}h${hole.w - hole.r * 2}a${hole.r} ${hole.r} 0 0 1 ${hole.r} ${hole.r}v${hole.h - hole.r * 2}a${hole.r} ${hole.r} 0 0 1 -${hole.r} ${hole.r}h-${hole.w - hole.r * 2}a${hole.r} ${hole.r} 0 0 1 -${hole.r} -${hole.r}v-${hole.h - hole.r * 2}a${hole.r} ${hole.r} 0 0 1 ${hole.r} -${hole.r}Z`
       : "");
   const canGo = !step.ready || step.ready(ctx);
+  const compact = size.vh < COMPACT_H;
+  const spoken = `${step.end ? "Your next step" : `Step ${n + 1} of ${counted}`}. ${step.title(ctx)}. ${step.text(ctx)} ${step.doIt && !isDone ? step.doIt(ctx) : ""}`;
+  const live = (
+    <p className="gd-sr" role="status">
+      {spoken}
+    </p>
+  );
 
   return (
     <div className="gd">
+      {liveHost ? createPortal(live, liveHost) : live}
       <svg className="gd-dim" width={size.vw} height={size.vh} aria-hidden="true">
         <path d={path} fillRule="evenodd" />
       </svg>
       {hole && <div className={`gd-ring${step.doIt ? " gd-ring-do" : ""}`} aria-hidden="true" style={{ left: hole.x, top: hole.y, width: hole.w, height: hole.h }} />}
-      <div className="gd-card" ref={cardRef} data-guide-card role="region" aria-label={`${tour.title}, step ${Math.min(n + 1, counted)} of ${counted}`} style={{ left: pos.left, top: pos.top, width: pos.width }}>
+      <div className={`gd-card${compact ? " gd-compact" : ""}`} ref={cardRef} data-guide-card role="region" aria-label={`${tour.title}, step ${Math.min(n + 1, counted)} of ${counted}`} style={{ left: pos.left, top: pos.top, width: pos.width }}>
         <div className="gd-top">
           <span className="gd-count">{step.end ? "Your next step" : `Step ${n + 1} of ${counted}`}</span>
           <button type="button" className="gd-x" onClick={onClose} aria-label="Close the tour">
@@ -168,9 +218,7 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
         <h2 className="gd-h" ref={headRef} tabIndex={-1}>
           {step.title(ctx)}
         </h2>
-        <p className="gd-text" aria-live="polite">
-          {step.text(ctx)}
-        </p>
+        <p className="gd-text">{step.text(ctx)}</p>
         {step.doIt && !isDone && (
           <p className="gd-do">
             <IconHandFinger size={16} aria-hidden="true" /> {step.doIt(ctx)}
