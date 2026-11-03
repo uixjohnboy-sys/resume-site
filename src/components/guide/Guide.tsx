@@ -133,6 +133,7 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
       const typing = active && active !== document.body && !active.closest("[data-guide-card]") && active.matches("a, button, input, select, textarea");
       const fr = typing ? active.getBoundingClientRect() : null;
       const nextFocus = fr ? { x: Math.round(fr.left), y: Math.round(fr.top), w: Math.round(fr.width), h: Math.round(fr.height) } : null;
+      if (nextFocus) setMoreAt(-1);
       setFocusBox((b) => (b?.x === nextFocus?.x && b?.y === nextFocus?.y && b?.w === nextFocus?.w && b?.h === nextFocus?.h ? b : nextFocus));
       const el = name ? findSpot(name) : null;
       if (!el) {
@@ -242,12 +243,9 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
         <h2 className="gd-h" ref={headRef} tabIndex={-1}>
           {step.title(ctx)}
         </h2>
-        <p className="gd-text">{step.text(ctx)}</p>
-        {compact && (
-          <button type="button" className="gd-more-btn" aria-expanded={more} onClick={() => setMoreAt(more ? -1 : n)}>
-            {more ? "Show less" : "Read this step"}
-          </button>
-        )}
+        <p className="gd-text" id="gd-step-text" tabIndex={compact && more ? 0 : undefined}>
+          {step.text(ctx)}
+        </p>
         {step.doIt && !isDone && (
           <p className="gd-do">
             <IconHandFinger size={16} aria-hidden="true" /> {step.doIt(ctx)}
@@ -258,6 +256,11 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
           <button type="button" className="gd-btn gd-quiet" onClick={back} disabled={n === 0}>
             Back
           </button>
+          {compact && (
+            <button type="button" className="gd-more-btn" aria-expanded={more} aria-controls="gd-step-text" onClick={() => setMoreAt(more ? -1 : n)}>
+              Step details
+            </button>
+          )}
           {last ? (
             <button type="button" className="gd-btn" onClick={onClose}>
               Keep exploring

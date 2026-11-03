@@ -19,10 +19,10 @@ export const person = {
 };
 
 export const summary =
-  "HighLevel-certified GoHighLevel specialist with 5 years of professional experience and 58 client systems delivered for businesses in the United States, Australia and the United Kingdom. I also build what most GHL contractors can't: production web apps on Next.js, Firebase, Stripe and the Claude API, wired back into GoHighLevel so the CRM and the app stay in sync.";
+  "HighLevel-certified GoHighLevel specialist with 5 years of professional experience and 58 client systems delivered for businesses in the United States and Australia. I also build what most GHL contractors can't: production web apps on Next.js, Firebase, Stripe and the Claude API, wired back into GoHighLevel so the CRM and the app stay in sync.";
 
 export const availability =
-  "Available for remote part-time roles, contracts and fixed-scope builds. I work Australian business hours, with overlap into the UK morning.";
+  "Available for remote part-time roles, contracts and fixed-scope builds. Part-time, 4 hours a day, starting at 8 AM in your timezone.";
 
 export type LiveProject = {
   name: string;
@@ -106,7 +106,7 @@ export const jobs: { role: string; org: string; where: string; when: string; poi
   {
     role: "Freelance CRM and Automation Consultant",
     org: "Independent",
-    where: "Remote, US, AU and UK clients",
+    where: "Remote, US and AU clients",
     when: "Jan 2024 to present",
     points: [
       "Delivered 13+ systems in GoHighLevel for med spas, real estate teams, coaches and chiropractors.",

@@ -319,8 +319,19 @@
 .gd-compact.gd-more .gd-text {
   display: block;
 }
+/* A card taller than the screen scrolls, with Back and Next always in reach. */
+.gd-compact {
+  scroll-padding-bottom: 56px;
+}
+.gd-compact .gd-row {
+  position: sticky;
+  bottom: -8px;
+  align-items: center;
+  background: #fff;
+}
 .gd-more-btn {
   min-height: 24px;
+  white-space: nowrap;
   padding: 0;
   border: 0;
   background: none;
@@ -353,23 +364,20 @@
   .gd-compact .gd-row button {
     min-height: 28px;
   }
-  .gd-compact .gd-more-btn {
-    position: absolute;
-    right: 12px;
-    bottom: 6px;
+  /* Details open: the text takes the title's place and scrolls, so the card still leaves room for what the step asks you to press. */
+  .gd-compact.gd-more .gd-h {
+    display: none;
   }
-  .gd-compact.gd-more .gd-more-btn {
-    position: static;
+  .gd-compact.gd-more .gd-text {
+    max-height: 32px;
+    font-size: 12px;
+    line-height: 16px;
+    overflow-y: auto;
   }
-}
-@media (max-height: 300px) {
-  .gd-compact .gd-more-btn {
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
+  .gd-compact .gd-row {
+    bottom: -4px;
   }
-  .gd-compact.gd-more .gd-more-btn {
-    transform: none;
+  .gd-compact .gd-x:focus-visible {
+    outline-offset: -2px;
   }
 }

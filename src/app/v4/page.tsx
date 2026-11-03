@@ -38,7 +38,7 @@ const FIX_MAIL =
   encodeURIComponent("Hi John Boy, here is the workflow that is not doing what it should:\n\n");
 const WHATSAPP = "https://wa.me/639773659548?text=" + encodeURIComponent("Hi John Boy, I found you through your portfolio.");
 const LINKEDIN = "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist";
-const CV = "/Johnboy-Roxas-CV.pdf";
+const CV = "/John-Boy-Roxas-Resume.pdf";
 const BOOK = "/book";
 
 const clients = [
@@ -102,7 +102,7 @@ const steps = [
 const faqs = [
   {
     q: "What hours do you work?",
-    a: "I am in the Philippines (UTC+8): the same time as Perth, and two to three hours behind Sydney and Melbourne depending on daylight saving. I work during Australian business hours, and UK clients get overlap with their morning.",
+    a: "I am in the Philippines (UTC+8): the same time as Perth, and two to three hours behind Sydney and Melbourne depending on daylight saving. I work part-time, 4 hours a day, starting at 8 AM in your timezone.",
   },
   {
     q: "How do invoices and payment work?",
@@ -172,12 +172,12 @@ export default function V4() {
                 <span>About £8, or a fixed quote</span>
               </li>
               <li>
-                <b>Australian business hours</b>
-                <span>Plus UK mornings</span>
+                <b>4 hours a day</b>
+                <span>Starting at 8 AM your time</span>
               </li>
               <li>
                 <b>5 years building</b>
-                <span>For AU, UK and US clients</span>
+                <span>For AU and US clients</span>
               </li>
             </ul>
           </div>
@@ -530,7 +530,7 @@ export default function V4() {
 
       <footer className="v4-foot">
         <span>&copy; 2026 John Boy Roxas · Paniqui, Tarlac, Philippines</span>
-        <span>HighLevel certified · Working with Australian and UK businesses</span>
+        <span>HighLevel certified · For Australian and UK businesses</span>
       </footer>
     </div>
   );

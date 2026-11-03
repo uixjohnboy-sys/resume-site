@@ -117,7 +117,7 @@ export default function TaplineProject() {
   return (
     <main className="pj">
       <nav className="pj-nav">
-        <Link href="/v4">John Boy Roxas</Link>
+        <Link href="/v5">John Boy Roxas</Link>
       </nav>
 
       <header className="pj-hero">
@@ -244,7 +244,7 @@ export default function TaplineProject() {
         <div>
           <h2>Who built this</h2>
           <p className="pj-measure">
-            I&apos;m John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines (UTC+8). I&apos;ve spent five years building workflows, funnels and client portals for marketing agencies and small businesses. I work Australian business hours, with overlap into the UK morning.
+            I&apos;m John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines (UTC+8). I&apos;ve spent five years building workflows, funnels and client portals for marketing agencies and small businesses. Part-time, 4 hours a day, starting at 8 AM in your timezone. From AUD 15/hr.
           </p>
         </div>
       </section>

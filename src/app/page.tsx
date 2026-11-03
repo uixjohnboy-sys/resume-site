@@ -52,7 +52,7 @@ const WHATSAPP =
   "https://wa.me/639773659548?text=" + encodeURIComponent("Hi John Boy, I found you through your portfolio.");
 const LINKEDIN = "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist";
 const OLJ = "https://www.onlinejobs.ph/jobseekers/info/4412723";
-const CV = "/Johnboy-Roxas-CV.pdf";
+const CV = "/John-Boy-Roxas-Resume.pdf";
 
 // Same entries, dates and roles as the CV, newest first.
 const experience = [
@@ -86,7 +86,7 @@ const experience = [
   },
   {
     when: "Jan 2024 - now",
-    where: "US, AU, UK",
+    where: "US, AU",
     who: "Freelance",
     role: "CRM & Automation Consultant",
     did: "13+ GoHighLevel systems for med spas, real estate teams, coaches and chiropractors, including full migrations and snapshots.",

@@ -1644,3 +1644,18 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+/* A short screen (zoom, a landscape phone): the whole drawer scrolls, or the body is left a few pixels tall. */
+@media (max-height: 420px) {
+  .tl-drawer {
+    overflow-y: auto;
+    scroll-padding-bottom: 72px;
+  }
+  .tl-drawer-body {
+    flex: none;
+    overflow: visible;
+  }
+  .tl-footer-slot {
+    bottom: 0;
+  }
+}

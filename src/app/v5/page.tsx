@@ -10,7 +10,7 @@ import "./v5.css";
 
 export const metadata: Metadata = {
   title: "John Boy Roxas · GoHighLevel specialist · Resume",
-  description: "The resume you can click. HighLevel-certified GoHighLevel specialist in the Philippines, working with Australian and UK agencies and small businesses.",
+  description: "The resume you can click. HighLevel-certified GoHighLevel specialist in the Philippines, available to Australian and UK agencies and small businesses.",
   robots: { index: false, follow: false },
 };
 
@@ -106,6 +106,28 @@ export default function V5() {
               </article>
             ))}
           </div>
+        </section>
+
+        <section className="r-sec r-no-print">
+          <h2>How I work</h2>
+          <dl className="r-skills">
+            <div>
+              <dt>Rate</dt>
+              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start and invoiced monthly in AUD.</dd>
+            </div>
+            <div>
+              <dt>Hours</dt>
+              <dd>Part-time, 4 hours a day, starting at 8 AM in your timezone. I am in the Philippines (UTC+8).</dd>
+            </div>
+            <div>
+              <dt>Your data</dt>
+              <dd>My own login with only the access the job needs, no shared passwords, and test contacts for testing. I sign your NDA or data processing agreement before you share anything, and hand access back when the work ends.</dd>
+            </div>
+            <div>
+              <dt>If something breaks</dt>
+              <dd>I fix my own work first, then tell you what happened and what I changed so it does not repeat.</dd>
+            </div>
+          </dl>
         </section>
 
         <section className="r-sec">
