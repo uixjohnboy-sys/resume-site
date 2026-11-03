@@ -215,6 +215,7 @@ export default function Board() {
             onClick={() => {
               setOffer(false);
               markSeen();
+              Array.from(document.querySelectorAll<HTMLElement>("[data-guide-return]")).find((x) => x.offsetParent !== null)?.focus();
             }}
           >
             I&apos;ll explore on my own

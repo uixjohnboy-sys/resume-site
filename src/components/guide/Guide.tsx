@@ -53,35 +53,47 @@ const COMPACT_H = 500;
 function placeCard(box: Box | null, cardH: number, vw: number, vh: number): { left: number; top: number; width: number } {
   const width = Math.min(CARD_W, vw - MARGIN * 2);
   if (vw < 640 || vh < COMPACT_H) {
-    if (vw >= 640 && box) {
-      // A short, wide screen: beside the target, whichever side has room.
-      const roomRight = vw - (box.x + box.w);
-      return { left: roomRight >= box.x ? vw - width - MARGIN : MARGIN, width, top: MARGIN };
-    }
-    // A bottom sheet, unless the spot starts in the lower half of the screen.
-    const spotLow = box && box.y > vh / 2;
-    return { left: MARGIN, width, top: spotLow ? MARGIN : Math.max(MARGIN, vh - cardH - MARGIN) };
+    // A sheet at the top or bottom, whichever hides least of the target. A short, wide screen also picks a side.
+    const bottom = Math.max(MARGIN, vh - cardH - MARGIN);
+    const right = vw - width - MARGIN;
+    const roomRight = box ? vw - (box.x + box.w) >= box.x : true;
+    const sides = vw >= 640 ? (roomRight ? [right, MARGIN] : [MARGIN, right]) : [MARGIN];
+    const spots = sides.flatMap((left) => [{ left, top: bottom }, { left, top: MARGIN }]);
+    const hides = (o: { left: number; top: number }) =>
+      box ? Math.max(0, Math.min(o.left + width, box.x + box.w) - Math.max(o.left, box.x)) * Math.max(0, Math.min(o.top + cardH, box.y + box.h) - Math.max(o.top, box.y)) : 0;
+    const pick = spots.reduce((best, o) => (hides(o) < hides(best) ? o : best));
+    return { width, left: pick.left, top: pick.top };
   }
   if (!box) return { left: MARGIN * 2, width, top: Math.max(MARGIN, vh - cardH - MARGIN * 2) };
   const gap = 16;
-  const options = [
-    { left: box.x + box.w + PAD + gap, top: box.y },
-    { left: box.x - PAD - gap - width, top: box.y },
-    { left: box.x, top: box.y + box.h + PAD + gap },
-    { left: box.x, top: box.y - PAD - gap - cardH },
+  const maxX = vw - width - MARGIN;
+  const maxY = Math.max(MARGIN, vh - cardH - MARGIN);
+  const clamp = (v: number, hi: number) => Math.min(Math.max(MARGIN, v), hi);
+  const hole = { l: box.x - PAD, t: box.y - PAD, r: box.x + box.w + PAD, b: box.y + box.h + PAD };
+  // Clear of the target with room to spare: the card is never moved back on top of what it points at.
+  const clear = (o: { left: number; top: number }) => o.left + width <= hole.l || o.left >= hole.r || o.top + cardH <= hole.t || o.top >= hole.b;
+  const onScreen = (o: { left: number; top: number }) => o.left >= MARGIN && o.left <= maxX && o.top >= MARGIN && o.top <= maxY;
+  const beside = [
+    { left: hole.r + gap, top: clamp(box.y, maxY) },
+    { left: hole.l - gap - width, top: clamp(box.y, maxY) },
+    { left: clamp(box.x, maxX), top: hole.b + gap },
+    { left: clamp(box.x, maxX), top: hole.t - gap - cardH },
   ];
-  const fits = (o: { left: number; top: number }) => o.left >= MARGIN && o.left + width <= vw - MARGIN && o.top + 40 >= MARGIN && o.top + 40 <= vh - MARGIN;
-  const pick = options.find(fits) ?? { left: vw - width - MARGIN, top: vh - cardH - MARGIN };
-  return {
-    width,
-    left: Math.min(Math.max(MARGIN, pick.left), vw - width - MARGIN),
-    top: Math.min(Math.max(MARGIN, pick.top), Math.max(MARGIN, vh - cardH - MARGIN)),
-  };
+  const corners = [
+    { left: maxX, top: MARGIN },
+    { left: MARGIN, top: MARGIN },
+    { left: maxX, top: maxY },
+    { left: MARGIN, top: maxY },
+  ];
+  const pick = [...beside, ...corners].find((o) => onScreen(o) && clear(o)) ?? corners[2];
+  return { width, left: pick.left, top: pick.top };
 }
 
 export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; ctx: C; onClose: () => void }) {
   const [n, setN] = useState(0);
   const [box, setBox] = useState<Box | null>(null);
+  const [focusBox, setFocusBox] = useState<Box | null>(null);
+  const [moreAt, setMoreAt] = useState(-1);
   const [size, setSize] = useState({ vw: 1280, vh: 800, cardH: 240 });
   const cardRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
@@ -116,6 +128,12 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
       const name = typeof spot === "function" ? spot(ctxRef.current) : spot;
       const cardH = cardRef.current?.offsetHeight ?? 240;
       setSize((s) => (s.vw === window.innerWidth && s.vh === window.innerHeight && s.cardH === cardH ? s : { vw: window.innerWidth, vh: window.innerHeight, cardH }));
+      // Keep clear of the field the visitor is tabbing through (WCAG 2.4.11: focus never hidden by the card).
+      const active = document.activeElement as HTMLElement | null;
+      const typing = active && active !== document.body && !active.closest("[data-guide-card]") && active.matches("a, button, input, select, textarea");
+      const fr = typing ? active.getBoundingClientRect() : null;
+      const nextFocus = fr ? { x: Math.round(fr.left), y: Math.round(fr.top), w: Math.round(fr.width), h: Math.round(fr.height) } : null;
+      setFocusBox((b) => (b?.x === nextFocus?.x && b?.y === nextFocus?.y && b?.w === nextFocus?.w && b?.h === nextFocus?.h ? b : nextFocus));
       const el = name ? findSpot(name) : null;
       if (!el) {
         setBox((b) => (b ? null : b));
@@ -151,9 +169,11 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
     return () => clearTimeout(t);
   }, [isDone, n, next]);
 
-  // Focus follows the tour, unless a dialog the visitor is working in has it.
+  // Focus follows the tour, unless a dialog the visitor is working in has it. A button that just went disabled
+  // (Back on the first step) would otherwise drop focus to the page.
   useEffect(() => {
-    if (!modalOpen()) headRef.current?.focus();
+    const a = document.activeElement;
+    if (!modalOpen() || !a || a === document.body || a.closest("[data-guide-card]")) headRef.current?.focus();
   }, [n]);
 
   useEffect(() => {
@@ -166,8 +186,10 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
       // Ending the tour hands focus back to whatever can start it again.
       const a = document.activeElement;
       if (!a || a === document.body || a.closest("[data-guide-card]")) {
+        // Into the open dialog if there is one (the page behind it is inert), else whatever can start the tour again.
+        const dialogHead = document.querySelector<HTMLElement>('[aria-modal="true"] h2, [aria-modal="true"] h1');
         const home = Array.from(document.querySelectorAll<HTMLElement>("[data-guide-return]")).find((x) => x.offsetParent !== null);
-        setTimeout(() => home?.focus(), 0);
+        setTimeout(() => (dialogHead ?? home)?.focus(), 0);
       }
     };
   }, []);
@@ -182,7 +204,9 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
     return () => clearInterval(t);
   }, []);
 
-  const pos = placeCard(box, size.cardH, size.vw, size.vh);
+  const focusOutsideSpot = focusBox && !(box && focusBox.x >= box.x - 2 && focusBox.y >= box.y - 2 && focusBox.x + focusBox.w <= box.x + box.w + 2 && focusBox.y + focusBox.h <= box.y + box.h + 2);
+  const pos = placeCard(focusOutsideSpot ? focusBox : box, size.cardH, size.vw, size.vh);
+  const more = moreAt === n;
   // The hole stays on screen even when its target is taller than the screen.
   const holeTop = box ? Math.max(4, box.y - PAD) : 0;
   const holeBottom = box ? Math.min(size.vh - 4, box.y + box.h + PAD) : 0;
@@ -208,7 +232,7 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
         <path d={path} fillRule="evenodd" />
       </svg>
       {hole && <div className={`gd-ring${step.doIt ? " gd-ring-do" : ""}`} aria-hidden="true" style={{ left: hole.x, top: hole.y, width: hole.w, height: hole.h }} />}
-      <div className={`gd-card${compact ? " gd-compact" : ""}`} ref={cardRef} data-guide-card role="region" aria-label={`${tour.title}, step ${Math.min(n + 1, counted)} of ${counted}`} style={{ left: pos.left, top: pos.top, width: pos.width }}>
+      <div className={`gd-card${compact ? " gd-compact" : ""}${compact && more ? " gd-more" : ""}`} ref={cardRef} data-guide-card role="region" aria-label={`${tour.title}, step ${Math.min(n + 1, counted)} of ${counted}`} style={{ left: pos.left, top: pos.top, width: pos.width }}>
         <div className="gd-top">
           <span className="gd-count">{step.end ? "Your next step" : `Step ${n + 1} of ${counted}`}</span>
           <button type="button" className="gd-x" onClick={onClose} aria-label="Close the tour">
@@ -219,6 +243,11 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
           {step.title(ctx)}
         </h2>
         <p className="gd-text">{step.text(ctx)}</p>
+        {compact && (
+          <button type="button" className="gd-more-btn" aria-expanded={more} onClick={() => setMoreAt(more ? -1 : n)}>
+            {more ? "Show less" : "Read this step"}
+          </button>
+        )}
         {step.doIt && !isDone && (
           <p className="gd-do">
             <IconHandFinger size={16} aria-hidden="true" /> {step.doIt(ctx)}

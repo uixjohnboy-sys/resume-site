@@ -314,3 +314,62 @@
   font-size: 14px;
   line-height: 20px;
 }
+
+/* On a short screen the explanation is one press away, never lost. */
+.gd-compact.gd-more .gd-text {
+  display: block;
+}
+.gd-more-btn {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gd-teal-2);
+  font: inherit;
+  font-size: 12px;
+  line-height: 16px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 400% zoom: as small as the card can go and still say where you are. */
+@media (max-height: 300px) {
+  .gd-compact {
+    padding: 4px 8px;
+  }
+  .gd-compact .gd-h {
+    font-size: 13px;
+    line-height: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .gd-compact .gd-do {
+    display: none;
+  }
+  .gd-compact .gd-row {
+    margin-top: 2px;
+  }
+  .gd-compact .gd-row button {
+    min-height: 28px;
+  }
+  .gd-compact .gd-more-btn {
+    position: absolute;
+    right: 12px;
+    bottom: 6px;
+  }
+  .gd-compact.gd-more .gd-more-btn {
+    position: static;
+  }
+}
+@media (max-height: 300px) {
+  .gd-compact .gd-more-btn {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .gd-compact.gd-more .gd-more-btn {
+    transform: none;
+  }
+}

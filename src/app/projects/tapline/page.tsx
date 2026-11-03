@@ -102,7 +102,7 @@ const regions = [
 const tryIt = [
   ["Report a leak at 9:47 pm", "See who gets contacted, what the tenant is told, and what waits for a person."],
   ["Accept the job on your own phone", "Scan the code in the job and press accept. The board moves by itself."],
-  ["Report something harmless", "Try a pilot light that keeps going out. Nobody gets paged and no emergency text goes out."],
+  ["Report something small", "Replace the sample report with a wardrobe door off its track. It stays routine: nobody gets paged and no emergency text goes out."],
   ["Switch to Manchester", "Watch the trades, words, notice periods and emergency numbers change."],
 ];
 
@@ -244,7 +244,7 @@ export default function TaplineProject() {
         <div>
           <h2>Who built this</h2>
           <p className="pj-measure">
-            I&apos;m John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines (UTC+8). I&apos;ve spent five years building workflows, funnels and client portals for Australian and UK agencies and small businesses. I work Australian business hours, with overlap into the UK morning.
+            I&apos;m John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines (UTC+8). I&apos;ve spent five years building workflows, funnels and client portals for marketing agencies and small businesses. I work Australian business hours, with overlap into the UK morning.
           </p>
         </div>
       </section>
@@ -261,6 +261,9 @@ export default function TaplineProject() {
           </a>
           <a className="pj-btn pj-btn-quiet" href="/demo/tapline?tour=owner">
             Tour for agency owners
+          </a>
+          <a className="pj-btn pj-btn-quiet" href="/demo/tapline?tour=owner&region=UK">
+            UK version
           </a>
         </div>
         <p className="pj-end-mail">

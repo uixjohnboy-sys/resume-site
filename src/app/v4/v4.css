@@ -810,3 +810,13 @@
     transition: none !important;
   }
 }
+
+/* On the black contact section the focus ring is white. */
+.v4 .v4-contact a:focus-visible,
+.v4 .v4-contact .v4-btn:focus-visible {
+  outline-color: #fff;
+}
+.v4-more-h {
+  margin-top: 40px;
+  margin-bottom: 16px;
+}

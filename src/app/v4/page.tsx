@@ -264,7 +264,7 @@ export default function V4() {
                   without breaking the others. Re-entry is switched off so nobody gets the same series twice.
                 </p>
                 <p>
-                  <b>The result.</b> Every prospect&apos;s answers are on their contact before we speak, and nobody who
+                  <b>The result.</b>{" "}Every prospect&apos;s answers are on their contact before we speak, and nobody who
                   has booked gets another sales email. Tested end to end with real submissions.
                 </p>
               </div>
@@ -309,7 +309,7 @@ export default function V4() {
                 <p className="v4-case-tag">K Australia Design · Australian agency · Sep 2024 to Oct 2025</p>
                 <h3>Lead GoHighLevel automation for an agency&apos;s client accounts</h3>
                 <p>
-                  <b>The role.</b> I built the agency&apos;s GoHighLevel base so new client accounts could be set up
+                  <b>The role.</b>{" "}I built the agency&apos;s GoHighLevel base so new client accounts could be set up
                   from a tested starting point instead of from scratch.
                 </p>
                 <p>

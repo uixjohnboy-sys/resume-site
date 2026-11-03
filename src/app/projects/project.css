@@ -292,7 +292,7 @@
 .pj-end .pj-btn-quiet:hover {
   background: rgba(255, 255, 255, 0.1);
 }
-.pj-end a:focus-visible {
+.pj .pj-end a:focus-visible {
   outline-color: #fff;
 }
 
