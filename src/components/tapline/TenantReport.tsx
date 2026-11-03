@@ -92,7 +92,7 @@ export default function TenantReport({
             <input type="checkbox" checked={afterHours} onChange={(e) => setAfterHours(e.target.checked)} />
             <IconMoon size={15} aria-hidden="true" /> Demo: pretend it&apos;s 9:47 pm, after office hours
           </label>
-          <button type="submit" className="tl-btn tl-btn-primary tl-wide" disabled={busy || title.trim().length < 3}>
+          <button type="submit" className="tl-btn tl-btn-primary tl-wide" data-spot="tenant-send" disabled={busy || title.trim().length < 3}>
             {busy ? "Sending..." : "Send report"}
           </button>
           {title.trim().length < 3 && <p className="tl-hint">Describe the problem in a few words to send it.</p>}

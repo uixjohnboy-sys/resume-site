@@ -27,7 +27,7 @@ export default function Compliance({ sb, now, busy, act, onOpenJob }: { sb: Sand
   const soon = sb.compliance.filter((c) => c.dueAt >= now && c.dueAt - now <= 30 * D).length;
 
   return (
-    <section className="tl-view" aria-labelledby="tl-comp-h">
+    <section className="tl-view" aria-labelledby="tl-comp-h" data-spot="compliance">
       <div className="tl-view-head">
         <div>
           <h2 id="tl-comp-h">Compliance</h2>

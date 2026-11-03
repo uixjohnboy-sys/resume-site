@@ -93,7 +93,7 @@ export function phoneLink(id: string, role: "tenant" | "owner" | "tradie", jobId
 
 export function TryOnPhone({ url, who }: { url: string; who: string }) {
   return (
-    <div className="tl-try">
+    <div className="tl-try" data-spot="try-phone">
       <Qr value={url} size={104} label={`QR code: open the ${who}'s view on your phone`} />
       <div>
         <p>

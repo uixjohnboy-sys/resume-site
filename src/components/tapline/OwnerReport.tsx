@@ -109,7 +109,7 @@ export default function OwnerReport({ sb, now }: { sb: Sandbox; now: number }) {
   return (
     <section className="tl-view" aria-labelledby="tl-own-h">
       {controls}
-      <article className="tl-report">
+      <article className="tl-report" data-spot="owner-report">
         <header>
           <p className="tl-report-k">{sb.agency}</p>
           <h3>Maintenance statement, {period.label}</h3>

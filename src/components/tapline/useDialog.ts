@@ -35,9 +35,10 @@ export function useDialog(open: boolean, onClose: () => void, returnTo?: () => H
         return;
       }
       if (e.key !== "Tab") return;
-      const items = Array.from(el.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(
-        (x) => x.offsetParent !== null
-      );
+      const focusable = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      // The guided tour's card stays reachable by keyboard while a dialog holds the focus.
+      const guide = document.querySelector("[data-guide-card]");
+      const items = [...Array.from(el.querySelectorAll<HTMLElement>(focusable)), ...(guide ? Array.from(guide.querySelectorAll<HTMLElement>(focusable)) : [])].filter((x) => x.offsetParent !== null);
       if (!items.length) return;
       const a = items[0];
       const b = items[items.length - 1];

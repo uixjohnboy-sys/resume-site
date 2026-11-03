@@ -154,7 +154,7 @@ export default function Drawer({ id, s, j, onClose }: { id: string; s: S; j: Job
             </p>
           )}
 
-          <section className="tl-sec tl-timeline">
+          <section className="tl-sec tl-timeline" data-spot="activity">
             <h3>Activity</h3>
             <ol>
               {[...j.events].reverse().map((e, i) => (
@@ -267,7 +267,8 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
   const [edited, setEdited] = useState(false);
   const autoReply = (u: Urgency, tr: Trade, ch: ChargeTo) => {
     if (ch === "strata" && u === "routine") return strataReply;
-    if (u === (t?.urgency ?? "routine") && tr === (t?.trade ?? j.trade) && ch === (t?.chargeTo ?? "owner")) return suggested.current;
+    // Who pays changes nothing the tenant is told, except strata work (above).
+    if (u === (t?.urgency ?? "routine") && tr === (t?.trade ?? j.trade)) return suggested.current;
     return tenantReply(sb.region, sb.agency, p.tenant.split(" ")[0], { stage: "sent", urgency: u, trade: tr });
   };
   const follow = (u: Urgency, tr: Trade, ch: ChargeTo) => {
@@ -301,7 +302,7 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
   }
 
   return (
-    <section className="tl-sec tl-triage" aria-labelledby="tl-triage-h">
+    <section className="tl-sec tl-triage" aria-labelledby="tl-triage-h" data-spot="triage">
       <h3 id="tl-triage-h">Triage</h3>
       <p className="tl-source">{t.source === "ai" ? "Suggested by AI." : "Suggested by keyword rules (AI unavailable)."} You confirm before anything is sent.</p>
       {t.repeatOf && (
@@ -448,6 +449,7 @@ function TriageEditor({ s, j }: { s: S; j: Job }) {
         <button
           type="button"
           className="tl-btn tl-btn-primary"
+          data-spot="confirm"
           disabled={s.busy || !reply.trim()}
           onClick={() => s.act({ type: "confirm", jobId: j.id, trade, urgency: urg, reply, safety: safety.filter((x) => x.trim()), chargeTo: charge, strataReferral: strata, insuranceClaim: ins })}
         >

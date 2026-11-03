@@ -1,18 +1,29 @@
 "use client";
 
-import { IconCheck, IconDots, IconRepeat, IconSearch } from "@tabler/icons-react";
+import { IconCheck, IconDots, IconRepeat, IconRoute, IconSearch } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { kpis, stageClock } from "@/lib/tapline/metrics";
 import { REGION, STAGE_ORDER, TRADE_IDS, money, ruleTriage, stageLabel, terms, tradeLabel } from "@/lib/tapline/rules";
 import type { Job, Region, Sandbox, Trade } from "@/lib/tapline/types";
+import Guide from "@/components/guide/Guide";
 import Compliance from "./Compliance";
 import Drawer from "./Drawer";
 import OwnerReport from "./OwnerReport";
 import TenantReport from "./TenantReport";
+import { TOURS, type TourCtx } from "./tours";
 import { Avatar, ConfirmDialog, TimerChip, TradeIcon, dur, useAnnouncer } from "./ui";
 import { useSandbox } from "./useSandbox";
 
 type Tab = "board" | "compliance" | "owners";
+type TourId = keyof typeof TOURS;
+const TOUR_SEEN = "tapline-tour-seen";
+const EMAIL = "uix.johnboy@gmail.com";
+const DEMO_URL = "https://www.johnboydesign.com/demo/tapline";
+const CONTACT = {
+  mail: `mailto:${EMAIL}?subject=${encodeURIComponent("The Tapline demo")}&body=${encodeURIComponent("Hi John Boy, I tried the Tapline demo. Our agency:\n\n")}`,
+  whatsapp: `https://wa.me/639773659548?text=${encodeURIComponent("Hi John Boy, I tried the Tapline demo.")}`,
+  emailSelf: `mailto:?subject=${encodeURIComponent("Tapline repairs desk demo")}&body=${encodeURIComponent(`A live demo of a repairs desk for property managers: ${DEMO_URL}`)}`,
+};
 
 export default function Board() {
   const s = useSandbox();
@@ -28,6 +39,41 @@ export default function Board() {
   const [tab, setTab] = useState<Tab>("board");
   const announce = useAnnouncer(sb);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [tour, setTour] = useState<TourId | null>(null);
+  const [tourFrom, setTourFrom] = useState(0);
+  const [offer, setOffer] = useState(false);
+  const hasDemo = !!sb;
+
+  // The guided tour: offered once to a first-time visitor, opened straight by a ?tour= link.
+  useEffect(() => {
+    if (!hasDemo) return;
+    let wanted: string | null = null;
+    let seen = false;
+    try {
+      wanted = new URL(window.location.href).searchParams.get("tour");
+      seen = localStorage.getItem(TOUR_SEEN) === "1";
+    } catch {}
+    Promise.resolve().then(() => {
+      if (wanted === "manager" || wanted === "owner") {
+        setTour(wanted);
+        setTourFrom(Date.now());
+      } else if (!seen) setOffer(true);
+    });
+  }, [hasDemo]);
+
+  function startTour(which: TourId) {
+    setOffer(false);
+    setMenu(false);
+    setConfirm(null);
+    setTourFrom(Date.now());
+    setTour(which);
+    markSeen();
+  }
+  function markSeen() {
+    try {
+      localStorage.setItem(TOUR_SEEN, "1");
+    } catch {}
+  }
 
   // The phone menu is a disclosure: Escape or a click outside closes it and returns focus to its button.
   useEffect(() => {
@@ -99,6 +145,23 @@ export default function Board() {
       },
     });
 
+  const tourCtx: TourCtx = {
+    sb,
+    k,
+    // The newest repair a tenant reported since this tour began (a minute's grace for clock differences).
+    job: sb.jobs.filter((j) => j.createdAt >= tourFrom - 60_000 && j.events[0]?.by === "tenant").sort((a, b) => b.createdAt - a.createdAt)[0] ?? null,
+    tenantOpen,
+    sampleJobId: sb.jobs.find((j) => j.afterHours && j.urgency === "urgent" && j.stage !== "new" && j.events.length >= 5)?.id ?? null,
+    go: {
+      board: () => setTab("board"),
+      compliance: () => setTab("compliance"),
+      owners: () => setTab("owners"),
+      open: (jid) => setOpenId(jid),
+      tenant: () => setTenantOpen(true),
+    },
+    contact: CONTACT,
+  };
+
   function openJob(j: Job) {
     setOpenId(j.id);
     // Only a visitor's own new report is triaged automatically; seeded ones wait for a click.
@@ -123,7 +186,10 @@ export default function Board() {
             </div>
           </div>
           <div className="tl-top-actions">
-            <div className="tl-seg tl-desk" role="group" aria-label="Agency region">
+            <button type="button" className="tl-btn tl-btn-onink tl-desk" onClick={() => setOffer(true)}>
+              <IconRoute size={16} aria-hidden="true" /> Guided tour
+            </button>
+            <div className="tl-seg tl-desk" role="group" aria-label="Agency region" data-spot="regions">
               {(["AU", "UK"] as const).map((r) => (
                 <button key={r} type="button" aria-pressed={sb.region === r} onClick={() => sb.region !== r && askSwitch(r)}>
                   {r === "AU" ? "Australia" : "UK"}
@@ -133,7 +199,7 @@ export default function Board() {
             <button type="button" className="tl-btn tl-btn-onink tl-desk" onClick={askReset}>
               Reset demo
             </button>
-            <button type="button" className="tl-btn tl-btn-primary" onClick={() => setTenantOpen(true)}>
+            <button type="button" className="tl-btn tl-btn-primary" data-spot="report" onClick={() => setTenantOpen(true)}>
               <span className="tl-desk">Report a repair as a tenant</span>
               <span className="tl-mob">Report a repair</span>
             </button>
@@ -143,6 +209,15 @@ export default function Board() {
               </button>
               {menu && (
                 <div className="tl-menu" id="tl-menu">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenu(false);
+                      setOffer(true);
+                    }}
+                  >
+                    Guided tour
+                  </button>
                   <p className="tl-menu-h" id="tl-menu-h">
                     Agency
                   </p>
@@ -200,7 +275,7 @@ export default function Board() {
 
         {tab === "board" && (
           <>
-            <section className="tl-kpis" aria-label="At a glance">
+            <section className="tl-kpis" aria-label="At a glance" data-spot="kpis">
               <Kpi label="Open jobs" value={String(k.open)} note={k.late ? `${k.late} past target` : "All on target"} tone={k.late ? "late" : undefined} />
               <Kpi label="Median time to acknowledge" value={dur(k.medianAckHours)} note="Report to confirmed reply" />
               <Kpi
@@ -215,7 +290,7 @@ export default function Board() {
               <Kpi label="Manager hours saved" value={`~${k.hoursSaved}h`} note="Estimate: 25 min a job" />
             </section>
 
-            <div className="tl-filters">
+            <div className="tl-filters" data-spot="filters">
               <label className="tl-search">
                 <IconSearch size={16} aria-hidden="true" />
                 <span className="tl-sr">Search jobs</span>
@@ -256,7 +331,7 @@ export default function Board() {
                   .slice(0, st === "billed" ? 12 : 60);
                 const total = jobs.filter((j) => j.stage === st).length;
                 return (
-                  <section key={st} className="tl-col" aria-labelledby={`col-${st}`}>
+                  <section key={st} className="tl-col" aria-labelledby={`col-${st}`} data-spot={`col-${st}`}>
                     <h2 id={`col-${st}`}>
                       {stageLabel(sb.region, st)} <span>{total}</span>
                     </h2>
@@ -325,6 +400,35 @@ export default function Board() {
         />
       )}
       {confirm && <ConfirmDialog title={confirm.title} body={confirm.body} confirm={confirm.confirm} onConfirm={confirm.run} onClose={() => setConfirm(null)} />}
+      {offer && !tour && (
+        <section className="gd-start" aria-labelledby="gd-start-h">
+          <h2 className="gd-h" id="gd-start-h">
+            Take the guided tour?
+          </h2>
+          <p className="gd-text">Use the real product while it shows you around. No sign-up, and the data is fictional.</p>
+          <div className="gd-paths">
+            <button type="button" className="gd-path" onClick={() => startTour("manager")}>
+              <b>I&apos;m {sb.region === "AU" ? "a property manager" : "a letting agent"}</b>
+              <span>Follow one repair from the report to the bill. 2 minutes.</span>
+            </button>
+            <button type="button" className="gd-path" onClick={() => startTour("owner")}>
+              <b>I run the agency</b>
+              <span>See control, proof and risk across the desk. 1 minute.</span>
+            </button>
+          </div>
+          <button
+            type="button"
+            className="gd-later"
+            onClick={() => {
+              setOffer(false);
+              markSeen();
+            }}
+          >
+            I&apos;ll explore on my own
+          </button>
+        </section>
+      )}
+      {tour && <Guide key={tour} tour={TOURS[tour]} ctx={tourCtx} onClose={() => setTour(null)} />}
     </>
   );
 }

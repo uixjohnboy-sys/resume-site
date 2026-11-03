@@ -1,0 +1,287 @@
+/* The Guided Demo: one look for every project's tour. It sits above the app and
+   never blocks it: only the card takes clicks. Type 12/16 14/20 16/24, radius 12. */
+
+.gd {
+  --gd-ink: #0f1b2d;
+  --gd-muted: #57657a;
+  --gd-line: #e2e8f0;
+  --gd-teal: #0f766e;
+  --gd-teal-2: #115e59;
+  --gd-teal-soft: #e6f4f2;
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--gd-ink);
+}
+.gd-dim {
+  position: fixed;
+  inset: 0;
+}
+.gd-dim path {
+  fill: rgba(15, 27, 45, 0.38);
+}
+.gd-ring {
+  position: fixed;
+  border-radius: 12px;
+  outline: 2px solid var(--gd-teal);
+  outline-offset: 0;
+  transition: left 0.18s ease, top 0.18s ease, width 0.18s ease, height 0.18s ease;
+}
+.gd-ring-do {
+  animation: gd-pulse 1.6s ease-in-out infinite;
+}
+@keyframes gd-pulse {
+  50% {
+    outline-offset: 4px;
+  }
+}
+.gd-card {
+  position: fixed;
+  pointer-events: auto;
+  padding: 16px;
+  border: 1px solid var(--gd-line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(15, 27, 45, 0.24);
+  font-size: 14px;
+  line-height: 20px;
+  transition: left 0.18s ease, top 0.18s ease;
+}
+.gd-card *,
+.gd-start * {
+  box-sizing: border-box;
+}
+.gd-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.gd-count {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--gd-muted);
+}
+.gd-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: -6px -6px 0 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--gd-muted);
+  cursor: pointer;
+}
+.gd-x:hover {
+  background: #eef2f6;
+}
+.gd-h {
+  margin: 4px 0 4px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+.gd-h:focus {
+  outline: none;
+}
+.gd-text {
+  margin: 0;
+  color: #3b4a5f;
+}
+.gd-do {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--gd-teal-soft);
+  color: var(--gd-teal-2);
+  font-weight: 500;
+}
+.gd-do svg {
+  flex: none;
+  margin-top: 2px;
+}
+.gd-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+.gd-btn {
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--gd-teal);
+  border-radius: 6px;
+  background: var(--gd-teal);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.gd-btn:hover {
+  background: var(--gd-teal-2);
+}
+.gd-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.gd-quiet {
+  border-color: var(--gd-line);
+  background: #fff;
+  color: var(--gd-ink);
+}
+.gd-quiet:hover {
+  background: #f4f6f8;
+}
+.gd-card button:focus-visible,
+.gd-card a:focus-visible,
+.gd-start button:focus-visible {
+  outline: 2px solid var(--gd-teal);
+  outline-offset: 2px;
+}
+
+/* The end card */
+.gd-stats {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f4f6f8;
+}
+.gd-stats div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.gd-stats dt {
+  color: var(--gd-muted);
+}
+.gd-stats dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.gd-note {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--gd-muted);
+}
+.gd-cta {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* The offer shown to a first-time visitor, and the path picker */
+.gd-start {
+  --gd-ink: #0f1b2d;
+  --gd-muted: #57657a;
+  --gd-line: #e2e8f0;
+  --gd-teal: #0f766e;
+  --gd-teal-2: #115e59;
+  position: fixed;
+  z-index: 60;
+  left: 24px;
+  bottom: 24px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid var(--gd-line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(15, 27, 45, 0.24);
+  color: var(--gd-ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+}
+.gd-start .gd-h {
+  margin-top: 0;
+}
+.gd-paths {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.gd-path {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--gd-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--gd-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.gd-path b {
+  display: block;
+  font-weight: 600;
+}
+.gd-path span {
+  color: var(--gd-muted);
+  font-size: 12px;
+  line-height: 16px;
+}
+.gd-path:hover {
+  border-color: var(--gd-teal);
+  background: #f4f6f8;
+}
+.gd-later {
+  display: block;
+  margin: 8px auto 0;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: var(--gd-muted);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 639px) {
+  .gd-start {
+    left: 16px;
+    bottom: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gd-ring,
+  .gd-card {
+    transition: none;
+  }
+  .gd-ring-do {
+    animation: none;
+  }
+}
+@media print {
+  .gd,
+  .gd-start {
+    display: none !important;
+  }
+}
+
+/* A long card (the end card on a phone) scrolls inside itself. */
+.gd-card {
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+/* The ring stays visible on dark bars as well as light pages. */
+.gd-ring {
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.55);
+}

@@ -152,7 +152,7 @@ function dispatch(sb: Sandbox, j: Job, trade: Trade, urgency: Urgency, chargeTo:
       by: "tapline",
       text:
         chargeTo === "strata"
-          ? `Urgent: on-call ${con.business} sent to make it safe (up to ${money(sb.region, j.cap)}), charged to the strata; ${p.strata?.manager ?? c.strataBody} told`
+          ? `Urgent: on-call ${con.business} sent to make it safe (up to ${money(sb.region, j.cap)}), charged to the ${sb.region === "AU" ? "strata" : "block"}; ${p.strata?.manager ?? c.strataBody} told`
           : `Urgent: sent to on-call ${con.business} (up to ${money(sb.region, j.cap)}), ${c.owner} notified`,
     });
     // An urgent smoke alarm job (water or smoke at the alarm) still carries the law's 2-business-day deadline.
@@ -486,7 +486,7 @@ function bill(sb: Sandbox, j: Job, now: number): Result {
   const c = terms(sb.region);
   enter(j, "billed", now);
   j.billedAt = now;
-  j.events.push({ at: now, by: "tapline", text: `Bill entered in ${c.accounts}${j.triage?.chargeTo === "tenant" ? ", charged to the tenant" : j.triage?.chargeTo === "strata" ? ", charged to the strata" : ""}` });
+  j.events.push({ at: now, by: "tapline", text: `Bill entered in ${c.accounts}${j.triage?.chargeTo === "tenant" ? ", charged to the tenant" : j.triage?.chargeTo === "strata" ? `, charged to the ${sb.region === "AU" ? "strata" : "block"}` : ""}` });
   // A finished compliance job rolls its check forward.
   if (j.complianceId) {
     const item = sb.compliance.find((x) => x.id === j.complianceId);
