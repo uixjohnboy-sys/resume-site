@@ -18,24 +18,28 @@ const MAIL = `mailto:${EMAIL}?subject=${encodeURIComponent("Tapline")}&body=${en
 const WHATSAPP = `https://wa.me/639773659548?text=${encodeURIComponent("Hi John Boy, I saw Tapline.")}`;
 const SHOT = "/projects/tapline";
 
-const flow = [
+type Step = { n: string; title: string; body: string; img: string; w: number; h: number; alt: string; phone?: boolean; crop?: boolean; wide?: boolean };
+
+const flow: Step[] = [
   {
     n: "1",
     title: "The tenant reports it from a text-message link",
     body: "No app and no login. The form asks what's wrong, how to get in, and whether there are pets. A photo is optional.",
     img: `${SHOT}/report.png`,
-    w: 1440,
-    h: 900,
-    alt: "The tenant's report form open over the repairs board",
+    w: 800,
+    h: 1560,
+    alt: "The tenant's report form with the problem, access, photo and a send button",
+    phone: true,
   },
   {
     n: "2",
     title: "AI reads the report and the property's history",
     body: "It suggests the trade and urgency, spots an earlier repair at the same address, and drafts the reply. Nothing routine goes out until a person confirms it.",
     img: `${SHOT}/triage.png`,
-    w: 1440,
-    h: 900,
-    alt: "The job drawer showing the AI's suggested trade, urgency, emergency steps and reply",
+    w: 1024,
+    h: 1654,
+    alt: "The triage panel showing the AI's suggested trade, urgency, emergency steps and reply",
+    crop: true,
   },
   {
     n: "3",
@@ -72,8 +76,9 @@ const flow = [
     title: "Compliance and owner statements stay current",
     body: "Each check is listed per property and marked as law or agency policy. Each owner's month fits on one printable page.",
     img: `${SHOT}/compliance.png`,
-    w: 1440,
-    h: 900,
+    w: 2880,
+    h: 1240,
+    wide: true,
     alt: "The compliance view listing checks per property with due dates",
   },
 ];
@@ -133,7 +138,7 @@ export default function TaplineProject() {
           </a>
         </div>
         <p className="pj-fine">No sign-up. Fictional data. Your changes are private to you and reset after 48 hours.</p>
-        <Image className="pj-shot" src={`${SHOT}/board.png`} alt="The Tapline repairs board with jobs in columns from New to Bill entered" width={1440} height={900} sizes="(max-width: 1100px) 92vw, 1040px" priority />
+        <Image className="pj-shot" src={`${SHOT}/board.png`} alt="The Tapline repairs board with jobs in columns from New to Bill entered" width={2880} height={1800} sizes="(max-width: 1100px) 92vw, 1040px" priority />
       </header>
 
       <section className="pj-sec">
@@ -147,7 +152,7 @@ export default function TaplineProject() {
         <h2>How one repair moves</h2>
         <ol className="pj-flow">
           {flow.map((f) => (
-            <li key={f.n} className={f.phone ? "pj-step pj-step-phone" : "pj-step"}>
+            <li key={f.n} className={f.phone ? "pj-step pj-step-phone" : f.crop ? "pj-step pj-step-crop" : f.wide ? "pj-step pj-step-wide" : "pj-step"}>
               <div className="pj-step-text">
                 <span className="pj-n" aria-hidden="true">
                   {f.n}
@@ -155,7 +160,7 @@ export default function TaplineProject() {
                 <h3>{f.title}</h3>
                 <p>{f.body}</p>
               </div>
-              <Image className="pj-shot" src={f.img} alt={f.alt} width={f.w} height={f.h} sizes={f.phone ? "280px" : "(max-width: 1100px) 92vw, 640px"} />
+              <Image className="pj-shot" src={f.img} alt={f.alt} width={f.w} height={f.h} sizes={f.phone ? "280px" : f.crop ? "(max-width: 860px) 92vw, 460px" : "(max-width: 1100px) 92vw, 1040px"} />
             </li>
           ))}
         </ol>
