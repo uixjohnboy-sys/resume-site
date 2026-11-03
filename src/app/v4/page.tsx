@@ -43,7 +43,7 @@ const BOOK = "/book";
 
 const clients = [
   { name: "K Australia Design", note: "Australian agency" },
-  { name: "Confidential client", note: "Under NDA" },
+  { name: "Confidential client (NDA)", note: "Remote" },
   { name: "Chaos to Closing", note: "US coaching business" },
   { name: "Melbourne Chiropractic", note: "Australian clinic" },
   { name: "Wrldinvsn", note: "Lead flow project" },
@@ -152,7 +152,7 @@ export default function V4() {
             </h1>
             <p className="v4-lede">
               I&apos;m John Boy. I set up and repair the workflows, funnels, calendars and pipelines your enquiries run
-              through, in your business hours, tested before handover and documented so your team can run them.
+              through, tested before handover and documented so your team can run them.
             </p>
             <div className="v4-ctas">
               <a className="v4-btn v4-btn-dark" href={BOOK}>
@@ -250,6 +250,27 @@ export default function V4() {
               Selected work
             </p>
             <h2 data-rv>What I built, and why it was built that way.</h2>
+
+            <article className="v4-case" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">My own demo · Fictional data · Try it live</p>
+                <h3>Tapline, a repairs desk you can use right now</h3>
+                <p>
+                  <b>What it is.</b>{" "}A working repairs desk for property managers and letting agents: tenant reports, AI triage a person confirms, after-hours dispatch, owner approvals and contractors.
+                </p>
+                <p>
+                  <b>Try it.</b>{" "}<a href="/demo/tapline?tour=manager">Take the guided tour</a> or <a href="/projects/tapline">read how it works</a>. Nothing to sign up for.
+                </p>
+              </div>
+              <ol className="v4-flow" aria-label="How a repair moves through Tapline">
+                {["A tenant reports a repair", "AI suggests the trade and urgency", "The manager confirms and replies", "The owner approves the cost", "The contractor gets the job"].map((s, i) => (
+                  <li key={s}>
+                    <span>{String(i + 1).padStart(2, "0")}</span>
+                    {s}
+                  </li>
+                ))}
+              </ol>
+            </article>
 
             <article className="v4-case" data-rv>
               <div className="v4-case-copy">

@@ -73,7 +73,7 @@ export const jobs: { role: string; org: string; where: string; when: string; poi
     org: "Confidential client (NDA)",
     where: "Remote",
     when: "Apr 2026 to present",
-    points: ["Build and maintain GoHighLevel workflow automation, extended with n8n, Zapier and Claude."],
+    points: ["Details under NDA."],
   },
   {
     role: "GoHighLevel Systems Builder",

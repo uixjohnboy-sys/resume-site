@@ -61,7 +61,7 @@ const experience = [
     where: "Remote",
     who: "Confidential client (NDA)",
     role: "GoHighLevel Specialist, Automation",
-    did: "Builds and maintains GoHighLevel workflow automation, extended with n8n, Zapier and Claude.",
+    did: "Details under NDA.",
   },
   {
     when: "Mar 2026 - now",
