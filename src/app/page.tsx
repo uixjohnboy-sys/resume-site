@@ -3,6 +3,7 @@ import Image from "next/image";
 import { archivo, serif } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
 import IntroVideo from "@/components/v4/IntroVideo";
+import PaperRoll, { paperRollBoot } from "@/components/v4/PaperRoll";
 import "./v4/v4.css";
 
 // The homepage since 2026-11-04 (head to head: 74.0 against 68.0 for the resume page at /v5, which stays as the CV
@@ -67,6 +68,15 @@ const funnelSteps = [
   "Removed from marketing the moment they book",
 ];
 
+// His own practice designs, labelled as samples. They are not client work.
+const samples = [
+  { img: "/work/dental-clinic.jpg", name: "Dental clinic", kind: "Website sample" },
+  { img: "/work/mindset-coaching.jpg", name: "Mindset coaching", kind: "Funnel sample" },
+  { img: "/work/digital-products.jpg", name: "Digital products", kind: "Storefront sample" },
+  { img: "/work/words-like-alice.jpg", name: "Author website", kind: "Website sample" },
+  { img: "/work/landscaping.jpg", name: "Landscaping", kind: "Website sample" },
+];
+
 const capabilities = [
   "Sub-accounts and snapshots, set up so new clients start from a tested base",
   "Workflows, triggers, waits and branches that do not double-send",
@@ -126,6 +136,8 @@ const faqs = [
 export default function V4() {
   return (
     <div id="v4-root" className={`v4 ${archivo.variable} ${serif.variable}`}>
+      <script dangerouslySetInnerHTML={{ __html: paperRollBoot }} />
+      <PaperRoll />
       <Reveal />
 
       <header className="v4-nav">
@@ -400,6 +412,21 @@ export default function V4() {
               </ul>
             </article>
 
+            <h3 className="v4-more-h" data-rv>
+              Sample builds
+            </h3>
+            <p data-rv>My own practice designs, not client work.</p>
+            <ul className="v4-more" data-rv>
+              {samples.map((w) => (
+                <li key={w.img}>
+                  <div className="v4-more-frame">
+                    <Image src={w.img} alt={`${w.name}, ${w.kind}`} width={900} height={2000} sizes="(max-width: 700px) 45vw, 260px" />
+                  </div>
+                  <b>{w.name}</b>
+                  <span>{w.kind}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -562,6 +589,7 @@ export default function V4() {
         <span>&copy; 2026 John Boy Roxas · Paniqui, Tarlac, Philippines</span>
         <span>HighLevel certified · For Australian and UK businesses</span>
       </footer>
+      <div className="pr-end" aria-hidden="true" />
     </div>
   );
 }

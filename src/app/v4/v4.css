@@ -846,3 +846,130 @@
 #builds {
   scroll-margin-top: 88px;
 }
+
+/* ---------- The paper ---------- */
+:root:has(.v4) {
+  scroll-padding-bottom: 96px;
+}
+:root:has(.v4) body,
+.v4 {
+  background-color: #f7f6f2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html.pr-intro,
+html.pr-intro body {
+  overflow: hidden;
+}
+.pr-cover {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background-color: #f7f6f2;
+  background-image: inherit;
+  will-change: transform;
+}
+html.pr-intro .pr-cover {
+  display: block;
+}
+.pr-roll {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 81;
+  width: 100%;
+  height: 148px;
+  transform: translate3d(0, 100vh, 0);
+  transform-origin: top;
+  pointer-events: none;
+  will-change: transform;
+  background: linear-gradient(180deg, #cfccc2 0%, #ecEAe3 10%, #fbfaf6 26%, #ffffff 36%, #f6f4ee 52%, #e2dfd6 72%, #c2bfb4 88%, #98958a 100%);
+  box-shadow: 0 -22px 40px -14px rgba(10, 10, 10, 0.22);
+}
+html.pr-intro .pr-roll {
+  opacity: 0;
+  z-index: 82;
+}
+.pr-turn {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.pr-lines {
+  position: absolute;
+  inset: -22px 0 0;
+  background: repeating-linear-gradient(180deg, transparent 0 8px, rgba(10, 10, 10, 0.022) 15px, transparent 22px);
+  will-change: transform;
+}
+.pr-label {
+  display: none;
+  position: absolute;
+  inset: 0;
+  place-content: center;
+  text-align: center;
+  color: #0a0a0a;
+  font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
+}
+html.pr-intro .pr-label {
+  display: grid;
+}
+.pr-label b {
+  font-size: clamp(26px, 5vw, 44px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.pr-label span {
+  margin-top: 8px;
+  font-size: clamp(12px, 1.7vw, 15px);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #404040;
+}
+.pr-cap {
+  display: none;
+  position: absolute;
+  top: 0;
+  width: 48px;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at center, #7d7a70 0 7%, #a9a69b 8%, transparent 10%),
+    repeating-radial-gradient(ellipse at center, #fbfaf6 0 5.5%, #d2cfc5 6% 7%);
+  box-shadow: inset 2px 0 5px rgba(10, 10, 10, 0.16);
+}
+html.pr-intro .pr-cap {
+  display: block;
+}
+.pr-floor {
+  display: none;
+  position: fixed;
+  left: 8%;
+  right: 8%;
+  z-index: 81;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(10, 10, 10, 0.26), rgba(10, 10, 10, 0.09) 52%, transparent 72%);
+  pointer-events: none;
+}
+html.pr-intro .pr-floor {
+  display: block;
+}
+/* The bottom edge of the sheet, seen once the roll has run out. */
+.pr-end {
+  height: 72px;
+  background: #e4e1d8;
+  box-shadow: inset 0 14px 18px -12px rgba(10, 10, 10, 0.35);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pr-roll,
+  .pr-cover {
+    display: none !important;
+  }
+}
+@media print {
+  .pr {
+    display: none;
+  }
+}
