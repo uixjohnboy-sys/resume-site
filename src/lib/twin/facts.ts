@@ -21,7 +21,7 @@ export const FACTS: Fact[] = [
   {
     id: "ghl",
     title: "GoHighLevel depth",
-    text: "Five years in CRM and automation, in GoHighLevel since 2023, and 58 client systems built: workflows, pipelines, snapshots, sub-accounts, funnels, calendars and forms. For the automation engine he also uses n8n, Zapier and Make.",
+    text: "Five years in CRM and automation, in GoHighLevel since 2023, building client systems: workflows, pipelines, snapshots, sub-accounts, funnels, calendars and forms. For the automation engine he also uses n8n, Zapier and Make.",
   },
   {
     id: "beyond",

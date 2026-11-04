@@ -35,7 +35,7 @@ const header = {
 };
 
 const summary =
-  "HighLevel-certified GoHighLevel specialist with 5 years of professional experience and 58 client systems delivered across the roles and freelance work below, for businesses in the United States, Australia, and the United Kingdom. Beyond standard CRM implementation, I build the custom software most GHL contractors cannot: production web applications on Next.js, Firebase, Stripe, and the Anthropic Claude API, wired back into GoHighLevel by webhook so the CRM and the application stay in sync automatically. My flagship platform, Coach OS, is live and open to review before any interview, and my portfolio runs an AI twin that answers questions about my work.";
+  "HighLevel-certified GoHighLevel specialist with 5 years in CRM and automation, in GoHighLevel since 2023, building client systems, for businesses in the United States, Australia, and the United Kingdom. Beyond standard CRM implementation, I build the custom software most GHL contractors cannot: production web applications on Next.js, Firebase, Stripe, and the Anthropic Claude API, wired back into GoHighLevel by webhook so the CRM and the application stay in sync automatically. My flagship platform, Coach OS, is live and open to review before any interview, and my portfolio runs an AI twin that answers questions about my work.";
 
 const availability =
   "Available for remote part-time roles, contracts and fixed-scope builds, with flexible hours that overlap Australian business hours.";

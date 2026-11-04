@@ -46,7 +46,7 @@ type Diag = { step: 1 | 2 | 3 | 4; tick: string; facts: string[]; count: number;
 
 type Msg = { role: "user" | "assistant"; content: string; trace?: Trace; note?: boolean; diag?: Diag; live?: boolean };
 
-// What the scanner is "looking through": the parts of his 58 builds.
+// What the scanner is "looking through": the parts of his builds.
 const SYSTEMS = [
   "workflows", "pipelines", "webhook handlers", "Stripe lifecycle", "A2P 10DLC", "v2 API calls", "Coach OS",
   "snapshots", "sub-accounts", "Next.js apps", "Firebase rules", "n8n flows", "Zapier zaps", "Make scenarios",
@@ -64,7 +64,7 @@ const GREETING =
 const FAQ: { q: string; a: string; facts: string[] }[] = [
   {
     q: "What can he build in GoHighLevel?",
-    a: "Five years in CRM and automation, in GoHighLevel since 2023, and 58 client systems: workflows, pipelines, snapshots, sub-accounts, funnels, calendars and forms, with n8n, Zapier and Make for automation. Where GoHighLevel stops, he keeps building with webhooks, the v2 API, Stripe, A2P 10DLC and full Next.js apps wired back into the CRM. Send him one workflow that isn't firing and he'll tell you what's wrong with it, free: uix.johnboy@gmail.com.",
+    a: "Five years in CRM and automation, in GoHighLevel since 2023, building client systems: workflows, pipelines, snapshots, sub-accounts, funnels, calendars and forms, with n8n, Zapier and Make for automation. Where GoHighLevel stops, he keeps building with webhooks, the v2 API, Stripe, A2P 10DLC and full Next.js apps wired back into the CRM. Send him one workflow that isn't firing and he'll tell you what's wrong with it, free: uix.johnboy@gmail.com.",
     facts: ["ghl", "beyond", "offer"],
   },
   {
@@ -131,7 +131,7 @@ function Diagnosis({ d }: { d: Diag }) {
       <ol className="v3-diag-steps">
         <li data-s={st(1)}>Reading your message</li>
         <li data-s={st(2)}>
-          Scanning 58 client systems
+          Scanning client systems
           {d.step === 2 ? <code>{d.tick}</code> : null}
         </li>
         <li data-s={st(3)}>

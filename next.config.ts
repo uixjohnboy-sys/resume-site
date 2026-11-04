@@ -42,6 +42,8 @@ const nextConfig: NextConfig = {
     return [
       // The v4 hiring page became the homepage on 2026-11-04.
       { source: "/v4", destination: "/", permanent: false },
+      // The old AI twin home is retired: it repeated a client count JB can't stand behind.
+      { source: "/v3", destination: "/", permanent: false },
       // The Coach OS walkthrough booking page moved to the coachos
       // subdomain so the whole prospect journey (fit assessment ->
       // booking) lives under one brand. Old links in already-sent

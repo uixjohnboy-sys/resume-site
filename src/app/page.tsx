@@ -6,7 +6,7 @@ import IntroVideo from "@/components/v4/IntroVideo";
 import "./v4/v4.css";
 
 // The homepage since 2026-11-04 (head to head: 74.0 against 68.0 for the resume page at /v5, which stays as the CV
-// link; the old AI twin home is at /v3). Built as "v4" on 2026-10-31 from two research passes
+// link). Built as "v4" on 2026-10-31 from two research passes
 // (C:\CoachOS-ClientHunt\job-hunt\PORTFOLIO-REBUILD-STRATEGY.md): AU/UK
 // agency owners and business owners want, in 30 seconds, who he helps, real
 // proof, a real face, a rate, hours and an easy next step. Understated,
