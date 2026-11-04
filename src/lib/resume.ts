@@ -110,8 +110,8 @@ export const jobs: { role: string; org: string; where: string; when: string; poi
     where: "Remote, US and AU clients",
     when: "Jan 2022 to present",
     points: [
-      "CRM and automation work since 2022, in GoHighLevel since 2023: systems for med spas, real estate teams, coaches and chiropractors, including Melbourne Chiropractic.",
-      "Specialised in full GHL migrations, snapshot creation and SaaS-mode setup for scaling agencies.",
+      "CRM and automation work since 2022, in GoHighLevel since 2023.",
+      "Client work in this period includes Chaos to Closing, Wrldinvsn and K Australia Design, listed above.",
     ],
   },
   {

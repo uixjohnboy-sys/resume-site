@@ -43,9 +43,9 @@ const clients = [
   { name: "K Australia Design", note: "Australian agency" },
   { name: "Confidential client (NDA)", note: "Remote" },
   { name: "Chaos to Closing", note: "US coaching business" },
-  { name: "Melbourne Chiropractic", note: "Australian clinic" },
   { name: "Wrldinvsn", note: "Lead flow project" },
   { name: "Masterpiece Las Vegas", note: "US, 2021 to 2023" },
+  { name: "Virtualasting", note: "Full-time, 2021 to 2024" },
 ];
 
 const badges = [
@@ -65,15 +65,6 @@ const funnelSteps = [
   "Personal result email, or a 48-email nurture",
   "Booking confirmed, reminders 24 h and 1 h before",
   "Removed from marketing the moment they book",
-];
-
-const moreWork = [
-  { img: "/work/melbourne-chiropractic.jpg", name: "Melbourne Chiropractic", kind: "Clinic website, Australia" },
-  { img: "/work/dental-clinic.jpg", name: "Dental clinic", kind: "Clinic website" },
-  { img: "/work/mindset-coaching.jpg", name: "Mindset Coaching", kind: "Coaching funnel" },
-  { img: "/work/digital-products.jpg", name: "Digital products", kind: "Storefront funnel" },
-  { img: "/work/words-like-alice.jpg", name: "Words Like Alice", kind: "Author website" },
-  { img: "/work/landscaping.jpg", name: "Landscaping", kind: "Local service website" },
 ];
 
 const capabilities = [
@@ -387,20 +378,6 @@ export default function V4() {
               </div>
             </article>
 
-            <h3 className="v4-more-h" data-rv>
-              More sites and funnels
-            </h3>
-            <ul className="v4-more" data-rv>
-              {moreWork.map((w) => (
-                <li key={w.img}>
-                  <div className="v4-more-frame">
-                    <Image src={w.img} alt={`${w.name}, ${w.kind}`} width={900} height={2000} sizes="(max-width: 700px) 45vw, 260px" />
-                  </div>
-                  <b>{w.name}</b>
-                  <span>{w.kind}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </section>
 
