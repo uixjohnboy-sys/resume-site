@@ -236,12 +236,21 @@ export default function TaplineProject() {
       </section>
 
       <section className="pj-sec">
+        <h2>The same desk in GoHighLevel</h2>
+        <p className="pj-measure">In my own GoHighLevel account: a repairs pipeline and four workflows. An inbound webhook creates the tenant and the job, then routes by urgency. The others chase the owner&apos;s approval, escalate a contractor who hasn&apos;t replied, and ask the tenant how the repair went. They stay in draft and aren&apos;t connected to the demo above, because there are no real tenants to message.</p>
+        <div className="pj-ghl">
+          <Image src="/projects/tapline/ghl-list.png" alt="The four Tapline workflows in GoHighLevel, all in draft" width={1543} height={355} sizes="(max-width: 760px) 92vw, 640px" />
+          <Image src="/projects/tapline/ghl-workflow.png" alt="The intake workflow: webhook, contact, tag, opportunity, then urgent and routine branches" width={404} height={747} sizes="(max-width: 760px) 92vw, 300px" />
+        </div>
+      </section>
+
+      <section className="pj-sec">
         <h2>What&apos;s real and what&apos;s simulated</h2>
         <p className="pj-measure">The Integrations tab is real: signed requests, duplicate protection and a failed-event log with retries, through a public endpoint. The agency, the people and the jobs are fictional. Text messages appear on the phone pages rather than being sent. Bills are marked as entered in PropertyMe or Alto but aren&apos;t connected to either. A real build connects to your own systems and your own rules.</p>
       </section>
 
       <section className="pj-sec pj-who">
-        <Image src="/v3/jb-hero.webp" alt="John Boy Roxas" width={160} height={160} />
+        <Image src="/jb-portrait.png" alt="John Boy Roxas" width={160} height={160} />
         <div>
           <h2>Who built this</h2>
           <p className="pj-measure">

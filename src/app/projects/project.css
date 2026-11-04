@@ -372,3 +372,23 @@
 .pj-step-wide .pj-step-text {
   max-width: 680px;
 }
+
+.pj-ghl {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 20px;
+}
+.pj-ghl img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+}
+@media (max-width: 760px) {
+  .pj-ghl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
