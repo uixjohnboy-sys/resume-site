@@ -19,7 +19,7 @@ export const person = {
 };
 
 export const summary =
-  "HighLevel-certified GoHighLevel specialist with 5 years of professional experience and 58 client systems delivered across the roles and freelance work below, for businesses in the United States and Australia. I also build what most GHL contractors can't: production web apps on Next.js, Firebase, Stripe and the Claude API, wired back into GoHighLevel so the CRM and the app stay in sync.";
+  "HighLevel-certified GoHighLevel specialist with 5 years in CRM and automation, in GoHighLevel since 2023, and 58 client systems delivered across the roles and freelance work below, for businesses in the United States and Australia. I also build what most GHL contractors can't: production web apps on Next.js, Firebase, Stripe and the Claude API, wired back into GoHighLevel so the CRM and the app stay in sync.";
 
 export const availability =
   "Available for remote part-time roles, contracts and fixed-scope builds. Part-time, 4 hours a day, starting at 8 AM in your timezone.";
@@ -80,7 +80,7 @@ export const jobs: { role: string; org: string; where: string; when: string; poi
     role: "GoHighLevel Systems Builder",
     org: "Chaos to Closing",
     where: "Remote, United States",
-    when: "Mar 2026 to present",
+    when: "Project, ended Mar 2026",
     points: ["Built the client's entire business inside GoHighLevel from scratch, centred on social media lead capture and ManyChat nurture sequences."],
   },
   {
@@ -97,7 +97,7 @@ export const jobs: { role: string; org: string; where: string; when: string; poi
     role: "Lead GHL Automation Architect",
     org: "K Australia Design",
     where: "Remote, Australia",
-    when: "Sep 2024 to Oct 2025",
+    when: "Sep 2024 to Sep 2025",
     points: [
       "Engineered scalable GoHighLevel infrastructure that let the agency onboard new clients without technical work each time.",
       "Built always-on nurture automation across SMS, email and voicemail drop, and managed A2P 10DLC registration to protect deliverability.",
@@ -108,9 +108,9 @@ export const jobs: { role: string; org: string; where: string; when: string; poi
     role: "Freelance CRM and Automation Consultant",
     org: "Independent",
     where: "Remote, US and AU clients",
-    when: "Jan 2024 to present",
+    when: "Jan 2022 to present",
     points: [
-      "Delivered GoHighLevel systems for med spas, real estate teams, coaches and chiropractors, including Melbourne Chiropractic.",
+      "CRM and automation work since 2022, in GoHighLevel since 2023: systems for med spas, real estate teams, coaches and chiropractors, including Melbourne Chiropractic.",
       "Specialised in full GHL migrations, snapshot creation and SaaS-mode setup for scaling agencies.",
     ],
   },

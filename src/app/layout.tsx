@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 const siteTitle = "John Boy Roxas · GoHighLevel Specialist";
 const siteDescription =
-  "GoHighLevel specialist who also ships the custom software beside the CRM: Next.js, Firebase, Stripe, and the Claude API. 5 years, 58 client builds, and one flagship platform you can open right now.";
+  "GoHighLevel specialist who also ships the custom software beside the CRM: Next.js, Firebase, Stripe, and the Claude API. 5 years in CRM and automation, 58 client builds, and one flagship platform you can open right now.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.johnboydesign.com"),

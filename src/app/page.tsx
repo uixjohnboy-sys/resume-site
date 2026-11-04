@@ -186,8 +186,8 @@ export default function V4() {
                 <span>Starting at 8 AM your time</span>
               </li>
               <li>
-                <b>5 years building</b>
-                <span>Past work in AU and US</span>
+                <b>5 years in CRM and automation</b>
+                <span>GoHighLevel since 2023, past work in AU and US</span>
               </li>
             </ul>
           </div>
@@ -337,7 +337,7 @@ export default function V4() {
 
             <article className="v4-case" data-rv>
               <div className="v4-case-copy">
-                <p className="v4-case-tag">K Australia Design · Australian agency · Sep 2024 to Oct 2025</p>
+                <p className="v4-case-tag">K Australia Design · Australian agency · Sep 2024 to Sep 2025</p>
                 <h3>Lead GoHighLevel automation for an agency&apos;s client accounts</h3>
                 <p>
                   <b>The role.</b>{" "}I built the agency&apos;s GoHighLevel base so new client accounts could be set up

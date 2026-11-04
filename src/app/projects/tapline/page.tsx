@@ -254,7 +254,7 @@ export default function TaplineProject() {
         <div>
           <h2>Who built this</h2>
           <p className="pj-measure">
-            I&apos;m John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines (UTC+8). I&apos;ve spent five years building workflows, funnels and client portals for marketing agencies and small businesses. Part-time, 4 hours a day, starting at 8 AM in your timezone. From AUD 15/hr.
+            I&apos;m John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines (UTC+8). I&apos;ve spent five years in CRM and automation, and since 2023 I&apos;ve worked in GoHighLevel, building workflows, funnels and client portals for marketing agencies and small businesses. Part-time, 4 hours a day, starting at 8 AM in your timezone. From AUD 15/hr.
           </p>
         </div>
       </section>

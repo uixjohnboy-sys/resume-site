@@ -64,7 +64,7 @@ const GREETING =
 const FAQ: { q: string; a: string; facts: string[] }[] = [
   {
     q: "What can he build in GoHighLevel?",
-    a: "Five years and 58 client systems inside GoHighLevel: workflows, pipelines, snapshots, sub-accounts, funnels, calendars and forms, with n8n, Zapier and Make for automation. Where GoHighLevel stops, he keeps building with webhooks, the v2 API, Stripe, A2P 10DLC and full Next.js apps wired back into the CRM. Send him one workflow that isn't firing and he'll tell you what's wrong with it, free: uix.johnboy@gmail.com.",
+    a: "Five years in CRM and automation, in GoHighLevel since 2023, and 58 client systems: workflows, pipelines, snapshots, sub-accounts, funnels, calendars and forms, with n8n, Zapier and Make for automation. Where GoHighLevel stops, he keeps building with webhooks, the v2 API, Stripe, A2P 10DLC and full Next.js apps wired back into the CRM. Send him one workflow that isn't firing and he'll tell you what's wrong with it, free: uix.johnboy@gmail.com.",
     facts: ["ghl", "beyond", "offer"],
   },
   {
