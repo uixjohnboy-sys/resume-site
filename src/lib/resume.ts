@@ -43,6 +43,7 @@ export const projects: LiveProject[] = [
     points: [
       "Takes a repair from the tenant's report to the bill: AI triage with the property's history, after-hours dispatch, owner approval and invoice checks.",
       "The AI suggests and a person decides. Emergency wording is fixed and checked, and each market has its own trades, notice periods and compliance rules.",
+      "A real signed webhook you can break yourself: forged and replayed requests are rejected, retries are never applied twice, and failed events wait in a log.",
     ],
     img: "/projects/tapline/board.png",
     imgAlt: "The Tapline repairs board",

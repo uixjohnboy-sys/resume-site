@@ -7,6 +7,7 @@ import { REGION, STAGE_ORDER, TRADE_IDS, money, ruleTriage, stageLabel, terms, t
 import type { Job, Region, Sandbox, Trade } from "@/lib/tapline/types";
 import Guide from "@/components/guide/Guide";
 import Compliance from "./Compliance";
+import Integrations from "./Integrations";
 import Drawer from "./Drawer";
 import OwnerReport from "./OwnerReport";
 import TenantReport from "./TenantReport";
@@ -14,7 +15,7 @@ import { TOURS, type TourCtx } from "./tours";
 import { Avatar, ConfirmDialog, TimerChip, TradeIcon, dur, useAnnouncer } from "./ui";
 import { useSandbox } from "./useSandbox";
 
-type Tab = "board" | "compliance" | "owners";
+type Tab = "board" | "compliance" | "owners" | "integrations";
 type TourId = keyof typeof TOURS;
 const TOUR_SEEN = "tapline-tour-seen";
 const EMAIL = "uix.johnboy@gmail.com";
@@ -320,6 +321,7 @@ export default function Board() {
               ["board", "Repairs board"],
               ["compliance", "Compliance"],
               ["owners", `${c.owner[0].toUpperCase()}${c.owner.slice(1)} statements`],
+              ["integrations", "Integrations"],
             ] as const
           ).map(([v, l]) => (
             <button key={v} type="button" aria-current={tab === v ? "page" : undefined} onClick={() => setTab(v)}>
@@ -333,6 +335,7 @@ export default function Board() {
               setOpenId(jid);
             }} />}
         {tab === "owners" && <OwnerReport sb={sb} now={now} />}
+        {tab === "integrations" && id && <Integrations id={id} region={sb.region} />}
 
         {tab === "board" && (
           <>

@@ -102,6 +102,7 @@ const regions = [
 const tryIt = [
   ["Report a leak at 9:47 pm", "See who gets contacted, what the tenant is told, and what waits for a person."],
   ["Accept the job on your own phone", "Scan the code in the job and press accept. The board moves by itself."],
+  ["Try to break the webhook", "On the Integrations tab, change a signed request, replay it, or take the receiver down. Nothing is lost or applied twice."],
   ["Report something small", "Replace the sample report with a wardrobe door off its track. It stays routine: nobody gets paged and no emergency text goes out."],
   ["Switch to Manchester", "Watch the trades, words, notice periods and emergency numbers change."],
 ];
@@ -235,8 +236,8 @@ export default function TaplineProject() {
       </section>
 
       <section className="pj-sec">
-        <h2>What&apos;s simulated</h2>
-        <p className="pj-measure">The agency, the people and the jobs are fictional. Text messages appear on the phone pages rather than being sent. Bills are marked as entered in PropertyMe or Alto but aren&apos;t connected to either. A real build connects to your own systems and your own rules.</p>
+        <h2>What&apos;s real and what&apos;s simulated</h2>
+        <p className="pj-measure">The Integrations tab is real: signed requests, duplicate protection and a failed-event log with retries, through a public endpoint. The agency, the people and the jobs are fictional. Text messages appear on the phone pages rather than being sent. Bills are marked as entered in PropertyMe or Alto but aren&apos;t connected to either. A real build connects to your own systems and your own rules.</p>
       </section>
 
       <section className="pj-sec pj-who">

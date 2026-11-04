@@ -269,7 +269,7 @@ export default function V4() {
                   <b>What it is.</b>{" "}A working repairs desk for property managers and letting agents: tenant reports, AI triage a person confirms, after-hours dispatch, owner approvals and contractors.
                 </p>
                 <p>
-                  <b>Try it.</b>{" "}<a href="/demo/tapline?tour=manager">Take the guided tour</a> or <a href="/projects/tapline">read how it works</a>. Nothing to sign up for.
+                  <b>Try it.</b>{" "}<a href="/demo/tapline?tour=manager">Take the guided tour</a> or <a href="/projects/tapline">read how it works</a>. Nothing to sign up for. Its Integrations tab is a real signed webhook you can try to break.
                 </p>
               </div>
               <ol className="v4-flow" aria-label="How a repair moves through Tapline">
