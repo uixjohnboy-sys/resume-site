@@ -115,11 +115,12 @@ export const jobs: { role: string; org: string; where: string; when: string; poi
     ],
   },
   {
-    role: "Senior Design and Systems Strategist",
-    org: "Masterpiece Las Vegas",
-    where: "Remote, United States",
-    when: "Feb 2021 to Jun 2023",
+    role: "Automation and CRM Support",
+    org: "Virtualasting",
+    where: "Full-time, Manila",
+    when: "Feb 2021 to Jul 2024",
     points: [
+      "Lead engagement: Masterpiece Las Vegas, as Senior Design and Systems Strategist, Feb 2021 to Jun 2023.",
       "Developed conversion-focused UI/UX strategies and connected lead-capture forms to automated CRM workflows.",
       "Optimised marketing funnels by pairing visual design with data logic to lower lead costs.",
     ],

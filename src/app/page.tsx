@@ -18,7 +18,7 @@ import "./v4/v4.css";
 // policies. Testimonials render only when real ones exist.
 
 export const metadata: Metadata = {
-  title: "John Boy Roxas · GoHighLevel specialist for Australian and UK businesses",
+  title: "John Boy Roxas · GoHighLevel specialist for agencies and small businesses",
   description:
     "HighLevel-certified GoHighLevel specialist in the Philippines. Builds and fixes workflows, funnels, calendars and pipelines for Australian and UK agencies and small businesses. From AUD 15/hr.",
 };
@@ -44,7 +44,7 @@ const clients = [
   { name: "Confidential client (NDA)", note: "Remote" },
   { name: "Chaos to Closing", note: "US coaching business" },
   { name: "Wrldinvsn", note: "Lead flow project" },
-  { name: "Masterpiece Las Vegas", note: "US, 2021 to 2023" },
+  { name: "Masterpiece Las Vegas", note: "US, through Virtualasting" },
   { name: "Virtualasting", note: "Full-time, 2021 to 2024" },
 ];
 
@@ -151,7 +151,7 @@ export default function V4() {
             <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
             <h1>GoHighLevel systems you can try right now.</h1>
             <p className="v4-lede">
-              I&apos;m John Boy. I build and fix GoHighLevel for Australian and UK agencies and small businesses. Don&apos;t take my word for it: open a live build below and use it yourself.
+              I&apos;m John Boy. I build and fix GoHighLevel for agencies and small businesses, so every enquiry gets captured and followed up. Past clients in the US and Australia, and UK businesses are welcome. Don&apos;t take my word for it: open a live build below and use it yourself.
             </p>
             <div className="v4-ctas">
               <a className="v4-btn v4-btn-dark" href="/demo/tapline?tour=manager">
