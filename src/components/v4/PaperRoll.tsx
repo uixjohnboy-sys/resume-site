@@ -88,13 +88,13 @@ export default function PaperRoll() {
       const end = vh - rest();
 
       (async () => {
-        await run(roll, [{ opacity: 0, clipPath: inset(side), transform: `translate3d(0, ${middle + 26}px, 0)` }, { opacity: 1, clipPath: inset(side), transform: `translate3d(0, ${middle}px, 0)` }], 800, soft);
+        await run(roll, [{ opacity: 0, clipPath: inset(side), transform: `translate3d(0, ${middle + 26}px, 0) rotate(-1.6deg)` }, { opacity: 1, clipPath: inset(side), transform: `translate3d(0, ${middle}px, 0) rotate(-0.9deg)` }], 800, soft);
         await new Promise((r) => setTimeout(r, 900));
         if (!intro) return;
         run(label, [{ opacity: 1 }, { opacity: 0 }], 260, "ease-out");
         run(cap, [{ opacity: 1 }, { opacity: 0 }], 260, "ease-out");
         run(floor, [{ opacity: 1 }, { opacity: 0 }], 260, "ease-out");
-        await run(roll, [{ opacity: 1, clipPath: inset(side), transform: `translate3d(0, ${middle}px, 0)` }, { opacity: 1, clipPath: inset(0), transform: "translate3d(0, 0, 0)" }], 720, glide);
+        await run(roll, [{ opacity: 1, clipPath: inset(side), transform: `translate3d(0, ${middle}px, 0) rotate(-0.9deg)` }, { opacity: 1, clipPath: inset(0), transform: "translate3d(0, 0, 0) rotate(0deg)" }], 720, glide);
         if (!intro) return;
         const turning = lines.animate([{ transform: "translate3d(0, 0, 0)" }, { transform: "translate3d(0, 264px, 0)" }], { duration: 1400, easing: glide, fill: "forwards" });
         running.push(turning);
@@ -123,6 +123,7 @@ export default function PaperRoll() {
         <div className="pr-turn">
           <div className="pr-lines" ref={linesRef} />
         </div>
+        <div className="pr-flap" />
         <div className="pr-cap" ref={capRef} />
         <div className="pr-label" ref={labelRef}>
           <b>John Boy Roxas</b>

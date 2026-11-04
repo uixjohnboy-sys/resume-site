@@ -136,6 +136,7 @@ const faqs = [
 export default function V4() {
   return (
     <div id="v4-root" className={`v4 ${archivo.variable} ${serif.variable}`}>
+      <link rel="preload" as="image" href="/paper.webp" />
       <script dangerouslySetInnerHTML={{ __html: paperRollBoot }} />
       <PaperRoll />
       <Reveal />
