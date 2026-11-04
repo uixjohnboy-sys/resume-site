@@ -73,12 +73,12 @@ const shots = [
 ];
 
 const stats = [
-  { v: "30,275", count: "30,275", l: "Lines of code" },
-  { v: "26", count: "26", l: "GoHighLevel webhook events sent" },
-  { v: "84", count: "84", l: "Automated email templates" },
-  { v: "26", count: "26", l: "Page routes" },
-  { v: "36", count: "36", l: "API endpoints" },
-  { v: "10", count: "10", l: "Scheduled background jobs" },
+  { v: "30,275", l: "Lines of code" },
+  { v: "26", l: "GoHighLevel webhook events sent" },
+  { v: "84", l: "Automated email templates" },
+  { v: "26", l: "Page routes" },
+  { v: "36", l: "API endpoints" },
+  { v: "10", l: "Scheduled background jobs" },
 ];
 
 const modules = [
@@ -231,7 +231,7 @@ export default function CoachOsCaseStudy() {
               <div className="jb-board-grid">
                 {stats.map((s) => (
                   <div className="jb-cell" key={s.l}>
-                    <div className="jb-cell-v" data-count={s.count}>
+                    <div className="jb-cell-v">
                       {s.v}
                     </div>
                     <div className="jb-cell-l">{s.l}</div>

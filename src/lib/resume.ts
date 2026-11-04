@@ -110,7 +110,7 @@ export const jobs: { role: string; org: string; where: string; when: string; poi
     where: "Remote, US and AU clients",
     when: "Jan 2024 to present",
     points: [
-      "Delivered 13+ systems in GoHighLevel for med spas, real estate teams, coaches and chiropractors.",
+      "Delivered GoHighLevel systems for med spas, real estate teams, coaches and chiropractors, including Melbourne Chiropractic.",
       "Specialised in full GHL migrations, snapshot creation and SaaS-mode setup for scaling agencies.",
     ],
   },

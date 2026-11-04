@@ -187,7 +187,7 @@ export default function V4() {
               </li>
               <li>
                 <b>5 years building</b>
-                <span>For AU and US clients</span>
+                <span>Past work in AU and US</span>
               </li>
             </ul>
           </div>
