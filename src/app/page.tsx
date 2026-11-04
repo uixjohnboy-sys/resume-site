@@ -133,6 +133,7 @@ export default function V4() {
           John Boy Roxas
         </a>
         <nav className="v4-links" aria-label="Sections">
+          <a href="#builds">Builds</a>
           <a href="#work">Work</a>
           <a href="#rates">Rates</a>
           <a href="#process">How I work</a>
@@ -148,22 +149,97 @@ export default function V4() {
         <section className="v4-hero">
           <div className="v4-hero-copy" data-rv>
             <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
-            <h1>
-              GoHighLevel builds and fixes for <em>Australian and UK</em> agencies and small businesses.
-            </h1>
+            <h1>GoHighLevel systems you can try right now.</h1>
             <p className="v4-lede">
-              I&apos;m John Boy. I set up and repair the workflows, funnels, calendars and pipelines your enquiries run
-              through, tested before handover and documented so your team can run them.
+              I&apos;m John Boy. I build and fix GoHighLevel for Australian and UK agencies and small businesses. Don&apos;t take my word for it: open a live build below and use it yourself.
             </p>
             <div className="v4-ctas">
-              <a className="v4-btn v4-btn-dark" href={BOOK}>
+              <a className="v4-btn v4-btn-dark" href="/demo/tapline?tour=manager">
+                Try the live repairs desk
+              </a>
+              <a className="v4-btn v4-btn-line" href={BOOK}>
                 Book a 15-min call
               </a>
-              <a className="v4-btn v4-btn-line" href={FIX_MAIL}>
-                Send me one broken workflow, free
-              </a>
             </div>
-            <ul className="v4-facts" aria-label="At a glance">
+            <p className="v4-hero-free">
+              <a href={FIX_MAIL}>Or send me one broken workflow, and I&apos;ll tell you what&apos;s wrong with it, free.</a>
+            </p>
+          </div>
+          <div className="v4-hero-media" data-rv>
+            <IntroVideo />
+          </div>
+        </section>
+
+        {/* ---------- LIVE BUILDS: the first thing after the promise ---------- */}
+        <section className="v4-sec v4-builds" id="builds">
+          <div className="v4-in">
+            <p className="v4-kicker" data-rv>
+              Live builds
+            </p>
+            <h2 data-rv>Open them. Try to break them.</h2>
+            <article className="v4-case" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">My own demo · Fictional data · Try it live</p>
+                <h3>Tapline, a repairs desk you can use right now</h3>
+                <p>
+                  A working repairs desk for property managers and letting agents: tenant reports, AI triage a person confirms, after-hours dispatch, owner approvals and contractors. Nothing to sign up for.
+                </p>
+                <p>
+                  Its Integrations tab is a real signed webhook. Change a request, replay it, or take the receiver down, and watch nothing get lost or applied twice.
+                </p>
+                <div className="v4-ctas">
+                  <a className="v4-btn v4-btn-dark" href="/demo/tapline?tour=manager">
+                    Take the guided tour
+                  </a>
+                  <a className="v4-link" href="/demo/tapline?tour=manager&region=UK">
+                    UK version
+                  </a>
+                  <a className="v4-link" href="/projects/tapline">
+                    How it works
+                  </a>
+                </div>
+              </div>
+              <div className="v4-shots v4-shots-2">
+                <div className="v4-shot v4-shot-wide">
+                  <Image src="/projects/tapline/triage.png" alt="Tapline's AI triage panel, with the suggested trade, urgency and reply" width={1024} height={1654} sizes="(max-width: 900px) 90vw, 420px" />
+                </div>
+                <div className="v4-shot v4-shot-wide">
+                  <Image src="/projects/tapline/tenant.png" alt="What the tenant sees on their phone after reporting a repair" width={780} height={1768} sizes="(max-width: 900px) 90vw, 420px" />
+                </div>
+              </div>
+            </article>
+
+            <article className="v4-case v4-case-coach" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">Coach OS · my own product · runs on demo data</p>
+                <h3>When GoHighLevel is not enough, I build the app around it</h3>
+                <p>
+                  A client platform for one-to-one coaches, built from zero and connected to GoHighLevel both ways: a
+                  client portal with an AI companion, e-signed agreements, Stripe subscriptions and an owner dashboard.
+                  It runs on a sample practice you can click through.
+                </p>
+                <div className="v4-ctas">
+                  <a className="v4-btn v4-btn-line" href="https://coachos.johnboydesign.com/tour">
+                    Open the live tour
+                  </a>
+                  <a className="v4-link" href="/coach-os">
+                    Read the case study
+                  </a>
+                </div>
+              </div>
+              <div className="v4-shots v4-shots-2">
+                {[
+                  { img: "/coach-os-shots/app-portal.jpg", alt: "Coach OS client portal" },
+                  { img: "/coach-os-shots/app-dash-kanban.jpg", alt: "Coach OS owner pipeline" },
+                ].map((s) => (
+                  <div className="v4-shot v4-shot-wide" key={s.img}>
+                    <Image src={s.img} alt={s.alt} width={1440} height={760} sizes="(max-width: 900px) 90vw, 420px" />
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <ul className="v4-facts v4-facts-wide" aria-label="At a glance">
               <li>
                 <b>Available now</b>
                 <span>Part-time, contract or project</span>
@@ -181,9 +257,6 @@ export default function V4() {
                 <span>GoHighLevel since 2023, past work in AU and US</span>
               </li>
             </ul>
-          </div>
-          <div className="v4-hero-media" data-rv>
-            <IntroVideo />
           </div>
         </section>
 
@@ -248,30 +321,9 @@ export default function V4() {
         <section className="v4-sec v4-work" id="work">
           <div className="v4-in">
             <p className="v4-kicker" data-rv>
-              Selected work
+              Past work
             </p>
-            <h2 data-rv>What I built, and why it was built that way.</h2>
-
-            <article className="v4-case" data-rv>
-              <div className="v4-case-copy">
-                <p className="v4-case-tag">My own demo · Fictional data · Try it live</p>
-                <h3>Tapline, a repairs desk you can use right now</h3>
-                <p>
-                  <b>What it is.</b>{" "}A working repairs desk for property managers and letting agents: tenant reports, AI triage a person confirms, after-hours dispatch, owner approvals and contractors.
-                </p>
-                <p>
-                  <b>Try it.</b>{" "}<a href="/demo/tapline?tour=manager">Take the guided tour</a>, <a href="/demo/tapline?tour=manager&region=UK">the UK version</a>, or <a href="/projects/tapline">read how it works</a>. Nothing to sign up for. Its Integrations tab is a real signed webhook you can try to break.
-                </p>
-              </div>
-              <ol className="v4-flow" aria-label="How a repair moves through Tapline">
-                {["A tenant reports a repair", "AI suggests the trade and urgency", "The manager confirms and replies", "The owner approves the cost", "The contractor gets the job"].map((s, i) => (
-                  <li key={s}>
-                    <span>{String(i + 1).padStart(2, "0")}</span>
-                    {s}
-                  </li>
-                ))}
-              </ol>
-            </article>
+            <h2 data-rv>Client work, and why it was built that way.</h2>
 
             <article className="v4-case" data-rv>
               <div className="v4-case-copy">
@@ -346,36 +398,6 @@ export default function V4() {
                 <li>A2P 10DLC handled for deliverability</li>
                 <li>Enquiry to booked appointment, automatically</li>
               </ul>
-            </article>
-
-            <article className="v4-case v4-case-coach" data-rv>
-              <div className="v4-case-copy">
-                <p className="v4-case-tag">Coach OS · my own product · runs on demo data</p>
-                <h3>When GoHighLevel is not enough, I build the app around it</h3>
-                <p>
-                  A client platform for one-to-one coaches, built from zero and connected to GoHighLevel both ways: a
-                  client portal with an AI companion, e-signed agreements, Stripe subscriptions and an owner dashboard.
-                  It runs on a sample practice you can click through.
-                </p>
-                <div className="v4-ctas">
-                  <a className="v4-btn v4-btn-line" href="https://coachos.johnboydesign.com/tour">
-                    Open the live tour
-                  </a>
-                  <a className="v4-link" href="/coach-os">
-                    Read the case study
-                  </a>
-                </div>
-              </div>
-              <div className="v4-shots v4-shots-2">
-                {[
-                  { img: "/coach-os-shots/app-portal.jpg", alt: "Coach OS client portal" },
-                  { img: "/coach-os-shots/app-dash-kanban.jpg", alt: "Coach OS owner pipeline" },
-                ].map((s) => (
-                  <div className="v4-shot v4-shot-wide" key={s.img}>
-                    <Image src={s.img} alt={s.alt} width={1440} height={760} sizes="(max-width: 900px) 90vw, 420px" />
-                  </div>
-                ))}
-              </div>
             </article>
 
           </div>
