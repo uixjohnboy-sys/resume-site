@@ -6,7 +6,7 @@ import "./v5.css";
 
 // Portfolio v5: the resume you can click. It reads as a clean black and white resume, and every project line opens the
 // live product. The downloadable PDF is printed from this same page (scripts/make-resume-pdf.mjs), so the two
-// always match. Prototype for JB to compare with /v4: noindex and unlinked until he picks.
+// always match. This is the CV link for job applications; the homepage is the hiring page at /.
 
 export const metadata: Metadata = {
   title: "John Boy Roxas · GoHighLevel specialist · Resume",
@@ -145,7 +145,7 @@ export default function V5() {
           <dl className="r-skills">
             <div>
               <dt>Rate</dt>
-              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start.</dd>
+              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start and billed fortnightly.</dd>
             </div>
             <div>
               <dt>Hours</dt>

@@ -15,7 +15,7 @@ export const person = {
   site: "https://www.johnboydesign.com",
   pdf: "/John-Boy-Roxas-Resume.pdf",
   book: "/book",
-  photo: "/v3/jb-hero.webp",
+  photo: "/jb-portrait.png",
 };
 
 export const summary =

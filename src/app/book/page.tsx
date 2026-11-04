@@ -30,7 +30,7 @@ export default function BookPage() {
     <div className={`r ${archivo.variable}`}>
       <main className="r-sheet">
         <header className="r-book-head">
-          <Link className="r-book-back" href="/v5">
+          <Link className="r-book-back" href="/">
             John Boy Roxas
           </Link>
           <h1>Book a call</h1>
@@ -62,7 +62,7 @@ export default function BookPage() {
             </div>
             <div>
               <dt>Rate</dt>
-              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start.</dd>
+              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start and billed fortnightly.</dd>
             </div>
           </dl>
         </section>
@@ -85,6 +85,7 @@ export default function BookPage() {
             <Link href="/projects/tapline">Tapline, a repairs desk you can try</Link>
             <Link href="/coach-os">Coach OS case study</Link>
             <Link href="/v5">Resume</Link>
+            <Link href="/">Home</Link>
           </p>
         </section>
       </main>

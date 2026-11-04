@@ -8,7 +8,7 @@ import { useRef, useState } from "react";
 // John Boy records it (VIDEO_SRC empty) the card shows his photo only, with
 // no dead play button.
 const VIDEO_SRC = "";
-const POSTER = "/v3/jb-hero.webp";
+const POSTER = "/jb-portrait.png";
 
 export default function IntroVideo() {
   const ref = useRef<HTMLVideoElement>(null);

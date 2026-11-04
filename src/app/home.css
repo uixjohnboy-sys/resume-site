@@ -13,18 +13,18 @@
 .jb {
   /* Neutrals are green-biased on purpose. A pure grey next to #D5FE38
      reads as unconsidered. */
-  --ink: #0c0d0a;
-  --surface: #14160f;
-  --surface-2: #1a1d14;
-  --line: #2c3021;
-  --line-2: #3d4230;
+  --ink: #ffffff;
+  --surface: #fafafa;
+  --surface-2: #f5f5f5;
+  --line: #e5e5e5;
+  --line-2: #d4d4d4;
 
-  --neon: #d5fe38;
-  --neon-dim: #a8c92c;
+  --neon: #0a0a0a;
+  --neon-dim: #404040;
   --on-neon: #1a2200;
 
-  --text: #f4f2ed;
-  --text-2: #b8b4aa;
+  --text: #0a0a0a;
+  --text-2: #404040;
   --muted: #8f9482;
   --faint: #676c5b;
 
@@ -57,7 +57,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(12, 13, 10, 0.88);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
@@ -102,20 +102,20 @@
   height: 6px;
   border-radius: 50%;
   background: var(--neon);
-  box-shadow: 0 0 0 0 rgba(213, 254, 56, 0.55);
+  box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.55);
   animation: jb-pulse 2.4s ease-out infinite;
   flex: none;
 }
 
 @keyframes jb-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(213, 254, 56, 0.5);
+    box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 7px rgba(213, 254, 56, 0);
+    box-shadow: 0 0 0 7px rgba(10, 10, 10, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(213, 254, 56, 0);
+    box-shadow: 0 0 0 0 rgba(10, 10, 10, 0);
   }
 }
 
@@ -241,7 +241,7 @@
   content: "";
   position: absolute;
   inset: -8%;
-  background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(213, 254, 56, 0.16), transparent 70%);
+  background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(10, 10, 10, 0.16), transparent 70%);
   pointer-events: none;
 }
 
@@ -284,7 +284,7 @@
 .jb-video-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(12, 13, 10, 0.92) 0%, rgba(12, 13, 10, 0.25) 42%, rgba(12, 13, 10, 0.05) 70%);
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.25) 42%, rgba(255, 255, 255, 0.05) 70%);
   z-index: 1;
 }
 
@@ -339,7 +339,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1px solid rgba(213, 254, 56, 0.6);
+  border: 1px solid rgba(10, 10, 10, 0.6);
   animation: jb-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
@@ -364,7 +364,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-2);
-  background: rgba(12, 13, 10, 0.72);
+  background: rgba(255, 255, 255, 0.72);
   border: 1px solid var(--line-2);
   border-radius: 2px;
   padding: 4px 9px;
@@ -401,7 +401,7 @@
   height: 150px;
   object-fit: contain;
   margin-bottom: 16px;
-  filter: drop-shadow(0 0 22px rgba(213, 254, 56, 0.12));
+  filter: drop-shadow(0 0 22px rgba(10, 10, 10, 0.12));
 }
 
 .jb-award-t {
@@ -1012,7 +1012,7 @@ a.jb-proj:hover {
   width: 92px;
   height: 92px;
   object-fit: contain;
-  filter: drop-shadow(0 0 16px rgba(213, 254, 56, 0.1));
+  filter: drop-shadow(0 0 16px rgba(10, 10, 10, 0.1));
 }
 
 .jb-cert-mini span {
@@ -1200,7 +1200,7 @@ a.jb-proj:hover {
 
 .jb-work:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0 34px rgba(213, 254, 56, 0.1);
+  box-shadow: 0 0 34px rgba(10, 10, 10, 0.1);
 }
 
 /* The frame is a fixed window; the full-page screenshot pans down on
@@ -1266,7 +1266,7 @@ a.jb-proj:hover {
   text-decoration: none;
   border-radius: 999px;
   padding: 12px 20px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 24px rgba(213, 254, 56, 0.25);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 24px rgba(10, 10, 10, 0.25);
   opacity: 0;
   transform: translateY(84px);
   transition: opacity 0.35s ease, transform 0.35s ease;
@@ -1473,7 +1473,7 @@ a.jb-proj:hover {
   border-radius: 2px;
   background: var(--surface);
   padding: 6px;
-  box-shadow: 0 0 60px rgba(213, 254, 56, 0.08);
+  box-shadow: 0 0 60px rgba(10, 10, 10, 0.08);
 }
 
 .jb-cal iframe {
@@ -1614,7 +1614,7 @@ a.jb-proj:hover {
 
 .jb-sync-node.app {
   border-color: var(--neon-dim);
-  box-shadow: 0 0 26px rgba(213, 254, 56, 0.1);
+  box-shadow: 0 0 26px rgba(10, 10, 10, 0.1);
 }
 
 .jb-sync-k {
@@ -1671,7 +1671,7 @@ a.jb-proj:hover {
   width: 7px;
   height: 7px;
   background: var(--neon);
-  box-shadow: 0 0 10px rgba(213, 254, 56, 0.8);
+  box-shadow: 0 0 10px rgba(10, 10, 10, 0.8);
   animation: jb-packet-fwd 3.2s linear infinite;
 }
 
@@ -1736,7 +1736,7 @@ a.jb-proj:hover {
   width: 520px;
   height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(213, 254, 56, 0.07), transparent 65%);
+  background: radial-gradient(circle, rgba(10, 10, 10, 0.07), transparent 65%);
   pointer-events: none;
   z-index: 0;
   opacity: 0;
@@ -1753,7 +1753,7 @@ a.jb-proj:hover {
 .jb-cap-item:hover,
 a.jb-proj:hover {
   transform: translateY(-3px);
-  box-shadow: inset 0 0 0 1px var(--line-2), 0 0 30px rgba(213, 254, 56, 0.07);
+  box-shadow: inset 0 0 0 1px var(--line-2), 0 0 30px rgba(10, 10, 10, 0.07);
 }
 
 /* ---------- screenshot gallery (/coach-os) ---------- */
@@ -1775,7 +1775,7 @@ a.jb-proj:hover {
 
 .jb-shot:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0 34px rgba(213, 254, 56, 0.09);
+  box-shadow: 0 0 34px rgba(10, 10, 10, 0.09);
 }
 
 .jb-shot-bar {
@@ -1923,7 +1923,7 @@ a.jb-proj:hover {
 
 .jb-btn-primary:hover {
   opacity: 1;
-  box-shadow: 0 0 24px rgba(213, 254, 56, 0.35);
+  box-shadow: 0 0 24px rgba(10, 10, 10, 0.35);
 }
 
 .jb-row {

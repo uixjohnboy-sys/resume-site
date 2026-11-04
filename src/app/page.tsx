@@ -1,170 +1,51 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { archivo, jetmono, serif } from "./fonts";
-import V3Motion from "@/components/v3/V3Motion";
-import PortraitDissolve from "@/components/v3/PortraitDissolve";
-import TwinVoice from "@/components/v3/TwinVoice";
-import LiveSystem from "@/components/v3/LiveSystem";
-import TwinChat from "@/components/v3/TwinChat";
-import ProofLab from "@/components/v3/ProofLab";
-import Preloader from "@/components/v3/Preloader";
-import Cursor from "@/components/v3/Cursor";
-import LocalTime from "@/components/v3/LocalTime";
-import "./v3.css";
+import { archivo, serif } from "./fonts";
+import Reveal from "@/components/v4/Reveal";
+import IntroVideo from "@/components/v4/IntroVideo";
+import "./v4/v4.css";
 
-// The homepage (johnboydesign.com). Built as "v3" beside the old neon
-// one-pager and promoted to `/` on 2026-10-07, when John Boy started using it
-// for job applications; /v3 redirects here. The old page is in git history.
+// The homepage since 2026-11-04 (head to head: 74.0 against 68.0 for the resume page at /v5, which stays as the CV
+// link; the old AI twin home is at /v3). Built as "v4" on 2026-10-31 from two research passes
+// (C:\CoachOS-ClientHunt\job-hunt\PORTFOLIO-REBUILD-STRATEGY.md): AU/UK
+// agency owners and business owners want, in 30 seconds, who he helps, real
+// proof, a real face, a rate, hours and an easy next step. Understated,
+// light, factual, Australian spelling. No AI look, no hype, no scare tactics.
 //
-// Two readers, one page: a business owner deciding whether to hire him for a
-// build, and a recruiter or agency checking him for a role. The hero, the
-// wall, the proof lab and the work serve both; the experience section and the
-// contact row exist for the second (dates, roles, hours, CV, LinkedIn).
-//
-// Rules this page keeps:
-// - Every artifact on screen is a real pattern from his own work, written
-//   generically. No NDA projects, no invented results, no testimonials (the
-//   old ones were never re-verified with the clients).
-// - The experience list matches the CV PDF. The NDA client is listed only as
-//   a confidential client: no name, country, industry or project detail.
-// - Content is fully visible with JavaScript off or reduced motion on;
-//   V3Motion only adds movement on top of a finished static page.
+// Rules: no confidential client is named or described (the NDA client appears
+// only as "Confidential client (NDA)", no country or industry); capabilities learned on NDA
+// work are listed as skills, never attributed. No invented results, quotes or
+// policies. Testimonials render only when real ones exist.
 
 export const metadata: Metadata = {
-  alternates: { canonical: "https://www.johnboydesign.com" },
+  title: "John Boy Roxas · GoHighLevel specialist for Australian and UK businesses",
+  description:
+    "HighLevel-certified GoHighLevel specialist in the Philippines. Builds and fixes workflows, funnels, calendars and pipelines for Australian and UK agencies and small businesses. From AUD 15/hr.",
 };
 
 const EMAIL = "uix.johnboy@gmail.com";
-
 const MAIL =
+  `mailto:${EMAIL}?subject=` +
+  encodeURIComponent("Enquiry from your portfolio") +
+  "&body=" +
+  encodeURIComponent("Hi John Boy,\n\n");
+const FIX_MAIL =
   `mailto:${EMAIL}?subject=` +
   encodeURIComponent("One broken workflow") +
   "&body=" +
   encodeURIComponent("Hi John Boy, here is the workflow that is not doing what it should:\n\n");
-
-const HIRE_MAIL =
-  `mailto:${EMAIL}?subject=` +
-  encodeURIComponent("A role for you") +
-  "&body=" +
-  encodeURIComponent("Hi John Boy, I found you through your portfolio.\n\n");
-
-const WHATSAPP =
-  "https://wa.me/639773659548?text=" + encodeURIComponent("Hi John Boy, I found you through your portfolio.");
+const WHATSAPP = "https://wa.me/639773659548?text=" + encodeURIComponent("Hi John Boy, I found you through your portfolio.");
 const LINKEDIN = "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist";
-const OLJ = "https://www.onlinejobs.ph/jobseekers/info/4412723";
 const CV = "/John-Boy-Roxas-Resume.pdf";
+const BOOK = "/book";
 
-// Same entries, dates and roles as the CV, newest first.
-const experience = [
-  {
-    when: "Apr 2026 - now",
-    where: "Remote",
-    who: "Confidential client (NDA)",
-    role: "GoHighLevel Specialist, Automation",
-    did: "Details under NDA.",
-  },
-  {
-    when: "Mar 2026 - now",
-    where: "United States",
-    who: "Chaos to Closing",
-    role: "GoHighLevel Systems Builder",
-    did: "Built the client's whole business inside GoHighLevel from scratch: social lead capture and ManyChat nurture.",
-  },
-  {
-    when: "Dec 2025 - Feb 2026",
-    where: "Project",
-    who: "Wrldinvsn",
-    role: "Lead Flow & Funnel Operations",
-    did: "Lead tracking from first click to close, landing and VSL pages, and a booking system with reminders and cancellations.",
-  },
-  {
-    when: "Sep 2024 - Oct 2025",
-    where: "Australia",
-    who: "K Australia Design",
-    role: "Lead GHL Automation Architect",
-    did: "Agency infrastructure for onboarding new sub-accounts, multi-channel nurture, and A2P 10DLC registration.",
-  },
-  {
-    when: "Jan 2024 - now",
-    where: "US, AU",
-    who: "Freelance",
-    role: "CRM & Automation Consultant",
-    did: "13+ GoHighLevel systems for med spas, real estate teams, coaches and chiropractors, including full migrations and snapshots.",
-  },
-  {
-    when: "Feb 2021 - Jun 2023",
-    where: "United States",
-    who: "Masterpiece Las Vegas",
-    role: "Senior Design & Systems Strategist",
-    did: "Conversion-focused UI and funnels, with lead-capture forms connected to automated CRM workflows.",
-  },
-];
-
-// The practical answers a hiring manager looks for before a first call.
-const workingFacts = [
-  { k: "Based in", v: "Tarlac, Philippines (UTC+8)" },
-  { k: "Hours", v: "Flexible, overlapping Australian business hours" },
-  { k: "Engagement", v: "Remote: part-time role, contract or fixed-scope build" },
-  { k: "Tools", v: "Slack, ClickUp, GitHub, written docs with every build" },
-  { k: "Education", v: "BS Computer Science, 2013 - 2018" },
-];
-
-const stats = [
-  { v: "58", l: "client systems" },
-  { v: "5", l: "years in GHL" },
-  { v: "30,275", l: "lines in the flagship" },
-  { v: "26", l: "GHL events wired" },
-];
-
-// The walls. Buyer's words on top, the real mechanism underneath in mono,
-// because naming the cause is what separates a builder from a button-pusher.
-const walls = [
-  {
-    say: "Your client got charged twice.",
-    trace: "stripe retried the webhook. the handler was not idempotent.",
-  },
-  {
-    say: "Your dashboard says 40 leads. Your CRM says 27.",
-    trace: "pipelines count opportunities, not contacts.",
-  },
-  {
-    say: "The launch slipped two weeks.",
-    trace: "A2P 10DLC was submitted on day nine instead of day one.",
-  },
-  {
-    say: "You sold something you no longer had.",
-    trace: "inventory was tracked per price, not per product.",
-  },
-];
-
-// The builds already public on johnboydesign.com, same names and labels.
-// Tall full-page captures: the frame pans down them on hover.
-const works = [
-  { img: "/work/chaos-to-closing.jpg", name: "Chaos to Closing", kind: "Coaching business site", tags: ["GoHighLevel", "Site", "US"] },
-  { img: "/work/chaos-ai-funnel.jpg", name: "Chaos to Closing", kind: "AI funnel", tags: ["GoHighLevel", "Funnel", "AI"] },
-  { img: "/work/chaos-sales-page.jpg", name: "Chaos to Closing", kind: "Sales page", tags: ["GoHighLevel", "Funnel"] },
-  { img: "/work/mindset-coaching.jpg", name: "Mindset Coaching", kind: "Coaching funnel", tags: ["GoHighLevel", "Funnel"] },
-  { img: "/work/melbourne-chiropractic.jpg", name: "Melbourne Chiropractic", kind: "Clinic site", tags: ["Site", "AU"] },
-  { img: "/work/dental-clinic.jpg", name: "Dental Clinic", kind: "Clinic site", tags: ["Site"] },
-  { img: "/work/words-like-alice.jpg", name: "Words Like Alice", kind: "Author site", tags: ["Site"] },
-  { img: "/work/digital-products.jpg", name: "Digital Products", kind: "Storefront funnel", tags: ["GoHighLevel", "Funnel"] },
-  { img: "/work/landscaping.jpg", name: "Landscaping", kind: "Local service site", tags: ["Site"] },
-];
-
-// Coach OS, counted from the repository (recounted 2026-09-29).
-const coachStats = [
-  { v: "30,275", l: "lines of code" },
-  { v: "36", l: "API endpoints" },
-  { v: "10", l: "scheduled jobs" },
-  { v: "84", l: "email templates" },
-  { v: "26", l: "GHL events sent" },
-  { v: "26", l: "pages" },
-];
-
-const coachShots = [
-  { img: "/coach-os-shots/app-portal.jpg", cap: "Client portal with an AI companion that answers from the client's own history" },
-  { img: "/coach-os-shots/app-dash-kanban.jpg", cap: "One pipeline for every lead from every tool" },
-  { img: "/coach-os-shots/app-diagnostic.jpg", cap: "A scored diagnostic quiz that writes into the CRM and books the call" },
+const clients = [
+  { name: "K Australia Design", note: "Australian agency" },
+  { name: "Confidential client (NDA)", note: "Remote" },
+  { name: "Chaos to Closing", note: "US coaching business" },
+  { name: "Melbourne Chiropractic", note: "Australian clinic" },
+  { name: "Wrldinvsn", note: "Lead flow project" },
+  { name: "Masterpiece Las Vegas", note: "US, 2021 to 2023" },
 ];
 
 const badges = [
@@ -174,418 +55,163 @@ const badges = [
   { img: "/badge-course-community-expert.png", name: "Course & Community Expert" },
 ];
 
-const skills = [
-  "GoHighLevel",
-  "Webhooks",
-  "v2 API",
-  "Stripe",
-  "A2P 10DLC",
-  "Next.js",
-  "Firebase",
-  "Claude API",
-  "n8n",
-  "Zapier",
-  "Make",
+// Real ones only: { quote, name, role, country }. The section is hidden while empty.
+const testimonials: { quote: string; name: string; role: string; country: string }[] = [];
+
+const funnelSteps = [
+  "Form posts to an Inbound Webhook",
+  "Contact created, 9 answers saved to custom fields",
+  "Branch on lead source",
+  "Personal result email, or a 48-email nurture",
+  "Booking confirmed, reminders 24 h and 1 h before",
+  "Removed from marketing the moment they book",
 ];
 
-export default function V3() {
-  return (
-    <div
-      id="v3-root"
-      data-motion="pending"
-      suppressHydrationWarning
-      className={`v3 ${archivo.variable} ${jetmono.variable} ${serif.variable}`}
-    >
-      {/* Failsafe: if the motion script never mounts, show everything. */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html:
-            "setTimeout(function(){var r=document.getElementById('v3-root');if(r&&r.getAttribute('data-motion')==='pending')r.setAttribute('data-motion','off')},2500)",
-        }}
-      />
-      <Preloader />
-      <V3Motion />
-      <Cursor />
-      <div className="v3-grain" aria-hidden="true" />
-      <div className="v3-hud" aria-hidden="true">
-        <span className="v3-hud-n">01</span>
-        <span className="v3-hud-bar">
-          <i />
-        </span>
-        <span className="v3-hud-t">Intro</span>
-      </div>
+const moreWork = [
+  { img: "/work/melbourne-chiropractic.jpg", name: "Melbourne Chiropractic", kind: "Clinic website, Australia" },
+  { img: "/work/dental-clinic.jpg", name: "Dental clinic", kind: "Clinic website" },
+  { img: "/work/mindset-coaching.jpg", name: "Mindset Coaching", kind: "Coaching funnel" },
+  { img: "/work/digital-products.jpg", name: "Digital products", kind: "Storefront funnel" },
+  { img: "/work/words-like-alice.jpg", name: "Words Like Alice", kind: "Author website" },
+  { img: "/work/landscaping.jpg", name: "Landscaping", kind: "Local service website" },
+];
 
-      <header className="v3-nav" data-v3="nav">
-        <a className="v3-mark" href="#top">
+const capabilities = [
+  "Sub-accounts and snapshots, set up so new clients start from a tested base",
+  "Workflows, triggers, waits and branches that do not double-send",
+  "Funnels, landing pages, forms and surveys",
+  "Booking calendars with confirmations, reminders and no-show follow-up",
+  "Pipelines your team can actually read, with clean reporting",
+  "Email nurture sequences and list migrations (for example Mailchimp to GHL)",
+  "SMS set up properly, including the A2P 10DLC registration US carriers require",
+  "Integrations: webhooks, the GHL API, Stripe, Zapier, Make, n8n",
+  "Client portals and internal dashboards connected to the tools you already use",
+  "AI assistants that answer only from facts you approve",
+];
+
+const steps = [
+  { t: "15-minute call", d: "You show me what is happening. I tell you honestly whether I can help and how." },
+  { t: "Access, done safely", d: "You add me as a user with only the permissions the job needs. No shared passwords." },
+  { t: "A clear plan", d: "Hourly or a fixed quote, with the scope in writing before I start." },
+  { t: "Build and test", d: "Built in draft, tested with test contacts, with a short Loom update so you see progress." },
+  { t: "Handover", d: "A written note and a walkthrough, so your team can run it without me." },
+];
+
+const faqs = [
+  {
+    q: "What hours do you work?",
+    a: "I am in the Philippines (UTC+8): the same time as Perth, and two to three hours behind Sydney and Melbourne depending on daylight saving. I work part-time, 4 hours a day, starting at 8 AM in your timezone.",
+  },
+  {
+    q: "How do invoices and payment work?",
+    a: "I invoice fortnightly in AUD (or GBP for UK clients) as an overseas contractor, payable by bank transfer through Wise. Australian clients: I do not charge GST, and I can provide a Statement by a Supplier for your records. UK clients: I am not VAT registered, so no VAT is added; VAT-registered businesses account for it under the reverse charge.",
+  },
+  {
+    q: "Will you sign an NDA or a data processing agreement?",
+    a: "Yes. I already work under NDA for a current client, and I am happy to sign yours before you share anything.",
+  },
+  {
+    q: "Can you give me references?",
+    a: "Not yet. Instead of asking you to take someone's word for it, I show live systems you can use yourself. You can also send me one broken workflow and I will tell you what is wrong with it, free.",
+  },
+  {
+    q: "Can I start with one small job?",
+    a: "Yes. Start with one small job at the normal rate, with no retainer, and decide from there.",
+  },
+  {
+    q: "What happens if you are sick or we stop working together?",
+    a: "Everything I build lives in your account, with written notes, so your team or another specialist can pick it up. I tell you as early as I can if I will be away, and I hand back all access when the work ends.",
+  },
+  {
+    q: "What if something you built stops working?",
+    a: "Tell me and I fix my own work first, then explain exactly what happened and what I changed so it does not repeat.",
+  },
+  {
+    q: "Do you only work in GoHighLevel?",
+    a: "Mostly. Where GoHighLevel stops, I connect it to other tools with webhooks, Zapier, Make or n8n, and I can build custom apps that sync back into the CRM.",
+  },
+];
+
+export default function V4() {
+  return (
+    <div id="v4-root" className={`v4 ${archivo.variable} ${serif.variable}`}>
+      <Reveal />
+
+      <header className="v4-nav">
+        <a className="v4-mark" href="#top">
           John Boy Roxas
         </a>
-        {/* True while he is taking on work; change when he is full. */}
-        <span className="v3-avail">
-          <i className="v3-dot v3-dot-live" /> Available, flexible hours
-        </span>
-        <nav className="v3-links" aria-label="Sections">
-          <a href="#proof">Proof</a>
+        <nav className="v4-links" aria-label="Sections">
           <a href="#work">Work</a>
-          <a href="#experience">Experience</a>
+          <a href="#rates">Rates</a>
+          <a href="#process">How I work</a>
           <a href={CV}>CV</a>
-          <a className="v3-links-cta" href="#contact">
-            Contact
-          </a>
         </nav>
+        <a className="v4-btn v4-btn-dark v4-nav-cta" href={BOOK}>
+          Book a 15-min call
+        </a>
       </header>
 
       <main id="top">
-        {/* ---------- HERO: the AI world ---------- */}
-        <section className="v3-hero" data-v3="hero" data-hud="01|Intro">
-          <div className="v3-glow v3-glow-a" aria-hidden="true" />
-          <div className="v3-glow v3-glow-b" aria-hidden="true" />
-          <div className="v3-grid" aria-hidden="true" />
-          <div className="v3-spot" aria-hidden="true" />
-
-          <div className="v3-name" aria-hidden="true" data-depth="0.15">
-            <span>JOHN</span>
-            <span>BOY</span>
-          </div>
-
-          <div className="v3-stage">
-            {/* Amber glow behind the figure, driven by the twin's voice (--vl). */}
-            <div className="v3-voiceglow" aria-hidden="true" />
-            <div className="v3-portrait" data-depth="0.35">
-              <Image
-                src="/v3/jb-hero.webp"
-                alt="John Boy Roxas"
-                width={2000}
-                height={2000}
-                preload
-                quality={90}
-                sizes="(max-width: 760px) 92vw, 640px"
-              />
-              <PortraitDissolve />
-              {/* The AI half. Hidden until the twin speaks (TwinVoice sets
-                  data-twin on the stage), then it glitches in over the right
-                  side of the face. Pre-masked, so only the cyborg half has
-                  pixels; framing matches jb-hero.webp. */}
-              {/* A plain img on purpose: 33KB, pre-sized, invisible on load,
-                  and it must match the portrait's box exactly. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="v3-cyborg" src="/v3/jb-cyborg.webp" alt="" aria-hidden="true" decoding="async" />
-              <span className="v3-cyborg-eye" aria-hidden="true" />
-              {/* Sweeps the face while the twin diagnoses a question (TwinChat). */}
-              <span className="v3-scan" aria-hidden="true" />
-            </div>
-
-            {/* Data packets between the cards: the idempotency story, live. */}
-            <LiveSystem />
-
-            {/* Floating artifacts. Each is a real pattern from his builds.
-                data-live marks what LiveSystem animates; the markup holds the
-                end state (5 deliveries, 1 payment, Won) for no-JS. */}
-            <div className="v3-art v3-art-payload" data-depth="0.9" data-float="0">
-              <div className="v3-art-head">
-                <i className="v3-dot" /> POST /webhooks/stripe
-              </div>
-              <dl>
-                <dt>event</dt>
-                <dd>invoice.paid</dd>
-                <dt>id</dt>
-                <dd>in_1Q8fK2</dd>
-                <dt>attempt</dt>
-                <dd>
-                  #<b data-live="attempt">5</b>
-                </dd>
-              </dl>
-              <div className="v3-art-foot" data-live="verdict">
-                duplicate, ignored
-              </div>
-            </div>
-
-            <div className="v3-art v3-art-count" data-depth="1.2" data-float="1">
-              <b data-live="events">5</b> <i data-live="evword">events</i> in <span>/</span>{" "}
-              <b className="v3-neon" data-live="paid">
-                1
-              </b>{" "}
-              payment recorded
-            </div>
-
-            <div className="v3-art v3-art-pipe" data-depth="0.7" data-float="2">
-              <div className="v3-art-head">pipeline</div>
-              <ol>
-                <li className="on">New lead</li>
-                <li className="on">Contacted</li>
-                <li className="on">Booked</li>
-                <li className="on" data-live="won">
-                  Won
-                </li>
-              </ol>
-            </div>
-
-            <div className="v3-art v3-art-api" data-depth="1.05" data-float="3">
-              GHL v2 <span>/</span> contact.create <span>/</span> <b className="v3-neon">201</b> <span>/</span>{" "}
-              <b className="v3-ms" data-live="ms">
-                182ms
-              </b>
-            </div>
-
-            <div className="v3-art v3-art-cron" data-depth="0.55" data-float="4">
-              <span>02:00 UTC</span> checkin-reminder <b className="v3-neon">ok</b> 12 sent
-            </div>
-
-            <div className="v3-art v3-art-twin" data-depth="0.8" data-float="5">
-              <div className="v3-art-head">
-                <i className="v3-dot v3-dot-live" /> AI twin
-              </div>
-              <dl>
-                <dt>model</dt>
-                <dd>Claude</dd>
-                <dt>answers</dt>
-                <dd>verified facts</dd>
-                <dt>voice</dt>
-                <dd>ElevenLabs</dd>
-                <dt>fallback</dt>
-                <dd>armed</dd>
-              </dl>
-              <div className="v3-art-foot">voice and chat live</div>
-            </div>
-
-            <TwinVoice />
-          </div>
-
-          {/* Wide screens: the twin stands in the centre, the headline on its
-              left and the details on its right (JB, 2026-10-03). Narrower
-              screens stack them under the portrait. */}
-          <div className="v3-copy v3-copy-l">
-            <p className="v3-eyebrow" data-v3="line">
-              GoHighLevel architect <span>/</span> AI automation <span>/</span> Philippines
-            </p>
-            <h1 className="v3-h1" data-split="intro">
-              <span className="v3-line">
-                GoHighLevel specialist.
-              </span>
-              <span className="v3-line">
-                And the part that <em>leaves</em> GoHighLevel.
-              </span>
+        {/* ---------- HERO ---------- */}
+        <section className="v4-hero">
+          <div className="v4-hero-copy" data-rv>
+            <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
+            <h1>
+              GoHighLevel builds and fixes for <em>Australian and UK</em> agencies and small businesses.
             </h1>
-          </div>
-
-          <div className="v3-copy v3-copy-r">
-            <p className="v3-sub" data-v3="line">
-              Five years and 58 client systems inside GHL: workflows, pipelines, snapshots and sub-accounts. Then
-              the part most people hand to a developer. Webhooks, the v2 API, Stripe, A2P and full Next.js apps,
-              wired back into the CRM.
+            <p className="v4-lede">
+              I&apos;m John Boy. I set up and repair the workflows, funnels, calendars and pipelines your enquiries run
+              through, tested before handover and documented so your team can run them.
             </p>
-            <div className="v3-ctas" data-v3="line">
-              <a className="v3-btn v3-btn-primary" href={MAIL}>
-                Send me one broken workflow
+            <div className="v4-ctas">
+              <a className="v4-btn v4-btn-dark" href={BOOK}>
+                Book a 15-min call
               </a>
-              <a className="v3-btn v3-btn-ghost" href="#wall">
-                See what breaks
+              <a className="v4-btn v4-btn-line" href={FIX_MAIL}>
+                Send me one broken workflow, free
               </a>
             </div>
-            <ul className="v3-stats" data-v3="line">
-              {stats.map((s) => (
-                <li key={s.l}>
-                  <b>{s.v}</b>
-                  {s.l}
+            <ul className="v4-facts" aria-label="At a glance">
+              <li>
+                <b>Available now</b>
+                <span>Part-time, contract or project</span>
+              </li>
+              <li>
+                <b>From AUD 15/hr</b>
+                <span>About £8, or a fixed quote</span>
+              </li>
+              <li>
+                <b>4 hours a day</b>
+                <span>Starting at 8 AM your time</span>
+              </li>
+              <li>
+                <b>5 years building</b>
+                <span>For AU and US clients</span>
+              </li>
+            </ul>
+          </div>
+          <div className="v4-hero-media" data-rv>
+            <IntroVideo />
+          </div>
+        </section>
+
+        {/* ---------- PROOF STRIP ---------- */}
+        <section className="v4-strip" aria-label="Clients and certifications">
+          <div className="v4-in">
+            <p className="v4-strip-h">Worked with</p>
+            <ul className="v4-clients">
+              {clients.map((c) => (
+                <li key={c.name}>
+                  <b>{c.name}</b>
+                  <span>{c.note}</span>
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* "Talk to my AI" opens this; on wide screens it takes the copy column. */}
-          <TwinChat />
-
-          <div className="v3-scrollcue" aria-hidden="true">
-            scroll
-          </div>
-        </section>
-
-        {/* ---------- THE WALL: pinned scroll story ---------- */}
-        <section className="v3-band" aria-label="Tools he wires together">
-          {[0, 1].map((row) => (
-            <div key={row} className="v3-band-row" data-row={row} aria-hidden={row === 1}>
-              <div className="v3-band-track">
-                {[...skills, ...skills].map((k, i) => (
-                  <span key={i} className="v3-band-item">
-                    {k}
-                    <i className="v3-band-dot" />
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </section>
-
-        <section className="v3-wall" id="wall" data-v3="wall" data-hud="02|The wall">
-          <div className="v3-wall-in">
-            <p className="v3-eyebrow">Every GoHighLevel build hits a wall</p>
-            <ol className="v3-walls">
-              {walls.map((w, i) => (
-                <li className="v3-wallrow" key={w.say} data-v3="wallrow">
-                  <span className="v3-wallnum">0{i + 1}</span>
-                  <span className="v3-wallsay">{w.say}</span>
-                  <code className="v3-walltrace">
-                    <span className="v3-caret">&gt;</span> {w.trace}
-                  </code>
-                </li>
-              ))}
-            </ol>
-            <p className="v3-wallclose" data-v3="wallclose">
-              Most builders stop at the wall. <em>I build past it.</em>
-            </p>
-          </div>
-        </section>
-
-        {/* ---------- PROOF LAB: break the walls yourself ---------- */}
-        <section className="v3-section v3-proof" id="proof" data-hud="03|Proof lab">
-          <div className="v3-section-in">
-            <p className="v3-eyebrow" data-v3="reveal">
-              Proof lab <span>/</span> try it yourself
-            </p>
-            <h2 className="v3-h2" data-split="scroll">
-              Don&apos;t take my word for it. <em>Break it.</em>
-            </h2>
-            <p className="v3-section-sub" data-v3="reveal">
-              The four walls above, as small simulations. Press the buttons and watch the difference between a build
-              that looks done and one that survives a bad day.
-            </p>
-            <div data-v3="reveal">
-              <ProofLab />
-            </div>
-          </div>
-        </section>
-
-        {/* ---------- WORK ---------- */}
-        <section className="v3-section v3-work" id="work" data-hud="04|Work">
-          <div className="v3-section-in">
-            <p className="v3-eyebrow" data-v3="reveal">
-              Work <span>/</span> shipped, running
-            </p>
-            <h2 className="v3-h2" data-split="scroll">
-              The flagship, then the <em>funnels.</em>
-            </h2>
-
-            <article className="v3-coach" data-v3="reveal">
-              <div className="v3-coach-copy">
-                <p className="v3-coach-kicker">
-                  <i className="v3-dot v3-dot-live" /> Coach OS <span>/</span> live on sample data
-                </p>
-                <h3 className="v3-h3">A client-management platform, built from zero, wired into GoHighLevel both ways.</h3>
-                <p className="v3-coach-text">
-                  Four lead tools, a passwordless client portal with an AI companion, e-signed agreements, Stripe
-                  subscriptions and an owner dashboard with a health score per client. Not a template or a snapshot: a
-                  running product you can click through before you read another word.
-                </p>
-                <ul className="v3-coach-stats">
-                  {coachStats.map((c) => (
-                    <li key={c.l}>
-                      <b>{c.v}</b>
-                      {c.l}
-                    </li>
-                  ))}
-                </ul>
-                <div className="v3-ctas">
-                  <a className="v3-btn v3-btn-primary" href="https://coachos.johnboydesign.com/tour" data-cursor="Open">
-                    Open the live tour
-                  </a>
-                  <a className="v3-btn v3-btn-ghost" href="/coach-os">
-                    Read the case study
-                  </a>
-                </div>
-              </div>
-              <div className="v3-coach-shots">
-                {coachShots.map((c, i) => (
-                  <figure key={c.img} className="v3-coach-shot" data-i={i} data-clip>
-                    <Image src={c.img} alt={c.cap} width={1440} height={760} sizes="(max-width: 760px) 92vw, 560px" />
-                    <figcaption>{c.cap}</figcaption>
-                  </figure>
-                ))}
-              </div>
-            </article>
-
-            <div className="v3-hwrap">
-            <ul className="v3-works">
-              {works.map((w) => (
-                <li key={w.img} className="v3-workcard" data-cursor="Look">
-                  <div className="v3-workframe">
-                    <Image src={w.img} alt={`${w.name}, ${w.kind}`} width={900} height={2000} sizes="(max-width: 760px) 92vw, 380px" />
-                  </div>
-                  <div className="v3-workcap">
-                    <b>{w.name}</b>
-                    <span>{w.kind}</span>
-                  </div>
-                  <p className="v3-worktags">
-                    {w.tags.map((t) => (
-                      <i key={t}>{t}</i>
-                    ))}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* ---------- EXPERIENCE: what a recruiter checks ---------- */}
-        <section className="v3-section v3-exp" id="experience" data-hud="05|Experience">
-          <div className="v3-section-in">
-            <p className="v3-eyebrow" data-v3="reveal">
-              Experience <span>/</span> five years, remote
-            </p>
-            <h2 className="v3-h2" data-split="scroll">
-              Where the 58 systems <em>came from.</em>
-            </h2>
-            <div className="v3-exp-grid">
-              <ol className="v3-exp-list" data-v3="reveal">
-                {experience.map((e) => (
-                  <li key={e.who + e.when} className="v3-exp-row">
-                    <p className="v3-exp-when">
-                      {e.when}
-                      <span>{e.where}</span>
-                    </p>
-                    <div className="v3-exp-main">
-                      <p className="v3-exp-role">
-                        {e.role} <span>/</span> <b>{e.who}</b>
-                      </p>
-                      <p className="v3-exp-did">{e.did}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-              <aside className="v3-exp-card" data-v3="reveal">
-                <p className="v3-exp-card-h">
-                  <i className="v3-dot v3-dot-live" /> Working with me
-                </p>
-                <dl>
-                  {workingFacts.map((f) => (
-                    <div key={f.k}>
-                      <dt>{f.k}</dt>
-                      <dd>{f.v}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <div className="v3-exp-card-ctas">
-                  <a className="v3-btn v3-btn-primary" href={CV} data-cursor="Open">
-                    Download the CV
-                  </a>
-                  <a className="v3-btn v3-btn-ghost" href={LINKEDIN} target="_blank" rel="noopener noreferrer">
-                    LinkedIn
-                  </a>
-                </div>
-              </aside>
-            </div>
-          </div>
-        </section>
-
-        {/* ---------- CERTIFIED ---------- */}
-        <section className="v3-section v3-certs" data-hud="06|Certified">
-          <div className="v3-section-in">
-            <p className="v3-eyebrow" data-v3="reveal">
-              Certified by HighLevel
-            </p>
-            <ul className="v3-badges" data-v3="reveal">
+            <ul className="v4-badges" aria-label="HighLevel certifications">
               {badges.map((b) => (
                 <li key={b.name}>
-                  <Image src={b.img} alt="" width={160} height={160} />
+                  <Image src={b.img} alt="" width={64} height={64} />
                   <span>{b.name}</span>
                 </li>
               ))}
@@ -593,55 +219,350 @@ export default function V3() {
           </div>
         </section>
 
-        {/* ---------- THE OFFER ---------- */}
-        <section className="v3-section v3-offer" id="contact" data-hud="07|Contact">
-          <div className="v3-section-in">
-            <h2 className="v3-offer-h" data-split="scrub">
-              Send me one <em>broken</em> workflow.
-            </h2>
-            <p className="v3-offer-text" data-v3="reveal">
-              Before you hire anyone, me included: send one automation that is not firing or one funnel that is not
-              converting. I will tell you exactly what is wrong with it, free. That is a better interview than any
-              resume.
+        {/* ---------- TWO DOORS ---------- */}
+        <section className="v4-sec" id="who">
+          <div className="v4-in">
+            <p className="v4-kicker" data-rv>
+              Who I help
             </p>
-            <div className="v3-ctas v3-offer-ctas" data-v3="reveal">
-              <a className="v3-btn v3-btn-primary" href={MAIL}>
-                Email the workflow
-              </a>
-              <a className="v3-btn v3-btn-ghost" href="/book">
-                Book a call
-              </a>
+            <h2 data-rv>Two kinds of clients, one standard of work.</h2>
+            <div className="v4-doors">
+              <article className="v4-door" data-rv>
+                <h3>For agencies</h3>
+                <p className="v4-door-lede">An extra pair of hands inside your GoHighLevel, white-label.</p>
+                <ul>
+                  <li>Client sub-accounts built from your snapshot and your standards</li>
+                  <li>Workflow builds, fixes and clean-ups when your team is full</li>
+                  <li>Your tools and your process: Slack, ClickUp, Asana, time tracking</li>
+                  <li>Loom updates and handover notes your clients never see me in</li>
+                </ul>
+                <p className="v4-door-price">From AUD 15/hr, or a monthly block of hours.</p>
+              </article>
+              <article className="v4-door" data-rv>
+                <h3>For business owners</h3>
+                <p className="v4-door-lede">Clinics, coaches, trades and real estate: every enquiry captured and followed up.</p>
+                <ul>
+                  <li>Website and form enquiries that land in your CRM, not an inbox</li>
+                  <li>Online booking with confirmations and reminders</li>
+                  <li>Follow-up emails that stop the moment someone books</li>
+                  <li>A pipeline that shows where every lead is, at a glance</li>
+                </ul>
+                <p className="v4-door-price">A fixed quote after a free 15-minute call.</p>
+              </article>
             </div>
-            <div className="v3-hire" data-v3="reveal">
-              <p className="v3-hire-h">Hiring for a role instead?</p>
-              <p className="v3-hire-text">
-                Part-time, contract or a full build: email is the fastest way to reach me, and the CV has the detail.
+          </div>
+        </section>
+
+        {/* ---------- WORK ---------- */}
+        <section className="v4-sec v4-work" id="work">
+          <div className="v4-in">
+            <p className="v4-kicker" data-rv>
+              Selected work
+            </p>
+            <h2 data-rv>What I built, and why it was built that way.</h2>
+
+            <article className="v4-case" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">My own demo · Fictional data · Try it live</p>
+                <h3>Tapline, a repairs desk you can use right now</h3>
+                <p>
+                  <b>What it is.</b>{" "}A working repairs desk for property managers and letting agents: tenant reports, AI triage a person confirms, after-hours dispatch, owner approvals and contractors.
+                </p>
+                <p>
+                  <b>Try it.</b>{" "}<a href="/demo/tapline?tour=manager">Take the guided tour</a> or <a href="/projects/tapline">read how it works</a>. Nothing to sign up for.
+                </p>
+              </div>
+              <ol className="v4-flow" aria-label="How a repair moves through Tapline">
+                {["A tenant reports a repair", "AI suggests the trade and urgency", "The manager confirms and replies", "The owner approves the cost", "The contractor gets the job"].map((s, i) => (
+                  <li key={s}>
+                    <span>{String(i + 1).padStart(2, "0")}</span>
+                    {s}
+                  </li>
+                ))}
+              </ol>
+            </article>
+
+            <article className="v4-case" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">My own sales funnel · GoHighLevel</p>
+                <h3>A lead funnel that knows the prospect before the call</h3>
+                <p>
+                  <b>The problem.</b> Prospects arrived from messages and forms, their answers sat in another tool, and
+                  people who had already booked kept receiving marketing emails.
+                </p>
+                <p>
+                  <b>What I built.</b> Four connected workflows instead of one giant one, so each part can change
+                  without breaking the others. Re-entry is switched off so nobody gets the same series twice.
+                </p>
+                <p>
+                  <b>The result.</b>{" "}Every prospect&apos;s answers are on their contact before we speak, and nobody who
+                  has booked gets another sales email. Tested end to end with real submissions.
+                </p>
+              </div>
+              <ol className="v4-flow" aria-label="How the workflows connect">
+                {funnelSteps.map((s, i) => (
+                  <li key={s}>
+                    <span>{String(i + 1).padStart(2, "0")}</span>
+                    {s}
+                  </li>
+                ))}
+              </ol>
+            </article>
+
+            <article className="v4-case" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">Chaos to Closing · US coaching business · 2026</p>
+                <h3>A whole coaching business, built inside GoHighLevel</h3>
+                <p>
+                  <b>The brief.</b> Move the business into one system: website, sales page, an AI-assisted funnel, and
+                  lead capture from social media.
+                </p>
+                <p>
+                  <b>What I built.</b> The site and funnels in GoHighLevel, social lead capture with ManyChat, and the
+                  nurture sequences behind them.
+                </p>
+              </div>
+              <div className="v4-shots v4-shots-3">
+                {[
+                  { img: "/work/chaos-to-closing.jpg", alt: "Chaos to Closing website" },
+                  { img: "/work/chaos-sales-page.jpg", alt: "Chaos to Closing sales page" },
+                  { img: "/work/chaos-ai-funnel.jpg", alt: "Chaos to Closing AI funnel" },
+                ].map((s) => (
+                  <div className="v4-shot" key={s.img}>
+                    <Image src={s.img} alt={s.alt} width={900} height={2000} sizes="(max-width: 900px) 30vw, 220px" />
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="v4-case" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">K Australia Design · Australian agency · Sep 2024 to Oct 2025</p>
+                <h3>Lead GoHighLevel automation for an agency&apos;s client accounts</h3>
+                <p>
+                  <b>The role.</b>{" "}I built the agency&apos;s GoHighLevel base so new client accounts could be set up
+                  from a tested starting point instead of from scratch.
+                </p>
+                <p>
+                  <b>What I built.</b> Multi-channel nurture across SMS, email and voicemail drop, A2P 10DLC
+                  registration (the sign-up US carriers require before a business can text customers), and booking triggers that turned enquiries into confirmed
+                  appointments.
+                </p>
+              </div>
+              <ul className="v4-case-points">
+                <li>Snapshot-based setup for new sub-accounts</li>
+                <li>Nurture across three channels</li>
+                <li>A2P 10DLC handled for deliverability</li>
+                <li>Enquiry to booked appointment, automatically</li>
+              </ul>
+            </article>
+
+            <article className="v4-case v4-case-coach" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">Coach OS · my own product · runs on demo data</p>
+                <h3>When GoHighLevel is not enough, I build the app around it</h3>
+                <p>
+                  A client platform for one-to-one coaches, built from zero and connected to GoHighLevel both ways: a
+                  client portal with an AI companion, e-signed agreements, Stripe subscriptions and an owner dashboard.
+                  It runs on a sample practice you can click through.
+                </p>
+                <div className="v4-ctas">
+                  <a className="v4-btn v4-btn-line" href="https://coachos.johnboydesign.com/tour">
+                    Open the live tour
+                  </a>
+                  <a className="v4-link" href="/coach-os">
+                    Read the case study
+                  </a>
+                </div>
+              </div>
+              <div className="v4-shots v4-shots-2">
+                {[
+                  { img: "/coach-os-shots/app-portal.jpg", alt: "Coach OS client portal" },
+                  { img: "/coach-os-shots/app-dash-kanban.jpg", alt: "Coach OS owner pipeline" },
+                ].map((s) => (
+                  <div className="v4-shot v4-shot-wide" key={s.img}>
+                    <Image src={s.img} alt={s.alt} width={1440} height={760} sizes="(max-width: 900px) 90vw, 420px" />
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <h3 className="v4-more-h" data-rv>
+              More sites and funnels
+            </h3>
+            <ul className="v4-more" data-rv>
+              {moreWork.map((w) => (
+                <li key={w.img}>
+                  <div className="v4-more-frame">
+                    <Image src={w.img} alt={`${w.name}, ${w.kind}`} width={900} height={2000} sizes="(max-width: 700px) 45vw, 260px" />
+                  </div>
+                  <b>{w.name}</b>
+                  <span>{w.kind}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ---------- TESTIMONIALS (real ones only) ---------- */}
+        {testimonials.length > 0 && (
+          <section className="v4-sec">
+            <div className="v4-in">
+              <p className="v4-kicker" data-rv>
+                What clients say
               </p>
-              <a className="v3-hire-mail" href={HIRE_MAIL}>
-                {EMAIL}
-              </a>
+              <ul className="v4-quotes">
+                {testimonials.map((t) => (
+                  <li key={t.name} data-rv>
+                    <blockquote>{t.quote}</blockquote>
+                    <p>
+                      <b>{t.name}</b> · {t.role} · {t.country}
+                    </p>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="v3-offer-links" data-v3="reveal">
-              <a href={CV}>CV (PDF)</a>
-              <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">
-                LinkedIn
-              </a>
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">
-                WhatsApp
-              </a>
-              <a href={OLJ} target="_blank" rel="noopener noreferrer">
-                OnlineJobs.ph
-              </a>
-              <a href="/coach-os">Coach OS case study</a>
+          </section>
+        )}
+
+        {/* ---------- CAPABILITIES ---------- */}
+        <section className="v4-sec v4-cap">
+          <div className="v4-in v4-cap-in">
+            <div data-rv>
+              <p className="v4-kicker">What I can take off your plate</p>
+              <h2>Inside GoHighLevel, and where it connects to everything else.</h2>
+            </div>
+            <ul className="v4-cap-list" data-rv>
+              {capabilities.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ---------- RATES ---------- */}
+        <section className="v4-sec v4-rates" id="rates">
+          <div className="v4-in">
+            <p className="v4-kicker" data-rv>
+              Rates and ways to work
+            </p>
+            <h2 data-rv>Simple pricing, agreed before I start.</h2>
+            <div className="v4-plans">
+              <article className="v4-plan" data-rv>
+                <h3>Hourly</h3>
+                <p className="v4-plan-price">
+                  AUD 15<small>/hr · about £8</small>
+                </p>
+                <p>For agencies and ongoing support. Time tracked in your tool or mine, invoiced fortnightly.</p>
+              </article>
+              <article className="v4-plan" data-rv>
+                <h3>Monthly hours</h3>
+                <p className="v4-plan-price">
+                  AUD 15<small>/hr · about £8</small>
+                </p>
+                <p>A set block of hours each month, so your work has a reserved place in my week.</p>
+              </article>
+              <article className="v4-plan" data-rv>
+                <h3>Fixed-scope project</h3>
+                <p className="v4-plan-price">
+                  Fixed <small>quote</small>
+                </p>
+                <p>For a defined build, such as booking and reminders or a migration. Quoted after a free 15-minute call.</p>
+              </article>
+            </div>
+            <p className="v4-free" data-rv>
+              Not ready to commit? <a href={FIX_MAIL}>Send me one broken workflow</a> and I will tell you exactly what is
+              wrong with it, free.
             </p>
           </div>
         </section>
 
-        <footer className="v3-foot">
-          <span>&copy; 2026 John Boy Roxas &middot; Tarlac, Philippines</span>
-          <LocalTime />
-        </footer>
+        {/* ---------- PROCESS ---------- */}
+        <section className="v4-sec" id="process">
+          <div className="v4-in">
+            <p className="v4-kicker" data-rv>
+              How I work
+            </p>
+            <h2 data-rv>Five steps, no surprises.</h2>
+            <ol className="v4-steps">
+              {steps.map((s, i) => (
+                <li key={s.t} data-rv>
+                  <span className="v4-step-n">{i + 1}</span>
+                  <h3>{s.t}</h3>
+                  <p>{s.d}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ---------- DATA ---------- */}
+        <section className="v4-sec v4-data">
+          <div className="v4-in v4-data-in" data-rv>
+            <div>
+              <p className="v4-kicker">Your data</p>
+              <h2>Handled the way your clients would expect.</h2>
+            </div>
+            <ul>
+              <li>My own login on your platforms, with only the access the job needs</li>
+              <li>No shared passwords, and two-factor sign-in where the platform offers it</li>
+              <li>Test contacts for testing, never your real customers</li>
+              <li>NDA or data processing agreement signed before you share anything</li>
+              <li>Access removed and handed back when the work ends</li>
+              <li>For clinics: patient health information stays in your practice software, not the CRM, in line with the Australian Privacy Principles</li>
+              <li>For UK clients: a UK GDPR data processing agreement on request</li>
+            </ul>
+          </div>
+        </section>
+
+        {/* ---------- FAQ ---------- */}
+        <section className="v4-sec" id="faq">
+          <div className="v4-in v4-faq-in">
+            <div data-rv>
+              <p className="v4-kicker">Questions</p>
+              <h2>The things people ask before hiring me.</h2>
+            </div>
+            <div className="v4-faq" data-rv>
+              {faqs.map((f) => (
+                <details key={f.q}>
+                  <summary>{f.q}</summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- CONTACT ---------- */}
+        <section className="v4-sec v4-contact" id="contact">
+          <div className="v4-in" data-rv>
+            <h2>Tell me what you need built or fixed.</h2>
+            <p className="v4-lede">
+              A 15-minute call is the fastest way to find out whether I am the right fit. I reply to every email within
+              one business day.
+            </p>
+            <div className="v4-ctas">
+              <a className="v4-btn v4-btn-light" href={BOOK}>
+                Book a 15-min call
+              </a>
+              <a className="v4-btn v4-btn-ghost" href={MAIL}>
+                {EMAIL}
+              </a>
+            </div>
+            <p className="v4-contact-links">
+              <a href={WHATSAPP}>WhatsApp</a>
+              <a href={LINKEDIN}>LinkedIn</a>
+              <a href={CV}>CV (PDF)</a>
+              <a href="/coach-os">Coach OS case study</a>
+            </p>
+          </div>
+        </section>
       </main>
+
+      <footer className="v4-foot">
+        <span>&copy; 2026 John Boy Roxas · Paniqui, Tarlac, Philippines</span>
+        <span>HighLevel certified · For Australian and UK businesses</span>
+      </footer>
     </div>
   );
 }

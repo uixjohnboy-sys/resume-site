@@ -117,7 +117,7 @@ export default function TaplineProject() {
   return (
     <main className="pj">
       <nav className="pj-nav">
-        <Link href="/v5">John Boy Roxas</Link>
+        <Link href="/">John Boy Roxas</Link>
       </nav>
 
       <header className="pj-hero">
