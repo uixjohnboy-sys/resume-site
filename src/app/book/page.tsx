@@ -34,7 +34,7 @@ export default function BookPage() {
             John Boy Roxas
           </Link>
           <h1>Book a call</h1>
-          <p>A free 15-minute call. Pick a time below and tell me a little about what you need.</p>
+          <p>A free 15-minute call. Tell me a little about what you need, then pick a time.</p>
         </header>
 
         <div className="r-cal">
