@@ -847,168 +847,120 @@
   scroll-margin-top: 88px;
 }
 
-/* ---------- The paper ---------- */
-:root:has(.v4) {
-  scroll-padding-bottom: 96px;
-}
-:root:has(.v4) body,
-.v4 {
-  background-color: #f7f6f2;
+/* ---------- The page is one sheet of paper ----------
+   Nothing has its own background: type is ink, images are printed, and rules are pencil-thin, so the creases run
+   under everything and scroll with it. */
+:root:has(.v4) body {
+  background-color: #f8f7f2;
   background-image: url("/paper.webp");
   background-size: 1200px 1200px;
 }
-html.pr-intro,
-html.pr-intro body {
-  overflow: hidden;
-}
-.pr-cover {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  background-color: #f7f6f2;
-  background-image: inherit;
-  will-change: transform;
-}
-html.pr-intro .pr-cover {
-  display: block;
-}
-.pr-roll {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 81;
-  width: 100%;
-  height: 148px;
-  transform: translate3d(0, 100vh, 0);
-  transform-origin: top;
-  pointer-events: none;
-  will-change: transform;
-  background: linear-gradient(180deg, #cfccc2 0%, #ecEAe3 10%, #fbfaf6 26%, #ffffff 36%, #f6f4ee 52%, #e2dfd6 72%, #c2bfb4 88%, #98958a 100%);
-  box-shadow: 0 -22px 40px -14px rgba(10, 10, 10, 0.22);
-}
-html.pr-intro .pr-roll {
-  opacity: 0;
-  z-index: 82;
-}
-.pr-turn {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.pr-lines {
-  position: absolute;
-  inset: -22px 0 0;
-  background: repeating-linear-gradient(180deg, transparent 0 8px, rgba(10, 10, 10, 0.022) 15px, transparent 22px);
-  will-change: transform;
-}
-.pr-label {
-  display: none;
-  position: absolute;
-  inset: 0;
-  place-content: center;
-  text-align: center;
-  color: #0a0a0a;
-  font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
-}
-html.pr-intro .pr-label {
-  display: grid;
-}
-.pr-label b {
-  font-size: clamp(26px, 5vw, 44px);
-  line-height: 1.05;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-.pr-label span {
-  margin-top: 8px;
-  font-size: clamp(12px, 1.7vw, 15px);
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #404040;
-}
-.pr-cap {
-  display: none;
-  position: absolute;
-  top: 0;
-  width: 48px;
-  height: 100%;
-  border-radius: 50%;
-  background:
-    radial-gradient(ellipse at center, #7d7a70 0 7%, #a9a69b 8%, transparent 10%),
-    repeating-radial-gradient(ellipse at center, #fbfaf6 0 5.5%, #d2cfc5 6% 7%);
-  box-shadow: inset 2px 0 5px rgba(10, 10, 10, 0.16);
-}
-html.pr-intro .pr-cap {
-  display: block;
-}
-.pr-floor {
-  display: none;
-  position: fixed;
-  left: 8%;
-  right: 8%;
-  z-index: 81;
-  height: 52px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(10, 10, 10, 0.26), rgba(10, 10, 10, 0.09) 52%, transparent 72%);
-  pointer-events: none;
-}
-html.pr-intro .pr-floor {
-  display: block;
-}
-/* The bottom edge of the sheet, seen once the roll has run out. */
-.pr-end {
-  height: 72px;
-  background: #e4e1d8;
-  box-shadow: inset 0 14px 18px -12px rgba(10, 10, 10, 0.35);
-}
-@media (prefers-reduced-motion: reduce) {
-  .pr-roll,
-  .pr-cover {
-    display: none !important;
-  }
-}
-@media print {
-  .pr {
-    display: none;
-  }
-}
-
-/* Sections sit on the sheet, so the creases run under everything except the black panels. */
 .v4 {
-  --paper: transparent;
-  --paper-2: rgba(70, 64, 50, 0.04);
-  --card: rgba(255, 255, 255, 0.62);
+  background: none;
+  --ink: #17160f;
+  --ink-2: #39372d;
+  --line: rgba(45, 40, 28, 0.2);
 }
-.v4-nav {
-  background: rgba(250, 249, 245, 0.86);
+.v4 *:not(img):not(svg):not(path) {
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
-.pr-cover {
-  background-image: url("/paper.webp");
-  background-size: 1200px 1200px;
-}
-.pr-roll {
-  background-image: linear-gradient(180deg, #d6d3ca 0%, #f1efe9 10%, #ffffff 26%, #ffffff 40%, #fbfaf6 56%, #ebe9e1 74%, #cfccc2 90%, #a5a297 100%), url("/paper.webp");
-  background-size: 100% 100%, 900px 900px;
-  background-blend-mode: multiply;
-}
-/* The loose end of the sheet, lying along the closed roll. */
-.pr-flap {
-  display: none;
-  position: absolute;
-  left: -2%;
-  right: -2%;
-  top: 83%;
-  height: 16px;
-  transform: rotate(-0.25deg);
-  background: linear-gradient(180deg, rgba(40, 36, 28, 0.2) 0, rgba(255, 255, 255, 0.35) 2px, rgba(40, 36, 28, 0.08) 10px, transparent 16px);
-}
-html.pr-intro .pr-flap {
-  display: block;
-}
-.pr-cap {
-  background: url("/roll-cap.png") center / 100% 100% no-repeat;
-  border-radius: 0;
+/* Printed, not placed: white in an image becomes the paper, and the creases show through. */
+.v4 img {
+  mix-blend-mode: multiply;
+  filter: grayscale(0.12) contrast(0.97);
   box-shadow: none;
+}
+.v4 :is(p, li, span, b, a, h1, h2, h3, summary, dd, dt, small) {
+  text-shadow: 0 0 0.5px rgba(23, 22, 15, 0.28);
+}
+/* Text and images follow the sheet: components/v4/PrintOnPaper.tsx moves each word and redraws each image along the
+   creases. Here the whole page multiplies onto the paper, and its ink thins on the same crease lines. */
+.v4 {
+  mix-blend-mode: multiply;
+  -webkit-mask: url("/paper-wear.webp") 0 0 / 1200px 1200px;
+  mask: url("/paper-wear.webp") 0 0 / 1200px 1200px;
+}
+.v4 img {
+  mix-blend-mode: normal;
+}
+.v4-w {
+  display: inline-block;
+  text-decoration: inherit;
+}
+/* The sheet has no bars or boxes. */
+.v4-nav {
+  position: static;
+  border-bottom: 1px solid var(--line);
+}
+.v4 :is(.v4-case, .v4-plan, .v4-door, .v4-shot, .v4-more-frame, .v4-photo, .v4-facts, .v4-strip) {
+  border-color: transparent;
+  border-radius: 0;
+}
+.v4 :is(.v4-door, .v4-plan, .v4-flow li, .v4-quotes li, .v4-steps li) {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+.v4 .v4-case {
+  padding: 40px 0 0;
+  border-top: 1px solid var(--line);
+}
+.v4 .v4-case-copy b,
+.v4 h1,
+.v4 h2,
+.v4 h3 {
+  color: var(--ink);
+}
+.v4-photo figcaption {
+  position: static;
+  padding: 10px 0 0;
+}
+.v4-photo figcaption,
+.v4-photo figcaption * {
+  color: var(--ink) !important;
+}
+.v4 .v4-facts {
+  gap: 0;
+}
+.v4 .v4-facts li {
+  border-top: 1px solid var(--line);
+  padding-left: 0;
+}
+/* The closing section is ink on paper too. */
+.v4 :is(.v4-contact, .v4-contact *, .v4-foot, .v4-foot *, footer, footer *) {
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+/* Buttons are drawn on, not stuck on. */
+.v4 .v4-btn,
+.v4 .v4-nav-cta {
+  color: var(--ink) !important;
+  border: 1.5px solid var(--ink) !important;
+}
+.v4 .v4-btn-dark,
+.v4 .v4-nav-cta {
+  border-width: 2.5px !important;
+  font-weight: 700;
+}
+.v4 .v4-btn:hover,
+.v4 .v4-nav-cta:hover {
+  background: rgba(23, 22, 15, 0.07) !important;
+}
+.v4 .v4-contact a:focus-visible,
+.v4 .v4-contact .v4-btn:focus-visible {
+  outline-color: var(--ink);
+}
+/* A sheet darkens a little toward its edges. */
+.v4::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: transparent !important;
+  box-shadow: inset 0 0 130px rgba(70, 60, 40, 0.06);
 }

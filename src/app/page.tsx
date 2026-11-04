@@ -3,7 +3,7 @@ import Image from "next/image";
 import { archivo, serif } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
 import IntroVideo from "@/components/v4/IntroVideo";
-import PaperRoll, { paperRollBoot } from "@/components/v4/PaperRoll";
+import PrintOnPaper from "@/components/v4/PrintOnPaper";
 import "./v4/v4.css";
 
 // The homepage since 2026-11-04 (head to head: 74.0 against 68.0 for the resume page at /v5, which stays as the CV
@@ -137,8 +137,6 @@ export default function V4() {
   return (
     <div id="v4-root" className={`v4 ${archivo.variable} ${serif.variable}`}>
       <link rel="preload" as="image" href="/paper.webp" />
-      <script dangerouslySetInnerHTML={{ __html: paperRollBoot }} />
-      <PaperRoll />
       <Reveal />
 
       <header className="v4-nav">
@@ -590,7 +588,7 @@ export default function V4() {
         <span>&copy; 2026 John Boy Roxas · Paniqui, Tarlac, Philippines</span>
         <span>HighLevel certified · For Australian and UK businesses</span>
       </footer>
-      <div className="pr-end" aria-hidden="true" />
+      <PrintOnPaper />
     </div>
   );
 }
