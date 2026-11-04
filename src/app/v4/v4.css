@@ -915,6 +915,14 @@
 .v4 h3 {
   color: var(--ink);
 }
+.v4 .v4-photo {
+  overflow: visible;
+  aspect-ratio: auto;
+}
+.v4 .v4-photo img {
+  height: auto;
+  aspect-ratio: 4 / 5;
+}
 .v4-photo figcaption {
   position: static;
   padding: 10px 0 0;
