@@ -402,7 +402,7 @@ html:has(.v4) {
 .v4-marquee {
   display: flex;
   width: max-content;
-  animation: v4-slide 46s linear infinite;
+  animation: v4-slide 70s linear infinite;
 }
 .v4-marquee:hover {
   animation-play-state: paused;
@@ -637,7 +637,7 @@ html:has(.v4) {
 }
 .v4-more {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin: 0;
   padding: 0;
@@ -948,9 +948,6 @@ html:has(.v4) {
     padding: 22px 22px 0 0;
     border-left: 0;
     border-top: 1px solid var(--line);
-  }
-  .v4-more {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .v4-foot-cols {
     grid-template-columns: repeat(2, minmax(0, 1fr));

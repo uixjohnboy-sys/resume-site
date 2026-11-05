@@ -42,12 +42,12 @@ const BOOK = "/book";
 const DEMO = "/demo/tapline?tour=manager";
 
 const clients = [
-  { name: "K Australia Design", note: "Australian agency" },
-  { name: "Confidential client (NDA)", note: "Remote" },
-  { name: "Chaos to Closing", note: "US coaching business" },
-  { name: "Wrldinvsn", note: "Lead flow project" },
+  { name: "K Australia Design", note: "Lead GHL Automation Architect · Sep 2024 to Sep 2025" },
+  { name: "Confidential client (NDA)", note: "GoHighLevel Specialist · Apr 2026 to present" },
+  { name: "Chaos to Closing", note: "GoHighLevel Systems Builder · Ended Mar 2026" },
+  { name: "Wrldinvsn", note: "Lead Flow and Funnel Operations · Dec 2025 to Feb 2026" },
   { name: "Masterpiece Las Vegas", note: "US, through Virtualasting" },
-  { name: "Virtualasting", note: "Full-time, 2021 to 2024" },
+  { name: "Virtualasting", note: "Automation and CRM Support · Feb 2021 to Jul 2024" },
 ];
 
 const badges = [
@@ -73,7 +73,6 @@ const funnelSteps = [
 const samples = [
   { img: "/work/dental-clinic.jpg", name: "Dental clinic", kind: "Website sample" },
   { img: "/work/mindset-coaching.jpg", name: "Mindset coaching", kind: "Funnel sample" },
-  { img: "/work/digital-products.jpg", name: "Digital products", kind: "Storefront sample" },
   { img: "/work/words-like-alice.jpg", name: "Author website", kind: "Website sample" },
   { img: "/work/landscaping.jpg", name: "Landscaping", kind: "Website sample" },
 ];
@@ -144,6 +143,7 @@ export default function V4() {
             <div className="v4-hero-copy" data-rv>
               <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
               <h1>GoHighLevel, built right.</h1>
+              <p className="v4-lede">Workflows, funnels and booking for agencies and small businesses.</p>
               <div className="v4-ctas">
                 <a className="v4-btn v4-btn-dark" href={DEMO}>
                   Try a live build
@@ -279,7 +279,7 @@ export default function V4() {
                 <ul>
                   <li>Sub-accounts from your snapshot</li>
                   <li>Workflow builds and fixes</li>
-                  <li>Your tools. Your clients never see me.</li>
+                  <li>Slack, ClickUp, Asana. Your clients never see me.</li>
                 </ul>
                 <p className="v4-door-price">From AUD 15/hr.</p>
               </article>
@@ -432,7 +432,7 @@ export default function V4() {
                 <p className="v4-plan-price">
                   AUD 15<small>/hr · about £8</small>
                 </p>
-                <p>A reserved block of hours each month.</p>
+                <p>Same rate. A block of hours held for you each month.</p>
               </article>
               <article className="v4-plan" data-rv>
                 <h3>Fixed project</h3>
