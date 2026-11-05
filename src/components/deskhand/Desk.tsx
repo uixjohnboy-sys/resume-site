@@ -330,10 +330,8 @@ const hhmm = (m: number) => {
 
 function Calendar({ visits }: { visits: Visit[] }) {
   const inNext = visits.some((v) => v.isNew && NEXT_WEEK.includes(v.day));
-  const [week, setWeek] = useState<"this" | "next">(inNext ? "next" : "this");
-  useEffect(() => {
-    if (inNext) setWeek("next");
-  }, [inNext]);
+  const [chosen, setWeek] = useState<"this" | "next" | null>(null);
+  const week = chosen ?? (inNext ? "next" : "this");
   const days = week === "this" ? THIS_WEEK : NEXT_WEEK;
   return (
     <div className="dh-cal">
