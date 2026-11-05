@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { anton, host, plex } from "../fonts";
 import "../v4/v4.css";
 import "./sample-plan.css";
@@ -60,10 +61,10 @@ export default function SamplePlan() {
       <p className="v4-bar">Sample only. The business below is made up. This is not client work.</p>
       <header className="v4-nav">
         <div className="v4-nav-in">
-          <a className="v4-mark" href="/">
+          <Link className="v4-mark" href="/">
             <b>John Boy Roxas</b>
             <span>Systems and automation</span>
-          </a>
+          </Link>
           <a className="v4-btn v4-btn-dark v4-nav-cta" href={BRIEF_MAIL}>
             Send me your brief
           </a>
@@ -139,9 +140,9 @@ export default function SamplePlan() {
               <a className="v4-btn v4-btn-dark" href={BRIEF_MAIL}>
                 Send me your brief
               </a>
-              <a className="v4-btn v4-btn-line" href="/">
+              <Link className="v4-btn v4-btn-line" href="/">
                 Back to the portfolio
-              </a>
+              </Link>
             </div>
           </section>
         </div>
