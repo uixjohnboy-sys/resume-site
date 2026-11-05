@@ -84,7 +84,7 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
     c.suburb = known ?? "other";
     changed.suburb = c.suburb;
   }
-  if (typeof input.phone === "string" && input.phone.trim()) {
+  if (typeof input.phone === "string" && input.phone.trim() && !(c.phone && digits(c.phone) === digits(input.phone))) {
     const wanted = digits(input.phone);
     const inText = sb.conv.messages.filter((m) => m.from === "customer").some((m) => digits(m.text).includes(wanted) || m.text.includes(input.phone as string));
     if (!inText) return refuse(sb, ctx, "save_contact", "NOT_SAID", "Phone not saved: the customer has not said it", "Ask the customer for their mobile number.");
