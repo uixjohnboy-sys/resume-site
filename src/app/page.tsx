@@ -6,12 +6,12 @@ import IntroVideo from "@/components/v4/IntroVideo";
 import "./v4/v4.css";
 
 // White poster look since 2026-11-05, on JB's reference (xgensgrowth.com): its layout ideas, with his own words and proof.
+// Copy rule from JB, same day: short, straight to the point, confident. One line where a paragraph used to be.
 // The homepage since 2026-11-04 (head to head: 74.0 against 68.0 for the resume page at /v5, which stays as the CV
 // link). Built as "v4" on 2026-10-31 from two research passes
 // (C:\CoachOS-ClientHunt\job-hunt\PORTFOLIO-REBUILD-STRATEGY.md): AU/UK
 // agency owners and business owners want, in 30 seconds, who he helps, real
-// proof, a real face, a rate, hours and an easy next step. Understated,
-// light, factual, Australian spelling. No AI look, no hype, no scare tactics.
+// proof, a real face, a rate, hours and an easy next step. Australian spelling.
 //
 // Rules: no confidential client is named or described (the NDA client appears
 // only as "Confidential client (NDA)", no country or industry); capabilities learned on NDA
@@ -39,6 +39,7 @@ const WHATSAPP = "https://wa.me/639773659548?text=" + encodeURIComponent("Hi Joh
 const LINKEDIN = "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist";
 const CV = "/John-Boy-Roxas-Resume.pdf";
 const BOOK = "/book";
+const DEMO = "/demo/tapline?tour=manager";
 
 const clients = [
   { name: "K Australia Design", note: "Australian agency" },
@@ -61,11 +62,11 @@ const testimonials: { quote: string; name: string; role: string; country: string
 
 const funnelSteps = [
   "Form posts to an Inbound Webhook",
-  "Contact created, 9 answers saved to custom fields",
+  "Contact created, 9 answers saved",
   "Branch on lead source",
-  "Personal result email, or a 48-email nurture",
-  "Booking confirmed, reminders 24 h and 1 h before",
-  "Removed from marketing the moment they book",
+  "Personal result email or 48-email nurture",
+  "Booking confirmed, two reminders",
+  "Off marketing the moment they book",
 ];
 
 // His own practice designs, labelled as samples. They are not client work.
@@ -78,59 +79,35 @@ const samples = [
 ];
 
 const capabilities = [
-  "Sub-accounts and snapshots, set up so new clients start from a tested base",
-  "Workflows, triggers, waits and branches that do not double-send",
-  "Funnels, landing pages, forms and surveys",
-  "Booking calendars with confirmations, reminders and no-show follow-up",
-  "Pipelines your team can actually read, with clean reporting",
-  "Email nurture sequences and list migrations (for example Mailchimp to GHL)",
-  "SMS set up properly, including the A2P 10DLC registration US carriers require",
-  "Integrations: webhooks, the GHL API, Stripe, Zapier, Make, n8n",
-  "Client portals and internal dashboards connected to the tools you already use",
+  "Sub-accounts and snapshots",
+  "Workflows that do not double-send",
+  "Funnels, forms and surveys",
+  "Calendars, reminders and no-show follow-up",
+  "Pipelines and reporting",
+  "Email nurture and list migrations",
+  "SMS and A2P 10DLC registration",
+  "Webhooks, the GHL API, Stripe, Zapier, Make, n8n",
+  "Client portals and dashboards",
   "AI assistants that answer only from facts you approve",
 ];
 
 const steps = [
-  { t: "15-minute call", d: "You show me what is happening. I tell you honestly whether I can help and how." },
-  { t: "Access, done safely", d: "You add me as a user with only the permissions the job needs. No shared passwords." },
-  { t: "A clear plan", d: "Hourly or a fixed quote, with the scope in writing before I start." },
-  { t: "Build and test", d: "Built in draft, tested with test contacts, with a short Loom update so you see progress." },
-  { t: "Handover", d: "A written note and a walkthrough, so your team can run it without me." },
+  { t: "Call", d: "15 minutes. You show me. I tell you if I can help." },
+  { t: "Access", d: "My own login. Only what the job needs." },
+  { t: "Plan", d: "Scope and price in writing." },
+  { t: "Build", d: "Built in draft. Tested with test contacts." },
+  { t: "Handover", d: "Written notes and a walkthrough." },
 ];
 
 const faqs = [
-  {
-    q: "What hours do you work?",
-    a: "I am in the Philippines (UTC+8): the same time as Perth, and two to three hours behind Sydney and Melbourne depending on daylight saving. I work part-time, 4 hours a day, starting at 8 AM in your timezone.",
-  },
-  {
-    q: "How do invoices and payment work?",
-    a: "I invoice fortnightly in AUD (or GBP for UK clients) as an overseas contractor, payable by bank transfer through Wise. Australian clients: I do not charge GST, and I can provide a Statement by a Supplier for your records. UK clients: I am not VAT registered, so no VAT is added; VAT-registered businesses account for it under the reverse charge.",
-  },
-  {
-    q: "Will you sign an NDA or a data processing agreement?",
-    a: "Yes. I already work under NDA for a current client, and I am happy to sign yours before you share anything.",
-  },
-  {
-    q: "Can you give me references?",
-    a: "Not yet. Instead of asking you to take someone's word for it, I show live systems you can use yourself. You can also send me one broken workflow and I will tell you what is wrong with it, free.",
-  },
-  {
-    q: "Can I start with one small job?",
-    a: "Yes. Start with one small job at the normal rate, with no retainer, and decide from there.",
-  },
-  {
-    q: "What happens if you are sick or we stop working together?",
-    a: "Everything I build lives in your account, with written notes, so your team or another specialist can pick it up. I tell you as early as I can if I will be away, and I hand back all access when the work ends.",
-  },
-  {
-    q: "What if something you built stops working?",
-    a: "Tell me and I fix my own work first, then explain exactly what happened and what I changed so it does not repeat.",
-  },
-  {
-    q: "Do you only work in GoHighLevel?",
-    a: "Mostly. Where GoHighLevel stops, I connect it to other tools with webhooks, Zapier, Make or n8n, and I can build custom apps that sync back into the CRM.",
-  },
+  { q: "What hours do you work?", a: "Part-time, 4 hours a day, from 8 AM your time. I am in the Philippines (UTC+8)." },
+  { q: "How do invoices work?", a: "Fortnightly, in AUD or GBP, by bank transfer through Wise. No GST or VAT added." },
+  { q: "Will you sign an NDA?", a: "Yes. I already work under one." },
+  { q: "Can you give me references?", a: "Not yet. Try my live builds instead, or send me one broken workflow and I will check it, free." },
+  { q: "Can I start with one small job?", a: "Yes. Normal rate, no retainer." },
+  { q: "What if you are sick or we stop working together?", a: "Everything lives in your account, with written notes. Anyone can pick it up. All access goes back to you." },
+  { q: "What if something you built breaks?", a: "I fix my own work first, then tell you what happened." },
+  { q: "Do you only work in GoHighLevel?", a: "Mostly. Past that, I connect it with webhooks, Zapier, Make or n8n, or build a custom app." },
 ];
 
 export default function V4() {
@@ -139,7 +116,7 @@ export default function V4() {
       <Reveal />
 
       <p className="v4-bar">
-        Available now: part-time, contract or project. <a href="/demo/tapline?tour=manager">Try a live build</a>
+        Available now. Part-time, contract or project. <a href="#rates">See my rates</a>
       </p>
       <header className="v4-nav">
         <div className="v4-nav-in">
@@ -164,24 +141,24 @@ export default function V4() {
         {/* ---------- HERO ---------- */}
         <section className="v4-hero">
           <div className="v4-hero-in">
-          <div className="v4-hero-copy" data-rv>
-            <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
-            <h1>GoHighLevel systems you can try right now.</h1>
-            <div className="v4-ctas">
-              <a className="v4-btn v4-btn-dark" href="/demo/tapline?tour=manager">
-                Try the live repairs desk
-              </a>
-              <a className="v4-btn v4-btn-line" href={BOOK}>
-                Book a 15-min call
-              </a>
+            <div className="v4-hero-copy" data-rv>
+              <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
+              <h1>GoHighLevel, built right.</h1>
+              <div className="v4-ctas">
+                <a className="v4-btn v4-btn-dark" href={DEMO}>
+                  Try a live build
+                </a>
+                <a className="v4-btn v4-btn-line" href={BOOK}>
+                  Book a 15-min call
+                </a>
+              </div>
+              <p className="v4-hero-free">
+                <a href={FIX_MAIL}>Send me one broken workflow. I&apos;ll tell you what&apos;s wrong, free.</a>
+              </p>
             </div>
-            <p className="v4-hero-free">
-              <a href={FIX_MAIL}>Or send me one broken workflow, and I&apos;ll tell you what&apos;s wrong with it, free.</a>
-            </p>
-          </div>
-          <div className="v4-hero-media" data-rv>
-            <IntroVideo />
-          </div>
+            <div className="v4-hero-media" data-rv>
+              <IntroVideo />
+            </div>
           </div>
         </section>
 
@@ -190,26 +167,26 @@ export default function V4() {
           <div className="v4-in">
             <h2 data-rv>I build and fix GoHighLevel for agencies and small businesses.</h2>
             <p className="v4-lede" data-rv>
-              I&apos;m John Boy. Every enquiry gets captured and followed up. Past clients in the US and Australia. UK businesses are welcome too. Don&apos;t take my word for it: open a live build below and use it yourself.
+              Past clients in the US and Australia. UK businesses welcome.
             </p>
             <ul className="v4-facts" aria-label="At a glance" data-rv>
               <li>
                 <b>5 years</b>
-                <span>In CRM and automation. GoHighLevel since 2023, past work in AU and US</span>
+                <span>CRM and automation. GoHighLevel since 2023</span>
               </li>
               <li>
                 <b>AUD 15</b>
-                <span>From, per hour. About £8, or a fixed quote</span>
+                <span>From, per hour. About £8</span>
               </li>
               <li>
                 <b>4 hours</b>
-                <span>A day, part-time, starting at 8 AM your time</span>
+                <span>A day, from 8 AM your time</span>
               </li>
             </ul>
           </div>
         </section>
 
-        {/* ---------- LIVE BUILDS: the first thing after the promise ---------- */}
+        {/* ---------- LIVE BUILDS ---------- */}
         <section className="v4-sec v4-builds" id="builds">
           <div className="v4-in">
             <div className="v4-center">
@@ -220,17 +197,12 @@ export default function V4() {
             </div>
             <article className="v4-case" data-rv>
               <div className="v4-case-copy">
-                <p className="v4-case-tag">My own demo · Fictional data · Try it live</p>
-                <h3>Tapline, a repairs desk you can use right now</h3>
-                <p>
-                  A working repairs desk for property managers and letting agents: tenant reports, AI triage a person confirms, after-hours dispatch, owner approvals and contractors. Nothing to sign up for.
-                </p>
-                <p>
-                  Its Integrations tab is a real signed webhook. Change a request, replay it, or take the receiver down, and watch nothing get lost or applied twice.
-                </p>
+                <p className="v4-case-tag">My own demo · Fictional data</p>
+                <h3>Tapline. A repairs desk you can use now.</h3>
+                <p>AI triage a person confirms. After-hours dispatch. Owner approvals. A real signed webhook. No sign-up.</p>
                 <div className="v4-ctas">
-                  <a className="v4-btn v4-btn-dark" href="/demo/tapline?tour=manager">
-                    Take the guided tour
+                  <a className="v4-btn v4-btn-dark" href={DEMO}>
+                    Take the tour
                   </a>
                   <a className="v4-link" href="/demo/tapline?tour=manager&region=UK">
                     UK version
@@ -240,43 +212,27 @@ export default function V4() {
                   </a>
                 </div>
               </div>
-              <div className="v4-shots v4-shots-2">
-                <div className="v4-shot v4-shot-wide">
-                  <Image src="/projects/tapline/triage.png" alt="Tapline's AI triage panel, with the suggested trade, urgency and reply" width={1024} height={1654} sizes="(max-width: 900px) 90vw, 420px" />
-                </div>
-                <div className="v4-shot v4-shot-wide">
-                  <Image src="/projects/tapline/tenant.png" alt="What the tenant sees on their phone after reporting a repair" width={780} height={1768} sizes="(max-width: 900px) 90vw, 420px" />
-                </div>
+              <div className="v4-shot v4-shot-wide">
+                <Image src="/projects/tapline/board.png" alt="Tapline's repairs board, with open jobs moving from new report to bill entered" width={2880} height={1800} sizes="(max-width: 860px) 90vw, 560px" />
               </div>
             </article>
 
-            <article className="v4-case v4-case-coach" data-rv>
+            <article className="v4-case" data-rv>
               <div className="v4-case-copy">
-                <p className="v4-case-tag">Coach OS · my own product · runs on demo data</p>
-                <h3>When GoHighLevel is not enough, I build the app around it</h3>
-                <p>
-                  A client platform for one-to-one coaches, built from zero and connected to GoHighLevel both ways: a
-                  client portal with an AI companion, e-signed agreements, Stripe subscriptions and an owner dashboard.
-                  It runs on a sample practice you can click through.
-                </p>
+                <p className="v4-case-tag">Coach OS · My own product · Demo data</p>
+                <h3>When GoHighLevel is not enough, I build the app.</h3>
+                <p>Client portal. AI companion. E-signed agreements. Stripe subscriptions. Connected to GoHighLevel both ways.</p>
                 <div className="v4-ctas">
-                  <a className="v4-btn v4-btn-line" href="https://coachos.johnboydesign.com/tour">
-                    Open the live tour
+                  <a className="v4-btn v4-btn-dark" href="https://coachos.johnboydesign.com/tour">
+                    Open the tour
                   </a>
                   <a className="v4-link" href="/coach-os">
-                    Read the case study
+                    Case study
                   </a>
                 </div>
               </div>
-              <div className="v4-shots v4-shots-2">
-                {[
-                  { img: "/coach-os-shots/app-portal.jpg", alt: "Coach OS client portal" },
-                  { img: "/coach-os-shots/app-dash-kanban.jpg", alt: "Coach OS owner pipeline" },
-                ].map((s) => (
-                  <div className="v4-shot v4-shot-wide" key={s.img}>
-                    <Image src={s.img} alt={s.alt} width={1440} height={760} sizes="(max-width: 900px) 90vw, 420px" />
-                  </div>
-                ))}
+              <div className="v4-shot v4-shot-wide">
+                <Image src="/coach-os-shots/app-dash-kanban.jpg" alt="Coach OS owner pipeline" width={1440} height={760} sizes="(max-width: 860px) 90vw, 560px" />
               </div>
             </article>
           </div>
@@ -316,34 +272,26 @@ export default function V4() {
         {/* ---------- TWO DOORS ---------- */}
         <section className="v4-sec" id="who">
           <div className="v4-in">
-            <div className="v4-center">
-              <p className="v4-kicker" data-rv>
-                Who I help
-              </p>
-              <h2 data-rv>Two kinds of clients, one standard of work.</h2>
-            </div>
             <div className="v4-doors">
               <article className="v4-door" data-rv>
                 <h3>For agencies</h3>
-                <p className="v4-door-lede">An extra pair of hands inside your GoHighLevel, white-label.</p>
+                <p className="v4-door-lede">Extra hands inside your GoHighLevel. White-label.</p>
                 <ul>
-                  <li>Client sub-accounts built from your snapshot and your standards</li>
-                  <li>Workflow builds, fixes and clean-ups when your team is full</li>
-                  <li>Your tools and your process: Slack, ClickUp, Asana, time tracking</li>
-                  <li>Loom updates and handover notes your clients never see me in</li>
+                  <li>Sub-accounts from your snapshot</li>
+                  <li>Workflow builds and fixes</li>
+                  <li>Your tools. Your clients never see me.</li>
                 </ul>
-                <p className="v4-door-price">From AUD 15/hr, or a monthly block of hours.</p>
+                <p className="v4-door-price">From AUD 15/hr.</p>
               </article>
               <article className="v4-door" data-rv>
                 <h3>For business owners</h3>
-                <p className="v4-door-lede">Clinics, coaches, trades and real estate: every enquiry captured and followed up.</p>
+                <p className="v4-door-lede">Every enquiry captured and followed up.</p>
                 <ul>
-                  <li>Website and form enquiries that land in your CRM, not an inbox</li>
-                  <li>Online booking with confirmations and reminders</li>
-                  <li>Follow-up emails that stop the moment someone books</li>
-                  <li>A pipeline that shows where every lead is, at a glance</li>
+                  <li>Enquiries land in your CRM</li>
+                  <li>Online booking with reminders</li>
+                  <li>Follow-ups stop when someone books</li>
                 </ul>
-                <p className="v4-door-price">A fixed quote after a free 15-minute call.</p>
+                <p className="v4-door-price">A fixed quote after a free call.</p>
               </article>
             </div>
           </div>
@@ -356,25 +304,47 @@ export default function V4() {
               <p className="v4-kicker" data-rv>
                 Past work
               </p>
-              <h2 data-rv>Client work, and why it was built that way.</h2>
+              <h2 data-rv>What I have built.</h2>
             </div>
 
             <article className="v4-case" data-rv>
               <div className="v4-case-copy">
+                <p className="v4-case-tag">Chaos to Closing · US coaching business · 2026</p>
+                <h3>A whole coaching business, inside GoHighLevel.</h3>
+                <p>Website, sales page, AI-assisted funnel, social lead capture and nurture. One system.</p>
+              </div>
+              <div className="v4-shots v4-shots-3">
+                {[
+                  { img: "/work/chaos-to-closing.jpg", alt: "Chaos to Closing website" },
+                  { img: "/work/chaos-sales-page.jpg", alt: "Chaos to Closing sales page" },
+                  { img: "/work/chaos-ai-funnel.jpg", alt: "Chaos to Closing AI funnel" },
+                ].map((s) => (
+                  <div className="v4-shot" key={s.img}>
+                    <Image src={s.img} alt={s.alt} width={900} height={2000} sizes="(max-width: 860px) 30vw, 180px" />
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="v4-case" data-rv>
+              <div className="v4-case-copy">
+                <p className="v4-case-tag">K Australia Design · Australian agency · Sep 2024 to Sep 2025</p>
+                <h3>Lead automation for an agency&apos;s client accounts.</h3>
+                <p>A tested base, so new accounts never start from scratch.</p>
+              </div>
+              <ul className="v4-case-points">
+                <li>Snapshot-based setup for new sub-accounts</li>
+                <li>Nurture across SMS, email and voicemail drop</li>
+                <li>A2P 10DLC registration</li>
+                <li>Enquiry to booked appointment, automatically</li>
+              </ul>
+            </article>
+
+            <article className="v4-case" data-rv>
+              <div className="v4-case-copy">
                 <p className="v4-case-tag">My own sales funnel · GoHighLevel</p>
-                <h3>A lead funnel that knows the prospect before the call</h3>
-                <p>
-                  <b>The problem.</b> Prospects arrived from messages and forms, their answers sat in another tool, and
-                  people who had already booked kept receiving marketing emails.
-                </p>
-                <p>
-                  <b>What I built.</b> Four connected workflows instead of one giant one, so each part can change
-                  without breaking the others. Re-entry is switched off so nobody gets the same series twice.
-                </p>
-                <p>
-                  <b>The result.</b>{" "}Every prospect&apos;s answers are on their contact before we speak, and nobody who
-                  has booked gets another sales email. Tested end to end with real submissions.
-                </p>
+                <h3>A funnel that knows the prospect before the call.</h3>
+                <p>Four connected workflows. Answers on the contact before we speak. Tested end to end.</p>
               </div>
               <ol className="v4-flow" aria-label="How the workflows connect">
                 {funnelSteps.map((s, i) => (
@@ -384,54 +354,6 @@ export default function V4() {
                   </li>
                 ))}
               </ol>
-            </article>
-
-            <article className="v4-case" data-rv>
-              <div className="v4-case-copy">
-                <p className="v4-case-tag">Chaos to Closing · US coaching business · 2026</p>
-                <h3>A whole coaching business, built inside GoHighLevel</h3>
-                <p>
-                  <b>The brief.</b> Move the business into one system: website, sales page, an AI-assisted funnel, and
-                  lead capture from social media.
-                </p>
-                <p>
-                  <b>What I built.</b> The site and funnels in GoHighLevel, social lead capture with ManyChat, and the
-                  nurture sequences behind them.
-                </p>
-              </div>
-              <div className="v4-shots v4-shots-3">
-                {[
-                  { img: "/work/chaos-to-closing.jpg", alt: "Chaos to Closing website" },
-                  { img: "/work/chaos-sales-page.jpg", alt: "Chaos to Closing sales page" },
-                  { img: "/work/chaos-ai-funnel.jpg", alt: "Chaos to Closing AI funnel" },
-                ].map((s) => (
-                  <div className="v4-shot" key={s.img}>
-                    <Image src={s.img} alt={s.alt} width={900} height={2000} sizes="(max-width: 900px) 30vw, 220px" />
-                  </div>
-                ))}
-              </div>
-            </article>
-
-            <article className="v4-case" data-rv>
-              <div className="v4-case-copy">
-                <p className="v4-case-tag">K Australia Design · Australian agency · Sep 2024 to Sep 2025</p>
-                <h3>Lead GoHighLevel automation for an agency&apos;s client accounts</h3>
-                <p>
-                  <b>The role.</b>{" "}I built the agency&apos;s GoHighLevel base so new client accounts could be set up
-                  from a tested starting point instead of from scratch.
-                </p>
-                <p>
-                  <b>What I built.</b> Multi-channel nurture across SMS, email and voicemail drop, A2P 10DLC
-                  registration (the sign-up US carriers require before a business can text customers), and booking triggers that turned enquiries into confirmed
-                  appointments.
-                </p>
-              </div>
-              <ul className="v4-case-points">
-                <li>Snapshot-based setup for new sub-accounts</li>
-                <li>Nurture across three channels</li>
-                <li>A2P 10DLC handled for deliverability</li>
-                <li>Enquiry to booked appointment, automatically</li>
-              </ul>
             </article>
 
             <h3 className="v4-more-h" data-rv>
@@ -477,8 +399,8 @@ export default function V4() {
         <section className="v4-sec v4-cap">
           <div className="v4-in v4-cap-in">
             <div data-rv>
-              <p className="v4-kicker">What I can take off your plate</p>
-              <h2>Inside GoHighLevel, and where it connects to everything else.</h2>
+              <p className="v4-kicker">What I do</p>
+              <h2>Inside GoHighLevel, and everything it connects to.</h2>
             </div>
             <ul className="v4-cap-list" data-rv>
               {capabilities.map((c) => (
@@ -493,9 +415,9 @@ export default function V4() {
           <div className="v4-in">
             <div className="v4-center">
               <p className="v4-kicker" data-rv>
-                Rates and ways to work
+                Rates
               </p>
-              <h2 data-rv>Simple pricing, agreed before I start.</h2>
+              <h2 data-rv>Simple pricing.</h2>
             </div>
             <div className="v4-plans">
               <article className="v4-plan" data-rv>
@@ -503,26 +425,25 @@ export default function V4() {
                 <p className="v4-plan-price">
                   AUD 15<small>/hr · about £8</small>
                 </p>
-                <p>For agencies and ongoing support. Time tracked in your tool or mine, invoiced fortnightly.</p>
+                <p>Time tracked. Invoiced fortnightly.</p>
               </article>
               <article className="v4-plan" data-rv>
                 <h3>Monthly hours</h3>
                 <p className="v4-plan-price">
                   AUD 15<small>/hr · about £8</small>
                 </p>
-                <p>A set block of hours each month, so your work has a reserved place in my week.</p>
+                <p>A reserved block of hours each month.</p>
               </article>
               <article className="v4-plan" data-rv>
-                <h3>Fixed-scope project</h3>
+                <h3>Fixed project</h3>
                 <p className="v4-plan-price">
                   Fixed <small>quote</small>
                 </p>
-                <p>For a defined build, such as booking and reminders or a migration. Quoted after a free 15-minute call.</p>
+                <p>Quoted after a free 15-minute call.</p>
               </article>
             </div>
             <p className="v4-free v4-center" data-rv>
-              Not ready to commit? <a href={FIX_MAIL}>Send me one broken workflow</a> and I will tell you exactly what is
-              wrong with it, free.
+              Not ready? <a href={FIX_MAIL}>Send me one broken workflow.</a>{" "}I&apos;ll tell you what&apos;s wrong, free.
             </p>
           </div>
         </section>
@@ -534,7 +455,7 @@ export default function V4() {
               <p className="v4-kicker" data-rv>
                 How I work
               </p>
-              <h2 data-rv>Five steps, no surprises.</h2>
+              <h2 data-rv>Five steps. No surprises.</h2>
             </div>
             <ol className="v4-steps">
               {steps.map((s, i) => (
@@ -553,16 +474,14 @@ export default function V4() {
           <div className="v4-in v4-data-in" data-rv>
             <div>
               <p className="v4-kicker">Your data</p>
-              <h2>Handled the way your clients would expect.</h2>
+              <h2>Handled properly.</h2>
             </div>
             <ul>
-              <li>My own login on your platforms, with only the access the job needs</li>
-              <li>No shared passwords, and two-factor sign-in where the platform offers it</li>
-              <li>Test contacts for testing, never your real customers</li>
-              <li>NDA or data processing agreement signed before you share anything</li>
-              <li>Access removed and handed back when the work ends</li>
-              <li>For clinics: patient health information stays in your practice software, not the CRM, in line with the Australian Privacy Principles</li>
-              <li>For UK clients: a UK GDPR data processing agreement on request</li>
+              <li>My own login, with only the access the job needs</li>
+              <li>No shared passwords</li>
+              <li>Test contacts only, never your real customers</li>
+              <li>NDA or data processing agreement signed first</li>
+              <li>All access handed back when the work ends</li>
             </ul>
           </div>
         </section>
@@ -572,7 +491,7 @@ export default function V4() {
           <div className="v4-in v4-faq-in">
             <div data-rv>
               <p className="v4-kicker">Questions</p>
-              <h2>The things people ask before hiring me.</h2>
+              <h2>Before you hire me.</h2>
             </div>
             <div className="v4-faq" data-rv>
               {faqs.map((f) => (
@@ -589,10 +508,7 @@ export default function V4() {
         <section className="v4-sec v4-contact" id="contact">
           <div className="v4-in" data-rv>
             <h2>Tell me what you need built or fixed.</h2>
-            <p className="v4-lede">
-              A 15-minute call is the fastest way to find out whether I am the right fit. I reply to every email within
-              one business day.
-            </p>
+            <p className="v4-lede">15 minutes. A straight answer. Emails answered within one business day.</p>
             <div className="v4-ctas">
               <a className="v4-btn v4-btn-dark" href={BOOK}>
                 Book a 15-min call
@@ -601,12 +517,6 @@ export default function V4() {
                 {EMAIL}
               </a>
             </div>
-            <p className="v4-contact-links">
-              <a href={WHATSAPP}>WhatsApp</a>
-              <a href={LINKEDIN}>LinkedIn</a>
-              <a href={CV}>CV (PDF)</a>
-              <a href="/coach-os">Coach OS case study</a>
-            </p>
           </div>
         </section>
       </main>
@@ -622,7 +532,7 @@ export default function V4() {
                 <b>John Boy Roxas</b>
                 <span>GoHighLevel specialist</span>
               </a>
-              <p>I build and fix GoHighLevel for agencies and small businesses.</p>
+              <p>GoHighLevel, built right.</p>
             </div>
             <div>
               <p className="v4-foot-h">Explore</p>
@@ -638,7 +548,7 @@ export default function V4() {
               <p className="v4-foot-h">Start</p>
               <ul>
                 <li><a href={BOOK}>Book a 15-min call</a></li>
-                <li><a href="/demo/tapline?tour=manager">Try the repairs desk</a></li>
+                <li><a href={DEMO}>Try the repairs desk</a></li>
                 <li><a href={CV}>CV (PDF)</a></li>
               </ul>
             </div>

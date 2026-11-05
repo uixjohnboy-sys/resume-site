@@ -241,7 +241,7 @@ html:has(.v4) {
   padding: 64px 0;
 }
 .v4-hero h1 {
-  font-size: clamp(58px, 7.6vw, 110px);
+  font-size: clamp(60px, 9vw, 132px);
   line-height: 1.02;
 }
 .v4-hero-free {
@@ -335,7 +335,7 @@ html:has(.v4) {
 
 /* ---------- statement and numbers ---------- */
 .v4-statement {
-  padding: 96px 0 88px;
+  padding: 88px 0 72px;
   text-align: center;
 }
 .v4 .v4-statement h2 {
@@ -466,7 +466,7 @@ html:has(.v4) {
 
 /* ---------- sections ---------- */
 .v4-sec {
-  padding: 104px 0;
+  padding: 88px 0;
 }
 .v4-sec h2 {
   font-size: clamp(44px, 5.6vw, 80px);
@@ -541,7 +541,7 @@ html:has(.v4) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 48px;
-  align-items: start;
+  align-items: center;
   margin-top: 24px;
   padding: 48px;
   background: var(--panel);
@@ -567,7 +567,8 @@ html:has(.v4) {
   font-size: clamp(36px, 3.6vw, 50px);
 }
 .v4-case-copy p:not(.v4-case-tag) {
-  margin: 0 0 14px;
+  margin: 0;
+  font-size: 18px;
   color: var(--ink-2);
 }
 .v4-case-copy b {
@@ -616,7 +617,7 @@ html:has(.v4) {
   background: var(--card);
 }
 .v4-shot-wide {
-  aspect-ratio: 1440 / 760;
+  aspect-ratio: 16 / 10;
 }
 .v4-shot img,
 .v4-more-frame img {
