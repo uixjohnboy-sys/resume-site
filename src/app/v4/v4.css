@@ -253,6 +253,10 @@ html:has(.v4) {
   color: var(--ink-2);
   text-underline-offset: 3px;
 }
+.v4 .v4-hero-sample {
+  font-weight: 600;
+  color: var(--ink);
+}
 .v4-hero-media {
   align-self: end;
   width: 128%;

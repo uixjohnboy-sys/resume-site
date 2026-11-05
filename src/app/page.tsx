@@ -160,6 +160,8 @@ export default function V4() {
               </div>
               <p className="v4-hero-free">
                 <a href={BRIEF_MAIL}>Send me your brief. I&apos;ll send back a written plan for the full system, free.</a>
+                {" "}
+                <a className="v4-hero-sample" href="/sample-plan">See a sample plan</a>
               </p>
             </div>
             <div className="v4-hero-media" data-rv>
