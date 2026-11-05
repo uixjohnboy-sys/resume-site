@@ -20,7 +20,8 @@ export const CAPS = {
   ipMessages: 200,
   ipModelCalls: 600,
   ipSandboxes: 60,
-  siteMessages: 300,
+  // Also review budget while the evals run. Back to 300 the day G4 closes. The spend meter below still holds the day to $2.
+  siteMessages: 700,
   siteModelCalls: 1000,
   siteSandboxes: 150,
   ipReads: 600,

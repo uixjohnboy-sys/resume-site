@@ -237,6 +237,14 @@ await test("danger line: cleaning talk does not fire", () => {
   }
 });
 
+await test("the model can raise to the danger line, and writes none of it", async () => {
+  const sb = mia();
+  const r = await say(sb, "not sure what this is, my head is spinning since the cleaning", script({ tool: "flag_danger" }, { text: "Open a window." }));
+  assert.equal(r.reply, DANGER_TEXT);
+  assert.ok(sb.log.some((l) => l.tool === "danger_line"));
+  const again = await say(sb, "ok thanks, how much is a 2 bed deep clean?", script({ text: "A 2-bed deep clean is $290." }));
+  assert.match(again.reply, /\$290/);
+});
 await test("a chemical question gets the fixed line and Dana, never 000 or the model", async () => {
   const sb = mia();
   const m = script({ text: "Sure, mix away." });
