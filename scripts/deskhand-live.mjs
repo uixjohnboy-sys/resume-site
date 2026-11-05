@@ -1,7 +1,7 @@
 // Run: node scripts/deskhand-live.mjs [baseUrl]
 // Plays the three scripted customers against the live agent and prints what it did. A smoke test, not the eval: it uses real model
 // calls inside the demo's own spend meter, so run it sparingly.
-const BASE = process.argv[2] || "https://johnboydesign.com";
+const BASE = process.argv[2] || "https://www.johnboydesign.com";
 let cookie = "";
 
 async function post(body) {

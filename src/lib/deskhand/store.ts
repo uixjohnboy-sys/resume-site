@@ -16,9 +16,10 @@ export const CAPS = {
   messageChars: 500,
   conversationMessages: 16,
   sandboxMessages: 30,
-  ipMessages: 40,
-  ipModelCalls: 120,
-  ipSandboxes: 10,
+  // Review budget while the build is tested from one address. These return to 40, 120 and 10 the day G4 closes.
+  ipMessages: 200,
+  ipModelCalls: 600,
+  ipSandboxes: 60,
   siteMessages: 300,
   siteModelCalls: 1000,
   siteSandboxes: 150,

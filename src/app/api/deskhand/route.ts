@@ -53,6 +53,7 @@ function modelFor(ipKey: string): CallModel | null {
       {
         model: MODEL,
         max_tokens: 1500,
+        output_config: { effort: "low" },
         system,
         messages: messages as Anthropic.MessageParam[],
         tools: tools.map((t) => ({ ...t, strict: true })) as unknown as Anthropic.ToolUnion[],
