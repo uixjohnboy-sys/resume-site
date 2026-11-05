@@ -78,7 +78,8 @@ ${FACTS}
 
 Collecting details: ${INTAKE}
 Save each detail with save_contact as you learn it. To book: get details, call get_open_slots, offer the windows in plain words, wait for the customer's pick, then call book_visit.
-To move a booking: it needs the mobile number the booking is under. If the state block shows no verified booking, ask what mobile it is under. Once verified, call get_open_slots with the visit's job, offer windows, then call move_visit with their pick.
+Each new message starts with a <state> block written by the system. It is the truth right now and overrides anything said earlier, including what you said yourself. Never ask for something it already shows.
+To move a booking: it needs the mobile number the booking is under. If the state shows no verified booking, ask what mobile it is under. If it lists a verified booking, the number matched: say you've found it, call get_open_slots with that visit's job_key, offer the windows, then call move_visit with their pick.
 
 ${HANDOFF_RULES}
 
@@ -135,6 +136,7 @@ function template(sb: Sandbox, ledger: LedgerEntry[]): string {
     if (offers.length) return `Here's what's open: ${offers.map((o) => o.label).join("; ")}. The price is $${offers[0].price}. Which suits you?`;
   }
   if (ledger.some((l) => l.kind === "booked" || l.kind === "moved" || l.kind === "handoff")) return "";
+  if (sb.conv.verifiedContactId) return "I've found your booking. Which day suits you better?";
   return nextQuestion(currentContact(sb));
 }
 
@@ -218,11 +220,13 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   let usedRules = !model;
 
   if (model) {
-    const history: ModelMessage[] = conv.messages.slice(-24).map((m) => ({ role: m.from === "customer" ? "user" : "assistant", content: m.text }));
+    const history: ModelMessage[] = conv.messages.slice(-24).map((m) => ({ role: m.from === "customer" ? "user" : "assistant", content: m.from === "customer" ? m.text.replace(/[<>]/g, "") : m.text }));
     while (history.length && history[0].role !== "user") history.shift();
+    // The state goes on the newest message, where a small model reads it as the truth of the moment.
+    history[history.length - 1] = { role: "user", content: `${stateBlock(sb)}\n<customer_message>${String(history[history.length - 1].content)}</customer_message>` };
     const started = Date.now();
     const budget = opts.deadlineMs ?? TURN_DEADLINE_MS;
-    const system = `${SYSTEM}\n\n${stateBlock(sb)}`;
+    const system = SYSTEM;
     try {
       for (let round = 0; round <= MAX_ROUNDS; round++) {
         const left = budget - (Date.now() - started);
@@ -283,7 +287,10 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   }
 
   const receipts = ledger.map((l) => receiptFor(sb, l)).filter(Boolean).join(" ");
-  const finalText = [prefix.trim(), reply.trim(), receipts].filter(Boolean).join(" ").trim();
+  // Once something real has happened, the receipt is the message. The model's own version of it would only repeat or blur it.
+  const settled = ledger.some((l) => l.kind === "booked" || l.kind === "moved" || (l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends));
+  const name = currentContact(sb)?.firstName;
+  const finalText = (settled ? [prefix.trim(), name ? `Thanks ${name}.` : "", receipts] : [prefix.trim(), reply.trim(), receipts]).filter(Boolean).join(" ").trim();
   return done(finalText || "Sorry, I missed that. What can I help you with?", modelCalls, usedRules);
 }
 

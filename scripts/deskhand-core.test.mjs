@@ -121,6 +121,7 @@ await test("Tom: wrong number refused, right number verified, move works", async
   assert.equal(sb.conv.verifiedContactId, null);
   await say(sb, `Sorry, ${CARDS.tom.mobile}`, script({ tool: "get_open_slots", input: { job_key: "regular-3" } }, { text: "Saturday between 8 am and 9 am work?" }));
   assert.equal(sb.conv.verifiedContactId, tomVisit.contactId);
+  assert.equal(sb.conv.contactId, tomVisit.contactId);
   const offer = sb.conv.offers.at(-1);
   const r = await say(sb, "Yes", script({ tool: "move_visit", input: { visit_id: tomVisit.id, slot_id: offer.id } }, { text: "Thanks Tom." }));
   assert.match(r.reply, /Moved to/);
@@ -267,7 +268,9 @@ await test("injection through a saved name reaches the model only as data", asyn
   assert.ok(!/[<>]/.test(c.firstName ?? ""));
   const m2 = script({ text: "Which suburb?" });
   await say(sb, "ok", m2);
-  assert.equal((m2.calls[0].system.match(/<state/g) ?? []).length, 1);
+  const sent = JSON.stringify(m2.calls[0].messages);
+  assert.equal((sent.match(/<state/g) ?? []).length, 1);
+  assert.doesNotMatch(m2.calls[0].system, /Dave/);
 });
 
 await test("model off: after strikes the conversation moves to fixed rules with no more calls", async () => {

@@ -35,19 +35,20 @@ const NEVER: [RegExp, string][] = [
 const sentences = (t: string) => t.split(/(?<=[.!?])\s+|\n+/).map((s) => s.trim()).filter(Boolean);
 const has = (ledger: LedgerEntry[], kind: LedgerEntry["kind"]) => ledger.some((l) => l.kind === kind);
 
-const kindOf = (s: string): JobKind | null => {
-  if (/\b(end of lease|bond clean|vacate|move[- ]?out|exit clean)\b/i.test(s)) return "lease";
-  if (/\b(deep|first clean|first visit|spring|one[- ]?off|once[- ]?off)\b/i.test(s)) return "deep";
-  if (/\b(regular|fortnight\w*|weekly|week|after that|each visit)\b/i.test(s)) return "regular";
-  return null;
+const kindsIn = (s: string): JobKind[] => {
+  const kinds: JobKind[] = [];
+  if (/\b(end of lease|bond clean|vacate|move[- ]?out|exit clean)\b/i.test(s)) kinds.push("lease");
+  if (/\b(deep|first clean|first visit|spring|one[- ]?off|once[- ]?off)\b/i.test(s)) kinds.push("deep");
+  if (/\b(regular|fortnight\w*|weekly|week|after that|each visit)\b/i.test(s)) kinds.push("regular");
+  return kinds;
 };
 
 function checkPrices(text: string, ctx: GuardCtx): Trip | null {
-  let previous: JobKind | null = null;
+  let previous: JobKind[] = [];
   const fromOffers = new Set(ctx.offers.map((o) => o.price));
   for (const s of sentences(text)) {
-    const here = kindOf(s);
-    const kind = here ?? previous;
+    const here = kindsIn(s);
+    const kinds = here.length ? here : previous;
     for (const m of s.matchAll(/\$\s?(\d[\d,]*)(\.\d{2})?/g)) {
       const value = Number(m[1].replace(/,/g, ""));
       const addOn = (/\boven\b/i.test(s) && value === ADD_ONS.oven.price) || (/\bfridge\b/i.test(s) && value === ADD_ONS.fridge.price) || (/\bbathroom\b/i.test(s) && value === ADD_ONS.bathroom.price);
@@ -55,11 +56,11 @@ function checkPrices(text: string, ctx: GuardCtx): Trip | null {
       if (addOn || fee) continue;
       const bed = s.match(/\b([1-4])[- ]?(bed\w*|br)\b|\bstudio\b/i);
       const beds = bed ? (bed[1] ? Number(bed[1]) : 1) : ctx.bedrooms;
-      const rows = Object.values(JOBS).filter((j) => (!kind || j.kind === kind) && (beds === null || j.beds === beds));
-      const ok = kind !== null && rows.some((j) => j.price === value);
-      if (!ok && !(kind === null && fromOffers.has(value))) return { reason: "a price that does not match its job", strike: false };
+      const rows = Object.values(JOBS).filter((j) => kinds.includes(j.kind) && (beds === null || j.beds === beds));
+      const ok = rows.some((j) => j.price === value);
+      if (!ok && !(kinds.length === 0 && fromOffers.has(value))) return { reason: "a price that does not match its job", strike: false };
     }
-    if (here) previous = here;
+    if (here.length) previous = here;
   }
   return null;
 }
@@ -67,7 +68,7 @@ function checkPrices(text: string, ctx: GuardCtx): Trip | null {
 function checkClaims(text: string, ctx: GuardCtx): Trip | null {
   const done = has(ctx.ledger, "booked") || has(ctx.ledger, "moved");
   for (const s of sentences(text)) {
-    if (s.endsWith("?")) continue;
+    if (s.endsWith("?") || /\b(can't|cannot|can not|couldn't|haven't|not|no booking|isn't|aren't)\b/i.test(s)) continue;
     if (/\b(booked|confirmed|locked in|you'?re (all )?set|got you down|in the (diary|calendar))\b/i.test(s) && !/\b(once|when|after|if|until|before|not)\b.{0,30}\b(booked|confirmed)\b/i.test(s) && !done) {
       return { reason: "claimed a booking that does not exist", strike: true };
     }

@@ -255,6 +255,10 @@ export function checkPhone(sb: Sandbox, text: string, ctx: ExecCtx) {
     const contact = sb.contacts.find((c) => c.phone && digits(c.phone) === number && sb.visits.some((v) => v.contactId === c.id));
     if (contact) {
       if (sb.conv.verifiedContactId !== contact.id) {
+        // From here the record being worked on is the real customer's. The blank enquiry opened for the call goes.
+        const opened = currentContact(sb);
+        if (opened && opened.id !== contact.id && !opened.existing && !sb.visits.some((v) => v.contactId === opened.id)) sb.contacts = sb.contacts.filter((c) => c.id !== opened.id);
+        sb.conv.contactId = contact.id;
         sb.conv.verifiedContactId = contact.id;
         addLog(sb, { at: ctx.at, actor: "server", tool: "phone_check", status: "checked", code: "MATCH", text: `Mobile matched a booking under ${contact.firstName}` });
       }
