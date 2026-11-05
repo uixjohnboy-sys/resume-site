@@ -105,6 +105,9 @@ function stateBlock(sb: Sandbox): string {
     offers.length ? `Windows already offered: ${offers.map((o) => `${o.id} = ${o.label}, ${o.jobKey}, $${o.price}`).join("; ")}.` : "",
     conv.feeNotice ? `A late fee was raised for the move; it ${conv.feeConsent ? "has been agreed" : "needs a clear yes"}.` : "",
     sb.handoffs.length ? `With ${OWNER} already: ${sb.handoffs.map((h) => h.reason).join(", ")}.` : "",
+    !conv.jobDone && c && !c.existing && c.firstName && c.suburb && c.bedrooms && c.access && !offers.length
+      ? `Next step: you have enough. Call get_open_slots now with job_key ${c.bedrooms >= 4 ? "regular-4" : `deep-${c.bedrooms}`} (end of lease: lease-${Math.min(3, c.bedrooms)}) and offer the windows. Do not ask which day first.`
+      : "",
     `</state>`,
   ].filter(Boolean).join("\n");
 }
@@ -312,7 +315,9 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   // Once something real has happened, the receipt is the message. The model's own version of it would only repeat or blur it.
   const settled = ledger.some((l) => l.kind === "booked" || l.kind === "moved" || (l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends));
   const name = currentContact(sb)?.firstName;
-  const finalText = (settled ? [prefix.trim(), name ? `Thanks ${name}.` : "", receipts] : [prefix.trim(), reply.trim(), receipts]).filter(Boolean).join(" ").trim();
+  // A passed-on question gets its promise from the receipt. A model line about Dana beside it would only say it twice.
+  if (ledger.some((l) => l.kind === "handoff") && /\bdana\b/i.test(reply)) reply = "";
+  const finalText = (settled ?[prefix.trim(), name ? `Thanks ${name}.` : "", receipts] : [prefix.trim(), reply.trim(), receipts]).filter(Boolean).join(" ").trim();
   return done(finalText || "Sorry, I missed that. What can I help you with?", modelCalls, usedRules);
 }
 

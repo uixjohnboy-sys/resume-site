@@ -261,7 +261,9 @@
   padding: 12px;
   overflow-y: auto;
 }
+/* Positioned, so the hidden sender labels inside stay with their message and cannot stretch the page. */
 .dh-msg {
+  position: relative;
   max-width: 88%;
   padding: 7px 10px;
   border-radius: 12px;

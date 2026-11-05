@@ -39,7 +39,8 @@ function nextReplies(conv: Conversation): Reply[] {
       "I'll be home on the day",
       "Can you check what's open?",
     ];
-    return one(script.find((s) => !said.includes(s)) ?? "Can you check what's open?");
+    const next = script.find((s) => !said.includes(s));
+    return next ? one(next) : [{ label: "Any day is fine. What's open?", send: "Any day is fine. What's open?" }];
   }
   if (conv.card === "tom") {
     if (conv.jobDone) {
@@ -355,7 +356,8 @@ export default function Desk() {
 
 /** Always the same height, so the moment a job finishes nothing on the screen jumps. */
 function Outcome({ log, jobDone, started, actions, waiting }: { log: LogEntry[]; jobDone: boolean; started: boolean; actions: number; waiting: number }) {
-  const big = log.find((l) => WEIGHTY.has(l.tool) && l.status === "done");
+  // What the customer came for comes first: a booking moved and a discount passed on is still a job done.
+  const big = log.find((l) => (l.tool === "book_visit" || l.tool === "move_visit") && l.status === "done") ?? log.find((l) => l.tool === "hand_off" && l.status === "done");
   const handedOnly = big?.tool === "hand_off";
   return (
     <div className={`dh-done ${jobDone ? "is-on" : ""}`}>
