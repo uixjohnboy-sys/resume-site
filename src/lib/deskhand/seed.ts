@@ -88,5 +88,12 @@ export function seedSandbox(): Sandbox {
       repeat,
     });
   });
-  return { contacts, visits, handoffs: [], log: [], seq: 0, nextRef: 1001 + R.length, nextOffer: 1, conv: freshConversation() };
+  // Weekly customers come back the same day next week, so next week reads like a real diary and not an empty one.
+  const NEXT: Partial<Record<DayKey, DayKey>> = { mon: "next-mon", tue: "next-tue", wed: "next-wed", thu: "next-thu", fri: "next-fri", sat: "next-sat" };
+  for (const v of [...visits]) {
+    const c = contacts.find((x) => x.id === v.contactId);
+    const next = NEXT[v.day];
+    if (c?.frequency === "weekly" && next) visits.push({ ...v, id: `${v.id}n`, ref: `LH-${Number(v.ref.slice(3)) + 100}`, day: next });
+  }
+  return { contacts, visits, handoffs: [], log: [], seq: 0, convNo: 0, nextRef: 1001 + R.length, nextOffer: 1, conv: freshConversation() };
 }

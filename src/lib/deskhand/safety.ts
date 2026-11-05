@@ -10,7 +10,6 @@ const DANGER: RegExp[] = [
   /\bsmoke (is |it's )?(coming|everywhere|pouring|filling|billowing)\b|\bfull of smoke\b|\bsee smoke\b/,
   /\b(mix|mixed|mixing)\b.{0,40}\b(chemicals?|bleach|ammonia|cleaners?|products?|sprays?)\b.{0,60}\b(fumes?|cough\w*|breathe|sick|dizzy|burn\w*|sting\w*|eyes?|gas)\b/,
   /\b(accidentally|just|i|we) (mixed|combined)\b.{0,40}\b(bleach|ammonia|chemicals?)\b/,
-  /\bbleach\b.{0,30}\bammonia\b|\bammonia\b.{0,30}\bbleach\b/,
   /\b(toxic |chemical |strong )?fumes\b/,
   /\b(can't|cant|cannot|can not|can hardly|struggling to|trouble) breath(e|ing)?\b/,
   /\b(swallowed|drank|drunk|ingested|ate)\b.{0,40}\b(spray|cleaner|bleach|chemicals?|detergent|poison|products?|dishwasher tablet)\b/,
@@ -30,6 +29,15 @@ export function isDanger(raw: string): boolean {
   if (NOT_DANGER.some((r) => r.test(t)) && !DANGER.slice(0, 2).some((r) => r.test(t))) return false;
   return DANGER.some((r) => r.test(t));
 }
+
+// Asking about mixing products is not an emergency: it needs one fixed, true sentence and Dana, not a call to 000.
+const SYMPTOMS = /\b(fumes?|cough\w*|breath\w*|dizzy|sick|burn\w*|sting\w*|swallow\w*|unconscious|hurt|fainted)\b/;
+export function isChemicalQuestion(raw: string): boolean {
+  const t = norm(raw);
+  if (SYMPTOMS.test(t)) return false;
+  return /\b(can|could|should|is it|safe|ok|okay|thinking|going|gonna|want|what happens|how)\b.{0,40}\b(mix|mixing|combine|combining)\b/.test(t) || /\b(mix|mixing|combine|combining)\b.{0,50}\b(ok|okay|safe)\b/.test(t);
+}
+export const CHEMICAL_TEXT = "Please don't mix cleaning products. Some combinations make a toxic gas. Leave it for now.";
 
 export const DANGER_TEXT = "This is a demo and nobody has been contacted. If there is any danger, call 000 or your local emergency number now.";
 
@@ -94,4 +102,4 @@ export function maskPersonal(raw: string): Masked {
   return { text, hit, hitAccess };
 }
 
-export const MASK_TEXT = "Please don't text codes or your address. Dana gets those by phone. If that was a real code, it's worth changing.";
+export const MASK_TEXT = "Please don't text codes or your address. We send a secure link for those after booking. If that was a real code, it's worth changing.";

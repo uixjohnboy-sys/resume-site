@@ -82,7 +82,8 @@ await test("a whole booking: details, windows, pick, receipt, pipeline", async (
   assert.equal(v.price, 380);
   assert.match(r.reply, /Booked for/);
   assert.match(r.reply, /\$380/);
-  assert.match(r.reply, /fortnightly day/);
+  assert.match(r.reply, /fortnightly clean is the same day and window, \$250/);
+  assert.match(r.reply, /secure link/);
   assert.ok(sb.conv.jobDone);
   assert.ok(sb.log.some((l) => /demo, not sent/.test(l.text)));
 });
@@ -219,7 +220,7 @@ await test("guard: never-say terms, safety, links, code, address requests", () =
 });
 
 await test("danger line: fires on present danger, and no model is called", async () => {
-  for (const s of ["I can smell gas", "the kitchen is on fire", "I mixed bleach and ammonia and I can't breathe", "my toddler drank the spray", "smoke is coming out of the oven", "someone is hurt", "he's unconscious", "I've got toxic fumes in the bathroom", "my son got burnt"]) {
+  for (const s of ["I can smell gas", "the kitchen is on fire", "I mixed bleach and ammonia and I can't breathe", "my toddler drank the spray", "smoke is coming out of the oven", "someone is hurt", "he's unconscious", "I've got toxic fumes in the bathroom", "my son got burnt", "I mixed bleach and ammonia and now the fumes are awful"]) {
     assert.ok(isDanger(s), s);
   }
   const sb = mia();
@@ -231,9 +232,63 @@ await test("danger line: fires on present danger, and no model is called", async
   assert.match(again.reply, /size/);
 });
 await test("danger line: cleaning talk does not fire", () => {
-  for (const s of ["Can you do the gas cooktop as well?", "We have a gas oven and a fireplace", "I've hurt my back so I need a regular clean", "fire alarm keeps beeping", "the smoke alarm is dusty", "burnt-on bbq grease", "I hurt my knee last year", "any chemicals you use?", "the oven is really burnt"]) {
+  for (const s of ["Can you do the gas cooktop as well?", "We have a gas oven and a fireplace", "I've hurt my back so I need a regular clean", "fire alarm keeps beeping", "the smoke alarm is dusty", "burnt-on bbq grease", "I hurt my knee last year", "any chemicals you use?", "the oven is really burnt", "can i mix bleach and ammonia to get mould off?", "I can see open windows on your calendar?"]) {
     assert.ok(!isDanger(s), s);
   }
+});
+
+await test("a chemical question gets the fixed line and Dana, never 000 or the model", async () => {
+  const sb = mia();
+  const m = script({ text: "Sure, mix away." });
+  const r = await say(sb, "the shower has black mould, can i mix bleach and ammonia before you come", m);
+  assert.equal(m.calls.length, 0);
+  assert.match(r.reply, /Please don't mix/);
+  assert.doesNotMatch(r.reply, /000/);
+  assert.ok(sb.handoffs.some((h) => h.reason === "chemicals"));
+  assert.ok(sb.handoffs.some((h) => h.reason === "condition"));
+});
+await test("arrival windows are not safety advice, and a safety trip never says 000", async () => {
+  assert.equal(g("I've found your booking. Here are the open windows for you."), null);
+  const sb = mia();
+  const r = await say(sb, "there's a stain on the bench", script({ text: "Rinse it with water and open the windows." }));
+  assert.doesNotMatch(r.reply, /000/);
+  assert.doesNotMatch(r.reply, /Rinse/);
+  assert.ok(sb.handoffs.some((h) => h.reason === "chemicals"));
+});
+await test("a dog that bites goes to Dana and the agent promises nothing about it", async () => {
+  assert.ok(g("Our team shuts dogs away or out while we work."));
+  const sb = mia();
+  const r = await say(sb, "my staffy nipped a tradie once, he'll be home", script({ text: "Thanks for telling me." }));
+  assert.match(r.reply, /plan for your dog/);
+  assert.ok(sb.handoffs.some((h) => h.reason === "pet"));
+});
+await test("end of lease: only windows between move-out and inspection", async () => {
+  const sb = mia();
+  const c = sb.contacts.find((x) => x.id === sb.conv.contactId);
+  c.suburb = "Glebe";
+  const ctx = { actor: "ai", at: 1, customerText: "", ledger: [] };
+  assert.equal(executeTool(sb, "get_open_slots", { job_key: "lease-2" }, ctx).code, "NEED_LEASE_DAYS");
+  const r = executeTool(sb, "get_open_slots", { job_key: "lease-2", empty_from_day: "next-mon", inspection_day: "next-wed" }, ctx);
+  assert.ok(r.ok);
+  for (const s of r.data.slots) assert.match(s.label, /Next (Monday|Tuesday)/);
+  assert.equal(executeTool(sb, "get_open_slots", { job_key: "lease-2", empty_from_day: "next-wed", inspection_day: "next-wed" }, ctx).code, "NO_LEASE_WINDOW");
+});
+await test("everything passed on is on Dana's card", async () => {
+  const sb = mia();
+  await say(sb, "can you park on my street?", script({ tool: "hand_off", input: { reason: "question", summary: "Parking on her street" } }, { text: "Good question." }));
+  await say(sb, "and do you do ironing?", script({ tool: "hand_off", input: { reason: "question", summary: "Asked about ironing" } }, { text: "Good question." }));
+  assert.equal(sb.handoffs.length, 1);
+  assert.deepEqual(sb.handoffs[0].items, ["Parking on her street", "Asked about ironing"]);
+  assert.equal(sb.handoffs[0].promised, "Reply by 5 pm today");
+  assert.ok(sb.handoffs[0].phone);
+});
+await test("log entries say which conversation, who and when", async () => {
+  const sb = mia();
+  await say(sb, "I'm Mia", script({ tool: "save_contact", input: { first_name: "Mia" } }, { text: "Thanks." }));
+  const last = sb.log.at(-1);
+  assert.equal(last.conv, sb.convNo);
+  assert.equal(last.who, "Mia");
+  assert.match(last.clock, /^9:\d\d am$/);
 });
 
 await test("masking: codes, addresses, emails, cards and real phones never reach the model or the record", async () => {

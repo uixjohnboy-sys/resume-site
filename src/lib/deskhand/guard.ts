@@ -18,7 +18,7 @@ export type GuardCtx = {
 
 const MAX_WORDS = 80;
 
-const SAFETY = /\b(first aid|rinse|flush (it|your)|open (the |all )?windows?|ventilate|evacuat\w*|get out of the house|leave the house|seek medical|see a doctor|poisons? (line|information)|13 ?11 ?26|safe to (mix|use|combine)|don't mix|do not mix|never mix)\b/i;
+const SAFETY = /\b(first aid|rinse (it|your|the)|flush (it|your)|open (the|all|your|a) windows?|ventilate|evacuat\w*|get out of the house|leave the house|seek medical|see a doctor|poisons? (line|information)|13 ?11 ?26|safe to (mix|use|combine)|don't mix|do not mix|never mix)\b/i;
 const NEVER: [RegExp, string][] = [
   [/\b(bond|deposit)\b.{0,40}\b(guarantee\w*|you'?ll get|will get|get it back|back for sure|definitely)\b|\bguarantee\w*\b.{0,40}\bbond\b/i, "promised the bond"],
   [/\b(your|the) (lease|agent|landlord|property manager) (can|can't|cannot|must|has to|requires?|is allowed)\b|\b(legally|by law)\b/i, "tenancy advice"],
@@ -29,6 +29,7 @@ const NEVER: [RegExp, string][] = [
   [/\b(ndis|aged care|home care)\b.{0,30}\b(yes|we (can|do)|accepted?|covered|billing is)\b|\b(we (can|do)|yes)\b.{0,30}\b(ndis|aged care|home care)\b/i, "agreed to funding billing"],
   [/\b(cash (discount|job)|no gst|no invoice|without (an )?invoice)\b/i, "a cash arrangement"],
   [/\bi('?m| am) (dana|a person|human|a real person)\b/i, "claimed to be a person"],
+  [/\b(we|our team|the team|the cleaners?) (will |can |'ll )?(shuts?|puts?|handles?|moves?|locks?|looks? after) .{0,20}\b(dogs?|pets?|cats?)\b/i, "promised to handle a pet"],
   [/\bhome (will be )?empty\b.{0,20}\b(on|until|from)\b/i, "said when a home is empty"],
 ];
 

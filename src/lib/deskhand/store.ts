@@ -69,7 +69,8 @@ export async function loadSandbox(id: string): Promise<Sandbox> {
   const redis = getRedis();
   if (!redis) return structuredClone(mem.sb.get(id) ?? seedSandbox());
   const sb = await redis.get<Sandbox>(`${PREFIX}:sb:${id}`);
-  return sb ?? seedSandbox();
+  // A sandbox saved by an older build has an older shape. It holds nothing worth keeping, so it starts fresh.
+  return sb && typeof sb.convNo === "number" ? sb : seedSandbox();
 }
 
 export async function saveSandbox(id: string, sb: Sandbox): Promise<boolean> {

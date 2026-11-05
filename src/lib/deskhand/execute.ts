@@ -29,8 +29,14 @@ export type Actor = LogEntry["actor"];
 export type ToolResult = { ok: true; data: Record<string, unknown> } | { ok: false; code: string; next: string; alternatives?: unknown };
 export type ExecCtx = { actor: Actor; customerText: string; at: number; ledger: LedgerEntry[] };
 
-export function addLog(sb: Sandbox, entry: Omit<LogEntry, "seq">): LogEntry {
-  const full = { ...entry, seq: ++sb.seq };
+const clockOf = (turn: number) => {
+  const m = 9 * 60 + 40 + turn;
+  return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")} am`;
+};
+
+export function addLog(sb: Sandbox, entry: Omit<LogEntry, "seq" | "conv" | "who" | "clock">): LogEntry {
+  const who = sb.contacts.find((c) => c.id === sb.conv.contactId)?.firstName ?? "New customer";
+  const full = { ...entry, seq: ++sb.seq, conv: sb.convNo, who, clock: clockOf(sb.conv.turn) };
   sb.log.push(full);
   return full;
 }
@@ -135,6 +141,15 @@ function getOpenSlots(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx)
     const deep = `deep-${job.beds}` as JobKey;
     return refuse(sb, ctx, "get_open_slots", "FIRST_VISIT_IS_DEEP", "Regular clean refused: a new customer's first visit is a deep clean", "Explain the first clean is a deep clean, then check that job.", JOB_KEYS.includes(deep) ? { job_key: deep, price: JOBS[deep].price } : { hand_off: "size" });
   }
+  let lease: DayKey[] | null = null;
+  if (job.kind === "lease") {
+    const from = input.empty_from_day as DayKey;
+    const until = input.inspection_day as DayKey;
+    if (!BOOKABLE_DAYS.includes(from) && !DAYS[from]) return refuse(sb, ctx, "get_open_slots", "NEED_LEASE_DAYS", "Calendar not checked: need the day it is empty and the inspection day", "Ask which day of the week the home will be empty from and which day of the week the final inspection is.");
+    if (!DAYS[until]) return refuse(sb, ctx, "get_open_slots", "NEED_LEASE_DAYS", "Calendar not checked: need the day it is empty and the inspection day", "Ask which day of the week the home will be empty from and which day of the week the final inspection is.");
+    lease = BOOKABLE_DAYS.filter((d) => DAYS[d].index >= DAYS[from].index && DAYS[d].index < DAYS[until].index);
+    if (!lease.length) return refuse(sb, ctx, "get_open_slots", "NO_LEASE_WINDOW", "Calendar not checked: no day between move-out and inspection", 'Use hand_off with reason "lease".');
+  }
   let minutes: number = job.minutes;
   let price: number = job.price;
   if (input.add_oven === true && job.kind !== "lease") { minutes += ADD_ONS.oven.minutes; price += ADD_ONS.oven.price; }
@@ -143,7 +158,8 @@ function getOpenSlots(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx)
   minutes += extra * ADD_ONS.bathroom.minutes;
   price += extra * ADD_ONS.bathroom.price;
 
-  const days = typeof input.day === "string" && BOOKABLE_DAYS.includes(input.day as DayKey) ? [input.day as DayKey] : BOOKABLE_DAYS;
+  const asked = typeof input.day === "string" && BOOKABLE_DAYS.includes(input.day as DayKey) ? [input.day as DayKey] : BOOKABLE_DAYS;
+  const days = lease ? asked.filter((d) => lease.includes(d)) : asked;
   const teams = (Object.keys(TEAMS) as Team[]).filter((t) => TEAMS[t].jobs.includes(job.kind));
   const offers: Offer[] = [];
   for (const day of days) {
@@ -181,7 +197,7 @@ function bookVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): T
   setStage(c, "Booked");
   sb.conv.jobDone = true;
   addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "book_visit", status: "done", ref: visit.ref, text: `Booked ${visit.ref}: ${jobLabel(visit.jobKey)}, ${offer.label}, ${TEAMS[offer.team].label}`, after: { stage: "Booked" } });
-  addLog(sb, { at: ctx.at, actor: "server", tool: "confirmation", status: "done", ref: visit.ref, text: "Confirmation recorded (demo, not sent)" });
+  addLog(sb, { at: ctx.at, actor: "server", tool: "confirmation", status: "done", ref: visit.ref, text: "Confirmation and secure details link recorded (demo, not sent)" });
   ctx.ledger.push({ kind: "booked", visitId: visit.id });
   return { ok: true, data: { ref: visit.ref, note: "The system adds the confirmation to your reply. Do not repeat the details." } };
 }
@@ -225,10 +241,18 @@ function handOff(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): Too
   const reason = input.reason as HandoffReason;
   if (!HANDOFF_KEYS.includes(reason)) return refuse(sb, ctx, "hand_off", "UNKNOWN_REASON", "Hand-off refused: unknown reason", "Use a listed reason.");
   const c = currentContact(sb) ?? (sb.conv.verifiedContactId ? sb.contacts.find((x) => x.id === sb.conv.verifiedContactId) ?? null : null);
-  if (sb.handoffs.some((h) => h.reason === reason && h.contactId === (c?.id ?? null))) return { ok: true, data: { already: true } };
   const summary = typeof input.summary === "string" ? input.summary.replace(/[<>]/g, "").slice(0, 300) : "";
-  const refused = sb.log.filter((l) => l.status === "refused").slice(-3).map((l) => l.text);
-  sb.handoffs.push({ id: `h${sb.handoffs.length + 1}`, contactId: c?.id ?? null, customer: c?.firstName ?? "Unknown caller", reason, aiSummary: summary, refused, actor: ctx.actor === "ai" ? "ai" : ctx.actor === "rules" ? "rules" : "server" });
+  const open = sb.handoffs.find((h) => h.reason === reason && h.contactId === (c?.id ?? null));
+  const refused = sb.log.filter((l) => l.status === "refused" && l.conv === sb.convNo).slice(-3).map((l) => l.text);
+  if (open) {
+    // Told the customer it was passed on, so it has to be on the card.
+    if (summary && !open.items.includes(summary)) open.items.push(summary);
+    open.phone = c?.phone ?? open.phone;
+    addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "hand_off", status: "done", text: `Added to Dana's card: ${HANDOFF_REASONS[reason].label}` });
+    ctx.ledger.push({ kind: "handoff", reason });
+    return { ok: true, data: { note: "Added to the card Dana already has." } };
+  }
+  sb.handoffs.push({ id: `h${sb.handoffs.length + 1}`, contactId: c?.id ?? null, customer: c?.firstName ?? "Unknown caller", reason, items: summary ? [summary] : [], phone: c?.phone ?? null, promised: "Reply by 5 pm today", refused, actor: ctx.actor === "ai" ? "ai" : ctx.actor === "rules" ? "rules" : "server" });
   if (c && HANDOFF_REASONS[reason].ends) setStage(c, "Handed to Dana");
   addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "hand_off", status: "done", text: `Handed to Dana: ${HANDOFF_REASONS[reason].label}`, after: c && HANDOFF_REASONS[reason].ends ? { stage: "Handed to Dana" } : undefined });
   if (HANDOFF_REASONS[reason].ends) sb.conv.jobDone = true;

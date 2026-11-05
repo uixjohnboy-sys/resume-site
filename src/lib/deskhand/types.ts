@@ -49,6 +49,10 @@ export type LogEntry = {
   seq: number;
   at: number;
   actor: "ai" | "rules" | "safety" | "server";
+  /** Which conversation this belongs to, who it was about, and the demo clock when it happened. */
+  conv: number;
+  who: string;
+  clock: string;
   tool: string;
   status: LogStatus;
   code?: string;
@@ -63,7 +67,10 @@ export type Handoff = {
   contactId: string | null;
   customer: string;
   reason: HandoffReason;
-  aiSummary: string;
+  /** Each thing passed on, newest last, so nothing the customer was told is missing from the card. */
+  items: string[];
+  phone: string | null;
+  promised: string;
   refused: string[];
   actor: "ai" | "rules" | "server";
 };
@@ -102,6 +109,7 @@ export type Sandbox = {
   handoffs: Handoff[];
   log: LogEntry[];
   seq: number;
+  convNo: number;
   nextRef: number;
   nextOffer: number;
   conv: Conversation;

@@ -1,7 +1,7 @@
 import { CLOCK_LABEL, BUSINESS, DAYS, FACTS, FIRST_TEXT, HANDOFF_KEYS, HANDOFF_PROMISE, HANDOFF_REASONS, HANDOFF_RULES, INTAKE, JOBS, JOB_KEYS, BOOKABLE_DAYS, OWNER, type HandoffReason } from "./pack.ts";
 import { addLog, checkPhone, currentContact, executeTool, slotLabel, type ExecCtx } from "./execute.ts";
 import { guardReply } from "./guard.ts";
-import { DANGER_TEXT, MASK_TEXT, isDanger, maskPersonal } from "./safety.ts";
+import { CHEMICAL_TEXT, DANGER_TEXT, MASK_TEXT, isChemicalQuestion, isDanger, maskPersonal } from "./safety.ts";
 import { CARDS, freshConversation, type CardId } from "./seed.ts";
 import type { Contact, LedgerEntry, LogEntry, Sandbox } from "./types.ts";
 
@@ -49,6 +49,8 @@ export const TOOLS = [
         add_fridge: { type: "boolean" },
         extra_bathrooms: { type: "integer" },
         day: { type: "string", enum: BOOKABLE_DAYS },
+        empty_from_day: { type: "string", enum: BOOKABLE_DAYS, description: "End of lease only: the day the home is empty from." },
+        inspection_day: { type: "string", enum: BOOKABLE_DAYS, description: "End of lease only: the day of the final inspection." },
       },
       ["job_key"],
     ),
@@ -114,8 +116,9 @@ const receiptFor = (sb: Sandbox, entry: LedgerEntry): string | null => {
     if (!v) return null;
     const job = JOBS[v.jobKey];
     const parts = [`Booked for ${DAYS[v.day].label}, arriving between ${slotLabel(v.day, v.start).split("arriving between ")[1]}. ${job.kind === "deep" ? "Deep clean" : job.kind === "lease" ? "End of lease clean" : "Regular clean"}, ${job.beds}-bed, $${v.price}. Ref ${v.ref}. We'll text if we're running late.`];
-    if (c?.frequency) parts.push(`${OWNER} will confirm your regular ${c.frequency} day after the first clean.`);
-    parts.push(`${OWNER} confirms your address${c?.access === "lockbox" ? " and lockbox code" : ""} by phone the afternoon before.`);
+    const regular = Object.values(JOBS).find((j) => j.kind === "regular" && j.beds === job.beds);
+    if (c?.frequency && regular) parts.push(`After that, your ${c.frequency} clean is the same day and window, $${regular.price}.`);
+    parts.push("We'll text you a secure link for your address, access and parking, so they never go through this chat.");
     return parts.join(" ");
   }
   if (entry.kind === "moved") {
@@ -124,6 +127,7 @@ const receiptFor = (sb: Sandbox, entry: LedgerEntry): string | null => {
     return `Moved to ${slotLabel(v.day, v.start).replace(", arriving", ", arriving")}.${entry.fee ? ` A $${entry.fee} late fee applies.` : ""} Ref ${v.ref}. We'll text if we're running late.`;
   }
   if (entry.kind === "handoff") {
+    if (entry.reason === "pet") return `${OWNER} will sort out a plan for your dog with you. She'll text you back by 5 pm today.`;
     return HANDOFF_REASONS[entry.reason].ends ? `I've passed this to ${OWNER} with a summary. ${HANDOFF_PROMISE}` : `I'll ask ${OWNER} and she'll text you back by 5 pm today.`;
   }
   return null;
@@ -152,14 +156,17 @@ const STRONG_HANDOFF: [RegExp, HandoffReason][] = [
   [/\b(speak|talk) (to|with) (a |an )?(person|human|real person|someone)\b|\b(speak|talk) (to|with) (dana|the owner|your boss)\b/i, "person"],
   [/\b(make|lodge|have) a complaint\b|\byou (damaged|broke|ruined)\b|\bfair trading\b/i, "complaint"],
   [/\b(stole|stolen|theft)\b/i, "theft"],
+  [/\bblack mou?ld\b|\basbestos\b|\bneedles\b|\bbed ?bugs\b|\bhoard(ing|er)\b|\bsqualor\b/i, "condition"],
+  [/\b(bit|bitten|bites|nipped|nips|snapped at|aggressive)\b/i, "pet"],
 ];
 
 export function startConversation(sb: Sandbox, card: CardId | null, at: number): LogEntry[] {
   const from = sb.log.length;
   sb.conv = freshConversation();
+  sb.convNo += 1;
   sb.conv.card = card;
   const info = card ? CARDS[card] : null;
-  const contact: Contact = { id: `n${sb.nextRef + sb.contacts.length}`, firstName: null, suburb: null, phone: info ? info.phone : null, bedrooms: null, access: null, frequency: null, notes: null, stage: "New enquiry", existing: false };
+  const contact: Contact = { id: `n${sb.nextRef + sb.contacts.length}`, firstName: null, suburb: null, phone: info ? info.phone : "0491 570 110", bedrooms: null, access: null, frequency: null, notes: null, stage: "New enquiry", existing: false };
   sb.contacts.push(contact);
   sb.conv.contactId = contact.id;
   addLog(sb, { at, actor: "server", tool: "missed_call", status: "done", text: info ? `Missed call from ${info.phone}. Dana's on a job. Texted back.` : "Missed call. Dana's on a job. Texted back." });
@@ -202,6 +209,15 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   const masked = maskPersonal(rawText);
   conv.turn += 1;
   conv.messages.push({ from: "customer", text: masked.text });
+
+  // A question about mixing products: one fixed sentence and Dana. The model never gets to answer it.
+  if (isChemicalQuestion(rawText)) {
+    const chem: ExecCtx = { actor: "server", customerText: masked.text, at: now, ledger };
+    addLog(sb, { at: now, actor: "safety", tool: "chemical_question", status: "flagged", text: "Question about mixing products: fixed answer, no AI" });
+    executeTool(sb, "hand_off", { reason: "chemicals", summary: masked.text.slice(0, 200) }, chem);
+    for (const [re, reason] of STRONG_HANDOFF) if (re.test(masked.text)) executeTool(sb, "hand_off", { reason, summary: masked.text.slice(0, 200) }, chem);
+    return done([CHEMICAL_TEXT, ...ledger.map((l) => receiptFor(sb, l))].filter(Boolean).join(" "), 0, false);
+  }
   if (masked.hit) addLog(sb, { at: now, actor: "safety", tool: "masking", status: "flagged", text: "Personal details removed before the AI or the record saw them" });
   const prefix = masked.hitAccess ? `${MASK_TEXT} ` : "";
   const ctx: ExecCtx = { actor: "ai", customerText: masked.text, at: now, ledger };
@@ -260,7 +276,7 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   // The hand-off backstop: strong phrases only, because a bond customer says "refund", "owner" and "manager".
   for (const [re, reason] of STRONG_HANDOFF) {
     if (re.test(masked.text) && !ledger.some((l) => l.kind === "handoff")) {
-      executeTool(sb, "hand_off", { reason, summary: "" }, { ...ctx, actor: "server" });
+      executeTool(sb, "hand_off", { reason, summary: masked.text.slice(0, 200) }, { ...ctx, actor: "server" });
     }
   }
 
@@ -278,7 +294,13 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     if (trip) {
       if (trip.strike) conv.strikes += 1;
       if (text) addLog(sb, { at: now, actor: trip.safety ? "safety" : "server", tool: "reply_guard", status: "flagged", code: trip.reason, text: `Reply replaced: ${trip.reason}` });
-      reply = trip.safety ? DANGER_TEXT : template(sb, ledger);
+      if (trip.safety) {
+        // Advice the agent must not give. Not an emergency, so not the emergency line: it goes to Dana instead.
+        executeTool(sb, "hand_off", { reason: "chemicals", summary: masked.text.slice(0, 200) }, { ...ctx, actor: "server" });
+        reply = "I can't advise on that here.";
+      } else {
+        reply = template(sb, ledger);
+      }
     }
     if (conv.strikes >= STRIKE_LIMIT || conv.noToolTurns >= NO_TOOL_LIMIT) {
       conv.rulesOnly = true;

@@ -4,31 +4,60 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BUSINESS, CLOCK_LABEL, DAYS, HANDOFF_REASONS, JOBS, JOB_KIND_LABEL, RULES, TEAMS, WINDOWS, type DayKey, type Team } from "@/lib/deskhand/pack";
 import { CARDS, type CardId } from "@/lib/deskhand/seed";
-import type { Contact, LogEntry, Sandbox, Visit } from "@/lib/deskhand/types";
+import type { Contact, Conversation, LogEntry, Offer, Sandbox, Visit } from "@/lib/deskhand/types";
 
 // The demo's one screen. The left pane is the customer's text thread; the right pane is what the agent is doing about it.
 // Everything shown comes from the server's record, and the reply only appears once the server has checked it.
 
 type Panel = "calendar" | "contact" | "handoffs" | "rules";
 type View = "customer" | "office";
-
-const STARTERS: Record<CardId, string[]> = {
-  mia: [
-    "Hi, how much for a fortnightly clean? 3 bed in Marrickville",
-    "I'm Mia. 2 bathrooms, a house, no stairs. Last cleaned about two months ago. No pets. Street parking is fine.",
-    "I'll be home on the day",
-    "Can you check what's open?",
-  ],
-  tom: ["Hi it's Tom, can I move my Thursday clean?", "It's under 0491 570 006", "Sorry, it's 0491 570 313", "Any chance of a discount? I've been with you a while", "Yes please, pass it on"],
-  priya: ["Hi, do you clean the common areas of a strata building in Glebe?", "It's 40 units and we'd want it weekly. I'm Priya."],
-};
+type Reply = { label: string; send: string };
 
 const STATUS_LABEL: Record<LogEntry["status"], string> = { done: "Done", checked: "Checked", refused: "Refused", failed: "Failed", flagged: "Flagged" };
 const ACTOR_LABEL: Record<LogEntry["actor"], string> = { ai: "Agent", rules: "Fixed rules", safety: "Safety", server: "System" };
+const WEIGHTY = new Set(["book_visit", "move_visit", "hand_off"]);
+
+const shortDay = (o: Offer) => DAYS[o.day].label.replace("next ", "Next ").replace(/(Next )?(\w{3})\w*/, "$1$2");
+const shortSlot = (o: Offer) => {
+  const w = WINDOWS.find((x) => x.start === o.start)?.label.replace(" and ", " to ") ?? "";
+  return `${shortDay(o)}, ${w}`;
+};
+
+/** The next thing the customer could say, chosen from what has really happened, so a tap can never be out of step. */
+function nextReplies(conv: Conversation): Reply[] {
+  if (!conv.card) return [];
+  const said = conv.messages.filter((m) => m.from === "customer").map((m) => m.text);
+  const lastAgent = [...conv.messages].reverse().find((m) => m.from === "agent")?.text ?? "";
+  const one = (send: string): Reply[] => (said.includes(send) ? [] : [{ label: send, send }]);
+  const slots = conv.offers.filter((o) => o.turn === conv.turn);
+  if (!conv.jobDone && slots.length) return slots.map((o) => ({ label: shortSlot(o), send: `${o.label} please` }));
+  if (conv.card === "mia") {
+    if (conv.jobDone) return [];
+    const script = [
+      "Hi, how much for a fortnightly clean? 3 bed in Marrickville",
+      "I'm Mia. 2 bathrooms, a house, no stairs. Last cleaned about two months ago. No pets. Street parking is fine.",
+      "I'll be home on the day",
+      "Can you check what's open?",
+    ];
+    return one(script.find((s) => !said.includes(s)) ?? "Can you check what's open?");
+  }
+  if (conv.card === "tom") {
+    if (conv.jobDone) {
+      if (/pass/i.test(lastAgent) && !said.includes("Yes please, pass it on")) return one("Yes please, pass it on");
+      return one("Any chance of a discount? I've been with you a while");
+    }
+    if (conv.verifiedContactId) return [{ label: "What's open?", send: "What's open? Any day is fine." }];
+    const script = ["Hi it's Tom, can I move my Thursday clean?", "It's under 0491 570 006", "Sorry, it's 0491 570 313"];
+    return one(script.find((s) => !said.includes(s)) ?? script[2]);
+  }
+  if (conv.card === "priya") {
+    return conv.jobDone ? one("It's 40 units and we'd want it weekly. I'm Priya.") : one("Hi, do you clean the common areas of a strata building in Glebe?");
+  }
+  return [];
+}
 
 async function api(body: unknown) {
-  const res = await fetch("/api/deskhand", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-  return res;
+  return fetch("/api/deskhand", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
 }
 
 export default function Desk() {
@@ -40,8 +69,11 @@ export default function Desk() {
   const [panel, setPanel] = useState<Panel>("calendar");
   const [view, setView] = useState<View>("customer");
   const [changed, setChanged] = useState<Set<string>>(new Set());
-  const thread = useRef<HTMLDivElement>(null);
   const [pending, setPending] = useState<string | null>(null);
+  const [announce, setAnnounce] = useState("");
+  const thread = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const replyBox = useRef<HTMLDivElement>(null);
 
   const start = useCallback(async (card: CardId | null) => {
     setNotice(null);
@@ -66,7 +98,7 @@ export default function Desk() {
 
   useEffect(() => {
     thread.current?.scrollTo({ top: thread.current.scrollHeight });
-  }, [sb?.conv.messages.length, pending]);
+  }, [sb?.conv.messages.length, pending, notice]);
 
   const send = useCallback(
     async (message: string) => {
@@ -109,6 +141,7 @@ export default function Desk() {
                 if (entry.tool === "book_visit" || entry.tool === "move_visit") setPanel("calendar");
                 if (entry.tool === "hand_off") setPanel("handoffs");
               }
+              if (entry.status === "done" && WEIGHTY.has(entry.tool)) setAnnounce(entry.text);
             } else if (event === "done") {
               if (parsed.sb) setSb(parsed.sb);
               else if (parsed.error) setNotice(parsed.error);
@@ -128,6 +161,16 @@ export default function Desk() {
     [busy],
   );
 
+  // The tapped button is gone and the field was disabled, so focus has to be put somewhere on purpose. Not on touch, where it would pop the keyboard.
+  const wasBusy = useRef(false);
+  useEffect(() => {
+    if (wasBusy.current && !busy && !window.matchMedia("(pointer: coarse)").matches) {
+      const next = replyBox.current?.querySelector("button") ?? input.current;
+      next?.focus({ preventScroll: true });
+    }
+    wasBusy.current = busy;
+  }, [busy]);
+
   const reset = useCallback(async () => {
     const res = await api({ reset: true });
     const data = await res.json();
@@ -135,69 +178,70 @@ export default function Desk() {
     setLiveLog([]);
     setChanged(new Set());
     setPanel("calendar");
+    setNotice(null);
+    setAnnounce("Demo reset.");
   }, []);
 
   const conv = sb?.conv;
   const contact = useMemo(() => sb?.contacts.find((c) => c.id === conv?.contactId) ?? null, [sb, conv?.contactId]);
   const log = useMemo(() => {
-    const all = [...(sb?.log ?? []), ...liveLog.filter((l) => !(sb?.log ?? []).some((x) => x.seq === l.seq))];
-    return all.slice().reverse();
-  }, [sb?.log, liveLog]);
-  const actions = (sb?.log ?? []).filter((l) => l.status === "done" || l.status === "checked").length + liveLog.filter((l) => l.status === "done").length;
-
-  const replies = useMemo(() => {
-    if (!conv?.card || conv.closed) return [] as string[];
-    const said = conv.messages.filter((m) => m.from === "customer").map((m) => m.text);
-    const open = conv.jobDone ? [] : conv.offers.filter((o) => o.turn === conv.turn).map((o) => `${o.label} please`);
-    if (open.length) return open;
-    return STARTERS[conv.card as CardId].filter((s) => !said.includes(s)).slice(0, 1);
-  }, [conv]);
-
+    const saved = (sb?.log ?? []).filter((l) => l.conv === sb?.convNo);
+    return [...saved, ...liveLog.filter((l) => !saved.some((x) => x.seq === l.seq))].reverse();
+  }, [sb?.log, sb?.convNo, liveLog]);
+  const actions = log.filter((l) => l.status === "done" || l.status === "checked").length;
+  const replies = useMemo(() => (conv ? nextReplies(conv) : []), [conv]);
   const started = Boolean(conv?.contactId);
-  const handoffCount = sb?.handoffs.length ?? 0;
+  const handoffs = sb?.handoffs ?? [];
+  const waiting = handoffs.filter((h) => h.contactId === conv?.contactId).length;
 
   return (
-    <div className="dh-app">
+    <div className={`dh-app ${started ? "is-started" : ""}`}>
       <header className="dh-top">
         <div className="dh-brand">
-          <span className="dh-mark" aria-hidden="true" />
+          <span className="dh-mark" aria-hidden="true">
+            <i />
+          </span>
           <div>
             <b>Deskhand</b>
             <span>Front desk for {BUSINESS}</span>
           </div>
         </div>
         <p className="dh-clock">Demo time: {CLOCK_LABEL}</p>
+        <p className="dh-note">Demo data, a fictional business. Nothing is really sent.</p>
         <div className="dh-top-acts">
           <button type="button" className="dh-btn" onClick={reset} disabled={busy}>
             Reset demo
           </button>
-          <Link className="dh-btn dh-btn-primary" href="/sample-plan">
+          <Link className="dh-btn dh-only-wide" href="/sample-plan">
             Want one for your business?
           </Link>
         </div>
       </header>
-      <p className="dh-note">Demo data, a fictional business. Nothing is really sent.</p>
 
-      <div className="dh-switch" role="tablist" aria-label="View">
-        <button type="button" role="tab" aria-selected={view === "customer"} onClick={() => setView("customer")}>
+      <div className="dh-switch">
+        <button type="button" aria-pressed={view === "customer"} onClick={() => setView("customer")}>
           Customer
         </button>
-        <button type="button" role="tab" aria-selected={view === "office"} onClick={() => setView("office")}>
+        <button type="button" aria-pressed={view === "office"} onClick={() => setView("office")}>
           Back office <span className="dh-count">{actions}</span>
         </button>
       </div>
+
+      <p className="dh-sr" role="status">
+        {announce}
+      </p>
 
       <main className="dh-main">
         <section className={`dh-customer ${view === "customer" ? "is-on" : ""}`} aria-label="Customer's text messages">
           <div className="dh-cards" role="group" aria-label="Play a customer">
             {(Object.keys(CARDS) as CardId[]).map((id) => (
-              <button key={id} type="button" className={`dh-card ${conv?.card === id ? "is-on" : ""}`} onClick={() => start(id)} disabled={busy}>
+              <button key={id} type="button" className={`dh-card ${conv?.card === id ? "is-on" : ""}`} aria-pressed={conv?.card === id} onClick={() => start(id)} disabled={busy}>
                 <b>{CARDS[id].name}</b>
                 <span>{CARDS[id].suburb}</span>
                 <small>{CARDS[id].job}</small>
               </button>
             ))}
-            <button type="button" className={`dh-card ${started && !conv?.card ? "is-on" : ""}`} onClick={() => start(null)} disabled={busy}>
+            <button type="button" className={`dh-card ${started && !conv?.card ? "is-on" : ""}`} aria-pressed={started && !conv?.card} onClick={() => start(null)} disabled={busy}>
               <b>Your own</b>
               <span>Make it up</span>
               <small>Type anything a customer might ask</small>
@@ -205,25 +249,43 @@ export default function Desk() {
           </div>
 
           <div className="dh-phone">
-            <div className="dh-thread" ref={thread} aria-live="polite">
+            {started && (
+              <p className="dh-thread-head">
+                <b>{contact?.firstName ?? "New customer"}</b> {contact?.phone}
+              </p>
+            )}
+            <div className="dh-thread" ref={thread} role="log" aria-label="Messages" aria-live="polite" tabIndex={0}>
               {!started && <p className="dh-empty">Pick a customer above. A missed call starts the conversation.</p>}
               {conv?.messages.map((m, i) => (
                 <p key={i} className={`dh-msg ${m.from === "customer" ? "from-them" : "from-desk"}`}>
+                  <span className="dh-sr">{m.from === "customer" ? "Customer: " : "Larkfield: "}</span>
                   {m.text}
                 </p>
               ))}
-              {pending && <p className="dh-msg from-them">{pending}</p>}
+              {pending && (
+                <p className="dh-msg from-them">
+                  <span className="dh-sr">Customer: </span>
+                  {pending}
+                </p>
+              )}
               {busy && <p className="dh-working">Deskhand is working on it</p>}
               {notice && <p className="dh-msg from-desk">{notice}</p>}
             </div>
 
             {started && (
-              <>
-                {replies.length > 0 && !busy && (
-                  <div className="dh-replies">
+              <div className="dh-compose">
+                <p className="dh-status">
+                  {conv?.jobDone ? "Job done. " : ""}
+                  {actions} actions.{" "}
+                  <button type="button" onClick={() => setView("office")}>
+                    See Back office
+                  </button>
+                </p>
+                {replies.length > 0 && (
+                  <div className={`dh-replies ${replies.length > 1 ? "is-grid" : ""}`} ref={replyBox}>
                     {replies.map((r) => (
-                      <button key={r} type="button" onClick={() => send(r)}>
-                        {r}
+                      <button key={r.send} type="button" onClick={() => send(r.send)} disabled={busy}>
+                        {r.label}
                       </button>
                     ))}
                   </div>
@@ -236,48 +298,53 @@ export default function Desk() {
                   }}
                 >
                   <label htmlFor="dh-text" className="dh-sr">
-                    Your message
+                    Your message, as the customer
                   </label>
-                  <input id="dh-text" value={text} onChange={(e) => setText(e.target.value)} maxLength={500} placeholder="Type as the customer" autoComplete="off" disabled={busy} />
-                  <button type="submit" className="dh-btn dh-btn-primary" disabled={busy || !text.trim()}>
+                  <input ref={input} id="dh-text" value={text} onChange={(e) => setText(e.target.value)} maxLength={500} placeholder="Type as the customer" autoComplete="off" disabled={busy} />
+                  <button type="submit" className="dh-send" disabled={busy || !text.trim()}>
                     Send
                   </button>
                 </form>
                 <p className="dh-privacy">Use made-up details. This demo deletes your messages within 48 hours. Our AI provider may keep them for up to 30 days.</p>
-              </>
+              </div>
             )}
           </div>
-          {busy && <p className="dh-status">{actions} actions so far. See Back office.</p>}
         </section>
 
         <section className={`dh-office ${view === "office" ? "is-on" : ""}`} aria-label="Back office">
-          {conv?.jobDone && <JobDone sb={sb as Sandbox} actions={actions} />}
+          <Outcome log={log} jobDone={Boolean(conv?.jobDone)} started={started} actions={actions} waiting={waiting} />
           <div className="dh-office-grid">
             <div className="dh-log">
-              <h2>Work log</h2>
-              {log.length === 0 && <p className="dh-empty">What the agent does shows up here as it happens.</p>}
-              <ol>
-                {log.map((l) => (
-                  <li key={l.seq} className={`dh-entry is-${l.status}`}>
-                    <span className="dh-pill">{STATUS_LABEL[l.status]}</span>
-                    <p>{l.text}</p>
-                    <small>{ACTOR_LABEL[l.actor]}</small>
-                  </li>
-                ))}
-              </ol>
+              <h2>Work log{contact?.firstName ? `: ${contact.firstName}` : ""}</h2>
+              <div className="dh-scroll">
+                {log.length === 0 && <p className="dh-empty">What the agent does shows up here as it happens.</p>}
+                <ol>
+                  {log.map((l) => (
+                    <li key={l.seq} className={`dh-entry is-${l.status} ${WEIGHTY.has(l.tool) && l.status === "done" ? "is-big" : ""}`}>
+                      <span className="dh-pill">{STATUS_LABEL[l.status]}</span>
+                      <p>{l.text}</p>
+                      <small>
+                        {l.clock}, {ACTOR_LABEL[l.actor]}
+                      </small>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
             <div className="dh-panels">
-              <div className="dh-tabs" role="tablist" aria-label="Records">
+              <div className="dh-tabs" role="group" aria-label="Records">
                 {(["calendar", "contact", "handoffs", "rules"] as Panel[]).map((p) => (
-                  <button key={p} type="button" role="tab" aria-selected={panel === p} onClick={() => setPanel(p)}>
-                    {p === "handoffs" ? `Handoffs${handoffCount ? ` (${handoffCount})` : ""}` : p[0].toUpperCase() + p.slice(1)}
+                  <button key={p} type="button" aria-pressed={panel === p} onClick={() => setPanel(p)}>
+                    {p === "handoffs" ? `Handoffs${handoffs.length ? ` (${handoffs.length})` : ""}` : p[0].toUpperCase() + p.slice(1)}
                   </button>
                 ))}
               </div>
-              {sb && panel === "calendar" && <Calendar visits={sb.visits} />}
-              {panel === "contact" && <ContactCard contact={contact} changed={changed} />}
-              {sb && panel === "handoffs" && <Handoffs sb={sb} />}
-              {panel === "rules" && <Rules />}
+              <div className="dh-scroll">
+                {sb && panel === "calendar" && <Calendar visits={sb.visits} />}
+                {panel === "contact" && <ContactCard contact={contact} changed={changed} />}
+                {sb && panel === "handoffs" && <Handoffs sb={sb} />}
+                {panel === "rules" && <Rules />}
+              </div>
             </div>
           </div>
         </section>
@@ -286,34 +353,34 @@ export default function Desk() {
   );
 }
 
-function JobDone({ sb, actions }: { sb: Sandbox; actions: number }) {
-  const handed = sb.handoffs.at(-1);
-  const contact = sb.contacts.find((c) => c.id === sb.conv.contactId);
-  const visit = sb.visits.filter((v) => v.contactId === sb.conv.contactId && v.isNew).at(-1);
-  const ended = handed && HANDOFF_REASONS[handed.reason].ends && !visit;
+/** Always the same height, so the moment a job finishes nothing on the screen jumps. */
+function Outcome({ log, jobDone, started, actions, waiting }: { log: LogEntry[]; jobDone: boolean; started: boolean; actions: number; waiting: number }) {
+  const big = log.find((l) => WEIGHTY.has(l.tool) && l.status === "done");
+  const handedOnly = big?.tool === "hand_off";
   return (
-    <div className="dh-done">
+    <div className={`dh-done ${jobDone ? "is-on" : ""}`}>
       <div>
-        <h2>{ended ? "Handed to Dana" : "Job done"}</h2>
-        <p>
-          {ended
-            ? `${handed.customer}: ${HANDOFF_REASONS[handed.reason].label}. Dana has the summary and nothing was promised.`
-            : visit
-              ? `${contact?.firstName}: ${visit.ref}, ${JOB_KIND_LABEL[JOBS[visit.jobKey].kind]}, $${visit.price}. On the calendar with ${TEAMS[visit.team].label}.`
-              : "The customer's request is finished."}
-        </p>
+        <h2>{jobDone ? (handedOnly ? "Handed to Dana" : "Job done") : started ? "In progress" : "Waiting for a call"}</h2>
+        <p>{jobDone && big ? big.text : started ? "The agent is working through this with the customer." : "Pick a customer to start."}</p>
       </div>
       <dl>
         <div>
           <dt>Actions taken</dt>
           <dd>{actions}</dd>
         </div>
-        <div>
-          <dt>People involved</dt>
-          <dd>0</dd>
-        </div>
+        {waiting > 0 ? (
+          <div>
+            <dt>Waiting on Dana</dt>
+            <dd>{waiting}</dd>
+          </div>
+        ) : (
+          <div>
+            <dt>People involved</dt>
+            <dd>0</dd>
+          </div>
+        )}
       </dl>
-      <Link className="dh-btn dh-btn-primary" href="/sample-plan">
+      <Link className={`dh-btn ${jobDone ? "dh-btn-primary" : ""}`} href="/sample-plan">
         Send me your brief
       </Link>
     </div>
@@ -321,9 +388,9 @@ function JobDone({ sb, actions }: { sb: Sandbox; actions: number }) {
 }
 
 const THIS_WEEK: DayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat"];
-const NEXT_WEEK: DayKey[] = ["next-mon", "next-tue", "next-wed", "next-thu", "next-fri"];
+const NEXT_WEEK: DayKey[] = ["next-mon", "next-tue", "next-wed", "next-thu", "next-fri", "next-sat"];
 const short = (day: DayKey) => DAYS[day].label.replace("next ", "").slice(0, 3);
-const hhmm = (m: number) => {
+const hour = (m: number) => {
   const h = Math.floor(m / 60);
   return `${h > 12 ? h - 12 : h} ${h >= 12 ? "pm" : "am"}`;
 };
@@ -333,20 +400,22 @@ function Calendar({ visits }: { visits: Visit[] }) {
   const [chosen, setWeek] = useState<"this" | "next" | null>(null);
   const week = chosen ?? (inNext ? "next" : "this");
   const days = week === "this" ? THIS_WEEK : NEXT_WEEK;
+  const fresh = useRef<HTMLDivElement>(null);
+  const newest = visits.filter((v) => v.isNew).at(-1)?.id;
+  useEffect(() => {
+    fresh.current?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [newest, week]);
   return (
     <div className="dh-cal">
-      <div className="dh-cal-head">
-        <h2>{week === "this" ? "This week" : "Next week"}</h2>
-        <div>
-          <button type="button" className="dh-btn" disabled={week === "this"} onClick={() => setWeek("this")}>
-            This week
-          </button>
-          <button type="button" className="dh-btn" disabled={week === "next"} onClick={() => setWeek("next")}>
-            Next week
-          </button>
-        </div>
+      <div className="dh-cal-head" role="group" aria-label="Week">
+        <button type="button" className="dh-btn" aria-pressed={week === "this"} onClick={() => setWeek("this")}>
+          This week
+        </button>
+        <button type="button" className="dh-btn" aria-pressed={week === "next"} onClick={() => setWeek("next")}>
+          Next week
+        </button>
       </div>
-      <div className="dh-cal-scroll">
+      <div className="dh-cal-scroll" tabIndex={0} role="region" aria-label="Calendar">
         <table>
           <thead>
             <tr>
@@ -354,6 +423,7 @@ function Calendar({ visits }: { visits: Visit[] }) {
               {days.map((d) => (
                 <th key={d} scope="col">
                   {short(d)}
+                  {d === "tue" ? " (today)" : ""}
                 </th>
               ))}
             </tr>
@@ -368,12 +438,13 @@ function Calendar({ visits }: { visits: Visit[] }) {
                       .filter((v) => v.team === t && v.day === d)
                       .sort((a, b) => a.start - b.start)
                       .map((v) => (
-                        <div key={v.id} className={`dh-visit ${v.isNew ? "is-new" : ""}`}>
+                        <div key={v.id} ref={v.id === newest ? fresh : undefined} className={`dh-visit ${v.isNew ? "is-new" : ""}`}>
                           <b>{v.customer}</b>
+                          <span>{hour(v.start)}</span>
                           <span>
-                            {hhmm(v.start)}, {JOB_KIND_LABEL[JOBS[v.jobKey].kind].replace(" clean", "")}, {JOBS[v.jobKey].beds}-bed
+                            {JOB_KIND_LABEL[JOBS[v.jobKey].kind].replace(" clean", "")}, {JOBS[v.jobKey].beds}&#8209;bed
                           </span>
-                          <small>{v.suburb}</small>
+                          <span className="dh-sub">{v.suburb}</span>
                         </div>
                       ))}
                   </td>
@@ -383,7 +454,7 @@ function Calendar({ visits }: { visits: Visit[] }) {
           </tbody>
         </table>
       </div>
-      <p className="dh-cal-note">Arrival windows start at {WINDOWS.map((w) => hhmm(w.start)).join(", ")}.</p>
+      <p className="dh-cal-note">Times are the start of the arrival window. The full job and travel are blocked out.</p>
     </div>
   );
 }
@@ -394,7 +465,7 @@ const FIELDS: [keyof Contact, string][] = [
   ["phone", "Mobile"],
   ["bedrooms", "Bedrooms"],
   ["access", "Access"],
-  ["frequency", "Wants"],
+  ["frequency", "How often"],
   ["notes", "Notes"],
 ];
 const STAGES = ["New enquiry", "Details collected", "Booked", "Handed to Dana"];
@@ -412,13 +483,16 @@ function ContactCard({ contact, changed }: { contact: Contact | null; changed: S
       </ol>
       <dl>
         {FIELDS.map(([k, label]) => (
-          <div key={k} className={changed.has(k) ? "is-changed" : ""}>
+          <div key={k}>
             <dt>{label}</dt>
-            <dd>{contact[k] === null || contact[k] === "" ? <span className="dh-none">Not yet</span> : String(contact[k])}</dd>
+            <dd>
+              {contact[k] === null || contact[k] === "" ? <span className="dh-none">Not yet</span> : String(contact[k])}
+              {changed.has(k) && <span className="dh-updated"> Updated</span>}
+            </dd>
           </div>
         ))}
       </dl>
-      <p className="dh-cal-note">Address and access are confirmed by phone, never stored here.</p>
+      <p className="dh-cal-note">Address and access come through a secure link, never this chat, and are not stored here.</p>
     </div>
   );
 }
@@ -427,14 +501,23 @@ function Handoffs({ sb }: { sb: Sandbox }) {
   if (!sb.handoffs.length) return <p className="dh-empty">Nothing waiting for Dana. Try Priya&apos;s strata building, or ask for a person.</p>;
   return (
     <ul className="dh-handoffs">
-      {sb.handoffs.map((h) => (
+      {[...sb.handoffs].reverse().map((h) => (
         <li key={h.id}>
-          <b>{h.customer}</b>
+          <div className="dh-handoff-head">
+            <b>{h.customer}</b>
+            <span>{h.phone}</span>
+            <span className="dh-promise">{h.promised}</span>
+          </div>
           <p>{HANDOFF_REASONS[h.reason].label}</p>
-          {h.aiSummary && (
-            <p className="dh-summary">
-              <span>AI summary</span> {h.aiSummary}
-            </p>
+          {h.items.length > 0 && (
+            <div className="dh-summary">
+              <span>{h.actor === "ai" ? "AI summary" : "From the customer"}</span>
+              <ul>
+                {h.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
           )}
           {h.refused.length > 0 && <small>Refused earlier: {h.refused.join("; ")}</small>}
         </li>
