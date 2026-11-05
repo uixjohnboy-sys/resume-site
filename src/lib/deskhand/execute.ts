@@ -70,6 +70,7 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
   const said = sb.conv.messages.filter((m) => m.from === "customer").map((m) => m.text).join(" ").toLowerCase();
   const before = { firstName: c.firstName, suburb: c.suburb, phone: c.phone, bedrooms: c.bedrooms, access: c.access, frequency: c.frequency, notes: c.notes };
   const changed: Record<string, unknown> = {};
+  const stage = c.stage;
 
   if (typeof input.first_name === "string" && input.first_name.trim()) {
     const name = input.first_name.replace(/[^\p{L} '-]/gu, "").trim().slice(0, 40);
@@ -108,7 +109,14 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
     changed.notes = c.notes;
   }
   if (c.firstName && c.suburb && c.phone && c.access && c.stage === "New enquiry") setStage(c, "Details collected");
-  addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "save_contact", status: "done", text: `Updated contact: ${Object.keys(changed).join(", ") || "no change"}`, before, after: changed });
+  // A small model often re-sends what it already saved. Only a real difference is a change, and only a change is logged.
+  const labels: Record<string, string> = { firstName: "name", suburb: "suburb", phone: "mobile", bedrooms: "bedrooms", access: "access", frequency: "how often", notes: "notes" };
+  const real = Object.keys(changed).filter((k) => before[k as keyof typeof before] !== changed[k]);
+  const stageBefore = stage;
+  if (real.length) {
+    const after = Object.fromEntries(real.map((k) => [k, changed[k]]));
+    addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "save_contact", status: "done", text: `Contact updated: ${real.map((k) => labels[k]).join(", ")}${c.stage !== stageBefore ? `. Pipeline: ${c.stage}` : ""}`, before, after });
+  }
   return { ok: true, data: { saved: Object.keys(changed), stage: c.stage } };
 }
 
