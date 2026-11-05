@@ -241,7 +241,7 @@ html:has(.v4) {
   padding: 64px 0;
 }
 .v4-hero h1 {
-  font-size: clamp(60px, 9vw, 132px);
+  font-size: clamp(56px, 7.3vw, 106px);
   line-height: 1.02;
 }
 .v4-hero-free {
@@ -970,8 +970,8 @@ html:has(.v4) {
     width: min(100%, 440px);
     margin: 0 auto;
   }
-  .v4-hero h1 {
-    text-wrap: wrap;
+  .v4-br {
+    display: none;
   }
   .v4-doors,
   .v4-case,

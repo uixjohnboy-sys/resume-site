@@ -19,9 +19,9 @@ import "./v4/v4.css";
 // policies. Testimonials render only when real ones exist.
 
 export const metadata: Metadata = {
-  title: "John Boy Roxas · GoHighLevel specialist for agencies and small businesses",
+  title: "John Boy Roxas · GoHighLevel, custom apps and AI agents",
   description:
-    "HighLevel-certified GoHighLevel specialist in the Philippines. Builds and fixes workflows, funnels, calendars and pipelines for Australian and UK agencies and small businesses. From AUD 15/hr.",
+    "HighLevel-certified builder in the Philippines. GoHighLevel systems, custom apps and AI agents for Australian and UK agencies and small businesses. Try live builds with no sign-up. From AUD 15/hr.",
 };
 
 const EMAIL = "uix.johnboy@gmail.com";
@@ -30,11 +30,11 @@ const MAIL =
   encodeURIComponent("Enquiry from your portfolio") +
   "&body=" +
   encodeURIComponent("Hi John Boy,\n\n");
-const FIX_MAIL =
+const BRIEF_MAIL =
   `mailto:${EMAIL}?subject=` +
-  encodeURIComponent("One broken workflow") +
+  encodeURIComponent("My brief") +
   "&body=" +
-  encodeURIComponent("Hi John Boy, here is the workflow that is not doing what it should:\n\n");
+  encodeURIComponent("Hi John Boy,\n\nMy business:\n\nThe job I want off my plate:\n\nHow we handle it today:\n\n");
 const WHATSAPP = "https://wa.me/639773659548?text=" + encodeURIComponent("Hi John Boy, I found you through your portfolio.");
 const LINKEDIN = "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist";
 const CV = "/John-Boy-Roxas-Resume.pdf";
@@ -87,7 +87,7 @@ const capabilities = [
   "SMS and A2P 10DLC registration",
   "Webhooks, the GHL API, Stripe, Zapier, Make, n8n",
   "Client portals and dashboards",
-  "AI assistants that answer only from facts you approve",
+  "AI agents that answer only from facts you approve",
 ];
 
 const steps = [
@@ -102,7 +102,7 @@ const faqs = [
   { q: "What hours do you work?", a: "Part-time, 4 hours a day, from 8 AM your time. I am in the Philippines (UTC+8)." },
   { q: "How do invoices work?", a: "Fortnightly, in AUD or GBP, by bank transfer through Wise. No GST or VAT added." },
   { q: "Will you sign an NDA?", a: "Yes. I already work under one." },
-  { q: "Can you give me references?", a: "Not yet. Try my live builds instead, or send me one broken workflow and I will check it, free." },
+  { q: "Can you give me references?", a: "Not yet. Try my live builds instead, or send me your brief and I will send back a written plan, free." },
   { q: "Can I start with one small job?", a: "Yes. Normal rate, no retainer." },
   { q: "What if you are sick or we stop working together?", a: "Everything lives in your account, with written notes. Anyone can pick it up. All access goes back to you." },
   { q: "What if something you built breaks?", a: "I fix my own work first, then tell you what happened." },
@@ -121,7 +121,7 @@ export default function V4() {
         <div className="v4-nav-in">
           <a className="v4-mark" href="#top">
             <b>John Boy Roxas</b>
-            <span>GoHighLevel specialist</span>
+            <span>Systems and automation</span>
           </a>
           <nav className="v4-links" aria-label="Sections">
             <a href="#builds">Builds</a>
@@ -141,9 +141,15 @@ export default function V4() {
         <section className="v4-hero">
           <div className="v4-hero-in">
             <div className="v4-hero-copy" data-rv>
-              <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
-              <h1>GoHighLevel, built right.</h1>
-              <p className="v4-lede">Workflows, funnels and booking for agencies and small businesses.</p>
+              <p className="v4-kicker">Systems builder · HighLevel certified</p>
+              <h1>
+                Try what I build{" "}
+                <br className="v4-br" />
+                before you{" "}
+                <br className="v4-br" />
+                hire me.
+              </h1>
+              <p className="v4-lede">GoHighLevel, custom apps and AI agents for agencies and small businesses.</p>
               <div className="v4-ctas">
                 <a className="v4-btn v4-btn-dark" href={DEMO}>
                   Try a live build
@@ -153,7 +159,7 @@ export default function V4() {
                 </a>
               </div>
               <p className="v4-hero-free">
-                <a href={FIX_MAIL}>Send me one broken workflow. I&apos;ll tell you what&apos;s wrong, free.</a>
+                <a href={BRIEF_MAIL}>Send me your brief. I&apos;ll send back a written plan for the full system, free.</a>
               </p>
             </div>
             <div className="v4-hero-media" data-rv>
@@ -165,7 +171,7 @@ export default function V4() {
         {/* ---------- WHAT I DO, IN NUMBERS ---------- */}
         <section className="v4-statement">
           <div className="v4-in">
-            <h2 data-rv>I build and fix GoHighLevel for agencies and small businesses.</h2>
+            <h2 data-rv>I build and fix the systems your business runs on.</h2>
             <p className="v4-lede" data-rv>
               Past clients in the US and Australia. UK businesses welcome.
             </p>
@@ -443,7 +449,7 @@ export default function V4() {
               </article>
             </div>
             <p className="v4-free v4-center" data-rv>
-              Not ready? <a href={FIX_MAIL}>Send me one broken workflow.</a>{" "}I&apos;ll tell you what&apos;s wrong, free.
+              Not ready? <a href={BRIEF_MAIL}>Send me your brief.</a>{" "}I&apos;ll send back a written plan, free.
             </p>
           </div>
         </section>
@@ -530,9 +536,9 @@ export default function V4() {
             <div>
               <a className="v4-mark" href="#top">
                 <b>John Boy Roxas</b>
-                <span>GoHighLevel specialist</span>
+                <span>Systems and automation</span>
               </a>
-              <p>GoHighLevel, built right.</p>
+              <p>Try what I build before you hire me.</p>
             </div>
             <div>
               <p className="v4-foot-h">Explore</p>
