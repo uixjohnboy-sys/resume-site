@@ -118,3 +118,6 @@
     grid-template-columns: 56px minmax(0, 1fr);
   }
 }
+.v4-nav-in .v4-nav-cta {
+  margin-left: auto;
+}
