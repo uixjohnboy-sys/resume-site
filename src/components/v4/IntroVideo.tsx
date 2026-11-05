@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 // no dead play button.
 const VIDEO_SRC = "";
 const POSTER = "/jb-portrait.png";
+const CUTOUT = "/jb-cutout.webp";
 
 export default function IntroVideo() {
   const ref = useRef<HTMLVideoElement>(null);
@@ -17,11 +18,7 @@ export default function IntroVideo() {
   if (!VIDEO_SRC) {
     return (
       <figure className="v4-photo">
-        <Image src={POSTER} alt="John Boy Roxas" width={2000} height={2000} sizes="(max-width: 900px) 80vw, 420px" priority />
-        <figcaption>
-          <b>John Boy Roxas</b>
-          <span>Paniqui, Tarlac, Philippines</span>
-        </figcaption>
+        <Image src={CUTOUT} alt="John Boy Roxas" width={1400} height={1400} sizes="(max-width: 860px) 90vw, 500px" priority />
       </figure>
     );
   }

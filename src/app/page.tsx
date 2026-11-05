@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { archivo, serif } from "./fonts";
+import { anton, host, plex } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
 import IntroVideo from "@/components/v4/IntroVideo";
-import PrintOnPaper from "@/components/v4/PrintOnPaper";
 import "./v4/v4.css";
 
+// White poster look since 2026-11-05, on JB's reference (xgensgrowth.com): its layout ideas, with his own words and proof.
 // The homepage since 2026-11-04 (head to head: 74.0 against 68.0 for the resume page at /v5, which stays as the CV
 // link). Built as "v4" on 2026-10-31 from two research passes
 // (C:\CoachOS-ClientHunt\job-hunt\PORTFOLIO-REBUILD-STRATEGY.md): AU/UK
@@ -135,35 +135,38 @@ const faqs = [
 
 export default function V4() {
   return (
-    <div id="v4-root" className={`v4 ${archivo.variable} ${serif.variable}`}>
-      <link rel="preload" as="image" href="/paper.webp" />
+    <div id="v4-root" className={`v4 ${anton.variable} ${host.variable} ${plex.variable}`}>
       <Reveal />
 
+      <p className="v4-bar">
+        Available now: part-time, contract or project. <a href="/demo/tapline?tour=manager">Try a live build</a>
+      </p>
       <header className="v4-nav">
-        <a className="v4-mark" href="#top">
-          John Boy Roxas
-        </a>
-        <nav className="v4-links" aria-label="Sections">
-          <a href="#builds">Builds</a>
-          <a href="#work">Work</a>
-          <a href="#rates">Rates</a>
-          <a href="#process">How I work</a>
-          <a href={CV}>CV</a>
-        </nav>
-        <a className="v4-btn v4-btn-dark v4-nav-cta" href={BOOK}>
-          Book a 15-min call
-        </a>
+        <div className="v4-nav-in">
+          <a className="v4-mark" href="#top">
+            <b>John Boy Roxas</b>
+            <span>GoHighLevel specialist</span>
+          </a>
+          <nav className="v4-links" aria-label="Sections">
+            <a href="#builds">Builds</a>
+            <a href="#work">Work</a>
+            <a href="#rates">Rates</a>
+            <a href="#process">How I work</a>
+            <a href={CV}>CV</a>
+          </nav>
+          <a className="v4-btn v4-btn-dark v4-nav-cta" href={BOOK}>
+            Book a 15-min call
+          </a>
+        </div>
       </header>
 
       <main id="top">
         {/* ---------- HERO ---------- */}
         <section className="v4-hero">
+          <div className="v4-hero-in">
           <div className="v4-hero-copy" data-rv>
             <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
             <h1>GoHighLevel systems you can try right now.</h1>
-            <p className="v4-lede">
-              I&apos;m John Boy. I build and fix GoHighLevel for agencies and small businesses, so every enquiry gets captured and followed up. Past clients in the US and Australia. UK businesses are welcome too. Don&apos;t take my word for it: open a live build below and use it yourself.
-            </p>
             <div className="v4-ctas">
               <a className="v4-btn v4-btn-dark" href="/demo/tapline?tour=manager">
                 Try the live repairs desk
@@ -179,15 +182,42 @@ export default function V4() {
           <div className="v4-hero-media" data-rv>
             <IntroVideo />
           </div>
+          </div>
+        </section>
+
+        {/* ---------- WHAT I DO, IN NUMBERS ---------- */}
+        <section className="v4-statement">
+          <div className="v4-in">
+            <h2 data-rv>I build and fix GoHighLevel for agencies and small businesses.</h2>
+            <p className="v4-lede" data-rv>
+              I&apos;m John Boy. Every enquiry gets captured and followed up. Past clients in the US and Australia. UK businesses are welcome too. Don&apos;t take my word for it: open a live build below and use it yourself.
+            </p>
+            <ul className="v4-facts" aria-label="At a glance" data-rv>
+              <li>
+                <b>5 years</b>
+                <span>In CRM and automation. GoHighLevel since 2023, past work in AU and US</span>
+              </li>
+              <li>
+                <b>AUD 15</b>
+                <span>From, per hour. About £8, or a fixed quote</span>
+              </li>
+              <li>
+                <b>4 hours</b>
+                <span>A day, part-time, starting at 8 AM your time</span>
+              </li>
+            </ul>
+          </div>
         </section>
 
         {/* ---------- LIVE BUILDS: the first thing after the promise ---------- */}
         <section className="v4-sec v4-builds" id="builds">
           <div className="v4-in">
-            <p className="v4-kicker" data-rv>
-              Live builds
-            </p>
-            <h2 data-rv>Open them. Try to break them.</h2>
+            <div className="v4-center">
+              <p className="v4-kicker" data-rv>
+                Live builds
+              </p>
+              <h2 data-rv>Open them. Try to break them.</h2>
+            </div>
             <article className="v4-case" data-rv>
               <div className="v4-case-copy">
                 <p className="v4-case-tag">My own demo · Fictional data · Try it live</p>
@@ -249,32 +279,13 @@ export default function V4() {
                 ))}
               </div>
             </article>
-
-            <ul className="v4-facts v4-facts-wide" aria-label="At a glance">
-              <li>
-                <b>Available now</b>
-                <span>Part-time, contract or project</span>
-              </li>
-              <li>
-                <b>From AUD 15/hr</b>
-                <span>About £8, or a fixed quote</span>
-              </li>
-              <li>
-                <b>4 hours a day</b>
-                <span>Starting at 8 AM your time</span>
-              </li>
-              <li>
-                <b>5 years in CRM and automation</b>
-                <span>GoHighLevel since 2023, past work in AU and US</span>
-              </li>
-            </ul>
           </div>
         </section>
 
         {/* ---------- PROOF STRIP ---------- */}
         <section className="v4-strip" aria-label="Clients and certifications">
-          <div className="v4-in">
-            <p className="v4-strip-h">Worked with</p>
+          <p className="v4-strip-h">Worked with</p>
+          <div className="v4-marquee">
             <ul className="v4-clients">
               {clients.map((c) => (
                 <li key={c.name}>
@@ -283,24 +294,34 @@ export default function V4() {
                 </li>
               ))}
             </ul>
-            <ul className="v4-badges" aria-label="HighLevel certifications">
-              {badges.map((b) => (
-                <li key={b.name}>
-                  <Image src={b.img} alt="" width={64} height={64} />
-                  <span>{b.name}</span>
+            <ul className="v4-clients" aria-hidden="true">
+              {clients.map((c) => (
+                <li key={c.name}>
+                  <b>{c.name}</b>
+                  <span>{c.note}</span>
                 </li>
               ))}
             </ul>
           </div>
+          <ul className="v4-badges" aria-label="HighLevel certifications">
+            {badges.map((b) => (
+              <li key={b.name}>
+                <Image src={b.img} alt="" width={64} height={64} />
+                <span>{b.name}</span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* ---------- TWO DOORS ---------- */}
         <section className="v4-sec" id="who">
           <div className="v4-in">
-            <p className="v4-kicker" data-rv>
-              Who I help
-            </p>
-            <h2 data-rv>Two kinds of clients, one standard of work.</h2>
+            <div className="v4-center">
+              <p className="v4-kicker" data-rv>
+                Who I help
+              </p>
+              <h2 data-rv>Two kinds of clients, one standard of work.</h2>
+            </div>
             <div className="v4-doors">
               <article className="v4-door" data-rv>
                 <h3>For agencies</h3>
@@ -331,10 +352,12 @@ export default function V4() {
         {/* ---------- WORK ---------- */}
         <section className="v4-sec v4-work" id="work">
           <div className="v4-in">
-            <p className="v4-kicker" data-rv>
-              Past work
-            </p>
-            <h2 data-rv>Client work, and why it was built that way.</h2>
+            <div className="v4-center">
+              <p className="v4-kicker" data-rv>
+                Past work
+              </p>
+              <h2 data-rv>Client work, and why it was built that way.</h2>
+            </div>
 
             <article className="v4-case" data-rv>
               <div className="v4-case-copy">
@@ -414,7 +437,7 @@ export default function V4() {
             <h3 className="v4-more-h" data-rv>
               Sample builds
             </h3>
-            <p data-rv>My own practice designs, not client work.</p>
+            <p className="v4-more-note" data-rv>My own practice designs, not client work.</p>
             <ul className="v4-more" data-rv>
               {samples.map((w) => (
                 <li key={w.img}>
@@ -468,10 +491,12 @@ export default function V4() {
         {/* ---------- RATES ---------- */}
         <section className="v4-sec v4-rates" id="rates">
           <div className="v4-in">
-            <p className="v4-kicker" data-rv>
-              Rates and ways to work
-            </p>
-            <h2 data-rv>Simple pricing, agreed before I start.</h2>
+            <div className="v4-center">
+              <p className="v4-kicker" data-rv>
+                Rates and ways to work
+              </p>
+              <h2 data-rv>Simple pricing, agreed before I start.</h2>
+            </div>
             <div className="v4-plans">
               <article className="v4-plan" data-rv>
                 <h3>Hourly</h3>
@@ -495,7 +520,7 @@ export default function V4() {
                 <p>For a defined build, such as booking and reminders or a migration. Quoted after a free 15-minute call.</p>
               </article>
             </div>
-            <p className="v4-free" data-rv>
+            <p className="v4-free v4-center" data-rv>
               Not ready to commit? <a href={FIX_MAIL}>Send me one broken workflow</a> and I will tell you exactly what is
               wrong with it, free.
             </p>
@@ -505,14 +530,16 @@ export default function V4() {
         {/* ---------- PROCESS ---------- */}
         <section className="v4-sec" id="process">
           <div className="v4-in">
-            <p className="v4-kicker" data-rv>
-              How I work
-            </p>
-            <h2 data-rv>Five steps, no surprises.</h2>
+            <div className="v4-center">
+              <p className="v4-kicker" data-rv>
+                How I work
+              </p>
+              <h2 data-rv>Five steps, no surprises.</h2>
+            </div>
             <ol className="v4-steps">
               {steps.map((s, i) => (
                 <li key={s.t} data-rv>
-                  <span className="v4-step-n">{i + 1}</span>
+                  <span className="v4-step-n">{String(i + 1).padStart(2, "0")}</span>
                   <h3>{s.t}</h3>
                   <p>{s.d}</p>
                 </li>
@@ -567,10 +594,10 @@ export default function V4() {
               one business day.
             </p>
             <div className="v4-ctas">
-              <a className="v4-btn v4-btn-light" href={BOOK}>
+              <a className="v4-btn v4-btn-dark" href={BOOK}>
                 Book a 15-min call
               </a>
-              <a className="v4-btn v4-btn-ghost" href={MAIL}>
+              <a className="v4-btn v4-btn-line v4-btn-mail" href={MAIL}>
                 {EMAIL}
               </a>
             </div>
@@ -585,10 +612,51 @@ export default function V4() {
       </main>
 
       <footer className="v4-foot">
-        <span>&copy; 2026 John Boy Roxas · Paniqui, Tarlac, Philippines</span>
-        <span>HighLevel certified · For Australian and UK businesses</span>
+        <div className="v4-foot-mark" aria-hidden="true">
+          JB
+        </div>
+        <div className="v4-foot-in">
+          <div className="v4-foot-cols">
+            <div>
+              <a className="v4-mark" href="#top">
+                <b>John Boy Roxas</b>
+                <span>GoHighLevel specialist</span>
+              </a>
+              <p>I build and fix GoHighLevel for agencies and small businesses.</p>
+            </div>
+            <div>
+              <p className="v4-foot-h">Explore</p>
+              <ul>
+                <li><a href="#builds">Live builds</a></li>
+                <li><a href="#work">Past work</a></li>
+                <li><a href="#rates">Rates</a></li>
+                <li><a href="#process">How I work</a></li>
+                <li><a href="#faq">Questions</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="v4-foot-h">Start</p>
+              <ul>
+                <li><a href={BOOK}>Book a 15-min call</a></li>
+                <li><a href="/demo/tapline?tour=manager">Try the repairs desk</a></li>
+                <li><a href={CV}>CV (PDF)</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="v4-foot-h">Contact</p>
+              <ul>
+                <li><a href={MAIL}>{EMAIL}</a></li>
+                <li><a href={WHATSAPP}>WhatsApp</a></li>
+                <li><a href={LINKEDIN}>LinkedIn</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="v4-foot-end">
+            <span>&copy; 2026 John Boy Roxas · Paniqui, Tarlac, Philippines</span>
+            <span>HighLevel certified · For Australian and UK businesses</span>
+          </div>
+        </div>
       </footer>
-      <PrintOnPaper />
     </div>
   );
 }
