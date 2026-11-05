@@ -153,7 +153,14 @@ export default function Desk() {
           }
         }
       } catch {
+        // The server may have finished the turn even though the answer never arrived, so show what the record says.
         setNotice("That didn't go through. Please try again.");
+        fetch("/api/deskhand")
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.sb) setSb(d.sb);
+          })
+          .catch(() => {});
       } finally {
         setPending(null);
         setBusy(false);
