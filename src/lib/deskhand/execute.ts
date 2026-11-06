@@ -179,6 +179,10 @@ function getOpenSlots(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx)
 function bookVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): ToolResult {
   const c = currentContact(sb);
   if (!c) return refuse(sb, ctx, "book_visit", "NO_CONVERSATION", "No customer in this conversation", "Say you can't do that here.");
+  // A verified customer with a booking already on the calendar is moving it, whichever tool the model reached for. Booking again
+  // would put the same household on the calendar twice (G2 v2, N1).
+  const upcoming = sb.conv.verifiedContactId === c.id ? sb.visits.find((v) => v.contactId === c.id && minuteOf(v.day, v.start) > NOW) : undefined;
+  if (upcoming) return moveVisit(sb, { visit_id: upcoming.id, slot_id: input.slot_id }, ctx);
   const missing = [!c.firstName && "first name", !c.suburb && "suburb", !c.phone && "mobile", !c.access && "home or lockbox"].filter(Boolean);
   if (missing.length) return refuse(sb, ctx, "book_visit", "MISSING_DETAILS", `Booking refused: still need ${missing.join(", ")}`, `Ask for: ${missing.join(", ")}.`);
   const already = sb.visits.find((v) => v.contactId === c.id && v.isNew);

@@ -129,6 +129,20 @@ await test("Tom: wrong number refused, right number verified, move works", async
   assert.equal(sb.visits.find((v) => v.id === tomVisit.id).day, offer.day);
 });
 
+await test("a verified customer asking to move is never booked twice, whichever tool the model picks", async () => {
+  for (let i = 0; i < 10; i++) {
+    const sb = seedSandbox();
+    startConversation(sb, "tom", 1);
+    const tomVisit = sb.visits.find((v) => v.customer === "Tom");
+    await say(sb, `move my Thursday clean, it's under ${CARDS.tom.mobile}`, script({ tool: "get_open_slots", input: { job_key: "regular-3" } }, { text: "Which suits?" }));
+    const o = sb.conv.offers.at(-1);
+    await say(sb, "that one", script({ tool: "book_visit", input: { slot_id: o.id } }, { text: "Done." }));
+    const toms = sb.visits.filter((v) => v.customer === "Tom" && !v.id.endsWith("n"));
+    assert.equal(toms.length, 1, "Tom has two bookings");
+    assert.equal(toms[0].id, tomVisit.id);
+    assert.equal(toms[0].day, o.day);
+  }
+});
 await test("a model-supplied phone proves nothing", async () => {
   const sb = seedSandbox();
   startConversation(sb, "tom", 1);

@@ -49,18 +49,33 @@ function modelFor(ipKey: string): CallModel | null {
   const client = new Anthropic({ apiKey: key, maxRetries: 0 });
   return async ({ system, messages, tools, timeoutMs }) => {
     if (!(await reserveCall(ipKey))) throw new Error("over cap");
-    const res = await client.messages.create(
-      {
-        model: MODEL,
-        max_tokens: 1500,
-        output_config: { effort: "low" },
-        system,
-        messages: messages as Anthropic.MessageParam[],
-        tools: tools.map((t) => ({ ...t, strict: true })) as unknown as Anthropic.ToolUnion[],
-        tool_choice: tools.length ? { type: "auto", disable_parallel_tool_use: true } : undefined,
-      },
-      { timeout: timeoutMs },
-    );
+    const started = Date.now();
+    const call = (timeout: number) =>
+      client.messages.create(
+        {
+          model: MODEL,
+          max_tokens: 1500,
+          output_config: { effort: "low" },
+          system,
+          messages: messages as Anthropic.MessageParam[],
+          tools: tools.map((t) => ({ ...t, strict: true })) as unknown as Anthropic.ToolUnion[],
+          tool_choice: tools.length ? { type: "auto", disable_parallel_tool_use: true } : undefined,
+        },
+        { timeout },
+      );
+    let res: Anthropic.Message;
+    try {
+      res = await call(timeoutMs);
+    } catch (e) {
+      // Busy or rate-limited is usually gone in a second: one retry while the turn still has time, then the fixed rules.
+      // Only the status code is logged, never the request or the provider's message.
+      const status = (e as { status?: number }).status ?? 0;
+      console.warn(`deskhand model status ${status || "none"}`);
+      const left = timeoutMs - (Date.now() - started) - 1200;
+      if (![429, 500, 502, 503, 529].includes(status) || left < 4000) throw e;
+      await new Promise((r) => setTimeout(r, 1200));
+      res = await call(left);
+    }
     await settleCall(priceOf(res.usage.input_tokens, res.usage.output_tokens));
     return { content: res.content as unknown as ModelBlock[], stopReason: res.stop_reason };
   };

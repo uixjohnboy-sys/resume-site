@@ -716,6 +716,29 @@
 }
 
 /* phone: one pane at a time */
+/* Short screens (a landscape phone, or 200% zoom) cannot hold a fixed shell: the page scrolls and the thread keeps a usable height. */
+@media (max-height: 560px) {
+  .dh-app {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .dh-main {
+    min-height: auto;
+  }
+  .dh-phone,
+  .dh-office-grid {
+    min-height: auto;
+  }
+  .dh-thread {
+    min-height: 240px;
+    max-height: 70vh;
+  }
+  .dh-scroll {
+    max-height: 70vh;
+  }
+}
+
 @media (max-width: 860px) {
   .dh-top {
     flex-wrap: wrap;

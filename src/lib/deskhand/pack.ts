@@ -115,6 +115,7 @@ End of lease clean: 1-bed $340, 2-bed $420, 3-bed $540. 4-bed goes to ${OWNER}.
 Extra bathroom $40. Oven $60 on regular and deep. Inside fridge $40.
 Regular means weekly or fortnightly with an existing customer. A new customer's first visit, a one-off or a monthly clean is charged as a deep clean. Say: "First clean is a deep clean so we can get on top of everything: $380. After that it's $250 a fortnight."
 Word meanings: bond, vacate, move-out and exit clean mean end of lease. Spring, once-off and one-off mean deep. Unit, flat and apartment are the same.
+TIME ON SITE with two cleaners: regular 1-bed 1 h, 2-bed 1 h 30, 3-bed 2 h, 4-bed 2 h 30. Deep 1-bed 2 h, 2-bed 2 h 30, 3-bed 3 h 30. End of lease 1-bed 2 h 30, 2-bed 3 h 30, 3-bed 5 h. Oven adds 30 min, fridge and each extra bathroom 15 min.
 HOURS Mon to Fri 8 am to 4 pm, Sat 8 am to 12 pm. Earliest booking is the next working day. Visits are arrival windows, never exact times.
 AREA ${AREA.join(", ")}. Anywhere else: "Sorry, we don't get out to [suburb]."
 INCLUDED Regular: kitchen benches, cooktop, outside of appliances, bathrooms, dusting, vacuum and mop, bins, beds if linen is left out. Deep adds skirting, doors and frames, switches, fans and vents, inside the microwave, shower grout and glass, under light furniture. End of lease: oven, rangehood, inside cupboards and drawers, inside windows and tracks, skirting, switches, spot-clean of walls, vacuum and mop.
