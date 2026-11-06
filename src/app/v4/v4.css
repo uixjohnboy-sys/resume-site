@@ -1115,6 +1115,55 @@ html:has(.v4) {
   flex: 1;
 }
 
+/* Worked with: six names that hold still, so each can be read and checked. */
+.v4-clients-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  max-width: 1176px;
+  margin: 0 auto;
+  padding: 0 32px;
+  text-align: left;
+}
+.v4-clients-grid li {
+  padding: 20px 24px;
+  border-top: 1px solid var(--line);
+  border-right: 0;
+  white-space: normal;
+}
+.v4 .v4-clients-grid b {
+  font-size: 26px;
+}
+/* The film frame shows the Tapline board under the play mark until the video exists. */
+.v4-film-wait {
+  overflow: hidden;
+}
+.v4-film-still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  opacity: 0.32;
+}
+.v4-film-wait > div,
+.v4-film-play {
+  z-index: 1;
+}
+@media (max-width: 860px) {
+  .v4-clients-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0 16px;
+  }
+  .v4-clients-grid li {
+    padding: 16px 12px 16px 0;
+  }
+  .v4 .v4-clients-grid b {
+    font-size: 21px;
+  }
+}
+
 /* ---------- centred hero, and the portrait in About ---------- */
 .v4-hero-center {
   background: radial-gradient(ellipse 60% 70% at 50% 60%, #ececea 0%, rgba(255, 255, 255, 0) 100%);

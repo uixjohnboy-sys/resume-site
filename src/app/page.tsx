@@ -132,7 +132,7 @@ export default function Home() {
                 <br className="v4-br" />
                 your CRM can&apos;t.
               </h1>
-              <p className="v4-lede">Custom apps, AI agents and GoHighLevel systems that take the manual work off your plate. Try them live, no sign-up.</p>
+              <p className="v4-lede">GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time, from AUD 15/hr.</p>
               <div className="v4-ctas">
                 <a className="v4-btn v4-btn-dark" href="#intro">
                   Try it live
@@ -162,6 +162,7 @@ export default function Home() {
                 </video>
               ) : (
                 <div className="v4-film-wait">
+                  <Image className="v4-film-still" src="/projects/tapline/board.png" alt="" width={2880} height={1800} sizes="(max-width: 860px) 100vw, 1040px" />
                   <span className="v4-film-play" aria-hidden="true" />
                   <div>
                     <p className="v4-kicker">Intro video · being recorded</p>
@@ -221,7 +222,8 @@ export default function Home() {
             <h2 data-rv>I&apos;m John Boy. I build the systems your business runs on.</h2>
             <p className="v4-lede" data-rv>
               From the Philippines, working with past clients in the US and Australia. UK businesses welcome. I work part-time, 4 hours a day from 8 AM your time,
-              white-label for agencies, and I invoice fortnightly.
+              white-label for agencies, inside your tools: Slack, ClickUp, Asana, Loom. I invoice fortnightly, and I will sign an NDA before you share anything about
+              your business.
             </p>
             <ul className="v4-facts" aria-label="At a glance" data-rv>
               <li>
@@ -240,24 +242,14 @@ export default function Home() {
           </div>
           <div className="v4-strip v4-strip-flat" aria-label="Clients and certifications">
             <p className="v4-strip-h">Worked with</p>
-            <div className="v4-marquee">
-              <ul className="v4-clients">
-                {clients.map((c) => (
-                  <li key={c.name}>
-                    <b>{c.name}</b>
-                    <span>{c.note}</span>
-                  </li>
-                ))}
-              </ul>
-              <ul className="v4-clients" aria-hidden="true">
-                {clients.map((c) => (
-                  <li key={c.name}>
-                    <b>{c.name}</b>
-                    <span>{c.note}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ul className="v4-clients v4-clients-grid">
+              {clients.map((c) => (
+                <li key={c.name}>
+                  <b>{c.name}</b>
+                  <span>{c.note}</span>
+                </li>
+              ))}
+            </ul>
             <ul className="v4-badges" aria-label="HighLevel certifications">
               {badges.map((b) => (
                 <li key={b.name}>
