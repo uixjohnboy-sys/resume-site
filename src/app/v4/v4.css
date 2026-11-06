@@ -935,6 +935,150 @@ html:has(.v4) {
   font-size: 13.5px;
 }
 
+/* ---------- intro: the film and its chapters ---------- */
+.v4-intro {
+  border-top: 1px solid var(--line);
+}
+.v4-film {
+  margin: 48px auto 0;
+  max-width: 1040px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--ink);
+}
+.v4-film video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--ink);
+}
+.v4-film-wait {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  height: 100%;
+  padding: 40px;
+  background: radial-gradient(ellipse 70% 80% at 80% 20%, #2a2a28 0%, var(--ink) 70%);
+  color: #fff;
+}
+.v4-film-wait .v4-kicker {
+  margin: 0;
+  color: #cfcfca;
+}
+.v4-film-wait p:last-child {
+  max-width: 560px;
+  font-size: 19px;
+  line-height: 1.5;
+}
+.v4-chapters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 1040px;
+  margin: 24px auto 0;
+  padding: 0;
+  list-style: none;
+}
+.v4-chapter {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px 16px 20px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: inherit;
+  text-decoration: none;
+}
+.v4-chapter:hover .v4-chapter-cta {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.v4-chapter-shot {
+  aspect-ratio: 16 / 10;
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+}
+.v4-chapter-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+.v4-chapter-plan {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  padding: 20px 28px;
+  font-family: var(--label);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.v4-chapter-plan i {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--line);
+}
+.v4-chapter-plan i:nth-of-type(2) {
+  width: 70%;
+}
+.v4-chapter-plan i:nth-of-type(3) {
+  width: 85%;
+}
+.v4-chapter-n {
+  font-family: var(--display);
+  font-size: 30px;
+  line-height: 1;
+}
+.v4-chapter .v4-case-tag {
+  margin: 8px 0 6px;
+}
+.v4 .v4-chapter h3 {
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+.v4-chapter p {
+  flex: 1;
+  margin: 0 0 14px;
+  color: var(--ink-2);
+}
+.v4-chapter-cta {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.v4-about {
+  border-top: 1px solid var(--line);
+  padding-bottom: 0;
+}
+.v4-strip-flat {
+  margin-top: 56px;
+  border-bottom: 0;
+}
+@media (max-width: 860px) {
+  .v4-chapters {
+    grid-template-columns: 1fr;
+  }
+  .v4-film {
+    aspect-ratio: 4 / 3;
+  }
+  .v4-film-wait {
+    padding: 24px;
+  }
+  .v4-film-wait p:last-child {
+    font-size: 17px;
+  }
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 1040px) {
   .v4-links {
