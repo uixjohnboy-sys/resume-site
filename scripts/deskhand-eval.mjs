@@ -80,8 +80,15 @@ async function post(body) {
 
 const ONLY = process.argv[4] ? new RegExp(process.argv[4]) : null;
 const results = [];
+// One sandbox carries several cases, reset between them, so a run claims only a few new sandboxes. A sandbox
+// takes 30 messages in its life and Reset does not refill that, so a new one starts before it would run out.
+let used = 99;
 for (const c of CASES.filter((x) => !ONLY || ONLY.test(x.id))) {
-  cookie = "";
+  if (used + c.lines.length > 26) {
+    cookie = "";
+    used = 0;
+  }
+  used += c.lines.length;
   await post({ reset: true });
   let s = await post({ start: c.card ?? null });
   const replies = [];

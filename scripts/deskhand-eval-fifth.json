@@ -1,0 +1,72 @@
+{
+ "summary": {
+  "label": "fifth",
+  "conversations": 3,
+  "passed": 0,
+  "guardTrips": 0,
+  "messages": 3,
+  "slowestTurnMsP95": 1938
+ },
+ "results": [
+  {
+   "id": "hand-3",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1938,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-4",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1743,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-7",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1626,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?"
+   ]
+  }
+ ]
+}
