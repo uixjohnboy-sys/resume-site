@@ -78,8 +78,9 @@ async function post(body) {
   return { status: res.status, ...(await res.json()) };
 }
 
+const ONLY = process.argv[4] ? new RegExp(process.argv[4]) : null;
 const results = [];
-for (const c of CASES) {
+for (const c of CASES.filter((x) => !ONLY || ONLY.test(x.id))) {
   cookie = "";
   await post({ reset: true });
   let s = await post({ start: c.card ?? null });
@@ -111,9 +112,10 @@ for (const c of CASES) {
     reconcile: (sb?.log.filter((l) => l.tool === "book_visit" && l.status === "done").length ?? 0) <= (sb?.visits.filter((v) => v.isNew).length ?? 0),
   };
   const pass = Object.values(checks).every(Boolean);
+  const paused = (sb?.log ?? []).filter((l) => l.tool === "fallback").map((l) => l.code ?? "no code");
   const guard = (sb?.log ?? []).filter((l) => l.tool === "reply_guard").length;
   results.push({ id: c.id, pass, checks, failed, guard, turns: times.length, maxMs: Math.max(0, ...times), replies });
-  console.log(`${pass ? "PASS" : "FAIL"} ${c.id}${pass ? "" : ` ${Object.entries(checks).filter(([, v]) => !v).map(([k]) => k).join(",")}${failed ? ` (${failed})` : ""}`}${guard ? ` guard:${guard}` : ""}`);
+  console.log(`${pass ? "PASS" : "FAIL"} ${c.id}${pass ? "" : ` ${Object.entries(checks).filter(([, v]) => !v).map(([k]) => k).join(",")}${failed ? ` (${failed})` : ""}`}${guard ? ` guard:${guard}` : ""}${paused.length ? ` paused:${paused.join("/")}` : ""}`);
 }
 const all = results.flatMap((r) => r.maxMs);
 const sorted = [...all].sort((a, b) => a - b);

@@ -86,7 +86,8 @@ ${FACTS}
 Collecting details: ${INTAKE}
 Save each detail with save_contact as you learn it. A studio counts as 1 bedroom. Stairs, when it was last cleaned, pets and parking are good to know: ask each at most once, never twice, and never let them hold up checking the calendar. When the customer picks a window, call book_visit straight away: do not ask them to confirm it first. To book: get details, call get_open_slots, offer the windows in plain words, wait for the customer's pick, then call book_visit.
 Each new message starts with a <state> block written by the system. It is the truth right now and overrides anything said earlier, including what you said yourself. Never ask for something it already shows.
-To move a booking: it needs the mobile number the booking is under. If the state shows no verified booking, ask what mobile it is under. If it lists a verified booking, the number matched: say you've found it, call get_open_slots with that visit's job_key, offer the windows, then call move_visit with their pick.
+To move a booking: it needs the mobile number the booking is under. If the state shows no verified booking, ask what mobile it is under. If it lists a verified booking, the number matched: in the same turn, call get_open_slots with that visit's job_key (no day needed), offer the windows, then call move_visit with their pick. Do not ask which day first.
+End of lease is a normal booking: never hand it off just because it is a bond clean. Hand it off only if the customer says the home is not empty, or the power or water is off, or it is 4-bed.
 
 ${HANDOFF_RULES}
 
@@ -281,9 +282,11 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
         // Two refusals of the same kind in a turn: stop rather than loop, and let the templates answer.
         if (ledger.filter((l) => l.kind === "refused").length >= 3) break;
       }
-    } catch {
+    } catch (e) {
       usedRules = true;
-      addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", text: "AI is paused, using simple booking rules" });
+      // BUILD-ONLY DIAGNOSIS (remove before G4): a status code or "over cap", never a provider message.
+      const why = e instanceof Error && /^(status:[\w:]{1,30}|over cap)$/.test(e.message) ? e.message : undefined;
+      addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", code: why, text: "AI is paused, using simple booking rules" });
     }
   }
 

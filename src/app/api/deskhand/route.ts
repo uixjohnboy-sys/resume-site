@@ -72,9 +72,14 @@ function modelFor(ipKey: string): CallModel | null {
       const status = (e as { status?: number }).status ?? 0;
       console.warn(`deskhand model status ${status || "none"}`);
       const left = timeoutMs - (Date.now() - started) - 1200;
-      if (![429, 500, 502, 503, 529].includes(status) || left < 4000) throw e;
+      // BUILD-ONLY DIAGNOSIS (remove before G4): the status travels as the error's message into the back-office log's code.
+      if (![429, 500, 502, 503, 529].includes(status) || left < 4000) throw new Error(`status:${status || (e as Error).name || "none"}`);
       await new Promise((r) => setTimeout(r, 1200));
-      res = await call(left);
+      try {
+        res = await call(left);
+      } catch (again) {
+        throw new Error(`status:${(again as { status?: number }).status ?? "none"}:retried`);
+      }
     }
     await settleCall(priceOf(res.usage.input_tokens, res.usage.output_tokens));
     return { content: res.content as unknown as ModelBlock[], stopReason: res.stop_reason };
