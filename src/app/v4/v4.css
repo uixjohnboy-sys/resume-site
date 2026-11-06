@@ -947,6 +947,10 @@ html:has(.v4) {
   border-radius: var(--radius);
   background: var(--ink);
 }
+/* Until the intro is recorded the frame is a short note, not a big empty screen. */
+.v4-film:has(.v4-film-wait) {
+  aspect-ratio: auto;
+}
 .v4-film video {
   display: block;
   width: 100%;
@@ -959,7 +963,8 @@ html:has(.v4) {
   justify-content: flex-end;
   gap: 10px;
   height: 100%;
-  padding: 40px;
+  min-height: 180px;
+  padding: 36px 40px;
   background: radial-gradient(ellipse 70% 80% at 80% 20%, #2a2a28 0%, var(--ink) 70%);
   color: #fff;
 }
