@@ -117,7 +117,7 @@ export default function Home() {
 
       <main id="top">
         {/* ---------- 1. HERO ---------- */}
-        <section className="v4-hero">
+        <section className="v4-hero v4-hero-center">
           <div className="v4-hero-in">
             <div className="v4-hero-copy" data-rv>
               <p className="v4-kicker">Systems builder · HighLevel certified</p>
@@ -137,9 +137,6 @@ export default function Home() {
                   Book a 15-min call
                 </a>
               </div>
-            </div>
-            <div className="v4-hero-media" data-rv>
-              <IntroVideo />
             </div>
           </div>
         </section>
@@ -161,8 +158,11 @@ export default function Home() {
                 </video>
               ) : (
                 <div className="v4-film-wait">
-                  <p className="v4-kicker">Intro video</p>
-                  <p>I&apos;m recording a short walk-through of these builds. Until it&apos;s up, you can open each one below and use it yourself.</p>
+                  <span className="v4-film-play" aria-hidden="true" />
+                  <div>
+                    <p className="v4-kicker">Intro video · being recorded</p>
+                    <p>A short walk-through of these builds, from me. Until it&apos;s up, open each one below and use it yourself.</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -198,6 +198,9 @@ export default function Home() {
         {/* ---------- 3. WHO I AM ---------- */}
         <section className="v4-statement v4-about" id="about">
           <div className="v4-in">
+            <div className="v4-about-photo" data-rv>
+              <IntroVideo />
+            </div>
             <p className="v4-kicker" data-rv>
               About
             </p>

@@ -947,10 +947,6 @@ html:has(.v4) {
   border-radius: var(--radius);
   background: var(--ink);
 }
-/* Until the intro is recorded the frame is a short note, not a big empty screen. */
-.v4-film:has(.v4-film-wait) {
-  aspect-ratio: auto;
-}
 .v4-film video {
   display: block;
   width: 100%;
@@ -1074,13 +1070,77 @@ html:has(.v4) {
     grid-template-columns: 1fr;
   }
   .v4-film {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
   }
   .v4-film-wait {
     padding: 24px;
   }
   .v4-film-wait p:last-child {
     font-size: 17px;
+  }
+}
+
+/* ---------- centred hero, and the portrait in About ---------- */
+.v4-hero-center {
+  background: radial-gradient(ellipse 60% 70% at 50% 60%, #ececea 0%, rgba(255, 255, 255, 0) 100%);
+}
+.v4-hero-center .v4-hero-in {
+  display: block;
+  min-height: 0;
+  text-align: center;
+}
+.v4-hero-center .v4-hero-copy {
+  padding: 120px 0 112px;
+}
+.v4-hero-center h1 {
+  font-size: clamp(58px, 9vw, 128px);
+}
+.v4-hero-center .v4-lede {
+  margin-inline: auto;
+}
+.v4-hero-center .v4-ctas {
+  justify-content: center;
+}
+.v4-about-photo {
+  width: min(400px, 78%);
+  margin: 0 auto 8px;
+}
+/* The film frame keeps its real 16:9 shape, so the page shows where the video will sit. */
+.v4-film-wait {
+  position: relative;
+  align-items: flex-start;
+}
+.v4-film-play {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 92px;
+  height: 92px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.v4-film-play::after {
+  content: "";
+  position: absolute;
+  left: 37px;
+  top: 28px;
+  border-style: solid;
+  border-width: 18px 0 18px 28px;
+  border-color: transparent transparent transparent rgba(255, 255, 255, 0.9);
+}
+@media (max-width: 860px) {
+  .v4-hero-center .v4-hero-copy {
+    padding: 72px 0 64px;
+  }
+  .v4-film-play {
+    width: 64px;
+    height: 64px;
+  }
+  .v4-film-play::after {
+    left: 25px;
+    top: 19px;
+    border-width: 12px 0 12px 19px;
   }
 }
 
