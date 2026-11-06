@@ -13,7 +13,7 @@ import "./v4/v4.css";
 // or industry). No invented results, quotes or policies. Testimonials render only when real ones exist.
 
 export const metadata: Metadata = {
-  title: "John Boy Roxas · GoHighLevel, custom apps and AI agents",
+  title: "John Boy Roxas · I build what your CRM can't",
   description:
     "HighLevel-certified builder in the Philippines. GoHighLevel systems, custom apps and AI agents for Australian and UK agencies and small businesses. Try live builds with no sign-up. From AUD 15/hr.",
 };
@@ -128,16 +128,14 @@ export default function Home() {
             <div className="v4-hero-copy" data-rv>
               <p className="v4-kicker">Systems builder · HighLevel certified</p>
               <h1>
-                Try what I build{" "}
+                I build what{" "}
                 <br className="v4-br" />
-                before you{" "}
-                <br className="v4-br" />
-                hire me.
+                your CRM can&apos;t.
               </h1>
-              <p className="v4-lede">GoHighLevel, custom apps and AI agents for agencies and small businesses.</p>
+              <p className="v4-lede">Custom apps, AI agents and GoHighLevel systems that take the manual work off your plate. Try them live, no sign-up.</p>
               <div className="v4-ctas">
                 <a className="v4-btn v4-btn-dark" href="#intro">
-                  Watch the intro
+                  Try it live
                 </a>
                 <a className="v4-btn v4-btn-line" href={BOOK}>
                   Book a 15-min call
@@ -299,7 +297,7 @@ export default function Home() {
                 <b>John Boy Roxas</b>
                 <span>Systems and automation</span>
               </a>
-              <p>Try what I build before you hire me.</p>
+              <p>I build what your CRM can&apos;t.</p>
             </div>
             <div>
               <p className="v4-foot-h">Try</p>
