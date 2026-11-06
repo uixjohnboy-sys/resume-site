@@ -1134,8 +1134,16 @@ html:has(.v4) {
     padding: 72px 0 64px;
   }
   .v4-film-play {
+    top: 40%;
     width: 64px;
     height: 64px;
+  }
+  /* On a phone the frame is small: the play mark and one short label, the rest of the note is said by the chapters. */
+  .v4-film-wait {
+    padding: 16px 18px;
+  }
+  .v4-film-wait p:last-child {
+    display: none;
   }
   .v4-film-play::after {
     left: 25px;
