@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BUSINESS, CLOCK_LABEL, DAYS, HANDOFF_REASONS, JOBS, JOB_KIND_LABEL, RULES, TEAMS, WINDOWS, type DayKey, type Team } from "@/lib/deskhand/pack";
 import { CARDS, type CardId } from "@/lib/deskhand/seed";
 import type { Contact, Conversation, LogEntry, Offer, Sandbox, Visit } from "@/lib/deskhand/types";
+import Guide from "@/components/guide/Guide";
+import { TOUR, type TourCtx } from "./tour";
 
 // The demo's one screen. The left pane is the customer's text thread; the right pane is what the agent is doing about it.
 // Everything shown comes from the server's record, and the reply only appears once the server has checked it.
@@ -72,6 +74,7 @@ export default function Desk() {
   const [changed, setChanged] = useState<Set<string>>(new Set());
   const [pending, setPending] = useState<string | null>(null);
   const [announce, setAnnounce] = useState("");
+  const [touring, setTouring] = useState(false);
   const thread = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const replyBox = useRef<HTMLDivElement>(null);
@@ -202,6 +205,25 @@ export default function Desk() {
   const handoffs = sb?.handoffs ?? [];
   const waiting = handoffs.filter((h) => h.contactId === conv?.contactId).length;
 
+  const tourCtx: TourCtx = useMemo(
+    () => ({
+      sb,
+      busy,
+      log,
+      go: {
+        customer: () => setView("customer"),
+        office: () => setView("office"),
+        panel: (p) => setPanel(p),
+        start: (card) => {
+          setTouring(false);
+          void start(card);
+        },
+      },
+      contact: { book: "/book", brief: "/sample-plan" },
+    }),
+    [sb, busy, log, start],
+  );
+
   return (
     <div className={`dh-app ${started ? "is-started" : ""}`}>
       <header className="dh-top">
@@ -217,6 +239,9 @@ export default function Desk() {
         <p className="dh-clock">Demo time: {CLOCK_LABEL}</p>
         <p className="dh-note">Demo data, a fictional business. Nothing is really sent.</p>
         <div className="dh-top-acts">
+          <button type="button" className="dh-btn dh-btn-primary" onClick={() => setTouring(true)} disabled={busy || touring}>
+            Take the 2-minute tour
+          </button>
           <button type="button" className="dh-btn" onClick={reset} disabled={busy}>
             Reset demo
           </button>
@@ -241,7 +266,7 @@ export default function Desk() {
 
       <main className="dh-main">
         <section className={`dh-customer ${view === "customer" ? "is-on" : ""}`} aria-label="Customer's text messages">
-          <div className="dh-cards" role="group" aria-label="Play a customer">
+          <div className="dh-cards" role="group" aria-label="Play a customer" data-spot="cards">
             {(Object.keys(CARDS) as CardId[]).map((id) => (
               <button key={id} type="button" className={`dh-card ${conv?.card === id ? "is-on" : ""}`} aria-pressed={conv?.card === id} onClick={() => start(id)} disabled={busy}>
                 <b>{CARDS[id].name}</b>
@@ -262,7 +287,7 @@ export default function Desk() {
                 <b>{contact?.firstName ?? "New customer"}</b> {contact?.phone}
               </p>
             )}
-            <div className="dh-thread" ref={thread} role="log" aria-label="Messages" aria-live="polite" tabIndex={0}>
+            <div className="dh-thread" data-spot="thread" ref={thread} role="log" aria-label="Messages" aria-live="polite" tabIndex={0}>
               {!started && <p className="dh-empty">Pick a customer above. A missed call starts the conversation.</p>}
               {conv?.messages.map((m, i) => (
                 <p key={i} className={`dh-msg ${m.from === "customer" ? "from-them" : "from-desk"}`}>
@@ -290,7 +315,7 @@ export default function Desk() {
                   </button>
                 </p>
                 {replies.length > 0 && (
-                  <div className={`dh-replies ${replies.length > 1 ? "is-grid" : ""}`} ref={replyBox}>
+                  <div className={`dh-replies ${replies.length > 1 ? "is-grid" : ""}`} ref={replyBox} data-spot="replies">
                     {replies.map((r) => (
                       <button key={r.send} type="button" onClick={() => send(r.send)} disabled={busy}>
                         {r.label}
@@ -322,7 +347,7 @@ export default function Desk() {
         <section className={`dh-office ${view === "office" ? "is-on" : ""}`} aria-label="Back office">
           <Outcome log={log} jobDone={Boolean(conv?.jobDone)} started={started} actions={actions} waiting={waiting} />
           <div className="dh-office-grid">
-            <div className="dh-log">
+            <div className="dh-log" data-spot="log">
               <h2>Work log{contact?.firstName ? `: ${contact.firstName}` : ""}</h2>
               <div className="dh-scroll">
                 {log.length === 0 && <p className="dh-empty">What the agent does shows up here as it happens.</p>}
@@ -339,7 +364,7 @@ export default function Desk() {
                 </ol>
               </div>
             </div>
-            <div className="dh-panels">
+            <div className="dh-panels" data-spot="panels">
               <div className="dh-tabs" role="group" aria-label="Records">
                 {(["calendar", "contact", "handoffs", "rules"] as Panel[]).map((p) => (
                   <button key={p} type="button" aria-pressed={panel === p} onClick={() => setPanel(p)}>
@@ -357,6 +382,7 @@ export default function Desk() {
           </div>
         </section>
       </main>
+      {touring && <Guide tour={TOUR} ctx={tourCtx} onClose={() => setTouring(false)} />}
     </div>
   );
 }
@@ -367,7 +393,7 @@ function Outcome({ log, jobDone, started, actions, waiting }: { log: LogEntry[];
   const big = log.find((l) => (l.tool === "book_visit" || l.tool === "move_visit") && l.status === "done") ?? log.find((l) => l.tool === "hand_off" && l.status === "done");
   const handedOnly = big?.tool === "hand_off";
   return (
-    <div className={`dh-done ${jobDone ? "is-on" : ""}`}>
+    <div className={`dh-done ${jobDone ? "is-on" : ""}`} data-spot="outcome">
       <div>
         <h2>{jobDone ? (handedOnly ? "Handed to Dana" : "Job done") : started ? "In progress" : "Waiting for a call"}</h2>
         <p>{jobDone && big ? big.text : started ? "The agent is working through this with the customer." : "Pick a customer to start."}</p>
