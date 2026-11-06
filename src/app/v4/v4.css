@@ -1400,3 +1400,15 @@ html:has(.v4) {
     display: none;
   }
 }
+
+/* A shade under the note, so its words stay readable over the board. */
+.v4-film-wait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 10, 10, 0) 45%, rgba(10, 10, 10, 0.88) 100%);
+}
+.v4-film-wait > div,
+.v4-film-play {
+  z-index: 2;
+}
