@@ -173,7 +173,9 @@ function getOpenSlots(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx)
   sb.conv.offers.push(...offers);
   addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "get_open_slots", status: "checked", text: `Checked the calendar: ${offers.length} open windows for ${jobLabel(jobKey)}` });
   ctx.ledger.push({ kind: "slots", offerIds: offers.map((o) => o.id) });
-  return { ok: true, data: { price, slots: offers.map((o) => ({ slot_id: o.id, label: o.label })) } };
+  // The windows can go out before the last details are in, so say now what booking will still need.
+  const stillNeed = c ? [!c.firstName && "first name", !c.phone && "mobile", !c.access && "home or lockbox"].filter(Boolean) : [];
+  return { ok: true, data: { price, slots: offers.map((o) => ({ slot_id: o.id, label: o.label })), ...(stillNeed.length ? { ask_with_the_windows: stillNeed } : {}) } };
 }
 
 function bookVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): ToolResult {

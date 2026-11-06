@@ -84,7 +84,7 @@ Use only these facts. Never invent a fact, a price or a time.
 ${FACTS}
 
 Collecting details: ${INTAKE}
-Save each detail with save_contact as you learn it. To book: get details, call get_open_slots, offer the windows in plain words, wait for the customer's pick, then call book_visit.
+Save each detail with save_contact as you learn it. A studio counts as 1 bedroom. Stairs, when it was last cleaned, pets and parking are good to know: ask each at most once, never twice, and never let them hold up checking the calendar. When the customer picks a window, call book_visit straight away: do not ask them to confirm it first. To book: get details, call get_open_slots, offer the windows in plain words, wait for the customer's pick, then call book_visit.
 Each new message starts with a <state> block written by the system. It is the truth right now and overrides anything said earlier, including what you said yourself. Never ask for something it already shows.
 To move a booking: it needs the mobile number the booking is under. If the state shows no verified booking, ask what mobile it is under. If it lists a verified booking, the number matched: say you've found it, call get_open_slots with that visit's job_key, offer the windows, then call move_visit with their pick.
 
@@ -161,6 +161,7 @@ function nextQuestion(c: Contact | null): string {
 }
 
 const STRONG_HANDOFF: [RegExp, HandoffReason][] = [
+  [/\bcommon (areas?|property)\b|\bbody corporate\b|\bclean(ing)? (of |for )?(an |my |our |the )?offices?\b|\boffices? clean|\bbuilders?'? clean\b|\bpost[- ]?(renovation|reno|construction)\b|\bairbnb\b/i, "commercial"],
   [/\b(speak|talk) (to|with) (a |an )?(person|human|real person|someone)\b|\b(speak|talk) (to|with) (dana|the owner|your boss)\b/i, "person"],
   [/\b(make|lodge|have) a complaint\b|\byou (damaged|broke|ruined)\b|\bfair trading\b/i, "complaint"],
   [/\b(stole|stolen|theft)\b/i, "theft"],
