@@ -239,9 +239,11 @@ export default function Desk() {
         <p className="dh-clock">Demo time: {CLOCK_LABEL}</p>
         <p className="dh-note">Demo data, a fictional business. Nothing is really sent.</p>
         <div className="dh-top-acts">
-          <button type="button" className="dh-btn dh-btn-primary" onClick={() => setTouring(true)} disabled={busy || touring}>
-            Take the 2-minute tour
-          </button>
+          {!touring && (
+            <button type="button" className="dh-btn dh-btn-primary" onClick={() => setTouring(true)} disabled={busy}>
+              Take the 2-minute tour
+            </button>
+          )}
           <button type="button" className="dh-btn" onClick={reset} disabled={busy}>
             Reset demo
           </button>

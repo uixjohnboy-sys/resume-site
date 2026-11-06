@@ -832,3 +832,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* The shared tour engine in Deskhand's colours. */
+body:has(.dh) .gd {
+  --gd-ink: #231e16;
+  --gd-muted: #6f6754;
+  --gd-line: #e4ddcf;
+  --gd-teal: #8a5a0f;
+  --gd-teal-2: #6d4708;
+  --gd-teal-soft: #f6ead2;
+}

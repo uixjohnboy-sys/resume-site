@@ -191,6 +191,8 @@ export type TurnOptions = {
   callModel: CallModel | null;
   onLog?: (entry: LogEntry) => void;
   deadlineMs?: number;
+  /** BUILD-ONLY DIAGNOSIS (remove before G4): why there is no model this turn. */
+  pausedWhy?: string;
 };
 
 export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): Promise<TurnResult> {
@@ -244,6 +246,7 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   let text = "";
   let usedTool = false;
   let usedRules = !model;
+  if (!model && opts.pausedWhy && !conv.rulesOnly) addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", code: opts.pausedWhy, text: "AI is paused, using simple booking rules" });
 
   if (model) {
     const history: ModelMessage[] = conv.messages.slice(-24).map((m) => ({ role: m.from === "customer" ? "user" : "assistant", content: m.from === "customer" ? m.text.replace(/[<>]/g, "") : m.text }));

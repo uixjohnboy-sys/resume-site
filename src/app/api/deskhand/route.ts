@@ -139,15 +139,18 @@ export async function POST(req: Request) {
     }
 
     // Caps are checked for the model only: over a cap, the customer still gets the fixed rules, and is never told which cap.
-    const allowed = (await claimSandbox(id, ipKey)) && (await allowMessage(id, ipKey));
+    const claimed = await claimSandbox(id, ipKey);
+    const allowed = claimed && (await allowMessage(id, ipKey));
     const callModel = allowed ? modelFor(ipKey) : null;
+    // BUILD-ONLY DIAGNOSIS (remove before G4): which gate kept the model out.
+    const pausedWhy = !claimed ? "cap:new-sandbox" : !allowed ? "cap:messages" : !callModel ? "no-key" : undefined;
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
         const send = (event: string, data: unknown) => controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
         try {
-          const result = await runTurn(sb, raw, { now, callModel, onLog: (entry) => send("log", entry) });
+          const result = await runTurn(sb, raw, { now, callModel, pausedWhy, onLog: (entry) => send("log", entry) });
           const saved = await saveSandbox(id, sb);
           send("done", saved ? { reply: result.reply, sb } : { error: PAUSED });
         } catch {
