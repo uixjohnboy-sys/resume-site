@@ -57,6 +57,8 @@ const chapters = [
     tag: "My own demo · Fictional data",
     title: "Tapline, a repairs desk",
     line: "AI triage a person confirms, after-hours dispatch, owner approvals and a real signed webhook.",
+    before: "Tenants ring and text at all hours. Jobs live in inboxes and memory.",
+    after: "Every report triaged, sent to the right trade, approved and on the record.",
     img: "/projects/tapline/board.png",
     alt: "Tapline's repairs board",
     w: 2880,
@@ -69,6 +71,8 @@ const chapters = [
     tag: "My own product · Demo data",
     title: "Coach OS, built around GoHighLevel",
     line: "Client portal, AI companion, e-signed agreements and Stripe, synced with GoHighLevel both ways.",
+    before: "Clients chased across email, shared docs and payment links.",
+    after: "One portal for the work, the agreement and the payment, in step with the CRM.",
     img: "/coach-os-shots/app-dash-kanban.jpg",
     alt: "Coach OS owner pipeline",
     w: 1440,
@@ -81,6 +85,8 @@ const chapters = [
     tag: "What you get for a brief",
     title: "A plan for your whole system",
     line: "Send me what you need. I send back a written plan: agents, workflows and integrations. Free.",
+    before: "You know something is manual, but not what to build.",
+    after: "A written plan for the whole system, before you spend a cent.",
     img: null,
     alt: "",
     w: 0,
@@ -187,6 +193,16 @@ export default function Home() {
                     <span className="v4-case-tag">{c.tag}</span>
                     <h3>{c.title}</h3>
                     <p>{c.line}</p>
+                    <dl className="v4-ba">
+                      <div>
+                        <dt>Before</dt>
+                        <dd>{c.before}</dd>
+                      </div>
+                      <div>
+                        <dt>After</dt>
+                        <dd>{c.after}</dd>
+                      </div>
+                    </dl>
                     <span className="v4-chapter-cta">{c.cta}</span>
                   </a>
                 </li>
