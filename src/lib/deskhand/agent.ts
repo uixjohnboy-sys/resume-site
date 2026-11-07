@@ -67,7 +67,7 @@ export const TOOLS = [
   },
   {
     name: "flag_danger",
-    description: "Call this at once, instead of replying, if the message suggests anyone could be in danger right now: gas, fire, smoke, chemical exposure, something swallowed, trouble breathing, or an injury. Not for something already over. The system sends the fixed safety message.",
+    description: "Call this at once, instead of replying, if the message suggests anyone could be in danger right now: gas, fire, smoke, chemical exposure, something swallowed, trouble breathing, or an injury, including someone who has fallen, is bleeding, is not moving or will not wake. Not for something already over. The system sends the fixed safety message.",
     input_schema: strict({}, []),
   },
   {
@@ -359,7 +359,9 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   const lead = announce ? "AI is paused, using simple booking rules. " : "";
   // With no AI there is no second route to the danger line, so the fixed rules lean the safe way on a wider list of words.
   // A few false alarms here are the price of not missing a real one while the AI is unavailable.
-  if (/\b(gas|smoke|smoking|fire|flames?|burn\w*|fumes?|chemicals?|bleach|ammonia|poison\w*|swallow\w*|drank|breath\w*|dizzy|faint\w*|unconscious|hurt|injur\w*|bleed\w*|choking|wheez\w*|vomit\w*|blister\w*)\b/i.test(text)) {
+  // Words about a body in trouble, not the cleaning words around it ("gas oven", "burnt-on" and "fireplace" stay ordinary).
+  const body = /\b(fumes?|poison\w*|swallow\w*|drank|can'?t breathe|breathing|breathless|gasping|choking|wheez\w*|dizzy|faint\w*|unconscious|out cold|not moving|won'?t wake|can'?t wake|collapsed|fell|fallen|a fall|hit (his|her|my|their) head|bleed\w*|blood|gash|injur\w*|chest (pain|is|hurts)|blue (in the )?lips|vomit\w*|blister\w*|burnt (him|her|me|my|his)|burns on|electrocut\w*|smell gas|gas leak|on fire|smoke (is )?(coming|everywhere|filling))\b/i;
+  if (body.test(text) && !/\bhurt my (back|knee|shoulder|wrist|hip|neck)\b|\b(last (week|month|year)|years? ago|was fine)\b/i.test(text)) {
     executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
     addLog(sb, { at: base.at, actor: "safety", tool: "danger_line", status: "flagged", text: "AI paused, so words that might mean danger got the fixed safety message" });
     return `${lead}${DANGER_TEXT}`;
