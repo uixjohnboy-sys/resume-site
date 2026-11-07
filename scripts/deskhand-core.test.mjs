@@ -117,7 +117,7 @@ await test("Tom: wrong number refused, right number verified, move works", async
   const r0 = await say(sb, "Hi can I move my Thursday clean?", script({ tool: "move_visit", input: { visit_id: tomVisit.id, slot_id: "s1" } }, { text: "What mobile is it under?" }));
   assert.ok(sb.log.some((l) => l.code === "NOT_VERIFIED"));
   assert.match(r0.reply, /mobile/);
-  await say(sb, "It's under 0491 570 006", script({ text: "I can't see a booking on that number. What mobile is it under?" }));
+  await say(sb, "It's under 0491 570 808", script({ text: "I can't see a booking on that number. What mobile is it under?" }));
   assert.ok(sb.log.some((l) => l.code === "NO_MATCH"));
   assert.equal(sb.conv.verifiedContactId, null);
   await say(sb, `Sorry, ${CARDS.tom.mobile}`, script({ tool: "get_open_slots", input: { job_key: "regular-3" } }, { text: "Saturday between 8 am and 9 am work?" }));
@@ -409,6 +409,72 @@ await test("reconciliation: every state change has a log entry", async () => {
   assert.equal(booked.length, newVisits.length);
   assert.ok(booked[0].ref === newVisits[0].ref);
   for (let i = 1; i < sb.log.length; i++) assert.equal(sb.log[i].seq, sb.log[i - 1].seq + 1);
+});
+
+// G3 QA Majors, each held by a test.
+const verifiedTom = async () => {
+  const sb = seedSandbox();
+  startConversation(sb, "tom", 1);
+  await say(sb, `It's under ${CARDS.tom.mobile}`, script({ tool: "get_open_slots", input: { job_key: "regular-3" } }, { text: "Which suits?" }));
+  return sb;
+};
+
+await test("M2: a picked window moves once, even when the model calls move_visit again", async () => {
+  const sb = await verifiedTom();
+  const tomVisit = sb.visits.find((v) => v.customer === "Tom");
+  const o = sb.conv.offers.at(-1);
+  const r = await say(sb, o.label, script({ tool: "move_visit", input: { visit_id: tomVisit.id, slot_id: o.id } }, { text: "Done." }));
+  assert.equal(sb.log.filter((l) => l.tool === "move_visit" && l.status === "done").length, 1);
+  assert.equal(sb.log.filter((l) => l.tool === "confirmation").length, 1);
+  assert.equal(r.reply.split("Moved to").length - 1, 1, r.reply);
+});
+
+await test("M2: a move to the window the visit already holds is refused without a log row", async () => {
+  const sb = await verifiedTom();
+  const tomVisit = sb.visits.find((v) => v.customer === "Tom");
+  const o = sb.conv.offers.at(-1);
+  sb.conv.turn += 1;
+  const ctx = () => ({ actor: "ai", at: 1, customerText: "", ledger: [] });
+  assert.equal(executeTool(sb, "move_visit", { visit_id: tomVisit.id, slot_id: o.id }, ctx()).ok, true);
+  const rows = sb.log.length;
+  const again = executeTool(sb, "move_visit", { visit_id: tomVisit.id, slot_id: o.id }, ctx());
+  assert.equal(again.code, "ALREADY_THERE");
+  assert.equal(sb.log.length, rows);
+});
+
+await test("M3: Tom's scripted wrong number matches no one, even after Priya has booked", async () => {
+  const sb = seedSandbox();
+  for (const card of Object.values(CARDS)) assert.notEqual(card.phone.replace(/D/g, ""), "0491570808");
+  startConversation(sb, "priya", 1);
+  const priya = sb.contacts.find((c) => c.id === sb.conv.contactId);
+  Object.assign(priya, { firstName: "Priya", suburb: "Glebe", bedrooms: 2, access: "home" });
+  sb.visits.push({ ...sb.visits[0], id: "vP", ref: "LH-9999", contactId: priya.id, customer: "Priya", isNew: true });
+  startConversation(sb, "tom", 1);
+  await say(sb, "Hi it's Tom, can I move my Thursday clean?", script({ text: "What mobile is it under?" }));
+  await say(sb, "It's under 0491 570 808", script({ text: "I can't see a booking on that number." }));
+  assert.equal(sb.conv.verifiedContactId, null);
+  await say(sb, `It's under ${CARDS.priya.phone}`, script({ text: "I can't see a booking on that number." }));
+  assert.equal(sb.conv.verifiedContactId, null, "Tom verified on Priya's number");
+});
+
+await test("M4: the fixed rules offer a verified customer their own job, with no first-clean price", async () => {
+  const sb = await verifiedTom();
+  const r = await say(sb, "What's open? Any day is fine.", null);
+  assert.doesNotMatch(r.reply, /First clean|deep clean|$380|$250/, r.reply);
+  assert.match(r.reply, /what's open for your clean/i, r.reply);
+  assert.ok(!sb.handoffs.some((h) => h.contactId === sb.conv.contactId), "handed to Dana");
+});
+
+await test("M5: details added after a hand-off land on Dana's card, under the customer's name", async () => {
+  const sb = seedSandbox();
+  startConversation(sb, "priya", 1);
+  await say(sb, "Hi, can you quote for the common areas of our strata building?", script({ text: "I'll pass that to Dana." }));
+  assert.equal(sb.handoffs.at(-1).customer, "Unknown caller");
+  await say(sb, "It's 40 units and we'd want it weekly. I'm Priya.", script({ tool: "save_contact", input: { first_name: "Priya", frequency: "weekly", notes: "40 units, common areas" } }, { text: "Added to your request." }));
+  const h = sb.handoffs.at(-1);
+  assert.equal(h.customer, "Priya");
+  assert.ok(h.items.some((i) => /40 units/.test(i)), h.items.join(" | "));
+  assert.ok(h.items.some((i) => /weekly/.test(i)), h.items.join(" | "));
 });
 assert.ok(NOW > 0);
 console.log(`${passed} passed${process.exitCode ? ", with failures" : ""}`);

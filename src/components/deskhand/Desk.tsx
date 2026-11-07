@@ -50,7 +50,7 @@ function nextReplies(conv: Conversation): Reply[] {
       return one("Any chance of a discount? I've been with you a while");
     }
     if (conv.verifiedContactId) return [{ label: "What's open?", send: "What's open? Any day is fine." }];
-    const script = ["Hi it's Tom, can I move my Thursday clean?", "It's under 0491 570 006", "Sorry, it's 0491 570 313"];
+    const script = ["Hi it's Tom, can I move my Thursday clean?", "It's under 0491 570 808", "Sorry, it's 0491 570 313"];
     return one(script.find((s) => !said.includes(s)) ?? script[2]);
   }
   if (conv.card === "priya") {
@@ -82,10 +82,17 @@ export default function Desk() {
   const start = useCallback(async (card: CardId | null) => {
     setNotice(null);
     setChanged(new Set());
-    const res = await api({ start: card });
-    const data = await res.json();
-    if (data.sb) setSb(data.sb);
-    else setNotice(data.error ?? "Please try again.");
+    setBusy(true);
+    try {
+      const res = await api({ start: card });
+      const data = await res.json();
+      if (data.sb) setSb(data.sb);
+      else setNotice(data.error ?? "Please try again.");
+    } catch {
+      setNotice("Please try again.");
+    } finally {
+      setBusy(false);
+    }
     setLiveLog([]);
     setPanel("calendar");
   }, []);

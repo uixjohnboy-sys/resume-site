@@ -103,6 +103,7 @@ export async function POST(req: Request) {
   } catch {
     return json({ error: "Please try again." }, 400);
   }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return json({ error: "Please try again." }, 400);
   const raw = typeof body.text === "string" ? body.text.normalize("NFKC").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").trim() : null;
 
   // The danger line never depends on the store, a cap or the model.
@@ -113,6 +114,8 @@ export async function POST(req: Request) {
   const ipKey = hashKey(network(clientIp(req)));
   const lock = await takeLock(id);
   if (!lock) return json({ error: "One moment, still working on your last message." }, 409);
+  // The stream frees the lock when the turn ends. Every other way out frees it here (G3 QA, M1: an early return held it ~33 s).
+  let streaming = false;
 
   try {
     const sb = await loadSandbox(id);
@@ -124,7 +127,7 @@ export async function POST(req: Request) {
       return json({ sb: fresh });
     }
     if ("start" in body) {
-      const card = typeof body.start === "string" && body.start in CARDS ? (body.start as CardId) : null;
+      const card = typeof body.start === "string" && Object.hasOwn(CARDS, body.start) ? (body.start as CardId) : null;
       // A new customer on a fresh page: earlier contacts and visits stay, the conversation does not.
       sb.conv = freshConversation();
       startConversation(sb, card, now);
@@ -164,11 +167,11 @@ export async function POST(req: Request) {
         }
       },
     });
+    streaming = true;
     return new Response(stream, { headers: { "content-type": "text/event-stream", "cache-control": "no-store", "x-accel-buffering": "no" } });
   } catch {
-    await freeLock(id, lock);
     return json({ error: PAUSED }, 503);
   } finally {
-    if (!("text" in body)) await freeLock(id, lock);
+    if (!streaming) await freeLock(id, lock);
   }
 }

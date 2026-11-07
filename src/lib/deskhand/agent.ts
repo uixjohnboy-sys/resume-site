@@ -271,7 +271,10 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
       for (let round = 0; round <= MAX_ROUNDS; round++) {
         const left = budget - (Date.now() - started);
         if (left < 1500) break;
-        const res = await model({ system, messages: history, tools: round === MAX_ROUNDS ? [] as unknown as typeof TOOLS : TOOLS, timeoutMs: left });
+        // Once this turn has booked or moved, the model no longer gets the tools to do it again.
+        const settledNow = ledger.some((l) => l.kind === "booked" || l.kind === "moved");
+        const tools = round === MAX_ROUNDS ? ([] as unknown as typeof TOOLS) : settledNow ? (TOOLS.filter((t) => t.name !== "book_visit" && t.name !== "move_visit") as unknown as typeof TOOLS) : TOOLS;
+        const res = await model({ system, messages: history, tools, timeoutMs: left });
         modelCalls += 1;
         const calls = res.content.filter((b): b is Extract<ModelBlock, { type: "tool_use" }> => b.type === "tool_use");
         const said = res.content.filter((b): b is Extract<ModelBlock, { type: "text" }> => b.type === "text").map((b) => b.text).join(" ").trim();
@@ -342,7 +345,14 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
 
   // One hand-off line is enough: if the job has gone to Dana, the lighter "I'll ask Dana" line is dropped.
   const ending = ledger.some((l) => l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends);
-  const receipts = ledger.filter((l) => !(ending && l.kind === "handoff" && !HANDOFF_REASONS[l.reason].ends)).map((l) => receiptFor(sb, l)).filter(Boolean).join(" ");
+  const seen = new Set<string>();
+  const receipts = ledger
+    .filter((l) => !(ending && l.kind === "handoff" && !HANDOFF_REASONS[l.reason].ends))
+    // One receipt per visit, however many entries the turn holds for it.
+    .filter((l) => !("visitId" in l) || (!seen.has(l.visitId) && Boolean(seen.add(l.visitId))))
+    .map((l) => receiptFor(sb, l))
+    .filter(Boolean)
+    .join(" ");
   // Once something real has happened, the receipt is the message. The model's own version of it would only repeat or blur it.
   const settled = ledger.some((l) => l.kind === "booked" || l.kind === "moved" || (l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends));
   const name = currentContact(sb)?.firstName;
@@ -370,13 +380,26 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
     return `${lead}${DANGER_TEXT}`;
   }
   if (!c) return `${lead}${OWNER}'s on a job. She'll text you back by 5 pm today.`;
+  // The server already booked or moved the picked window this turn: the receipt is the reply, nothing more to ask.
+  if (base.ledger.some((l) => l.kind === "booked" || l.kind === "moved")) return lead;
   const t = text.trim();
   const pick = sb.conv.offers.filter((o) => o.turn < sb.conv.turn).find((o) => t.toLowerCase().includes(o.label.toLowerCase()) || t === o.id);
   if (pick) {
     const r = executeTool(sb, "book_visit", { slot_id: pick.id }, ctx);
     if (r.ok) return lead;
   }
-  if (!/\b(clean|book|price|quote|bedroom|bed|deep|regular|lease|bond)\b/i.test(t) && (t.includes("?") || t.split(/\s+/).length > 5)) {
+  // A verified customer is moving the booking they have: their own job, their own price, so no first-clean line (G3 QA, M4).
+  if (sb.conv.verifiedContactId) {
+    const r = executeTool(sb, "get_open_slots", {}, ctx);
+    if (r.ok && (r.data.slots as unknown[]).length) {
+      const slots = r.data.slots as { label: string }[];
+      return `${lead}Here's what's open for your clean: ${slots.map((s) => s.label).join("; ")}. Reply with the one that suits.`;
+    }
+    executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
+    return lead;
+  }
+  // "What's open?" is asking for windows, not a question for Dana.
+  if (!/\b(clean|book|price|quote|bedroom|bed|deep|regular|lease|bond|open|available|free|times?|windows?|days?|when)\b/i.test(t) && (t.includes("?") || t.split(/\s+/).length > 5)) {
     executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
     return announce ? lead : `${SAFETY_NOTE} `;
   }

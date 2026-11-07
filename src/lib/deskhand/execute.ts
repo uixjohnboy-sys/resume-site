@@ -21,6 +21,7 @@ import {
   type Team,
 } from "./pack.ts";
 import type { Contact, LedgerEntry, LogEntry, Offer, Sandbox, Stage, Visit } from "./types.ts";
+import { CARDS, type CardId } from "./seed.ts";
 
 // The only code that changes a sandbox. The model proposes and this decides: every call is validated against the data and the
 // business pack, and the state change and its log entry are written together, so the log can never claim what did not happen.
@@ -119,6 +120,15 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
   const labels: Record<string, string> = { firstName: "name", suburb: "suburb", phone: "mobile", bedrooms: "bedrooms", access: "access", frequency: "how often", notes: "notes" };
   const real = Object.keys(changed).filter((k) => before[k as keyof typeof before] !== changed[k]);
   const stageBefore = stage;
+  // Dana's open card follows the contact: the name and mobile, and anything new the customer adds, so "I've passed that on" is true.
+  for (const h of sb.handoffs.filter((x) => x.contactId === c.id)) {
+    if (c.firstName) h.customer = c.firstName;
+    if (c.phone) h.phone = c.phone;
+    for (const k of real.filter((x) => x === "notes" || x === "frequency" || x === "bedrooms")) {
+      const item = `${labels[k][0].toUpperCase()}${labels[k].slice(1)}: ${String(changed[k])}`;
+      if (!h.items.includes(item)) h.items.push(item);
+    }
+  }
   if (real.length) {
     const after = Object.fromEntries(real.map((k) => [k, changed[k]]));
     addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "save_contact", status: "done", text: `Contact updated: ${real.map((k) => labels[k]).join(", ")}${c.stage !== stageBefore ? `. Pipeline: ${c.stage}` : ""}`, before, after });
@@ -178,7 +188,13 @@ function getOpenSlots(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx)
   return { ok: true, data: { price, slots: offers.map((o) => ({ slot_id: o.id, label: o.label })), ...(stillNeed.length ? { ask_with_the_windows: stillNeed } : {}) } };
 }
 
+/** A turn books or moves once. A second call in the same turn would send the customer a second confirmation (G3 QA, M2). */
+const doneThisTurn = (ctx: ExecCtx): ToolResult | null =>
+  ctx.ledger.some((l) => l.kind === "booked" || l.kind === "moved") ? { ok: false, code: "ALREADY_DONE", next: "That is already done this turn. Do not call it again; the system adds the confirmation." } : null;
+
 function bookVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): ToolResult {
+  const again = doneThisTurn(ctx);
+  if (again) return again;
   const c = currentContact(sb);
   if (!c) return refuse(sb, ctx, "book_visit", "NO_CONVERSATION", "No customer in this conversation", "Say you can't do that here.");
   // A verified customer with a booking already on the calendar is moving it, whichever tool the model reached for. Booking again
@@ -209,6 +225,8 @@ function bookVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): T
 }
 
 function moveVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): ToolResult {
+  const again = doneThisTurn(ctx);
+  if (again) return again;
   const verified = sb.conv.verifiedContactId;
   if (!verified) return refuse(sb, ctx, "move_visit", "NOT_VERIFIED", "Move refused: no matching mobile number", "Ask what mobile the booking is under.");
   const visit = sb.visits.find((v) => v.id === input.visit_id && v.contactId === verified);
@@ -217,6 +235,7 @@ function moveVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): T
   const offer = sb.conv.offers.find((o) => o.id === input.slot_id);
   if (!offer) return refuse(sb, ctx, "move_visit", "NOT_OFFERED", "Move refused: that window was never offered", "Call get_open_slots and offer the windows first.");
   if (offer.turn >= sb.conv.turn) return refuse(sb, ctx, "move_visit", "NOT_AGREED", "Move refused: the customer has not picked a window yet", "Offer the windows and wait for their pick.");
+  if (offer.day === visit.day && offer.start === visit.start) return { ok: false, code: "ALREADY_THERE", next: `${visit.ref} is already in that window. Do not move it again.` };
   if (!teamFree(sb.visits, offer.team, offer.day, offer.start, visit.minutes, visit.id)) {
     return refuse(sb, ctx, "move_visit", "SLOT_GONE", "Move refused: that window has just gone", "Call get_open_slots and offer other windows.");
   }
@@ -288,9 +307,12 @@ export function executeTool(sb: Sandbox, name: string, input: unknown, ctx: Exec
 export function checkPhone(sb: Sandbox, text: string, ctx: ExecCtx) {
   const found = text.match(/0491[\s-]?57\d[\s-]?\d{3}/g);
   if (!found) return;
+  // A card customer has one real mobile. Another customer's number, even one booked earlier in this sandbox, is not theirs (G3 QA, M3).
+  const card = sb.conv.card && sb.conv.card in CARDS ? CARDS[sb.conv.card as CardId] : null;
+  const cardMobile = card ? digits(("mobile" in card && card.mobile) || card.phone) : null;
   for (const raw of found) {
     const number = digits(raw);
-    const contact = sb.contacts.find((c) => c.phone && digits(c.phone) === number && sb.visits.some((v) => v.contactId === c.id));
+    const contact = cardMobile && number !== cardMobile ? undefined : sb.contacts.find((c) => c.phone && digits(c.phone) === number && sb.visits.some((v) => v.contactId === c.id));
     if (contact) {
       if (sb.conv.verifiedContactId !== contact.id) {
         // From here the record being worked on is the real customer's. The blank enquiry opened for the call goes.
