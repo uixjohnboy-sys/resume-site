@@ -20,8 +20,13 @@ async function post(body) {
   }
   return res.json();
 }
+// A few sandboxes for the whole run, not one per text, so the run never trips the demo's own new-sandbox cap.
+let used = 99;
 async function ask(text) {
-  cookie = "";
+  if (++used > 25) {
+    cookie = "";
+    used = 1;
+  }
   await post({ start: null });
   const r = await post({ text });
   return { text, reply: r.reply ?? r.error ?? "", handed: (r.sb?.handoffs ?? []).map((h) => h.reason) };

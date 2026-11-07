@@ -306,7 +306,8 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
 
   // The hand-off backstop: strong phrases only, because a bond customer says "refund", "owner" and "manager".
   for (const [re, reason] of STRONG_HANDOFF) {
-    if (re.test(masked.text) && !ledger.some((l) => l.kind === "handoff")) {
+    // The server's reading wins over a softer one from the model: "common areas" is a strata job even if the model filed a question.
+    if (re.test(masked.text) && !ledger.some((l) => l.kind === "handoff" && l.reason === reason)) {
       executeTool(sb, "hand_off", { reason, summary: masked.text.slice(0, 200) }, { ...ctx, actor: "server" });
     }
   }
@@ -339,7 +340,9 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     }
   }
 
-  const receipts = ledger.map((l) => receiptFor(sb, l)).filter(Boolean).join(" ");
+  // One hand-off line is enough: if the job has gone to Dana, the lighter "I'll ask Dana" line is dropped.
+  const ending = ledger.some((l) => l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends);
+  const receipts = ledger.filter((l) => !(ending && l.kind === "handoff" && !HANDOFF_REASONS[l.reason].ends)).map((l) => receiptFor(sb, l)).filter(Boolean).join(" ");
   // Once something real has happened, the receipt is the message. The model's own version of it would only repeat or blur it.
   const settled = ledger.some((l) => l.kind === "booked" || l.kind === "moved" || (l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends));
   const name = currentContact(sb)?.firstName;
@@ -354,6 +357,13 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   const ctx: ExecCtx = { ...base, actor: "rules" };
   const c = currentContact(sb);
   const lead = announce ? "AI is paused, using simple booking rules. " : "";
+  // With no AI there is no second route to the danger line, so the fixed rules lean the safe way on a wider list of words.
+  // A few false alarms here are the price of not missing a real one while the AI is unavailable.
+  if (/\b(gas|smoke|smoking|fire|flames?|burn\w*|fumes?|chemicals?|bleach|ammonia|poison\w*|swallow\w*|drank|breath\w*|dizzy|faint\w*|unconscious|hurt|injur\w*|bleed\w*|choking|wheez\w*|vomit\w*|blister\w*)\b/i.test(text)) {
+    executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
+    addLog(sb, { at: base.at, actor: "safety", tool: "danger_line", status: "flagged", text: "AI paused, so words that might mean danger got the fixed safety message" });
+    return `${lead}${DANGER_TEXT}`;
+  }
   if (!c) return `${lead}${OWNER}'s on a job. She'll text you back by 5 pm today.`;
   const t = text.trim();
   const pick = sb.conv.offers.filter((o) => o.turn < sb.conv.turn).find((o) => t.toLowerCase().includes(o.label.toLowerCase()) || t === o.id);

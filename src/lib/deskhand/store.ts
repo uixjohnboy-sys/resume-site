@@ -19,7 +19,7 @@ export const CAPS = {
   // Review budget while the build is tested from one address. These return to 40, 120 and 10 the day G4 closes.
   ipMessages: 600,
   ipModelCalls: 1500,
-  ipSandboxes: 60,
+  ipSandboxes: 200,
   // Also review budget while the evals run. Back to 300 the day G4 closes. The spend meter below still holds the day to $2.
   siteMessages: 700,
   // Review budget too: back to 1000 when G4 closes. The $2 meter below is still the real ceiling on spend.
