@@ -440,7 +440,13 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   let finalText = parts.filter(Boolean).join(" ").trim();
   // The first price a customer is given carries the condition line, once, from the server.
   const quoted = [...finalText.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])));
-  if (quoted && !booked &&!conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) finalText = `${finalText} ${CONDITION_LINE}`;
+  // Right after the sentence with the price, so the reply still ends on its question.
+  if (quoted && !booked && !conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) {
+    const s = sentences(finalText);
+    const at = s.map((x) => [...x.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])))).lastIndexOf(true);
+    s.splice(at + 1, 0, CONDITION_LINE);
+    finalText = s.join(" ");
+  }
   return done(finalText || "Sorry, I missed that. What can I help you with?", modelCalls, usedRules);
 }
 
