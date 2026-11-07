@@ -523,5 +523,38 @@ await test("G3 QA recheck: on the fixed rules, a moved customer's next message g
   assert.ok(!sb.log.some((l) => l.code === "UNKNOWN_JOB"));
   assert.ok(sb.handoffs.some((h) => h.contactId === tomVisit.contactId));
 });
+await test("G3 QA recheck 3 N2: with the AI paused, Mia's tap script still ends in a booking", async () => {
+  const sb = mia();
+  const lines = [
+    "Hi, how much for a fortnightly clean? 3 bed in Marrickville",
+    "I'm Mia. 2 bathrooms, a house, no stairs. Last cleaned about two months ago. No pets. Street parking is fine.",
+    "I'll be home on the day",
+    "Can you check what's open?",
+  ];
+  let r;
+  for (const line of lines) {
+    r = await say(sb, line, null);
+    if (sb.conv.offers.length) break;
+  }
+  const c = sb.contacts.find((x) => x.id === sb.conv.contactId);
+  assert.equal(c.firstName, "Mia");
+  assert.equal(c.suburb, "Marrickville");
+  assert.equal(c.bedrooms, 3);
+  assert.equal(c.frequency, "fortnightly");
+  assert.equal(sb.handoffs.length, 0, sb.handoffs.map((h) => h.reason).join(","));
+  assert.ok(sb.conv.offers.length, r.reply);
+  r = await say(sb, `${sb.conv.offers.at(-1).label} please`, null);
+  assert.match(r.reply, /Booked for/, r.reply);
+});
+
+await test("G3 QA recheck 3: Aussie sign-offs beside a pick are not passed to Dana", async () => {
+  for (const extra of [" sweet as", " no worries, thanks heaps mate", " cheers, too easy"]) {
+    const sb = mia();
+    await say(sb, "I'm Mia in Newtown, 2 bed, I'll be home", script({ tool: "save_contact", input: { first_name: "Mia", suburb: "Newtown", bedrooms: 2, access: "home" } }, { tool: "get_open_slots", input: { job_key: "deep-2" } }, { text: "Which suits?" }));
+    await say(sb, sb.conv.offers[0].label + extra, script({ text: "Sure." }));
+    assert.equal(sb.handoffs.length, 0, extra);
+  }
+});
+
 assert.ok(NOW > 0);
 console.log(`${passed} passed${process.exitCode ? ", with failures" : ""}`);

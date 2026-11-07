@@ -19,14 +19,14 @@ export const CAPS = {
   // Review budget while the build is tested from one address. These return to 40, 120 and 10 the day G4 closes (sandboxes were 200, now 400 after evals spent the day).
   ipMessages: 4000,
   ipModelCalls: 8000,
-  ipSandboxes: 400,
+  ipSandboxes: 1000,
   // Also review budget while the evals run. Back to 300 the day G4 closes. The spend meter below still holds the day to $2.
   // 2026-11-07: a full G3 day (two reviewers, rechecks, evals, safety) spent 1500 by mid-afternoon.
   siteMessages: 4000,
   // Review budget too: back to 1000 when G4 closes. The $2 meter below is still the real ceiling on spend.
   siteModelCalls: 8000,
   // Review budget: back to 150 when G4 closes. Today's evals spent the 150, which left real visitors on the fixed rules.
-  siteSandboxes: 400,
+  siteSandboxes: 1000,
   ipReads: 600,
   siteMicrodollars: 2_000_000,
 };

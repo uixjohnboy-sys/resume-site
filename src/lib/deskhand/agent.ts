@@ -1,4 +1,4 @@
-import { CLOCK_LABEL, BUSINESS, DAYS, FACTS, FIRST_TEXT, HANDOFF_KEYS, HANDOFF_PROMISE, HANDOFF_REASONS, HANDOFF_RULES, INTAKE, JOBS, JOB_KEYS, BOOKABLE_DAYS, OWNER, type HandoffReason } from "./pack.ts";
+import { AREA, CLOCK_LABEL, BUSINESS, DAYS, FACTS, FIRST_TEXT, HANDOFF_KEYS, HANDOFF_PROMISE, HANDOFF_REASONS, HANDOFF_RULES, INTAKE, JOBS, JOB_KEYS, BOOKABLE_DAYS, OWNER, type HandoffReason } from "./pack.ts";
 import { addLog, checkPhone, currentContact, executeTool, slotLabel, type ExecCtx } from "./execute.ts";
 import { guardReply } from "./guard.ts";
 import { CHEMICAL_TEXT, DANGER_TEXT, MASK_TEXT, isChemicalQuestion, isDanger, maskPersonal } from "./safety.ts";
@@ -264,7 +264,7 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
       .toLowerCase()
       .replace(picked.label.toLowerCase(), " ")
       .replace(/\b(i'?ll|i will|we'?ll|someone'?s?|will) be (at )?home\b|\bhome on the day\b|\block ?box\b|\bkey safe\b/g, " ")
-      .replace(/\b(please|pls|thanks|thank you|ta|cheers|yes|yep|yeah|ok|okay|sure|great|perfect|lovely|awesome|sounds good|that one|this one|works|suits?|is fine|fine|good|for me|i'?ll take|take|book|let'?s do|go with|i'?d like|can we do|could we do|can you do|how about|what about|that|it|the|one|is|me|us|and|so|hi|hey|then|please do|do|we|i|you|can|could|would)\b/g, " ")
+      .replace(/\b(please|pls|thanks|thank you|ta|cheers|yes|yep|yeah|ok|okay|sure|great|perfect|lovely|awesome|sounds good|that one|this one|works|suits?|is fine|fine|good|for me|i'?ll take|take|book|let'?s do|go with|i'?d like|can we do|could we do|can you do|how about|what about|that|it|the|one|is|me|us|and|so|hi|hey|then|please do|do|we|i|you|can|could|would|sweet as|no worries|no dramas|all good|mate|heaps|legend|beauty|ripper|too easy|much appreciated|appreciate it)\b/g, " ")
       .replace(/[^\p{L}\p{N}?]+/gu, " ")
       .trim();
     const words = rest.replace(/\?/g, " ").split(/\s+/).filter(Boolean).length;
@@ -423,26 +423,34 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
     executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
     return lead;
   }
-  // "What's open?" is asking for windows, not a question for Dana.
-  if (!/\b(clean|book|price|quote|bedroom|bed|deep|regular|lease|bond|open|available|free|times?|windows?|days?|when)\b/i.test(t) && (t.includes("?") || t.split(/\s+/).length > 5)) {
+  // Read every detail a message carries, wherever it sits ("3 bed in Marrickville", "I'm Mia. 2 bathrooms..."), so a customer
+  // who says it all at once is not asked again, and is not passed to Dana for saying too much (G3 QA recheck 3, N2).
+  const asked = sb.conv.messages.at(-2)?.from === "agent" ? sb.conv.messages.at(-2)!.text : "";
+  const found: Record<string, unknown> = {};
+  // The lead-in in any case, the name itself capitalised ("I'm Mia", "it's Tom"; not "I'm home").
+  const named = t.match(/\b(?:[Ii]'?m|[Ii] am|[Mm]y name is|[Nn]ame'?s|[Tt]his is|[Ii]t'?s)\s+([A-Z][a-z'-]{1,30})\b/);
+  const bare = /first name/i.test(asked) ? t.match(/^([A-Za-z][a-z'-]{1,30})[.!]?$/) : null;
+  const notAName = /^(yes|yeah|yep|no|nope|ok|okay|sure|hi|hello|hey|thanks|home|lockbox|weekly|fortnightly)$/i;
+  const name = named?.[1] ?? bare?.[1];
+  if (!c.firstName && name && !notAName.test(name)) found.first_name = name[0].toUpperCase() + name.slice(1);
+  const lower = ` ${t.toLowerCase()} `;
+  const area = AREA.find((a) => new RegExp(`[^a-z]${a.toLowerCase()}[^a-z]`).test(lower));
+  if (!c.suburb && area) found.suburb = area;
+  else if (!c.suburb && /suburb/i.test(asked) && /^[\p{L} ]{3,30}$/u.test(t)) found.suburb = t;
+  const bedsSaid = t.match(/\b([1-8])\s*-?\s*(?:bed|beds|bedroom|bedrooms|br)\b/i) ?? (/bedroom/i.test(asked) ? t.match(/^\D*([1-8])\D*$/) : null);
+  if (!c.bedrooms && bedsSaid) found.bedrooms = Number(bedsSaid[1]);
+  const often = t.match(/\b(weekly|fortnightly)\b/i);
+  if (!c.frequency && often) found.frequency = often[1].toLowerCase();
+  if (Object.keys(found).length) executeTool(sb, "save_contact", found, ctx);
+  // "What's open?" is asking for windows, not a question for Dana; nor is a message that just gave us details.
+  if (!Object.keys(found).length && !/\b(clean|book|price|quote|bedroom|bed|deep|regular|lease|bond|open|available|free|times?|windows?|days?|when|home|lock ?box)\b/i.test(t) && (t.includes("?") || t.split(/\s+/).length > 5)) {
     executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
     return announce ? lead : `${SAFETY_NOTE} `;
   }
-  if (!c.firstName) {
-    if (sb.conv.turn > 1 && /^[\p{L} '-]{2,40}$/u.test(t)) executeTool(sb, "save_contact", { first_name: t.split(" ")[0] }, ctx);
-    else return `${lead}What's your first name?`;
-  }
-  if (!c.suburb) {
-    const area = t.length < 30 ? t : "";
-    if (c.firstName && area && /^[\p{L} ]+$/u.test(area) && area !== c.firstName && sb.conv.messages.at(-2)?.text.includes("suburb")) executeTool(sb, "save_contact", { suburb: area }, ctx);
-    else return `${lead}Which suburb are you in?`;
-  }
+  if (!c.firstName) return `${lead}What's your first name?`;
+  if (!c.suburb) return `${lead}Which suburb are you in?`;
   if (c.suburb === "other") return `${lead}Sorry, we don't get out there.`;
-  if (!c.bedrooms) {
-    const n = t.match(/\b([1-4])\b/);
-    if (n) executeTool(sb, "save_contact", { bedrooms: Number(n[1]) }, ctx);
-    else return `${lead}How many bedrooms? Just the number, 1 to 4.`;
-  }
+  if (!c.bedrooms) return `${lead}How many bedrooms? Just the number, 1 to 4.`;
   if (!c.access) {
     if (/\block\s?box\b/i.test(t)) executeTool(sb, "save_contact", { access: "lockbox" }, ctx);
     else if (/\bhome\b/i.test(t)) executeTool(sb, "save_contact", { access: "home" }, ctx);
