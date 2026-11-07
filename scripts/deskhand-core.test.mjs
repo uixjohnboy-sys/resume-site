@@ -476,5 +476,16 @@ await test("M5: details added after a hand-off land on Dana's card, under the cu
   assert.ok(h.items.some((i) => /40 units/.test(i)), h.items.join(" | "));
   assert.ok(h.items.some((i) => /weekly/.test(i)), h.items.join(" | "));
 });
+await test("G3 recheck: Mia picking a window is booked by the server, with no model call and no hand-off", async () => {
+  const sb = mia();
+  await say(sb, "I'm Mia in Newtown, 2 bed, I'll be home", script({ tool: "save_contact", input: { first_name: "Mia", suburb: "Newtown", bedrooms: 2, access: "home" } }, { tool: "get_open_slots", input: { job_key: "deep-2" } }, { text: "Which suits?" }));
+  const o = sb.conv.offers[0];
+  const m = script({ tool: "hand_off", input: { reason: "question", summary: "Booking tool unavailable" } }, { text: "I'll ask Dana." });
+  const r = await say(sb, `${o.label} please`, m);
+  assert.equal(m.calls.length, 0, "model was called after the server booked");
+  assert.equal(sb.handoffs.length, 0);
+  assert.match(r.reply, /Booked for/);
+  assert.equal(sb.conv.noToolTurns, 0);
+});
 assert.ok(NOW > 0);
 console.log(`${passed} passed${process.exitCode ? ", with failures" : ""}`);

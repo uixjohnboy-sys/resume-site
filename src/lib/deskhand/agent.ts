@@ -253,11 +253,15 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
 
   let model = opts.callModel;
   if (conv.rulesOnly) model = null;
+  // The server already booked or moved the window the customer picked: the receipt is the whole reply, so there is nothing for the
+  // model to do, and a model turn here could only repeat it or second-guess it.
+  const settledByServer = ledger.some((l) => l.kind === "booked" || l.kind === "moved");
+  if (settledByServer) model = null;
   let modelCalls = 0;
   let text = "";
   let usedTool = false;
-  let usedRules = !model;
-  if (!model && opts.pausedWhy && !conv.rulesOnly) addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", code: opts.pausedWhy, text: "AI is paused, using simple booking rules" });
+  let usedRules = !model && !settledByServer;
+  if (!model && !settledByServer && opts.pausedWhy && !conv.rulesOnly) addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", code: opts.pausedWhy, text: "AI is paused, using simple booking rules" });
 
   if (model) {
     const history: ModelMessage[] = conv.messages.slice(-24).map((m) => ({ role: m.from === "customer" ? "user" : "assistant", content: m.from === "customer" ? m.text.replace(/[<>]/g, "") : m.text }));
@@ -271,10 +275,9 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
       for (let round = 0; round <= MAX_ROUNDS; round++) {
         const left = budget - (Date.now() - started);
         if (left < 1500) break;
-        // Once this turn has booked or moved, the model no longer gets the tools to do it again.
-        const settledNow = ledger.some((l) => l.kind === "booked" || l.kind === "moved");
-        const tools = round === MAX_ROUNDS ? ([] as unknown as typeof TOOLS) : settledNow ? (TOOLS.filter((t) => t.name !== "book_visit" && t.name !== "move_visit") as unknown as typeof TOOLS) : TOOLS;
-        const res = await model({ system, messages: history, tools, timeoutMs: left });
+        // A second book or move in the same turn is answered ALREADY_DONE by the server. The tools stay listed: taking them away
+        // made the model hand a finished booking to Dana as "booking tool unavailable" (G3 recheck).
+        const res = await model({ system, messages: history, tools: round === MAX_ROUNDS ? [] as unknown as typeof TOOLS : TOOLS, timeoutMs: left });
         modelCalls += 1;
         const calls = res.content.filter((b): b is Extract<ModelBlock, { type: "tool_use" }> => b.type === "tool_use");
         const said = res.content.filter((b): b is Extract<ModelBlock, { type: "text" }> => b.type === "text").map((b) => b.text).join(" ").trim();
@@ -321,7 +324,8 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   }
 
   let reply = text;
-  if (!usedRules) {
+  // A turn the server settled had no model reply to check, and must not count as a turn without a tool.
+  if (!usedRules && !settledByServer) {
     if (usedTool) conv.noToolTurns = 0;
     else conv.noToolTurns += 1;
     const said = conv.messages.filter((m) => m.from === "customer").map((m) => m.text).join(" ");
