@@ -131,6 +131,7 @@ export default function Desk() {
         const res = await api({ text: words });
         if (!(res.headers.get("content-type") ?? "").includes("event-stream")) {
           const data = await res.json();
+          setPending(null);
           if (data.sb) setSb(data.sb);
           setNotice(data.reply ?? data.error ?? null);
           return;
@@ -161,6 +162,10 @@ export default function Desk() {
               }
               if (entry.status === "done" && WEIGHTY.has(entry.tool)) setAnnounce(entry.text);
             } else if (event === "done") {
+              // The record and the end of the pending bubble land in one update, so the customer's message is never on screen twice
+              // (G4 Accessibility recheck, M5).
+              setPending(null);
+              setBusy(false);
               if (parsed.sb) setSb(parsed.sb);
               else if (parsed.error) setNotice(parsed.error);
               else if (parsed.reply) setNotice(parsed.reply);
@@ -186,11 +191,13 @@ export default function Desk() {
     [busy],
   );
 
-  // The tapped button is gone and the field was disabled, so focus has to be put somewhere on purpose. Not on touch, where it would pop the keyboard.
+  // The tapped button is gone and the field was disabled, so focus has to be put somewhere on purpose. A reply button on any device;
+  // the text field only on a fine pointer, where focusing it does not pop a keyboard.
   const wasBusy = useRef(false);
   useEffect(() => {
-    if (wasBusy.current && !busy && !window.matchMedia("(pointer: coarse)").matches) {
-      const next = replyBox.current?.querySelector("button") ?? input.current;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    if (wasBusy.current && !busy) {
+      const next = replyBox.current?.querySelector("button") ?? (coarse ? null : input.current);
       next?.focus({ preventScroll: true });
       // At 200% and 400% zoom the reply sits below the fold: bring it into view without jumping the page (G4 Accessibility, M3).
       next?.scrollIntoView({ block: "nearest" });
@@ -238,6 +245,8 @@ export default function Desk() {
         office: () => setView("office"),
         panel: (p) => setPanel(p),
         start: (card) => {
+          // Back to the thread, so the new customer and their first reply are on screen and take the focus (G4 A11y recheck, M1).
+          setView("customer");
           setTouring(false);
           void start(card);
         },
@@ -311,7 +320,7 @@ export default function Desk() {
                 <b>{contact?.firstName ?? "New customer"}</b> {contact?.phone}
               </p>
             )}
-            <div className="dh-thread" data-spot="thread" ref={thread} role="log" aria-label="Messages" aria-live="polite" aria-busy={busy} tabIndex={0}>
+            <div className="dh-thread" data-spot="thread" ref={thread} role="log" aria-label="Messages" aria-live="polite" tabIndex={0}>
               {!started && <p className="dh-empty">Pick a customer above. A missed call starts the conversation.</p>}
               {/* The message being sent keeps its place and its node when the server's copy arrives, so it is announced once (G4 A11y, M5). */}
               {[...(conv?.messages ?? []), ...(pending ? [{ from: "customer" as const, text: pending }] : [])].map((m, i) => (
