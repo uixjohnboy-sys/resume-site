@@ -44,7 +44,9 @@ function sameOrigin(req: Request) {
 
 /** Calls the model only inside the spend meter. Anything it cannot do becomes a throw, and the turn falls back to fixed rules. */
 function modelFor(ipKey: string): CallModel | null {
-  const key = process.env.ANTHROPIC_API_KEY;
+  // Its own key in its own Console workspace with a monthly limit, so abuse of a public demo can't reach the other demos.
+  // Falls back to the shared key until JB has set DESKHAND_ANTHROPIC_API_KEY in Vercel.
+  const key = process.env.DESKHAND_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
   if (!key) return null;
   const client = new Anthropic({ apiKey: key, maxRetries: 0 });
   return async ({ system, messages, tools, timeoutMs }) => {
