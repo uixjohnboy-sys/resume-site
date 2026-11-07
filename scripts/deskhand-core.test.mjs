@@ -742,5 +742,39 @@ await test("G4 recheck: counts of rooms and time are not addresses; word-like st
   for (const t of ["8 Rose Row", "14 Kent Walk", "lock-box 7741", "building buzzer 1402", "access number 8812", "jane(at)gmail.com", "jane [at] gmail [dot] com"]) assert.notEqual(maskPersonal(t).text, t, t);
 });
 
+await test("G4 AIQ recheck: the widened net leaves machines, taps and landlords alone", () => {
+  for (const t of ["my landlord's not responding to my emails", "the washing machine is frothing", "kids ate their lunch next to the washing liquid cupboard", "the tap's been bleeding rust stains", "she's not responding to my texts"]) assert.ok(!isDanger(t), t);
+  for (const t of ["my dad is not responding", "the dog is frothing at the mouth", "the baby swallowed a dishwasher tablet"]) assert.ok(isDanger(t), t);
+});
+
+await test("G4 AIQ recheck: with the AI paused every reply carries the 000 line; lease words, number words and extras", async () => {
+  const sb = seedSandbox();
+  startConversation(sb, null, 1);
+  for (const line of ["I'm Sam in Newtown", "four bedroom house", "I'll be home"]) {
+    const r = await say(sb, line, null);
+    assert.match(r.reply, /\b000\b/, r.reply);
+  }
+  assert.equal(sb.contacts.find((c) => c.id === sb.conv.contactId).bedrooms, 4);
+  assert.ok(sb.handoffs.some((h) => h.reason === "size"));
+  for (const words of ["end of tenancy clean", "we hand the keys back to the agent on Friday"]) {
+    const s = seedSandbox();
+    startConversation(s, null, 1);
+    await say(s, `I'm Sam in Newtown, 2 bed, ${words}`, null);
+    await say(s, "I'll be home", null);
+    assert.ok(!s.visits.some((v) => v.isNew), words);
+  }
+  const s = seedSandbox();
+  startConversation(s, null, 1);
+  await say(s, "I'm Kate in Leichhardt, 3 bed, 3 bathrooms, deep clean with the oven", null);
+  const r = await say(s, "I'll be home", null);
+  assert.match(r.reply, /\$480/, r.reply);
+});
+
+await test("G4 AIQ recheck: questions typed without a question mark do not turn the AI off", async () => {
+  const sb = mia();
+  for (const q of ["do you bring products", "are you insured", "how do I pay", "can you do inside windows", "do I need to be home", "how long does a 2 bed take", "can you do Saturdays", "what about pets", "do you do ovens"]) await say(sb, q, script({ text: "We do." }));
+  assert.equal(sb.conv.rulesOnly, false);
+});
+
 assert.ok(NOW > 0);
 console.log(`${passed} passed${process.exitCode ? ", with failures" : ""}`);

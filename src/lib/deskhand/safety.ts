@@ -8,7 +8,9 @@ const norm = (s: string) => stripFormat(s).toLowerCase().replace(/[‘’]/g, "'
 // This is the first layer and it runs with no model at all. It cannot catch every way of saying it, so the agent has a second route:
 // flag_danger, which can only raise to this same fixed line. A blind corpus measures both (scripts/deskhand-safety.test.mjs).
 const CHEM = "bleach|ammonia|chlorine|domestos|drain cleaner|oven cleaner|toilet cleaner|floor cleaner|mould spray|cleaning (stuff|spray|products?|chemicals?)|chemicals?|detergent|descaler|tile stripper|stripper|vapou?rs?|dishwasher (tablets?|pods?)|rat bait|snail bait|eucalyptus oil|turps|acid|caustic|fumes?";
-const SYMPTOM = "dizzy|faint\\w*|pass(ing)? out|frothing|twitching|wheez\\w*|cough\\w*|choking|breath\\w*|burns?|burning|blister\\w*|foaming|drows\\w*|sleepy|gone pale|vomit\\w*|throw\\w* up|sting\\w*|eyes (are )?(streaming|watering|red)|can't see|lips?|throat|screaming|wobbly|overcome|rash|swollen";
+// People and animals, for words that are only an emergency about one.
+const WHO = "he|she|he's|she's|i'm|someone|somebody|mum|dad|mother|father|nan|grandma|grandpa|son|daughter|wife|husband|partner|kid|kids|child|baby|toddler|boy|girl|cleaner|neighbour|flatmate|friend|dog|puppy|cat|kitten|pet";
+const SYMPTOM = "dizzy|faint\\w*|pass(ing)? out|twitching|wheez\\w*|cough\\w*|choking|breath\\w*|burns?|burning|blister\\w*|foaming|drows\\w*|sleepy|gone pale|vomit\\w*|throw\\w* up|sting\\w*|eyes (are )?(streaming|watering|red)|can't see|lips?|throat|screaming|wobbly|overcome|rash|swollen";
 const DANGER: RegExp[] = [
   /\bgas\b.{0,45}\b(smell\w*|stink\w*|reek\w*|whiff|leak\w*|hiss\w*|pouring|on for ages|escap\w*)\b/,
   /\b(smell\w*|stink\w*|reek\w*|whiff)\b.{0,30}\bgas\b/,
@@ -19,15 +21,19 @@ const DANGER: RegExp[] = [
   // Electrical: sparks with burning or smoke, or a burning smell from a power point or wiring (G4 AI Quality, M5).
   /\bsparks?\b.{0,40}\b(burning|smok\w*|smell\w*)\b|\bburning (plastic|rubber|wires?|smell (from|coming from|out of) (the )?(power ?point|plug|wall|switch|wiring|outlet))\b/,
   // A body in trouble right now, in everyday words.
-  /\b(heart attack|having a stroke|seizure|having a fit|not responding|unresponsive|turning blue|blue lips|frothing|foaming at the mouth)\b/,
+  // Words that also describe machines, taps and landlords count only about a person or an animal (G4 AI Quality recheck, M5:
+  // "the washing machine is frothing", "my landlord's not responding" and "the tap's been bleeding rust" fired on their own).
+  /\b(heart attack|having a stroke|seizure|having a fit|turning blue|blue lips|foaming at the mouth|frothing at the mouth)\b/,
+  new RegExp(`\\b(${WHO})\\b.{0,30}\\b(not responding|unresponsive|frothing|foaming|bleeding)\\b(?! to (my|our|the|any|her|his) (emails?|texts?|messages?|calls?))`),
   /\b(can't|cant|cannot|can not|struggling to) (catch|get) (my|his|her|their|a) breath\b/,
-  /\bblood (everywhere|all over|on the (floor|tiles))\b|\bbleeding\b(?! (colou?rs?|dye|ink))/,
+  /\bblood (everywhere|all over)\b|\bthere'?s blood (on|all over|everywhere)\b|\bbleeding (badly|a lot|heavily|everywhere|and (won't|will not) stop)\b/,
   /\b(toxic |chemical |strong )?fumes\b/,
   new RegExp("\\b(" + CHEM + ")\\b.{0,120}\\b(" + SYMPTOM + ")\\b"),
   new RegExp("\\b(" + SYMPTOM + ")\\b.{0,120}\\b(" + CHEM + ")\\b"),
   new RegExp("\\b(swallow\\w*|drank|drunk|ingest\\w*|mouthful|chew\\w*|got into|(?<!\\b(we|i|you|they) )had some|ate)\\b.{0,60}\\b(" + CHEM + "|spray|poison|product|cleaner|oil)\\b"),
   // Not "had some": "we had some tablets left" is not an emergency, "the toddler got into the dishwasher tablets" is.
-  /\b(swallow\w*|drank|drunk|ingest\w*|got into|ate|eaten)\b.{0,60}\b(dishwashing liquid|washing liquid|liquid|tablets?|pods?|capsules?)\b/,
+  // The thing swallowed comes straight after the verb ("drank some dishwashing liquid"), not a cupboard later in the sentence.
+  /\b(swallow\w*|drank|drunk|ingest\w*|got into|ate|eaten)\s+(some |the |a |an |of |his |her |their |my |our |two |a few )*(\w+ ){0,2}(dishwashing liquid|washing liquid|detergent|tablets?|pods?|capsules?)\b(?! cupboard| drawer| shelf)/,
   /\b(can't|cant|cannot|can not|can hardly|struggling to|trouble) (get a )?breath(e|ing)?\b/,
   /\bpoison(ed|ing)\b/,
   /\b(unconscious|passed out|not breathing|stopped breathing|collapsed|won't wake|bleeding (badly|a lot))\b/,

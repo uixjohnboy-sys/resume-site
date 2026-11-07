@@ -383,7 +383,9 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   // A turn the server settled had no model reply to check, and must not count as a turn without a tool.
   if (!usedRules && !settledByServer) {
     // A question answered from the facts is the job, not chat: it does not count toward turning the AI off (G1 N2, G4 AI Quality M6).
-    if (usedTool || masked.text.includes("?")) conv.noToolTurns = 0;
+    // Texts often drop the "?": a message that opens like a question counts as one (G4 AIQ recheck, M6).
+    const asking = masked.text.includes("?") || /^\s*(do|does|did|are|is|can|could|how|what|when|where|which|who|will|would|should|any)\b/i.test(masked.text);
+    if (usedTool || asking) conv.noToolTurns = 0;
     else conv.noToolTurns += 1;
     const said = conv.messages.filter((m) => m.from === "customer").map((m) => m.text).join(" ");
     const mine = currentContact(sb)?.id ?? null;
@@ -461,8 +463,16 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     s.splice(at + 1, 0, CONDITION_LINE);
     finalText = s.join(" ");
   }
-  return done(finalText || "Sorry, I missed that. What can I help you with?", modelCalls, usedRules);
+  finalText = finalText || "Sorry, I missed that. What can I help you with?";
+  // No AI means no second route to the danger line, so every fixed-rules reply says what to do in an emergency.
+  if (usedRules && !/\b000\b/.test(finalText)) finalText = `${finalText} ${PAUSED_SAFETY}`;
+  return done(finalText, modelCalls, usedRules);
 }
+
+/** Bond clean in the words people use for it: the fixed rules pass these to Dana rather than book them as something else. */
+const LEASE_WORDS = /\b(bond|end of (the )?(lease|tenancy|rental)|vacat\w*|move[- ]?out|moving out|exit clean|keys? back|hand(ing)? (back )?the keys|final inspection|rental inspection|leaving the (house|unit|flat|place|rental))\b/i;
+/** While the AI is paused, every reply carries this: the keyword net cannot know every way of saying danger (G4 AIQ recheck, M5). */
+const PAUSED_SAFETY = "If anyone is in danger, call 000 or your local emergency number.";
 
 // The fixed-rules path: the same executeTool and gates, one field at a time, and anything that is not a booking goes to Dana.
 function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean): string {
@@ -475,7 +485,7 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   // With no AI there is no second route to the danger line, so the fixed rules lean the safe way on a wider list of words.
   // A few false alarms here are the price of not missing a real one while the AI is unavailable.
   // Words about a body in trouble, not the cleaning words around it ("gas oven", "burnt-on" and "fireplace" stay ordinary).
-  const body = /\b(fumes?|poison\w*|swallow\w*|drank|can'?t breathe|breathing|breathless|gasping|choking|wheez\w*|dizzy|faint\w*|unconscious|out cold|not moving|won'?t wake|can'?t wake|collapsed|fell|fallen|a fall|hit (his|her|my|their) head|bleed\w*|blood|gash|injur\w*|chest (pain|is|hurts)|blue (in the )?lips|vomit\w*|blister\w*|burnt (him|her|me|my|his)|burns on|electrocut\w*|smell gas|gas leak|on fire|alight|ablaze|sparks?|heart attack|having a stroke|seizure|having a fit|frothing|foaming|unresponsive|not responding|catch (my|his|her|their) breath|smoke'?s? (is )?(coming|everywhere|filling|pouring))\b/i;
+  const body = /\b(fumes?|poison\w*|swallow\w*|drank|can'?t breathe|breathing|breathless|gasping|choking|wheez\w*|dizzy|faint\w*|unconscious|out cold|not moving|won'?t wake|can'?t wake|collapsed|fell|fallen|a fall|hit (his|her|my|their) head|bleed\w*|blood|gash|injur\w*|chest (pain|is|hurts)|blue (in the )?lips|vomit\w*|blister\w*|burnt (him|her|me|my|his)|burns on|electrocut\w*|smell gas|gas leak|on fire|alight|ablaze|heart attack|having a stroke|seizure|having a fit|foaming at the mouth|catch (my|his|her|their) breath|smoke'?s? (is )?(coming|everywhere|filling|pouring))\b/i;
   if (body.test(text) && !/\bhurt my (back|knee|shoulder|wrist|hip|neck)\b|\b(last (week|month|year)|years? ago|was fine)\b/i.test(text)) {
     executeTool(sb, "hand_off", { reason: "question", summary: text.slice(0, 200) }, ctx);
     addLog(sb, { at: base.at, actor: "safety", tool: "danger_line", status: "flagged", text: "AI paused, so words that might mean danger got the fixed safety message" });
@@ -522,8 +532,10 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   const area = AREA.find((a) => new RegExp(`[^a-z]${a.toLowerCase()}[^a-z]`).test(lower));
   if (!c.suburb && area) found.suburb = area;
   else if (!c.suburb && /suburb/i.test(asked) && /^[\p{L} ]{3,30}$/u.test(t)) found.suburb = t;
-  const bedsSaid = t.match(/\b([1-8])\s*-?\s*(?:bed|beds|bedroom|bedrooms|br)\b/i) ?? (/bedroom/i.test(asked) ? t.match(/^\D*([1-8])\D*$/) : null);
-  if (!c.bedrooms && bedsSaid) found.bedrooms = Number(bedsSaid[1]);
+  // "3 bed", "four bedroom", "a studio", or a bare "4" when asked (G4 AI Quality recheck: "four bedroom" looped).
+  const WORDS: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, studio: 1 };
+  const bedsSaid = t.match(/\b([1-8]|one|two|three|four|five|six|seven|eight)\s*-?\s*(?:bed|beds|bedroom|bedrooms|br)\b/i) ?? t.match(/\b(studio)\b/i) ?? (/bedroom/i.test(asked) ? t.match(/^\D*?([1-8]|one|two|three|four|five|six|seven|eight)\D*$/i) : null);
+  if (!c.bedrooms && bedsSaid) found.bedrooms = WORDS[bedsSaid[1].toLowerCase()] ?? Number(bedsSaid[1]);
   const often = t.match(/\b(weekly|fortnightly)\b/i);
   if (!c.frequency && often) found.frequency = often[1].toLowerCase();
   if (Object.keys(found).length) executeTool(sb, "save_contact", found, ctx);
@@ -553,12 +565,17 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
     executeTool(sb, "hand_off", { reason: "size", summary: `${c.bedrooms}-bed home. ${text.slice(0, 160)}` }, ctx);
     return lead;
   }
-  if (/\b(bond|end of (the )?lease|vacat\w*|move[- ]?out|moving out|exit clean)\b/i.test(all)) {
+  if (LEASE_WORDS.test(all)) {
     executeTool(sb, "hand_off", { reason: "question", summary: `End of lease clean, ${c.bedrooms}-bed, ${c.suburb}. ${text.slice(0, 140)}` }, ctx);
     return `${lead}We fit end of lease cleans around your move-out and inspection days.`;
   }
   const beds = c.bedrooms ?? 3;
-  const r = executeTool(sb, "get_open_slots", { job_key: `deep-${beds}` }, ctx);
+  // Extras the customer asked for are priced, not dropped: the oven, the fridge, and bathrooms beyond the standard count (1 for a 1 or
+  // 2-bed, 2 for a 3-bed) (G4 AI Quality recheck: "3 bathrooms, deep clean with the oven" was booked at $380).
+  const bathsSaid = all.match(/\b([1-6]|one|two|three|four|five|six)\s*(?:bath|baths|bathroom|bathrooms)\b/i);
+  const baths = bathsSaid ? WORDS[bathsSaid[1].toLowerCase()] ?? Number(bathsSaid[1]) : 0;
+  const extras = { add_oven: /\boven\b/i.test(all), add_fridge: /\b(inside (the )?fridge|fridge)\b/i.test(all), extra_bathrooms: Math.max(0, baths - (beds <= 2 ? 1 : 2)) };
+  const r = executeTool(sb, "get_open_slots", { job_key: `deep-${beds}`, ...extras }, ctx);
   if (!r.ok) {
     executeTool(sb, "hand_off", { reason: "question", summary: text.slice(0, 200) }, ctx);
     return lead;
