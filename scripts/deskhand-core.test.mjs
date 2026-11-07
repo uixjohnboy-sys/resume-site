@@ -684,8 +684,10 @@ await test("G4 F10: fixed rules never book the wrong job and close a finished co
     const sb = seedSandbox();
     startConversation(sb, null, 1);
     await say(sb, line, null);
-    await say(sb, "I'll be home", null);
+    const said = await say(sb, "I'll be home", null);
     assert.ok(!sb.visits.some((v) => v.isNew), line);
+    // No fixed-rules line may say "booked" when nothing was (G4 NP recheck).
+    assert.doesNotMatch(said.reply, /\bbooked\b/i, said.reply);
     assert.ok(sb.handoffs.some((h) => h.reason === reason && h.items.length), line);
   }
   const sb = seedSandbox();

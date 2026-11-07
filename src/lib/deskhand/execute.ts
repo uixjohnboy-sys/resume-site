@@ -318,7 +318,14 @@ function handOff(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): Too
   const reason = input.reason as HandoffReason;
   if (!HANDOFF_KEYS.includes(reason)) return refuse(sb, ctx, "hand_off", "UNKNOWN_REASON", "Hand-off refused: unknown reason", "Use a listed reason.");
   const c = currentContact(sb) ?? (sb.conv.verifiedContactId ? sb.contacts.find((x) => x.id === sb.conv.verifiedContactId) ?? null : null);
-  const summary = typeof input.summary === "string" ? input.summary.replace(/[<>]/g, "").slice(0, 300) : "";
+  // Dana reads booking refs, never internal ids: "visit v17" becomes "LH-1017" (G4 NP and DD minors).
+  const summary =
+    typeof input.summary === "string"
+      ? input.summary
+          .replace(/[<>]/g, "")
+          .replace(/\b(?:visit |booking )?(v\d+n?)\b/gi, (m, id) => sb.visits.find((v) => v.id === id)?.ref ?? m)
+          .slice(0, 300)
+      : "";
   const open = sb.handoffs.find((h) => h.reason === reason && h.contactId === (c?.id ?? null));
   const refused = sb.log.filter((l) => l.status === "refused" && l.conv === sb.convNo).slice(-3).map((l) => l.text);
   if (open) {

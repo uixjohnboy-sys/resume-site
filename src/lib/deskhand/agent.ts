@@ -130,7 +130,7 @@ const HANDOFF_LEAD: Partial<Record<HandoffReason, string>> = {
   commercial: "Strata, office and Airbnb cleans are ones Dana quotes herself.",
   funding: "Funded cleans are set up by Dana herself.",
   leaseDates: "There's no window free before your inspection.",
-  cancel: "Your clean stays booked until Dana confirms. Moving or cancelling is free up to 24 hours before.",
+  cancel: "Nothing changes until Dana confirms. Moving or cancelling is free up to 24 hours before.",
 };
 
 const receiptFor = (sb: Sandbox, entry: LedgerEntry): string | null => {
@@ -555,7 +555,7 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   }
   if (/\b(bond|end of (the )?lease|vacat\w*|move[- ]?out|moving out|exit clean)\b/i.test(all)) {
     executeTool(sb, "hand_off", { reason: "question", summary: `End of lease clean, ${c.bedrooms}-bed, ${c.suburb}. ${text.slice(0, 140)}` }, ctx);
-    return `${lead}An end of lease clean is booked around your move-out and inspection days.`;
+    return `${lead}We fit end of lease cleans around your move-out and inspection days.`;
   }
   const beds = c.bedrooms ?? 3;
   const r = executeTool(sb, "get_open_slots", { job_key: `deep-${beds}` }, ctx);
