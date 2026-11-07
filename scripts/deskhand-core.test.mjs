@@ -444,7 +444,7 @@ await test("M2: a move to the window the visit already holds is refused without 
 
 await test("M3: Tom's scripted wrong number matches no one, even after Priya has booked", async () => {
   const sb = seedSandbox();
-  for (const card of Object.values(CARDS)) assert.notEqual(card.phone.replace(/D/g, ""), "0491570808");
+  for (const card of Object.values(CARDS)) assert.notEqual(card.phone.replace(/\D/g, ""), "0491570808");
   startConversation(sb, "priya", 1);
   const priya = sb.contacts.find((c) => c.id === sb.conv.contactId);
   Object.assign(priya, { firstName: "Priya", suburb: "Glebe", bedrooms: 2, access: "home" });
@@ -460,7 +460,7 @@ await test("M3: Tom's scripted wrong number matches no one, even after Priya has
 await test("M4: the fixed rules offer a verified customer their own job, with no first-clean price", async () => {
   const sb = await verifiedTom();
   const r = await say(sb, "What's open? Any day is fine.", null);
-  assert.doesNotMatch(r.reply, /First clean|deep clean|$380|$250/, r.reply);
+  assert.doesNotMatch(r.reply, /First clean|deep clean|\$380|\$250/, r.reply);
   assert.match(r.reply, /what's open for your clean/i, r.reply);
   assert.ok(!sb.handoffs.some((h) => h.contactId === sb.conv.contactId), "handed to Dana");
 });
@@ -488,16 +488,27 @@ await test("G3 recheck: Mia picking a window is booked by the server, with no mo
   assert.equal(sb.conv.noToolTurns, 0);
 });
 await test("G3 QA recheck N1: anything said beside a pick goes to Dana, and a plain pick does not", async () => {
-  for (const [extra, handed] of [[" please, thanks!", false], [" works for me. I'll be home", false], [" please. Also can you add the oven, and do I need to be there?", true]]) {
+  const cases = [
+    [(l) => `${l} please, thanks!`, false],
+    [(l) => `${l} works for me. I'll be home`, false],
+    [(l) => `Can we do ${l}?`, false],
+    [(l) => `Yes ${l} is perfect, book it`, false],
+    [(l) => `${l} please. Also can you add the oven, and do I need to be there?`, true],
+    [(l) => `${l} please, and add the fridge too`, true],
+    [(l) => `${l}. Can you do it cheaper?`, true],
+    [(l) => `${l} please, our dog is a bit nervous`, true],
+  ];
+  for (const [say1, handed] of cases) {
     const sb = mia();
     await say(sb, "I'm Mia in Newtown, 2 bed, I'll be home", script({ tool: "save_contact", input: { first_name: "Mia", suburb: "Newtown", bedrooms: 2, access: "home" } }, { tool: "get_open_slots", input: { job_key: "deep-2" } }, { text: "Which suits?" }));
     const o = sb.conv.offers[0];
-    const r = await say(sb, o.label + extra, script({ text: "Sure." }));
-    assert.match(r.reply, /Booked for/, extra);
-    assert.equal(sb.handoffs.length, handed ? 1 : 0, extra);
+    const text = say1(o.label);
+    const r = await say(sb, text, script({ text: "Sure." }));
+    assert.match(r.reply, /Booked for/, text);
+    assert.equal(sb.handoffs.length, handed ? 1 : 0, `${text} -> ${sb.handoffs.map((h) => h.reason).join(",")}`);
     if (handed) {
-      assert.match(sb.handoffs[0].items.join(" "), /oven/);
-      assert.match(r.reply, /ask Dana/);
+      assert.equal(sb.handoffs[0].reason, "question", text);
+      assert.match(r.reply, /ask Dana/, text);
     }
   }
 });

@@ -167,7 +167,7 @@ const STRONG_HANDOFF: [RegExp, HandoffReason][] = [
   [/\b(make|lodge|have) a complaint\b|\byou (damaged|broke|ruined)\b|\bfair trading\b/i, "complaint"],
   [/\b(stole|stolen|theft)\b/i, "theft"],
   [/\bblack mou?ld\b|\basbestos\b|\bneedles\b|\bbed ?bugs\b|\bhoard(ing|er)\b|\bsqualor\b/i, "condition"],
-  [/\b(bit|bitten|bites|nipped|nips|snapped at|aggressive)\b/i, "pet"],
+  [/\b(bitten|bites|nipped|nips|snapped at|aggressive)\b|(?<!\ba (little )?)\bbit\b(?! of\b)/i, "pet"],
 ];
 
 export function startConversation(sb: Sandbox, card: CardId | null, at: number): LogEntry[] {
@@ -263,11 +263,13 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     const rest = masked.text
       .toLowerCase()
       .replace(picked.label.toLowerCase(), " ")
-      .replace(/(i'?ll|i will|we'?ll|someone'?s?|will) be (at )?home|home on the day|lock ?box|key safe/g, " ")
-      .replace(/(please|pls|thanks|thank you|ta|cheers|yes|yep|yeah|ok|okay|sure|great|perfect|lovely|awesome|sounds good|that one|this one|works|suits?( me)?|is fine|fine|good|for me|i'?ll take|take|book( it| me| that)?|let'?s do|go with|i'?d like|that|it|the|one|is|me|and|so|hi|hey|then)/g, " ")
-      .replace(/[^p{L}p{N}?]+/gu, " ")
+      .replace(/\b(i'?ll|i will|we'?ll|someone'?s?|will) be (at )?home\b|\bhome on the day\b|\block ?box\b|\bkey safe\b/g, " ")
+      .replace(/\b(please|pls|thanks|thank you|ta|cheers|yes|yep|yeah|ok|okay|sure|great|perfect|lovely|awesome|sounds good|that one|this one|works|suits?|is fine|fine|good|for me|i'?ll take|take|book|let'?s do|go with|i'?d like|can we do|could we do|can you do|how about|what about|that|it|the|one|is|me|us|and|so|hi|hey|then|please do|do|we|i|you|can|could|would)\b/g, " ")
+      .replace(/[^\p{L}\p{N}?]+/gu, " ")
       .trim();
-    if (rest.includes("?") || rest.split(/s+/).filter(Boolean).length >= 3) {
+    const words = rest.replace(/\?/g, " ").split(/\s+/).filter(Boolean).length;
+    // Two real words left ("add oven", "cheaper price"), or a question with anything in it, is more than a pick.
+    if (words >= 2 || (words >= 1 && rest.includes("?"))) {
       executeTool(sb, "hand_off", { reason: "question", summary: `After booking, the customer added: ${masked.text.slice(0, 180)}` }, { ...ctx, actor: "server" });
     }
   }
