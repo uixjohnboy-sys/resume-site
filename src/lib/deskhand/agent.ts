@@ -191,8 +191,8 @@ export type TurnOptions = {
   callModel: CallModel | null;
   onLog?: (entry: LogEntry) => void;
   deadlineMs?: number;
-  /** BUILD-ONLY DIAGNOSIS (remove before G4): why there is no model this turn. */
-  pausedWhy?: string;
+  /** True when the live demo meant to use the model but could not. The log says the AI is paused, never which gate. */
+  paused?: boolean;
 };
 
 export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): Promise<TurnResult> {
@@ -277,7 +277,7 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   let text = "";
   let usedTool = false;
   let usedRules = !model && !settledByServer;
-  if (!model && !settledByServer && opts.pausedWhy && !conv.rulesOnly) addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", code: opts.pausedWhy, text: "AI is paused, using simple booking rules" });
+  if (!model && !settledByServer && opts.paused && !conv.rulesOnly) addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", text: "AI is paused, using simple booking rules" });
 
   if (model) {
     const history: ModelMessage[] = conv.messages.slice(-24).map((m) => ({ role: m.from === "customer" ? "user" : "assistant", content: m.from === "customer" ? m.text.replace(/[<>]/g, "") : m.text }));
@@ -318,11 +318,9 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
         // Two refusals of the same kind in a turn: stop rather than loop, and let the templates answer.
         if (ledger.filter((l) => l.kind === "refused").length >= 3) break;
       }
-    } catch (e) {
+    } catch {
       usedRules = true;
-      // BUILD-ONLY DIAGNOSIS (remove before G4): a status code or "over cap", never a provider message.
-      const why = e instanceof Error && /^(status:[\w:]{1,30}|over cap)$/.test(e.message) ? e.message : undefined;
-      addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", code: why, text: "AI is paused, using simple booking rules" });
+      addLog(sb, { at: now, actor: "server", tool: "fallback", status: "flagged", text: "AI is paused, using simple booking rules" });
     }
   }
 
