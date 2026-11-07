@@ -86,7 +86,11 @@ export async function saveSandbox(id: string, sb: Sandbox): Promise<boolean> {
     return true;
   }
   try {
-    await redis.set(`${PREFIX}:sb:${id}`, sb, { ex: TTL });
+    // The sandbox dies 48 hours after it was first claimed, however often it is saved, so "deleted within 48 hours" stays true
+    // (G4 Security, M4). The claim is always taken before the first save; a sandbox with no claim is never written.
+    const left = await redis.ttl(`${PREFIX}:claimed:${id}`);
+    if (left <= 0) return false;
+    await redis.set(`${PREFIX}:sb:${id}`, sb, { ex: left });
     return true;
   } catch {
     return false;
@@ -133,24 +137,38 @@ export async function allowMessage(id: string, ipKey: string) {
   );
 }
 
-/** Claimed once, before the first model call, the first time a sandbox is used. */
+/**
+ * Claimed once, before anything is saved for a new id: a start, a reset or a message. Over the new-sandbox caps nothing is claimed,
+ * so the next request is checked again, and nothing is saved (G4 Security, M2 and M3: start and reset used to save unclaimed, and
+ * a failed claim used to stay claimed).
+ */
 export async function claimSandbox(id: string, ipKey: string) {
   const redis = getRedis();
   const seen = `${PREFIX}:claimed:${id}`;
   if (redis) {
     try {
-      const first = await redis.set(seen, 1, { nx: true, ex: TTL });
-      if (!first) return true;
+      if (await redis.exists(seen)) return true;
     } catch {
       return false;
     }
   } else {
     if (process.env.NODE_ENV === "production") return false;
     if (mem.counters.get(seen)) return true;
-    mem.counters.set(seen, 1);
   }
   const d = today();
-  return (await under(`${PREFIX}:new:ip:${ipKey}:${d}`, CAPS.ipSandboxes)) && (await under(`${PREFIX}:new:site:${d}`, CAPS.siteSandboxes));
+  const ok = (await under(`${PREFIX}:new:ip:${ipKey}:${d}`, CAPS.ipSandboxes)) && (await under(`${PREFIX}:new:site:${d}`, CAPS.siteSandboxes));
+  if (!ok) return false;
+  if (!redis) {
+    mem.counters.set(seen, 1);
+    return true;
+  }
+  try {
+    // Two first requests at once both count; that only ever errs on the strict side.
+    await redis.set(seen, 1, { nx: true, ex: TTL });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function allowRead(ipKey: string) {

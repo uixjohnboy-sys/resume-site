@@ -20,6 +20,7 @@ export const maxDuration = 25;
 const MODEL = "claude-haiku-5-5";
 const COOKIE = "deskhand";
 const PAUSED = "This demo is paused for a moment. Please try again shortly.";
+const BUSY = "This demo has had a busy day. Please try again tomorrow.";
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
 
@@ -103,7 +104,7 @@ export async function POST(req: Request) {
     return json({ error: "Please try again." }, 400);
   }
   if (!body || typeof body !== "object" || Array.isArray(body)) return json({ error: "Please try again." }, 400);
-  const raw = typeof body.text === "string" ? body.text.normalize("NFKC").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").trim() : null;
+  const raw = typeof body.text === "string" ? body.text.normalize("NFKC").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").replace(/\p{Cf}/gu, "").trim() : null;
 
   // The danger line never depends on the store, a cap or the model.
   if (raw && isDanger(raw) && !hasStore()) return json({ reply: DANGER_TEXT });
@@ -111,6 +112,11 @@ export async function POST(req: Request) {
 
   const id = await sandboxId();
   const ipKey = hashKey(network(clientIp(req)));
+  // Every way of saving a new sandbox (start, reset, a message) is counted first. Over the cap nothing is saved.
+  if (!(await claimSandbox(id, ipKey))) {
+    if (raw && isDanger(raw)) return json({ reply: DANGER_TEXT });
+    return json({ error: BUSY }, 503);
+  }
   const lock = await takeLock(id);
   if (!lock) return json({ error: "One moment, still working on your last message." }, 409);
   // The stream frees the lock when the turn ends. Every other way out frees it here (G3 QA, M1: an early return held it ~33 s).
@@ -139,11 +145,11 @@ export async function POST(req: Request) {
 
     const said = sb.conv.messages.filter((m) => m.from === "customer").length;
     if (said >= MAX_CUSTOMER_MESSAGES) {
-      return json({ reply: "That's as long as this demo conversation goes. Press New customer or Reset to try another.", sb });
+      return json({ reply: "That's as far as this demo conversation goes. Pick another customer above, or press Reset demo.", sb });
     }
 
     // Caps are checked for the model only: over a cap, the customer still gets the fixed rules, and is never told which cap.
-    const allowed = (await claimSandbox(id, ipKey)) && (await allowMessage(id, ipKey));
+    const allowed = await allowMessage(id, ipKey);
     const callModel = allowed ? modelFor(ipKey) : null;
 
     const encoder = new TextEncoder();
