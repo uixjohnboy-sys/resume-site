@@ -504,6 +504,9 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   // added to Dana's card in the customer's words (G4 QA, M2: Priya was asked her bedrooms after her request went to Dana).
   if (sb.conv.jobDone) {
     if (/^\W*(thanks?|thank you|ta|cheers|great|perfect|lovely|awesome|ok(ay)?|sounds good|see you( then)?|bye|no worries)\b[\w\s,.!']{0,30}$/i.test(t)) return `${lead}You're welcome. If anything changes, just text this number.`;
+    // A name given after the hand-off still reaches Dana's card ("I'm Priya"), so it doesn't read "Unknown caller" (G4 QA recheck).
+    const gave = !c.firstName ? t.match(/\b(?:[Ii]'?m|[Ii] am|[Mm]y name is|[Nn]ame'?s|[Tt]his is|[Ii]t'?s)\s+([A-Z][a-z'-]{1,30})\b/) : null;
+    if (gave && !/^(home|here|fine|ok|okay|good)$/i.test(gave[1])) executeTool(sb, "save_contact", { first_name: gave[1] }, ctx);
     const ended = sb.handoffs.find((h) => h.contactId === (sb.conv.verifiedContactId ?? c.id) && HANDOFF_REASONS[h.reason].ends);
     executeTool(sb, "hand_off", { reason: ended?.reason ?? "question", summary: text.slice(0, 200) }, ctx);
     return lead;

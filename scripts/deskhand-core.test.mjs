@@ -696,6 +696,7 @@ await test("G4 F10: fixed rules never book the wrong job and close a finished co
   const r = await say(sb, "It's 40 units and we'd want it weekly. I'm Priya.", null);
   assert.doesNotMatch(r.reply, /bedrooms/i);
   assert.ok(sb.handoffs[0].items.some((i) => /40 units/.test(i)), JSON.stringify(sb.handoffs[0]));
+  assert.equal(sb.handoffs[0].customer, "Priya");
   const r2 = await say(sb, "Thanks!", null);
   assert.match(r2.reply, /You're welcome/);
 });
