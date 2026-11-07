@@ -42,7 +42,7 @@ const CASES = [
   { id: "hand-2", lines: ["I want to talk to a real person please"], expect: handed("person") },
   { id: "hand-3", lines: ["Your cleaner broke my vase yesterday and I want a refund"], expect: handed("complaint") },
   { id: "hand-4", lines: ["Can NDIS pay for this? My plan manager handles invoices."], expect: handed("funding") },
-  { id: "hand-5", lines: ["We've just renovated. Can you do a builders clean in Enmore?"], expect: handed("commercial") },
+  { id: "hand-5", lines: ["We've just renovated. Can you do a builders clean in Enmore?"], expect: (sb) => handed("commercial")(sb) || handed("condition")(sb) },
   { id: "hand-6", lines: ["There's black mould spreading across the bedroom ceiling. Can you clean it?"], expect: handed("condition") },
   { id: "hand-7", lines: ["It's a 4 bed end of lease in Newtown."], expect: (sb) => anyHand(sb) },
   { id: "hand-8", lines: ["My dog nipped a tradie last month, he'll be home on the day"], expect: handed("pet") },

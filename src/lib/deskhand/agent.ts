@@ -240,6 +240,17 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     conv.feeConsent = { visitId: conv.feeNotice.visitId, turn: conv.turn };
   }
 
+  // Two things the evals showed a small model sometimes drops, so the server does them from the customer's own words.
+  // "I'll be home" or "lockbox" is saved as access, so it is never asked twice.
+  const opened = currentContact(sb);
+  if (opened && !opened.access) {
+    const access = /\block ?box\b|\bkey safe\b/i.test(masked.text) ? "lockbox" : /\b(i'?ll be|i will be|we'?ll be|someone(?:'s| will be)|be) (at )?home\b|\bhome on the day\b/i.test(masked.text) ? "home" : null;
+    if (access) executeTool(sb, "save_contact", { access }, { ...ctx, actor: "server" });
+  }
+  // Picking a window that was offered in an earlier message books it (or moves it, for a customer with a booking).
+  const picked = conv.jobDone ? undefined : [...conv.offers].reverse().find((o) => o.turn < conv.turn && masked.text.toLowerCase().includes(o.label.toLowerCase()));
+  if (picked) executeTool(sb, "book_visit", { slot_id: picked.id }, { ...ctx, actor: "server" });
+
   let model = opts.callModel;
   if (conv.rulesOnly) model = null;
   let modelCalls = 0;

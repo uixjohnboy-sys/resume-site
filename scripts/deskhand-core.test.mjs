@@ -143,6 +143,18 @@ await test("a verified customer asking to move is never booked twice, whichever 
     assert.equal(toms[0].day, o.day);
   }
 });
+await test("the server saves home or lockbox, and books a window the customer picked, whatever the model does", async () => {
+  const sb = mia();
+  const c = sb.contacts.find((x) => x.id === sb.conv.contactId);
+  Object.assign(c, { firstName: "Mia", suburb: "Marrickville", bedrooms: 3 });
+  await say(sb, "I'll be home on the day", script({ text: "Will you be home or use a lockbox?" }));
+  assert.equal(c.access, "home");
+  await say(sb, "what's open", script({ tool: "get_open_slots", input: { job_key: "deep-3" } }, { text: "Which suits?" }));
+  const o = sb.conv.offers[0];
+  const r = await say(sb, `${o.label} please`, script({ text: "Here are the windows again: ..." }));
+  assert.ok(sb.visits.some((v) => v.contactId === c.id && v.isNew));
+  assert.match(r.reply, /Booked for/);
+});
 await test("a model-supplied phone proves nothing", async () => {
   const sb = seedSandbox();
   startConversation(sb, "tom", 1);

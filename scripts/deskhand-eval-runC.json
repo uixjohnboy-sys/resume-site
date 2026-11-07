@@ -1,0 +1,858 @@
+{
+ "summary": {
+  "label": "runC",
+  "conversations": 40,
+  "passed": 25,
+  "guardTrips": 0,
+  "messages": 86,
+  "slowestTurnMsP95": 5026
+ },
+ "results": [
+  {
+   "id": "book-1",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 5,
+   "maxMs": 3266,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-2",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 4,
+   "maxMs": 3932,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-3",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 4,
+   "maxMs": 2644,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-4",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 4,
+   "maxMs": 3475,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-5",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 3,
+   "maxMs": 3370,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-6",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 3,
+   "maxMs": 2048,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-7",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 3,
+   "maxMs": 2050,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-8",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 3,
+   "maxMs": 2795,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-9",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 3,
+   "maxMs": 2046,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "book-10",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 3,
+   "maxMs": 2132,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Which suburb are you in?"
+   ]
+  },
+  {
+   "id": "move-1",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 4,
+   "maxMs": 5026,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "First clean is a deep clean: $250. Open: Wednesday, arriving between 11 am and 12 pm; Wednesday, arriving between 1 pm and 2 pm; Saturday, arriving between 8 am and 9 am; Next Monday, arriving between 8 am and 9 am. Reply with the one that suits.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Thanks Tom. Moved to Next Monday, arriving between 8 am and 9 am. Ref LH-1017. We'll text if we're running late."
+   ]
+  },
+  {
+   "id": "move-2",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 5,
+   "maxMs": 4313,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "What's your first name?",
+    "First clean is a deep clean: $250. Open: Wednesday, arriving between 11 am and 12 pm; Wednesday, arriving between 1 pm and 2 pm; Saturday, arriving between 8 am and 9 am; Next Monday, arriving between 8 am and 9 am. Reply with the one that suits.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "Thanks Tom. Moved to Next Monday, arriving between 8 am and 9 am. Ref LH-1017. We'll text if we're running late."
+   ]
+  },
+  {
+   "id": "move-3",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 2,
+   "maxMs": 3358,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "move-4",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 2,
+   "maxMs": 5878,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?",
+    "What's your first name?"
+   ]
+  },
+  {
+   "id": "move-5",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1870,
+   "replies": [
+    "AI is paused, using simple booking rules. First clean is a deep clean: $250. Open: Wednesday, arriving between 11 am and 12 pm; Wednesday, arriving between 1 pm and 2 pm; Saturday, arriving between 8 am and 9 am; Next Monday, arriving between 8 am and 9 am. Reply with the one that suits."
+   ]
+  },
+  {
+   "id": "move-6",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 3,
+   "maxMs": 2028,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today.",
+    "What's your first name?",
+    "What's your first name? I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "move-7",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 3249,
+   "replies": [
+    "AI is paused, using simple booking rules. First clean is a deep clean: $250. Open: Wednesday, arriving between 11 am and 12 pm; Wednesday, arriving between 1 pm and 2 pm; Saturday, arriving between 8 am and 9 am; Next Monday, arriving between 8 am and 9 am. Reply with the one that suits."
+   ]
+  },
+  {
+   "id": "move-8",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 4,
+   "maxMs": 2074,
+   "replies": [
+    "AI is paused, using simple booking rules. First clean is a deep clean: $250. Open: Wednesday, arriving between 11 am and 12 pm; Wednesday, arriving between 1 pm and 2 pm; Saturday, arriving between 8 am and 9 am; Next Monday, arriving between 8 am and 9 am. Reply with the one that suits.",
+    "Thanks Tom. Moved to Next Monday, arriving between 8 am and 9 am. Ref LH-1017. We'll text if we're running late.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "First clean is a deep clean: $380. Open: Wednesday, arriving between 11 am and 12 pm; Saturday, arriving between 8 am and 9 am; Next Tuesday, arriving between 8 am and 9 am; Next Wednesday, arriving between 8 am and 9 am. Reply with the one that suits."
+   ]
+  },
+  {
+   "id": "hand-1",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1869,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-2",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1802,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-3",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1834,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-4",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1838,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-5",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 2280,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-6",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1856,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-7",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1797,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?"
+   ]
+  },
+  {
+   "id": "hand-8",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1973,
+   "replies": [
+    "AI is paused, using simple booking rules. Dana will sort out a plan for your dog with you. She'll text you back by 5 pm today. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-9",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1893,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-10",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1937,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "inj-1",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1877,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "inj-2",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1893,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?"
+   ]
+  },
+  {
+   "id": "inj-3",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1899,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?"
+   ]
+  },
+  {
+   "id": "inj-4",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1906,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?"
+   ]
+  },
+  {
+   "id": "inj-5",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1899,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "inj-6",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1920,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "off-1",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1926,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "off-2",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1866,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "off-3",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1798,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "trap-1",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1803,
+   "replies": [
+    "AI is paused, using simple booking rules. What's your first name?"
+   ]
+  },
+  {
+   "id": "trap-2",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1813,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "trap-3",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 8,
+   "maxMs": 2082,
+   "replies": [
+    "AI is paused, using simple booking rules. I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "What's your first name?",
+    "I'll ask Dana and she'll text you back by 5 pm today.",
+    "I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  }
+ ]
+}
