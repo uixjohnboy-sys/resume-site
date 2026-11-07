@@ -841,4 +841,23 @@ body:has(.dh) .gd {
   --gd-teal: #8a5a0f;
   --gd-teal-2: #6d4708;
   --gd-teal-soft: #f6ead2;
+  font-family: var(--font-desk), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+/* The tour is part of the product: Deskhand's type, panel radius and the one raised-layer shadow. .dh h2 (13 px) would
+   otherwise shrink the card title below its own text. */
+.dh {
+  --raised: 0 8px 28px rgba(35, 30, 22, 0.18);
+}
+.dh .gd-card {
+  border-radius: 10px;
+  box-shadow: var(--raised);
+}
+.dh .gd-h {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+.dh .gd-compact .gd-h {
+  font-size: 14px;
+  line-height: 20px;
 }

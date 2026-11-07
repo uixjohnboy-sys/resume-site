@@ -24,6 +24,11 @@ export type TourCtx = {
 type Step = GuideStep<TourCtx>;
 const said = (c: TourCtx) => c.sb?.conv.messages.filter((m) => m.from === "customer").length ?? 0;
 const actions = (c: TourCtx) => c.log.filter((l) => l.status === "done" || l.status === "checked").length;
+const booked = (c: TourCtx) => Boolean(c.sb?.conv.jobDone);
+/** A person was pulled in for this customer: the card and the end card must not claim nobody was. */
+const handedOff = (c: TourCtx) => Boolean(c.sb && c.sb.handoffs.some((h) => h.contactId && h.contactId === c.sb!.conv.contactId));
+const plural = (n: number) => `${n} ${n === 1 ? "action" : "actions"}`;
+// Every card that reports a result reads the visitor's own state, so pressing only Next never shows a job that didn't happen.
 
 const steps: Step[] = [
   {
@@ -59,7 +64,10 @@ const steps: Step[] = [
   {
     id: "log",
     title: () => "Every action is on the record",
-    text: (c) => `So far: ${actions(c)} actions. Each one is in the work log with the time and who did it. Refusals show up here too.`,
+    text: (c) =>
+      actions(c)
+        ? `So far: ${plural(actions(c))}. Each one is in the work log with the time and who did it. Refusals show up here too.`
+        : "Nothing yet. Once Mia has said something, each action the agent takes lands here with the time and who did it. Refusals too.",
     spot: "log",
     enter: (c) => c.go.office(),
   },
@@ -75,7 +83,10 @@ const steps: Step[] = [
   {
     id: "calendar",
     title: () => "On the calendar",
-    text: () => "The visit went to a team that's free and allowed to do the job, with travel time kept clear. The contact moved to Booked.",
+    text: (c) =>
+      booked(c)
+        ? "The visit went to a team that's free and allowed to do the job, with travel time kept clear. The contact moved to Booked."
+        : "Mia isn't booked yet. When she picks a window, her visit lands here, on a team that's free and allowed to do the job.",
     spot: "panels",
     enter: (c) => {
       c.go.office();
@@ -84,8 +95,13 @@ const steps: Step[] = [
   },
   {
     id: "outcome",
-    title: () => "Job done",
-    text: (c) => `${actions(c)} actions, and no person involved. The customer was told only what really happened.`,
+    title: (c) => (booked(c) ? "Job done" : "Where the result shows"),
+    text: (c) =>
+      !booked(c)
+        ? "When the job is finished, this card shows what the agent did and whether a person was needed. Mia's job isn't finished yet."
+        : handedOff(c)
+          ? `${plural(actions(c))}, and one thing passed to Dana with a summary. The customer was told only what really happened.`
+          : `${plural(actions(c))}, and no person involved. The customer was told only what really happened.`,
     spot: "outcome",
     enter: (c) => c.go.office(),
   },
@@ -102,7 +118,13 @@ const steps: Step[] = [
   {
     id: "end",
     title: () => "Want one for your business?",
-    text: (c) => `That was ${actions(c)} actions with nobody involved. I build agents like this around your own CRM and calendar, and a real build starts with you approving each reply.`,
+    text: (c) =>
+      (booked(c)
+        ? handedOff(c)
+          ? `That was ${plural(actions(c))}, with only the odd question passed to the owner. `
+          : `That was ${plural(actions(c))} with nobody involved. `
+        : "Close this and tap through Mia's replies to see the whole job. ") +
+      "I'm John Boy, and I build agents like this around your own CRM and calendar. A real build starts with you approving each reply.",
     end: (c) => (
       <>
         <div className="gd-cta">
