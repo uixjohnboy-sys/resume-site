@@ -356,7 +356,10 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
 function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean): string {
   const ctx: ExecCtx = { ...base, actor: "rules" };
   const c = currentContact(sb);
-  const lead = announce ? "AI is paused, using simple booking rules. " : "";
+  // The net below catches most danger without the AI, not all of it (40 of 50 on a blind set), so while the AI is paused the
+  // reply itself says what to do in an emergency: on the first paused reply, and on any message it passes to Dana.
+  const SAFETY_NOTE = "If anyone is in danger, call 000 or your local emergency number.";
+  const lead = announce ? `AI is paused, using simple booking rules. ${SAFETY_NOTE} ` : "";
   // With no AI there is no second route to the danger line, so the fixed rules lean the safe way on a wider list of words.
   // A few false alarms here are the price of not missing a real one while the AI is unavailable.
   // Words about a body in trouble, not the cleaning words around it ("gas oven", "burnt-on" and "fireplace" stay ordinary).
@@ -375,7 +378,7 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   }
   if (!/\b(clean|book|price|quote|bedroom|bed|deep|regular|lease|bond)\b/i.test(t) && (t.includes("?") || t.split(/\s+/).length > 5)) {
     executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
-    return lead;
+    return announce ? lead : `${SAFETY_NOTE} `;
   }
   if (!c.firstName) {
     if (sb.conv.turn > 1 && /^[\p{L} '-]{2,40}$/u.test(t)) executeTool(sb, "save_contact", { first_name: t.split(" ")[0] }, ctx);
