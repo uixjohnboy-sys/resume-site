@@ -1,6 +1,14 @@
 /* The Guided Demo: one look for every project's tour. It sits above the app and
    never blocks it: only the card takes clicks. Type 12/16 14/20 16/24, radius 12. */
 
+/* Folded to its top row while focus is on a control the whole card would cover. Focus back in the card unfolds it. */
+.gd-card.gd-tucked > :not(.gd-top) {
+  display: none;
+}
+.gd-card.gd-tucked .gd-top {
+  margin-bottom: 0;
+}
+
 .gd {
   --gd-ink: #0f1b2d;
   --gd-muted: #57657a;

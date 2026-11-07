@@ -48,6 +48,7 @@ function findSpot(name: string): HTMLElement | null {
 }
 
 const COMPACT_H = 500;
+const TUCKED_H = 44;
 
 /** Where the card goes: beside the spot if it fits, else above or below; a sheet on a phone or a short screen (zoom). */
 function placeCard(box: Box | null, cardH: number, vw: number, vh: number): { left: number; top: number; width: number } {
@@ -98,6 +99,7 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
   const cardRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
   const ctxRef = useRef(ctx);
+  const tuckedRef = useRef(false);
   const closeRef = useRef(onClose);
   useEffect(() => {
     ctxRef.current = ctx;
@@ -126,8 +128,12 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
     const measure = () => {
       const spot = tour.steps[n].spot;
       const name = typeof spot === "function" ? spot(ctxRef.current) : spot;
-      const cardH = cardRef.current?.offsetHeight ?? 240;
-      setSize((s) => (s.vw === window.innerWidth && s.vh === window.innerHeight && s.cardH === cardH ? s : { vw: window.innerWidth, vh: window.innerHeight, cardH }));
+      const measured = cardRef.current?.offsetHeight ?? 240;
+      // A tucked card is short on purpose: keep the full height, or it would untuck and cover the focus again.
+      setSize((s) => {
+        const cardH = tuckedRef.current ? s.cardH : measured;
+        return s.vw === window.innerWidth && s.vh === window.innerHeight && s.cardH === cardH ? s : { vw: window.innerWidth, vh: window.innerHeight, cardH };
+      });
       // Keep clear of the field the visitor is tabbing through (WCAG 2.4.11: focus never hidden by the card).
       const active = document.activeElement as HTMLElement | null;
       const typing = active && active !== document.body && !active.closest("[data-guide-card]") && active.matches("a, button, input, select, textarea");
@@ -206,7 +212,16 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
   }, []);
 
   const focusOutsideSpot = focusBox && !(box && focusBox.x >= box.x - 2 && focusBox.y >= box.y - 2 && focusBox.x + focusBox.w <= box.x + box.w + 2 && focusBox.y + focusBox.h <= box.y + box.h + 2);
-  const pos = placeCard(focusOutsideSpot ? focusBox : box, size.cardH, size.vw, size.vh);
+  let pos = placeCard(focusOutsideSpot ? focusBox : box, size.cardH, size.vw, size.vh);
+  // Nowhere to put the whole card clear of the focused control (a small or zoomed screen): fold it to its top row until focus
+  // comes back to it (WCAG 2.4.11; G4 Deskhand Accessibility, M4).
+  const covers = (p: { left: number; top: number; width: number }, h: number) =>
+    !!focusBox && p.left < focusBox.x + focusBox.w && p.left + p.width > focusBox.x && p.top < focusBox.y + focusBox.h && p.top + h > focusBox.y;
+  const tucked = covers(pos, size.cardH);
+  if (tucked) pos = placeCard(focusBox, TUCKED_H, size.vw, size.vh);
+  useEffect(() => {
+    tuckedRef.current = tucked;
+  });
   const more = moreAt === n;
   // The hole stays on screen even when its target is taller than the screen.
   const holeTop = box ? Math.max(4, box.y - PAD) : 0;
@@ -219,7 +234,7 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
       : "");
   const canGo = !step.ready || step.ready(ctx);
   const compact = size.vh < COMPACT_H;
-  const spoken = `${step.end ? "Your next step" : `Step ${n + 1} of ${counted}`}. ${step.title(ctx)}. ${step.text(ctx)} ${step.doIt && !isDone ? step.doIt(ctx) : ""}`;
+  const spoken = `${step.end ? "Your next step" : `Step ${n + 1} of ${counted}`}. ${step.title(ctx)}. ${step.text(ctx)} ${step.doIt ? step.doIt(ctx) : ""}`;
   const live = (
     <p className="gd-sr" role="status">
       {spoken}
@@ -233,7 +248,7 @@ export default function Guide<C>({ tour, ctx, onClose }: { tour: GuideTour<C>; c
         <path d={path} fillRule="evenodd" />
       </svg>
       {hole && <div className={`gd-ring${step.doIt ? " gd-ring-do" : ""}`} aria-hidden="true" style={{ left: hole.x, top: hole.y, width: hole.w, height: hole.h }} />}
-      <div className={`gd-card${compact ? " gd-compact" : ""}${compact && more ? " gd-more" : ""}`} ref={cardRef} data-guide-card role="region" aria-label={`${tour.title}, step ${Math.min(n + 1, counted)} of ${counted}`} style={{ left: pos.left, top: pos.top, width: pos.width }}>
+      <div className={`gd-card${compact ? " gd-compact" : ""}${compact && more ? " gd-more" : ""}${tucked ? " gd-tucked" : ""}`} ref={cardRef} data-guide-card role="region" aria-label={`${tour.title}, step ${Math.min(n + 1, counted)} of ${counted}`} style={{ left: pos.left, top: pos.top, width: pos.width }}>
         <div className="gd-top">
           <span className="gd-count">{step.end ? "Your next step" : `Step ${n + 1} of ${counted}`}</span>
           <button type="button" className="gd-x" onClick={onClose} aria-label="Close the tour">

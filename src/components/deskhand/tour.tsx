@@ -34,7 +34,7 @@ const steps: Step[] = [
   {
     id: "hello",
     title: () => "An AI front desk, at work",
-    text: () => "A cleaning business misses calls all day while its teams are on jobs. You'll play a new customer and watch the agent do the whole front-desk job by itself. About two minutes.",
+    text: () => "A cleaning business misses calls all day while its teams are on jobs. You'll play a new customer and watch the agent do the whole front-desk job by itself. About three minutes.",
   },
   {
     id: "pick",
@@ -48,7 +48,7 @@ const steps: Step[] = [
   {
     id: "texted",
     title: () => "It texted back first",
-    text: () => "The missed call started the conversation. The agent says who it is and offers to sort a price and a booking.",
+    text: (c) => (c.sb?.conv.card === "mia" ? "The missed call started the conversation. The agent says who it is and offers to sort a price and a booking." : "Tap Mia's card first. The missed call starts the conversation, and the agent texts first."),
     spot: "thread",
     enter: (c) => c.go.customer(),
   },
@@ -58,7 +58,7 @@ const steps: Step[] = [
     text: () => "The reply only shows once the server has checked it: prices must match the price list, and nothing can be claimed that didn't happen.",
     spot: "replies",
     enter: (c) => c.go.customer(),
-    doIt: () => "Tap Mia's reply.",
+    doIt: (c) => (c.sb?.conv.card === "mia" ? "Tap Mia's reply." : "Tap Mia's card first, then her reply."),
     done: (c) => said(c) >= 1 && !c.busy,
   },
   {
@@ -77,7 +77,7 @@ const steps: Step[] = [
     text: () => "Keep tapping Mia's replies. The agent collects the details, checks the real calendar and offers open arrival windows. Pick one.",
     spot: "replies",
     enter: (c) => c.go.customer(),
-    doIt: () => "Tap until Mia picks a window.",
+    doIt: (c) => (c.sb?.conv.card === "mia" ? "Tap until Mia picks a window." : "Tap Mia's card first, then her replies until she picks a window."),
     done: (c) => Boolean(c.sb?.conv.jobDone),
   },
   {
@@ -128,11 +128,11 @@ const steps: Step[] = [
     end: (c) => (
       <>
         <div className="gd-cta">
-          <a className="gd-btn" href={c.contact.brief}>
-            Send me your brief
-          </a>
-          <a className="gd-btn gd-quiet" href={c.contact.book}>
+          <a className="gd-btn" href={c.contact.book}>
             Book a 15-min call
+          </a>
+          <a className="gd-btn gd-quiet" href={c.contact.brief}>
+            See what a plan looks like
           </a>
           <button type="button" className="gd-btn gd-quiet" onClick={() => c.go.start("tom")}>
             Now try Tom moving a booking

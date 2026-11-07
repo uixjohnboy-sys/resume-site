@@ -26,19 +26,26 @@ const shortSlot = (o: Offer) => {
 };
 
 /** The next thing the customer could say, chosen from what has really happened, so a tap can never be out of step. */
-function nextReplies(conv: Conversation): Reply[] {
-  if (!conv.card) return [];
+function nextReplies(conv: Conversation, contact: Contact | null): Reply[] {
   const said = conv.messages.filter((m) => m.from === "customer").map((m) => m.text);
   const lastAgent = [...conv.messages].reverse().find((m) => m.from === "agent")?.text ?? "";
   const one = (send: string): Reply[] => (said.includes(send) ? [] : [{ label: send, send }]);
-  const slots = conv.offers.filter((o) => o.turn === conv.turn);
-  if (!conv.jobDone && slots.length) return slots.map((o) => ({ label: shortSlot(o), send: `${o.label} please` }));
+  // The windows on offer now: the latest set, if it came after the job was done (a second change) or the job is still open.
+  const latest = conv.offers.at(-1)?.turn;
+  const slots = latest === undefined || (conv.jobDone && (conv.doneTurn === undefined || latest <= conv.doneTurn)) ? [] : conv.offers.filter((o) => o.turn === latest);
+  if (slots.length) {
+    const windows = slots.map((o) => ({ label: shortSlot(o), send: `${o.label} please` }));
+    // A pick can't book while home or lockbox is missing, so the answer to that comes first, or the pick loops (G4 DD, M1).
+    const needAccess = contact && !contact.access && !conv.verifiedContactId;
+    return needAccess ? [{ label: "I'll be home on the day", send: "I'll be home on the day" }, { label: "I'll leave a key in a lockbox", send: "I'll leave a key in a lockbox" }, ...windows] : windows;
+  }
+  if (!conv.card) return [];
   if (conv.card === "mia") {
     if (conv.jobDone) return [];
+    // Access rides on the second message, so the beat takes one AI turn fewer (G4 Product Lead, M2).
     const script = [
       "Hi, how much for a fortnightly clean? 3 bed in Marrickville",
-      "I'm Mia. 2 bathrooms, a house, no stairs. Last cleaned about two months ago. No pets. Street parking is fine.",
-      "I'll be home on the day",
+      "I'm Mia. 2 bathrooms, a house, no stairs, no pets. Last cleaned about two months ago. Street parking is fine, and I'll be home on the day.",
       "Can you check what's open?",
     ];
     const next = script.find((s) => !said.includes(s));
@@ -50,7 +57,7 @@ function nextReplies(conv: Conversation): Reply[] {
       return one("Any chance of a discount? I've been with you a while");
     }
     if (conv.verifiedContactId) return [{ label: "What's open?", send: "What's open? Any day is fine." }];
-    const script = ["Hi it's Tom, can I move my Thursday clean?", "It's under 0491 570 808", "Sorry, it's 0491 570 313"];
+    const script = ["Hi it's Tom, can I move my Thursday clean?", "It's under 0491 570 159", "Sorry, it's 0491 570 313"];
     return one(script.find((s) => !said.includes(s)) ?? script[2]);
   }
   if (conv.card === "priya") {
@@ -185,9 +192,18 @@ export default function Desk() {
     if (wasBusy.current && !busy && !window.matchMedia("(pointer: coarse)").matches) {
       const next = replyBox.current?.querySelector("button") ?? input.current;
       next?.focus({ preventScroll: true });
+      // At 200% and 400% zoom the reply sits below the fold: bring it into view without jumping the page (G4 Accessibility, M3).
+      next?.scrollIntoView({ block: "nearest" });
     }
     wasBusy.current = busy;
   }, [busy]);
+
+  // The inline "See Back office" hides the pane focus was in, so focus goes to the result card's heading (G4 Accessibility, M2).
+  const outcomeHead = useRef<HTMLHeadingElement>(null);
+  const toOffice = useCallback(() => {
+    setView("office");
+    requestAnimationFrame(() => outcomeHead.current?.focus());
+  }, []);
 
   const reset = useCallback(async () => {
     const res = await api({ reset: true });
@@ -207,7 +223,7 @@ export default function Desk() {
     return [...saved, ...liveLog.filter((l) => !saved.some((x) => x.seq === l.seq))].reverse();
   }, [sb?.log, sb?.convNo, liveLog]);
   const actions = log.filter((l) => l.status === "done" || l.status === "checked").length;
-  const replies = useMemo(() => (conv ? nextReplies(conv) : []), [conv]);
+  const replies = useMemo(() => (conv ? nextReplies(conv, contact) : []), [conv, contact]);
   const started = Boolean(conv?.contactId);
   const handoffs = sb?.handoffs ?? [];
   const waiting = handoffs.filter((h) => h.contactId === conv?.contactId).length;
@@ -246,15 +262,14 @@ export default function Desk() {
         <p className="dh-clock">Demo time: {CLOCK_LABEL}</p>
         <p className="dh-note">Demo data, a fictional business. Nothing is really sent.</p>
         <div className="dh-top-acts">
-          {!touring && (
-            <button type="button" className="dh-btn dh-btn-primary" onClick={() => setTouring(true)} disabled={busy}>
-              Take the 2-minute tour
-            </button>
-          )}
+          {/* Always on the page, so closing the tour can hand focus back to it (G4 Accessibility, M1). */}
+          <button type="button" className="dh-btn dh-btn-primary" data-guide-return onClick={() => setTouring(true)} disabled={busy || touring}>
+            Take the tour
+          </button>
           <button type="button" className="dh-btn" onClick={reset} disabled={busy}>
             Reset demo
           </button>
-          <Link className="dh-btn dh-only-wide" href="/sample-plan">
+          <Link className="dh-btn dh-only-wide" href="/book">
             Want one for your business?
           </Link>
         </div>
@@ -296,21 +311,20 @@ export default function Desk() {
                 <b>{contact?.firstName ?? "New customer"}</b> {contact?.phone}
               </p>
             )}
-            <div className="dh-thread" data-spot="thread" ref={thread} role="log" aria-label="Messages" aria-live="polite" tabIndex={0}>
+            <div className="dh-thread" data-spot="thread" ref={thread} role="log" aria-label="Messages" aria-live="polite" aria-busy={busy} tabIndex={0}>
               {!started && <p className="dh-empty">Pick a customer above. A missed call starts the conversation.</p>}
-              {conv?.messages.map((m, i) => (
+              {/* The message being sent keeps its place and its node when the server's copy arrives, so it is announced once (G4 A11y, M5). */}
+              {[...(conv?.messages ?? []), ...(pending ? [{ from: "customer" as const, text: pending }] : [])].map((m, i) => (
                 <p key={i} className={`dh-msg ${m.from === "customer" ? "from-them" : "from-desk"}`}>
                   <span className="dh-sr">{m.from === "customer" ? "Customer: " : "Larkfield: "}</span>
                   {m.text}
                 </p>
               ))}
-              {pending && (
-                <p className="dh-msg from-them">
-                  <span className="dh-sr">Customer: </span>
-                  {pending}
+              {busy && (
+                <p className="dh-working" aria-hidden="true">
+                  Deskhand is working on it
                 </p>
               )}
-              {busy && <p className="dh-working">Deskhand is working on it</p>}
               {notice && <p className="dh-msg from-desk">{notice}</p>}
             </div>
 
@@ -318,8 +332,8 @@ export default function Desk() {
               <div className="dh-compose">
                 <p className="dh-status">
                   {conv?.jobDone ? "Job done. " : ""}
-                  {actions} actions.{" "}
-                  <button type="button" onClick={() => setView("office")}>
+                  {actions} {actions === 1 ? "action" : "actions"}.{" "}
+                  <button type="button" onClick={toOffice}>
                     See Back office
                   </button>
                 </p>
@@ -347,14 +361,14 @@ export default function Desk() {
                     Send
                   </button>
                 </form>
-                <p className="dh-privacy">Use made-up details. This demo deletes your messages within 48 hours. Our AI provider may keep them for up to 30 days.</p>
+                <p className="dh-privacy">Use made-up details. This demo deletes your messages within 48 hours. They are processed in the US, and our AI provider deletes them within 30 days unless they are flagged for misuse.</p>
               </div>
             )}
           </div>
         </section>
 
         <section className={`dh-office ${view === "office" ? "is-on" : ""}`} aria-label="Back office">
-          <Outcome log={log} jobDone={Boolean(conv?.jobDone)} started={started} actions={actions} waiting={waiting} />
+          <Outcome log={log} jobDone={Boolean(conv?.jobDone)} started={started} actions={actions} waiting={waiting} headRef={outcomeHead} />
           <div className="dh-office-grid">
             <div className="dh-log" data-spot="log">
               <h2>Work log{contact?.firstName ? `: ${contact.firstName}` : ""}</h2>
@@ -397,14 +411,17 @@ export default function Desk() {
 }
 
 /** Always the same height, so the moment a job finishes nothing on the screen jumps. */
-function Outcome({ log, jobDone, started, actions, waiting }: { log: LogEntry[]; jobDone: boolean; started: boolean; actions: number; waiting: number }) {
+function Outcome({ log, jobDone, started, actions, waiting, headRef }: { log: LogEntry[]; jobDone: boolean; started: boolean; actions: number; waiting: number; headRef: React.RefObject<HTMLHeadingElement | null> }) {
   // What the customer came for comes first: a booking moved and a discount passed on is still a job done.
-  const big = log.find((l) => (l.tool === "book_visit" || l.tool === "move_visit") && l.status === "done") ?? log.find((l) => l.tool === "hand_off" && l.status === "done");
+  // The hand-off headline is the first one made (the job), not a later "Added to Dana's card" row (G4 PL m8).
+  const big = log.find((l) => (l.tool === "book_visit" || l.tool === "move_visit") && l.status === "done") ?? [...log].reverse().find((l) => l.tool === "hand_off" && l.status === "done");
   const handedOnly = big?.tool === "hand_off";
   return (
-    <div className={`dh-done ${jobDone ? "is-on" : ""}`} data-spot="outcome">
+    <div className={`dh-done ${jobDone ? "is-on" : ""} ${handedOnly && jobDone ? "is-handed" : ""}`} data-spot="outcome">
       <div>
-        <h2>{jobDone ? (handedOnly ? "Handed to Dana" : "Job done") : started ? "In progress" : "Waiting for a call"}</h2>
+        <h2 ref={headRef} tabIndex={-1}>
+          {jobDone ? (handedOnly ? "Handed to Dana" : "Job done") : started ? "In progress" : "Waiting for a call"}
+        </h2>
         <p>{jobDone && big ? big.text : started ? "The agent is working through this with the customer." : "Pick a customer to start."}</p>
       </div>
       <dl>
@@ -424,9 +441,15 @@ function Outcome({ log, jobDone, started, actions, waiting }: { log: LogEntry[];
           </div>
         )}
       </dl>
-      <Link className={`dh-btn ${jobDone ? "dh-btn-primary" : ""}`} href="/sample-plan">
-        Send me your brief
-      </Link>
+      {/* The next step is a real one: a call booked on John Boy's calendar, with the sample plan as a quiet second (G4 PL, M1). */}
+      <div className="dh-done-acts">
+        <Link className={`dh-btn ${jobDone ? "dh-btn-primary" : ""}`} href="/book">
+          Book a 15-min call
+        </Link>
+        <Link className="dh-done-link" href="/sample-plan">
+          See what a plan looks like
+        </Link>
+      </div>
     </div>
   );
 }
