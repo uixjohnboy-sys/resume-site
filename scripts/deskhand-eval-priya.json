@@ -1,0 +1,72 @@
+{
+ "summary": {
+  "label": "priya",
+  "conversations": 3,
+  "passed": 3,
+  "guardTrips": 0,
+  "messages": 3,
+  "slowestTurnMsP95": 7496
+ },
+ "results": [
+  {
+   "id": "hand-1",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 1964,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-5",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 7496,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today. I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "id": "hand-10",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "turns": 1,
+   "maxMs": 6442,
+   "replies": [
+    "I've passed this to Dana with a summary. Dana's on a job. She'll text you back by 5 pm today."
+   ]
+  }
+ ]
+}
