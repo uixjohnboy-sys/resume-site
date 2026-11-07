@@ -257,6 +257,20 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   // model to do, and a model turn here could only repeat it or second-guess it.
   const settledByServer = ledger.some((l) => l.kind === "booked" || l.kind === "moved");
   if (settledByServer) model = null;
+  // Anything else said with the pick ("...and can you add the oven?") is not dropped: it goes to Dana with the words as said,
+  // because a change to a booking just made is hers to price (G3 QA recheck, N1).
+  if (settledByServer && picked) {
+    const rest = masked.text
+      .toLowerCase()
+      .replace(picked.label.toLowerCase(), " ")
+      .replace(/(i'?ll|i will|we'?ll|someone'?s?|will) be (at )?home|home on the day|lock ?box|key safe/g, " ")
+      .replace(/(please|pls|thanks|thank you|ta|cheers|yes|yep|yeah|ok|okay|sure|great|perfect|lovely|awesome|sounds good|that one|this one|works|suits?( me)?|is fine|fine|good|for me|i'?ll take|take|book( it| me| that)?|let'?s do|go with|i'?d like|that|it|the|one|is|me|and|so|hi|hey|then)/g, " ")
+      .replace(/[^p{L}p{N}?]+/gu, " ")
+      .trim();
+    if (rest.includes("?") || rest.split(/s+/).filter(Boolean).length >= 3) {
+      executeTool(sb, "hand_off", { reason: "question", summary: `After booking, the customer added: ${masked.text.slice(0, 180)}` }, { ...ctx, actor: "server" });
+    }
+  }
   let modelCalls = 0;
   let text = "";
   let usedTool = false;
@@ -393,6 +407,11 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
     if (r.ok) return lead;
   }
   // A verified customer is moving the booking they have: their own job, their own price, so no first-clean line (G3 QA, M4).
+  // Already moved: no more windows to offer (asking would refuse UNKNOWN_JOB), so whatever they ask next goes to Dana.
+  if (sb.conv.verifiedContactId && sb.conv.jobDone) {
+    executeTool(sb, "hand_off", { reason: "question", summary: text.slice(0, 200) }, ctx);
+    return lead;
+  }
   if (sb.conv.verifiedContactId) {
     const r = executeTool(sb, "get_open_slots", {}, ctx);
     if (r.ok && (r.data.slots as unknown[]).length) {

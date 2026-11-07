@@ -487,5 +487,30 @@ await test("G3 recheck: Mia picking a window is booked by the server, with no mo
   assert.match(r.reply, /Booked for/);
   assert.equal(sb.conv.noToolTurns, 0);
 });
+await test("G3 QA recheck N1: anything said beside a pick goes to Dana, and a plain pick does not", async () => {
+  for (const [extra, handed] of [[" please, thanks!", false], [" works for me. I'll be home", false], [" please. Also can you add the oven, and do I need to be there?", true]]) {
+    const sb = mia();
+    await say(sb, "I'm Mia in Newtown, 2 bed, I'll be home", script({ tool: "save_contact", input: { first_name: "Mia", suburb: "Newtown", bedrooms: 2, access: "home" } }, { tool: "get_open_slots", input: { job_key: "deep-2" } }, { text: "Which suits?" }));
+    const o = sb.conv.offers[0];
+    const r = await say(sb, o.label + extra, script({ text: "Sure." }));
+    assert.match(r.reply, /Booked for/, extra);
+    assert.equal(sb.handoffs.length, handed ? 1 : 0, extra);
+    if (handed) {
+      assert.match(sb.handoffs[0].items.join(" "), /oven/);
+      assert.match(r.reply, /ask Dana/);
+    }
+  }
+});
+
+await test("G3 QA recheck: on the fixed rules, a moved customer's next message goes to Dana, with no UNKNOWN_JOB row", async () => {
+  const sb = await verifiedTom();
+  const tomVisit = sb.visits.find((v) => v.customer === "Tom");
+  const o = sb.conv.offers.at(-1);
+  await say(sb, o.label, null);
+  assert.equal(sb.visits.find((v) => v.id === tomVisit.id).day, o.day);
+  await say(sb, "Any chance of a discount? I've been with you a while", null);
+  assert.ok(!sb.log.some((l) => l.code === "UNKNOWN_JOB"));
+  assert.ok(sb.handoffs.some((h) => h.contactId === tomVisit.contactId));
+});
 assert.ok(NOW > 0);
 console.log(`${passed} passed${process.exitCode ? ", with failures" : ""}`);
