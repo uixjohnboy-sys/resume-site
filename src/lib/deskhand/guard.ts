@@ -14,6 +14,8 @@ export type GuardCtx = {
   /** First names and digits the customer themselves used. */
   customerText: string;
   firstName: string | null;
+  /** What earlier turns of this conversation already did, so a true mention of it is not a false claim. */
+  earlier?: { handoff: boolean; booked: boolean };
 };
 
 const MAX_WORDS = 80;
@@ -44,9 +46,19 @@ const kindsIn = (s: string): JobKind[] => {
   return kinds;
 };
 
+/** Every extra a reply could be adding to a job price: the oven, the fridge, and up to three extra bathrooms, as named in it. */
+function extrasNamed(text: string): number[] {
+  const oven = /\boven\b/i.test(text) ? [0, ADD_ONS.oven.price] : [0];
+  const fridge = /\bfridge\b/i.test(text) ? [0, ADD_ONS.fridge.price] : [0];
+  const baths = /\bbathrooms?\b/i.test(text) ? [0, 1, 2, 3].map((n) => n * ADD_ONS.bathroom.price) : [0];
+  return [...new Set(oven.flatMap((o) => fridge.flatMap((f) => baths.map((b) => o + f + b))))];
+}
+
 function checkPrices(text: string, ctx: GuardCtx): Trip | null {
   let previous: JobKind[] = [];
+  // A price the calendar itself offered is true whatever the sentence says around it (G4 AI Quality, M2).
   const fromOffers = new Set(ctx.offers.map((o) => o.price));
+  const extras = extrasNamed(text);
   for (const s of sentences(text)) {
     const here = kindsIn(s);
     const kinds = here.length ? here : previous;
@@ -58,8 +70,9 @@ function checkPrices(text: string, ctx: GuardCtx): Trip | null {
       const bed = s.match(/\b([1-4])[- ]?(bed\w*|br)\b|\bstudio\b/i);
       const beds = bed ? (bed[1] ? Number(bed[1]) : 1) : ctx.bedrooms;
       const rows = Object.values(JOBS).filter((j) => kinds.includes(j.kind) && (beds === null || j.beds === beds));
-      const ok = rows.some((j) => j.price === value);
-      if (!ok && !(kinds.length === 0 && fromOffers.has(value))) return { reason: "a price that does not match its job", strike: false };
+      // A total is the row's price plus extras the reply names: "$330 with the oven" for a 2-bed deep (G4 AI Quality, M2).
+      const ok = rows.some((j) => extras.some((e) => j.price + e === value));
+      if (!ok && !fromOffers.has(value)) return { reason: "a price that does not match its job", strike: false };
     }
     if (here.length) previous = here;
   }
@@ -67,19 +80,20 @@ function checkPrices(text: string, ctx: GuardCtx): Trip | null {
 }
 
 function checkClaims(text: string, ctx: GuardCtx): Trip | null {
-  const done = has(ctx.ledger, "booked") || has(ctx.ledger, "moved");
+  const done = has(ctx.ledger, "booked") || has(ctx.ledger, "moved") || Boolean(ctx.earlier?.booked);
+  const handedOff = has(ctx.ledger, "handoff") || Boolean(ctx.earlier?.handoff);
   for (const s of sentences(text)) {
     if (s.endsWith("?") || /\b(can't|cannot|can not|couldn't|haven't|not|no booking|isn't|aren't)\b/i.test(s)) continue;
     if (/\b(booked|confirmed|locked in|you'?re (all )?set|got you down|in the (diary|calendar))\b/i.test(s) && !/\b(once|when|after|if|until|before|not)\b.{0,30}\b(booked|confirmed)\b/i.test(s) && !done) {
       return { reason: "claimed a booking that does not exist", strike: true };
     }
-    if (/\b(moved|rescheduled|shifted)\b/i.test(s) && !/\b(once|when|after|if)\b/i.test(s) && !has(ctx.ledger, "moved")) {
+    if (/\b(moved|rescheduled|shifted)\b/i.test(s) && !/\b(once|when|after|if)\b/i.test(s) && !has(ctx.ledger, "moved") && !ctx.earlier?.booked) {
       return { reason: "claimed a move that did not happen", strike: true };
     }
     if (/\b(cancel+ed|cancel+ing it)\b/i.test(s) && !/\bif\b/i.test(s) && !/\b(free|fee|before)\b/i.test(s)) {
       return { reason: "claimed a cancellation", strike: true };
     }
-    if (/\b(passed|passing|sent|forwarded|flagged|told|let) .{0,20}\bdana\b|\bdana\b.{0,30}\b(will|'ll|she'?ll) (call|ring|text|contact|reply|get back)\b|\bshe'?ll (call|ring|text)\b/i.test(s) && !/\b(afternoon before|lockbox|address|on the day|before we start)\b/i.test(s) && !has(ctx.ledger, "handoff")) {
+    if (/\b(passed|passing|sent|forwarded|flagged|told|let) .{0,20}\bdana\b|\bdana\b.{0,30}\b(will|'ll|she'?ll) (call|ring|text|contact|reply|get back)\b|\bshe'?ll (call|ring|text)\b/i.test(s) && !/\b(afternoon before|lockbox|address|on the day|before we start)\b/i.test(s) && !handedOff) {
       return { reason: "claimed a hand-off that did not happen", strike: true };
     }
   }
@@ -93,7 +107,13 @@ export function guardReply(text: string, ctx: GuardCtx): Trip | null {
   if (/```|<\/?[a-z]+>|\bfunction\s*\(|\bslot_|\bs\d{1,4}\b|refusal|tool call/i.test(t)) return { reason: "code or internal words", strike: true };
   if (t.split(/\s+/).length > MAX_WORDS) return { reason: "too long", strike: true };
   if (SAFETY.test(t)) return { reason: "safety advice", strike: false, safety: true };
-  for (const [r, why] of NEVER) if (r.test(t)) return { reason: why, strike: false };
+  // A decline names the thing it declines ("we don't do cash jobs"): a never-say term right after a negation is not a promise (G4 AIQ m3).
+  for (const [r, why] of NEVER) {
+    for (const s of sentences(t)) {
+      const m = s.match(r);
+      if (m && !/\b(can'?t|cannot|don'?t|do not|won'?t|isn'?t|aren'?t|not|never|no)\b[^,.;]{0,25}$/i.test(s.slice(0, m.index))) return { reason: why, strike: false };
+    }
+  }
   for (const s of sentences(t)) if (s.endsWith("?") && /\b(street |full |home )?address\b|\b(lockbox |access |gate |alarm )?code\b|\bpin\b/i.test(s)) return { reason: "asked for an address or code", strike: false };
   const claim = checkClaims(t, ctx);
   if (claim) return claim;

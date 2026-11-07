@@ -61,6 +61,27 @@ export const slotLabel = (day: DayKey, start: number) => {
 };
 const jobLabel = (key: JobKey) => `${JOB_KIND_LABEL[JOBS[key].kind]}, ${JOBS[key].beds}-bed`;
 const digits = (s: string) => s.replace(/\D/g, "");
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight"];
+
+/**
+ * The booking a verified customer is working on: one made or moved in this sandbox first (the newest), else their next one.
+ * Not simply the first match, which moved an older booking when a customer came back (G4 QA, M1 and M4).
+ */
+export function activeVisit(sb: Sandbox, contactId: string | null): Visit | undefined {
+  if (!contactId) return undefined;
+  const ahead = sb.visits.filter((v) => v.contactId === contactId && minuteOf(v.day, v.start) > NOW);
+  return ahead.filter((v) => v.isNew).at(-1) ?? [...ahead].sort((a, b) => minuteOf(a.day, a.start) - minuteOf(b.day, b.start))[0];
+}
+
+/** A day the customer named in this message ("Friday", "next Tuesday"), as the bookable days it can mean. */
+function daysNamed(text: string): DayKey[] {
+  const t = text.toLowerCase();
+  const names: [RegExp, string][] = [[/\bmon(day)?\b/, "mon"], [/\btue(s|sday)?\b/, "tue"], [/\bwed(nesday)?\b/, "wed"], [/\bthu(rs|rsday)?\b/, "thu"], [/\bfri(day)?\b/, "fri"], [/\bsat(urday)?\b/, "sat"]];
+  const hit = names.filter(([r]) => r.test(t)).map(([, d]) => d);
+  if (hit.length !== 1) return [];
+  const next = /\bnext (week|mon|tue|wed|thu|fri|sat)/.test(t);
+  return BOOKABLE_DAYS.filter((d) => d === (next ? `next-${hit[0]}` : hit[0]) || (!next && d === `next-${hit[0]}`));
+}
 
 /** True when a job of this length starts at the window and leaves the team's other visits their travel time. */
 export function teamFree(visits: Visit[], team: Team, day: DayKey, start: number, minutes: number, ignore?: string) {
@@ -84,6 +105,10 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
     if (!said.includes(name.toLowerCase()) && name !== c.firstName) {
       return refuse(sb, ctx, "save_contact", "NOT_SAID", "Name not saved: the customer has not said it", "Ask the customer for their first name.");
     }
+    // A matched booking keeps its owner's name: whoever typed the number, the record is not renamed (G4 QA, M1).
+    if (c.id === sb.conv.verifiedContactId && c.firstName && name.toLowerCase() !== c.firstName.toLowerCase()) {
+      return refuse(sb, ctx, "save_contact", "NOT_THEIR_NAME", "Name not changed: the booking is under another name", "Keep the name on the booking. Dana can update it.");
+    }
     c.firstName = name;
     changed.firstName = name;
   }
@@ -99,19 +124,31 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
     c.phone = input.phone.trim().slice(0, 20);
     changed.phone = c.phone;
   }
-  if (typeof input.bedrooms === "number" && Number.isInteger(input.bedrooms) && input.bedrooms >= 1 && input.bedrooms <= 8) {
-    c.bedrooms = input.bedrooms;
-    changed.bedrooms = input.bedrooms;
+  // Every value needs the customer's own word for it, or a receipt would promise what nobody asked for (G4 AI Quality, M4).
+  const notSaid = (what: string) => refuse(sb, ctx, "save_contact", "NOT_SAID", `${what} not saved: the customer has not said it`, `Ask the customer about ${what.toLowerCase()}.`);
+  if (typeof input.bedrooms === "number" && Number.isInteger(input.bedrooms) && input.bedrooms >= 1 && input.bedrooms <= 8 && input.bedrooms !== c.bedrooms) {
+    const n = input.bedrooms;
+    if (!new RegExp(`\\b(${n}|${NUMBER_WORDS[n]})\\b`).test(said) && !(n === 1 && /\bstudio\b/.test(said))) return notSaid("Bedrooms");
+    c.bedrooms = n;
+    changed.bedrooms = n;
   }
-  if (input.access === "home" || input.access === "lockbox") {
+  if ((input.access === "home" || input.access === "lockbox") && input.access !== c.access) {
+    const heard = input.access === "home" ? /\bhome\b|\bbe (there|in|around)\b|\blet (you|them|the team) in\b/ : /\block ?box\b|\bkey ?safe\b|\bkey box\b|\bleave (a |the )?keys?\b|\bhidden key\b/;
+    if (!heard.test(said)) return notSaid("Access");
     c.access = input.access;
     changed.access = input.access;
   }
-  if (input.frequency === "weekly" || input.frequency === "fortnightly") {
+  if ((input.frequency === "weekly" || input.frequency === "fortnightly") && input.frequency !== c.frequency) {
+    const heard = input.frequency === "weekly" ? /\bweekly\b|\bevery week\b|\beach week\b|\bonce a week\b/ : /\bfortnight\w*\b|\bevery (two|2) weeks\b|\bevery other week\b/;
+    if (!heard.test(said)) return notSaid("How often");
     c.frequency = input.frequency;
     changed.frequency = input.frequency;
   }
   if (typeof input.notes === "string" && input.notes.trim()) {
+    // Notes are the customer's words, lightly shortened: most of their longer words must be ones the customer used.
+    const words = input.notes.toLowerCase().match(/[a-z]{4,}/g) ?? [];
+    const heard = words.filter((w) => said.includes(w.slice(0, 5))).length;
+    if (words.length && heard / words.length < 0.6) return notSaid("Notes");
     c.notes = input.notes.trim().slice(0, 200);
     changed.notes = c.notes;
   }
@@ -138,10 +175,9 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
 
 function getOpenSlots(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): ToolResult {
   const c = currentContact(sb);
-  const moved = sb.conv.verifiedContactId ? sb.visits.find((v) => v.contactId === sb.conv.verifiedContactId && !v.isNew) : undefined;
-  const jobKey = (moved?.jobKey ?? input.job_key) as JobKey;
+  const moving = activeVisit(sb, sb.conv.verifiedContactId);
+  const jobKey = (moving?.jobKey ?? input.job_key) as JobKey;
   if (!JOB_KEYS.includes(jobKey)) return refuse(sb, ctx, "get_open_slots", "UNKNOWN_JOB", "Job not on the price list", "Use hand_off with reason size if this cannot be priced.");
-  const moving = sb.conv.verifiedContactId ? sb.visits.find((v) => v.contactId === sb.conv.verifiedContactId && !v.isNew) : undefined;
   const suburb = moving?.suburb ?? c?.suburb;
   if (!suburb) return refuse(sb, ctx, "get_open_slots", "NEED_SUBURB", "Calendar not checked: no suburb yet", "Ask which suburb.");
   if (suburb === "other") return refuse(sb, ctx, "get_open_slots", "OUT_OF_AREA", "Calendar not checked: outside the service area", "Say you don't get out there.");
@@ -158,7 +194,7 @@ function getOpenSlots(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx)
     if (!BOOKABLE_DAYS.includes(from) && !DAYS[from]) return refuse(sb, ctx, "get_open_slots", "NEED_LEASE_DAYS", "Calendar not checked: need the day it is empty and the inspection day", "Ask which day of the week the home will be empty from and which day of the week the final inspection is.");
     if (!DAYS[until]) return refuse(sb, ctx, "get_open_slots", "NEED_LEASE_DAYS", "Calendar not checked: need the day it is empty and the inspection day", "Ask which day of the week the home will be empty from and which day of the week the final inspection is.");
     lease = BOOKABLE_DAYS.filter((d) => DAYS[d].index >= DAYS[from].index && DAYS[d].index < DAYS[until].index);
-    if (!lease.length) return refuse(sb, ctx, "get_open_slots", "NO_LEASE_WINDOW", "Calendar not checked: no day between move-out and inspection", 'Use hand_off with reason "lease".');
+    if (!lease.length) return leaseToDana(sb, ctx, jobKey, from, until);
   }
   let minutes: number = job.minutes;
   let price: number = job.price;
@@ -168,24 +204,38 @@ function getOpenSlots(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx)
   minutes += extra * ADD_ONS.bathroom.minutes;
   price += extra * ADD_ONS.bathroom.price;
 
-  const asked = typeof input.day === "string" && BOOKABLE_DAYS.includes(input.day as DayKey) ? [input.day as DayKey] : BOOKABLE_DAYS;
-  const days = lease ? asked.filter((d) => lease.includes(d)) : asked;
+  // A day the model did not pass but the customer named ("any Friday?") still narrows the search, so the four windows are on that day.
+  const named = daysNamed(ctx.customerText);
+  const asked = typeof input.day === "string" && BOOKABLE_DAYS.includes(input.day as DayKey) ? [input.day as DayKey] : named.length ? named : BOOKABLE_DAYS;
   const teams = (Object.keys(TEAMS) as Team[]).filter((t) => TEAMS[t].jobs.includes(job.kind));
-  const offers: Offer[] = [];
-  for (const day of days) {
-    for (const w of WINDOWS) {
-      const team = teams.find((t) => teamFree(sb.visits, t, day, w.start, minutes, moving?.id));
-      if (team && offers.length < 4 && !(moving && moving.day === day && moving.start === w.start)) {
-        offers.push({ id: `s${sb.nextOffer++}`, day, start: w.start, team, jobKey, minutes, price, label: slotLabel(day, w.start), turn: sb.conv.turn });
+  const search = (days: DayKey[]) => {
+    const found: Offer[] = [];
+    for (const day of lease ? days.filter((d) => lease.includes(d)) : days) {
+      for (const w of WINDOWS) {
+        const team = teams.find((t) => teamFree(sb.visits, t, day, w.start, minutes, moving?.id));
+        if (team && found.length < 4 && !(moving && moving.day === day && moving.start === w.start)) {
+          found.push({ id: `s${sb.nextOffer++}`, day, start: w.start, team, jobKey, minutes, price, label: slotLabel(day, w.start), turn: sb.conv.turn });
+        }
       }
     }
-  }
+    return found;
+  };
+  let offers = search(asked);
+  if (!offers.length && asked !== BOOKABLE_DAYS) offers = search(BOOKABLE_DAYS);
+  // A bond clean must land between move-out and inspection. With nothing free there, the job is Dana's, never "change the inspection" (G4 NP, M4).
+  if (lease && !offers.length) return leaseToDana(sb, ctx, jobKey, input.empty_from_day as DayKey, input.inspection_day as DayKey);
   sb.conv.offers.push(...offers);
   addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "get_open_slots", status: "checked", text: `Checked the calendar: ${offers.length} open windows for ${jobLabel(jobKey)}` });
   ctx.ledger.push({ kind: "slots", offerIds: offers.map((o) => o.id) });
   // The windows can go out before the last details are in, so say now what booking will still need.
   const stillNeed = c ? [!c.firstName && "first name", !c.phone && "mobile", !c.access && "home or lockbox"].filter(Boolean) : [];
   return { ok: true, data: { price, slots: offers.map((o) => ({ slot_id: o.id, label: o.label })), ...(stillNeed.length ? { ask_with_the_windows: stillNeed } : {}) } };
+}
+
+function leaseToDana(sb: Sandbox, ctx: ExecCtx, jobKey: JobKey, from: DayKey, until: DayKey): ToolResult {
+  const summary = `End of lease, ${JOBS[jobKey].beds}-bed: empty from ${DAYS[from].label}, final inspection ${DAYS[until].label}. No window free before the inspection.`;
+  handOff(sb, { reason: "leaseDates", summary }, { ...ctx, actor: "server" });
+  return { ok: false, code: "NO_LEASE_WINDOW", next: "No window before the inspection, so the system has passed it to Dana with both days. Do not ask to move the inspection and do not promise a time." };
 }
 
 /** A turn books or moves once. A second call in the same turn would send the customer a second confirmation (G3 QA, M2). */
@@ -199,7 +249,7 @@ function bookVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): T
   if (!c) return refuse(sb, ctx, "book_visit", "NO_CONVERSATION", "No customer in this conversation", "Say you can't do that here.");
   // A verified customer with a booking already on the calendar is moving it, whichever tool the model reached for. Booking again
   // would put the same household on the calendar twice (G2 v2, N1).
-  const upcoming = sb.conv.verifiedContactId === c.id ? sb.visits.find((v) => v.contactId === c.id && minuteOf(v.day, v.start) > NOW) : undefined;
+  const upcoming = sb.conv.verifiedContactId === c.id ? activeVisit(sb, c.id) : undefined;
   if (upcoming) return moveVisit(sb, { visit_id: upcoming.id, slot_id: input.slot_id }, ctx);
   const missing = [!c.firstName && "first name", !c.suburb && "suburb", !c.phone && "mobile", !c.access && "home or lockbox"].filter(Boolean);
   if (missing.length) return refuse(sb, ctx, "book_visit", "MISSING_DETAILS", `Booking refused: still need ${missing.join(", ")}`, `Ask for: ${missing.join(", ")}.`);
@@ -218,6 +268,7 @@ function bookVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): T
   sb.visits.push(visit);
   setStage(c, "Booked");
   sb.conv.jobDone = true;
+  sb.conv.doneTurn = sb.conv.turn;
   addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "book_visit", status: "done", ref: visit.ref, text: `Booked ${visit.ref}: ${jobLabel(visit.jobKey)}, ${offer.label}, ${TEAMS[offer.team].label}`, after: { stage: "Booked" } });
   addLog(sb, { at: ctx.at, actor: "server", tool: "confirmation", status: "done", ref: visit.ref, text: "Confirmation and secure details link recorded (demo, not sent)" });
   ctx.ledger.push({ kind: "booked", visitId: visit.id });
@@ -258,6 +309,7 @@ function moveVisit(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): T
   addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "move_visit", status: "done", ref: visit.ref, text: `Moved ${visit.ref} to ${offer.label}${fee ? `, $${fee} fee` : ""}`, before, after: { day: offer.day, start: offer.start, team: offer.team } });
   addLog(sb, { at: ctx.at, actor: "server", tool: "confirmation", status: "done", ref: visit.ref, text: "Confirmation recorded (demo, not sent)" });
   sb.conv.jobDone = true;
+  sb.conv.doneTurn = sb.conv.turn;
   ctx.ledger.push({ kind: "moved", visitId: visit.id, fee, fromLabel });
   return { ok: true, data: { ref: visit.ref, note: "The system adds the confirmation to your reply. Do not repeat the details." } };
 }
@@ -274,13 +326,16 @@ function handOff(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx): Too
     if (summary && !open.items.includes(summary)) open.items.push(summary);
     open.phone = c?.phone ?? open.phone;
     addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "hand_off", status: "done", text: `Added to Dana's card: ${HANDOFF_REASONS[reason].label}` });
-    ctx.ledger.push({ kind: "handoff", reason });
+    ctx.ledger.push({ kind: "handoff", reason, added: true });
     return { ok: true, data: { note: "Added to the card Dana already has." } };
   }
   sb.handoffs.push({ id: `h${sb.handoffs.length + 1}`, contactId: c?.id ?? null, customer: c?.firstName ?? "Unknown caller", reason, items: summary ? [summary] : [], phone: c?.phone ?? null, promised: "Reply by 5 pm today", refused, actor: ctx.actor === "ai" ? "ai" : ctx.actor === "rules" ? "rules" : "server" });
   if (c && HANDOFF_REASONS[reason].ends) setStage(c, "Handed to Dana");
   addLog(sb, { at: ctx.at, actor: ctx.actor, tool: "hand_off", status: "done", text: `Handed to Dana: ${HANDOFF_REASONS[reason].label}`, after: c && HANDOFF_REASONS[reason].ends ? { stage: "Handed to Dana" } : undefined });
-  if (HANDOFF_REASONS[reason].ends) sb.conv.jobDone = true;
+  if (HANDOFF_REASONS[reason].ends) {
+    sb.conv.jobDone = true;
+    sb.conv.doneTurn = sb.conv.turn;
+  }
   ctx.ledger.push({ kind: "handoff", reason });
   return { ok: true, data: { note: "The system tells the customer when Dana will reply. Do not promise a time." } };
 }
@@ -312,7 +367,7 @@ export function checkPhone(sb: Sandbox, text: string, ctx: ExecCtx) {
   const cardMobile = card ? digits(("mobile" in card && card.mobile) || card.phone) : null;
   for (const raw of found) {
     const number = digits(raw);
-    const contact = cardMobile && number !== cardMobile ? undefined : sb.contacts.find((c) => c.phone && digits(c.phone) === number && sb.visits.some((v) => v.contactId === c.id));
+    const contact = cardMobile && number !== cardMobile ? undefined : [...sb.contacts].reverse().find((c) => c.phone && digits(c.phone) === number && sb.visits.some((v) => v.contactId === c.id));
     if (contact) {
       if (sb.conv.verifiedContactId !== contact.id) {
         // From here the record being worked on is the real customer's. The blank enquiry opened for the call goes.

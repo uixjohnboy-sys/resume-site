@@ -87,6 +87,7 @@ export const HANDOFF_REASONS = {
   chemicals: { label: "Question about using or mixing chemicals", ends: false },
   pet: { label: "A dog that has bitten or is aggressive", ends: false },
   lease: { label: "End of lease home not empty, or no power or water", ends: true },
+  leaseDates: { label: "End of lease with no free window before the inspection", ends: true },
   question: { label: "A question with no approved answer", ends: false },
 } as const;
 export type HandoffReason = keyof typeof HANDOFF_REASONS;
@@ -94,6 +95,8 @@ export const HANDOFF_KEYS = Object.keys(HANDOFF_REASONS) as HandoffReason[];
 
 export const FIRST_TEXT = `Hi, it's the automated booking assistant at ${BUSINESS}. Sorry we missed your call, ${OWNER}'s on a job. I can sort a price and booking here if you like.`;
 export const HANDOFF_PROMISE = `${OWNER}'s on a job. She'll text you back by 5 pm today.`;
+/** Said once, by the server, after the first price a customer is given (SPEC; G4 UX Writer M4). */
+export const CONDITION_LINE = `That's for a home in normal condition. If it's very different on the day, ${OWNER} will talk to you before we start.`;
 
 /** What the Rules panel shows and the prompt is built from. */
 export const RULES = {
@@ -113,7 +116,7 @@ Regular clean: 1-bed $150, 2-bed $190, 3-bed $250, 4-bed $310.
 Deep clean: 1-bed $240, 2-bed $290, 3-bed $380. 4-bed goes to ${OWNER}.
 End of lease clean: 1-bed $340, 2-bed $420, 3-bed $540. 4-bed goes to ${OWNER}.
 Extra bathroom $40. Oven $60 on regular and deep. Inside fridge $40.
-Regular means weekly or fortnightly with an existing customer. A new customer's first visit, a one-off or a monthly clean is charged as a deep clean. Say: "First clean is a deep clean so we can get on top of everything: $380. After that it's $250 a fortnight."
+Regular means weekly or fortnightly with an existing customer. A new customer's first visit, a one-off or a monthly clean is charged as a deep clean. For a 3-bed that wants fortnightly cleans, say: "First clean is a deep clean so we can get on top of everything: $380. After that it's $250 a fortnight." Use weekly or fortnightly only if the customer said it. The system adds the normal-condition line itself.
 Word meanings: bond, vacate, move-out and exit clean mean end of lease. Spring, once-off and one-off mean deep. Unit, flat and apartment are the same.
 TIME ON SITE with two cleaners: regular 1-bed 1 h, 2-bed 1 h 30, 3-bed 2 h, 4-bed 2 h 30. Deep 1-bed 2 h, 2-bed 2 h 30, 3-bed 3 h 30. End of lease 1-bed 2 h 30, 2-bed 3 h 30, 3-bed 5 h. Oven adds 30 min, fridge and each extra bathroom 15 min.
 HOURS Mon to Fri 8 am to 4 pm, Sat 8 am to 12 pm. Earliest booking is the next working day. Visits are arrival windows, never exact times.
@@ -128,7 +131,7 @@ BOND "If your agent lists something we missed, tell us within 7 days of the insp
 MOVING free up to 24 hours before, then $50. End of lease free up to 48 hours before, then $150.
 ACCESS customer home, or keys in a lockbox. After booking we text a secure link for the address, access and parking, so they never go through this chat. If it isn't filled in by the afternoon before, ${OWNER} phones. Never ask for an address or a code.`;
 
-export const INTAKE = `Ask one or two at a time and skip what you know: first name; suburb; bedrooms and bathrooms, house or unit; stairs or a lift; when it was last cleaned properly; pets home on the day (dogs secured before the team arrives); where the team can park (permit or timed zones: can they leave a visitor permit); home or lockbox. End of lease also: is it empty with power and water on; which day of the week it will be empty from; which day of the week the final inspection is. get_open_slots needs both days and only offers windows between them.`;
+export const INTAKE = `Ask one or two at a time and skip what you know: first name; suburb; bedrooms and bathrooms, house or unit; stairs or a lift; when it was last cleaned properly; pets home on the day (dogs secured before the team arrives); where the team can park (permit or timed zones: can they leave a visitor permit); home or lockbox. End of lease also: is it empty with power and water on; the first day it is completely empty with the removalists gone ("out by Wednesday night" means empty from Thursday); which day of the week the final inspection is. get_open_slots needs both days and only offers windows between them. Never ask to move the inspection: if there is no window, the system passes it to the owner.`;
 
-export const HANDOFF_RULES = `Use hand_off for: a complaint, damage or refund for our work; asking for a person; cancelling, skipping or stopping cleans; waiving a fee; a discount they agree to pass on (decline first, then offer to pass it on); strata common areas, offices, builders or post-renovation cleans, Airbnb turnover; 4-bed deep or end of lease, extra living areas, more than 2 levels; NDIS, aged care or home care funding; hoarding, squalor, vermin, bed bugs, needles, a death in the home, black or spreading mould (mildew on grout is normal), asbestos or renovation dust; theft (no comment); heavy pet mess; a dog that has bitten, nipped or is aggressive (reason pet: promise nothing about what the team will do); which chemicals are safe to use or mix; an end of lease home that is not empty or has no power or water.
+export const HANDOFF_RULES = `Use hand_off for: a complaint, damage or refund for our work; asking for a person; cancelling, skipping or stopping cleans; waiving a fee; a discount they agree to pass on (decline first, then offer to pass it on); strata common areas, offices, builders or post-renovation cleans, Airbnb turnover; 4-bed deep or end of lease, extra living areas, more than 2 levels; NDIS, aged care or home care funding; hoarding, squalor, vermin, bed bugs, needles, a death in the home, black or spreading mould on walls or ceilings (dark mould or mildew on shower grout, silicone or tiles is normal deep clean work: answer it and keep booking), asbestos or renovation dust; theft (no comment); heavy pet mess; a dog that has bitten, nipped or is aggressive (reason pet: promise nothing about what the team will do); which chemicals are safe to use or mix; an end of lease home that is not empty or has no power or water.
 A question you have no fact for: use hand_off with reason "question". The booking can carry on.`;

@@ -82,7 +82,7 @@ await test("a whole booking: details, windows, pick, receipt, pipeline", async (
   assert.equal(v.price, 380);
   assert.match(r.reply, /Booked for/);
   assert.match(r.reply, /\$380/);
-  assert.match(r.reply, /fortnightly clean is the same day and window, \$250/);
+  assert.match(r.reply, /After this first clean it's \$250 a fortnight, and Dana will confirm your regular day\. .*running late\.$/);
   assert.match(r.reply, /secure link/);
   assert.ok(sb.conv.jobDone);
   assert.ok(sb.log.some((l) => /demo, not sent/.test(l.text)));
@@ -117,7 +117,7 @@ await test("Tom: wrong number refused, right number verified, move works", async
   const r0 = await say(sb, "Hi can I move my Thursday clean?", script({ tool: "move_visit", input: { visit_id: tomVisit.id, slot_id: "s1" } }, { text: "What mobile is it under?" }));
   assert.ok(sb.log.some((l) => l.code === "NOT_VERIFIED"));
   assert.match(r0.reply, /mobile/);
-  await say(sb, "It's under 0491 570 808", script({ text: "I can't see a booking on that number. What mobile is it under?" }));
+  await say(sb, "It's under 0491 570 159", script({ text: "I can't see a booking on that number. What mobile is it under?" }));
   assert.ok(sb.log.some((l) => l.code === "NO_MATCH"));
   assert.equal(sb.conv.verifiedContactId, null);
   await say(sb, `Sorry, ${CARDS.tom.mobile}`, script({ tool: "get_open_slots", input: { job_key: "regular-3" } }, { text: "Saturday between 8 am and 9 am work?" }));
@@ -274,7 +274,7 @@ await test("the model can raise to the danger line, and writes none of it", asyn
 await test("a chemical question gets the fixed line and Dana, never 000 or the model", async () => {
   const sb = mia();
   const m = script({ text: "Sure, mix away." });
-  const r = await say(sb, "the shower has black mould, can i mix bleach and ammonia before you come", m);
+  const r = await say(sb, "the bedroom wall has black mould, can i mix bleach and ammonia before you come", m);
   assert.equal(m.calls.length, 0);
   assert.match(r.reply, /Please don't mix/);
   assert.doesNotMatch(r.reply, /000/);
@@ -293,7 +293,7 @@ await test("a dog that bites goes to Dana and the agent promises nothing about i
   assert.ok(g("Our team shuts dogs away or out while we work."));
   const sb = mia();
   const r = await say(sb, "my staffy nipped a tradie once, he'll be home", script({ text: "Thanks for telling me." }));
-  assert.match(r.reply, /plan for your dog/);
+  assert.match(r.reply, /plan for your pet/);
   assert.ok(sb.handoffs.some((h) => h.reason === "pet"));
 });
 await test("end of lease: only windows between move-out and inspection", async () => {
@@ -444,14 +444,14 @@ await test("M2: a move to the window the visit already holds is refused without 
 
 await test("M3: Tom's scripted wrong number matches no one, even after Priya has booked", async () => {
   const sb = seedSandbox();
-  for (const card of Object.values(CARDS)) assert.notEqual(card.phone.replace(/\D/g, ""), "0491570808");
+  for (const card of Object.values(CARDS)) assert.notEqual(card.phone.replace(/\D/g, ""), "0491570159");
   startConversation(sb, "priya", 1);
   const priya = sb.contacts.find((c) => c.id === sb.conv.contactId);
   Object.assign(priya, { firstName: "Priya", suburb: "Glebe", bedrooms: 2, access: "home" });
   sb.visits.push({ ...sb.visits[0], id: "vP", ref: "LH-9999", contactId: priya.id, customer: "Priya", isNew: true });
   startConversation(sb, "tom", 1);
   await say(sb, "Hi it's Tom, can I move my Thursday clean?", script({ text: "What mobile is it under?" }));
-  await say(sb, "It's under 0491 570 808", script({ text: "I can't see a booking on that number." }));
+  await say(sb, "It's under 0491 570 159", script({ text: "I can't see a booking on that number." }));
   assert.equal(sb.conv.verifiedContactId, null);
   await say(sb, `It's under ${CARDS.priya.phone}`, script({ text: "I can't see a booking on that number." }));
   assert.equal(sb.conv.verifiedContactId, null, "Tom verified on Priya's number");
@@ -554,6 +554,174 @@ await test("G3 QA recheck 3: Aussie sign-offs beside a pick are not passed to Da
     await say(sb, sb.conv.offers[0].label + extra, script({ text: "Sure." }));
     assert.equal(sb.handoffs.length, 0, extra);
   }
+});
+
+// ---------- G4 v1 regressions: each tries to break its fix from the other side ----------
+const ready = async (sb, beds = 2, suburb = "Newtown") =>
+  say(sb, `I'm Mia in ${suburb}, ${beds} bed, I'll be home`, script({ tool: "save_contact", input: { first_name: "Mia", suburb, bedrooms: beds, access: "home" } }, { tool: "get_open_slots", input: { job_key: `deep-${Math.min(3, beds)}` } }, { text: "Which suits?" }));
+
+await test("G4 F1: a correct total with extras passes; a wrong one does not; no template says Sure", async () => {
+  const ctx = { ledger: [], offers: [], bedrooms: 2, customerText: "", firstName: null };
+  assert.equal(guardReply("A 2-bed deep clean with the oven is $350.", ctx), null);
+  assert.equal(guardReply("A 2-bed deep clean is $290, plus $40 for the extra bathroom, so $330.", ctx), null);
+  assert.ok(guardReply("A 2-bed deep clean is $300.", ctx));
+  const sb = mia();
+  const r = await say(sb, "could you do $300 then? I can pay cash", script({ text: "Sure, $300 cash is fine for a 3-bed deep clean." }));
+  assert.doesNotMatch(r.reply, /^(Sure|Yes|Ok)/i, r.reply);
+  assert.doesNotMatch(r.reply, /\$300/);
+});
+
+await test("G4 F1: a true mention of last turn's hand-off is not a false claim", async () => {
+  const ctx = { ledger: [], offers: [], bedrooms: 2, customerText: "", firstName: null, earlier: { handoff: true, booked: false } };
+  assert.equal(guardReply("I've passed that to Dana already, she'll text you.", ctx), null);
+  assert.ok(guardReply("I've passed that to Dana already, she'll text you.", { ...ctx, earlier: { handoff: false, booked: false } }));
+});
+
+await test("G4 F2: a hand-off keeps the model's answer and drops only its Dana line", async () => {
+  const sb = mia();
+  const r = await say(sb, "do you bring your own products? my toddler has allergies", script({ tool: "hand_off", input: { reason: "question", summary: "Asks about products, toddler allergies" } }, { text: "We bring all products, and you can leave your own out if you prefer. I'll pass the allergy question to Dana." }));
+  assert.match(r.reply, /leave your own out/);
+  assert.equal((r.reply.match(/Dana/g) ?? []).length, 1, r.reply);
+  const sb2 = mia();
+  const r2 = await say(sb2, "Are you a real person? I want to talk to a person", script({ text: "I'm the booking assistant." }));
+  assert.match(r2.reply, /booking assistant, not a person/);
+});
+
+await test("G4 F3: grout mildew is booked, black mould on a wall goes to Dana", async () => {
+  for (const t of ["a bit of black mould on the shower grout", "the grout has some black mould", "black mould in the silicone around the bath"]) {
+    const sb = mia();
+    await say(sb, t, script({ text: "A deep clean covers shower grout." }));
+    assert.ok(!sb.handoffs.some((h) => h.reason === "condition"), t);
+  }
+  const sb = mia();
+  await say(sb, "black mould is spreading across the bedroom ceiling", script({ text: "Thanks." }));
+  assert.ok(sb.handoffs.some((h) => h.reason === "condition"));
+});
+
+await test("G4 F4: a bond clean with no window before the inspection goes to Dana with both days", async () => {
+  const sb = mia();
+  const c = sb.contacts.find((x) => x.id === sb.conv.contactId);
+  Object.assign(c, { firstName: "Mia", suburb: "Newtown", bedrooms: 2, access: "home" });
+  sb.conv.turn = 1;
+  const r = executeTool(sb, "get_open_slots", { job_key: "lease-2", empty_from_day: "sat", inspection_day: "next-mon" }, { actor: "ai", at: 1, customerText: "", ledger: [] });
+  assert.equal(r.code, "NO_LEASE_WINDOW");
+  const h = sb.handoffs.find((x) => x.reason === "leaseDates");
+  assert.ok(h && /Saturday/.test(h.items[0]) && /next Monday/.test(h.items[0]), JSON.stringify(sb.handoffs));
+});
+
+await test("G4 F5: the condition line comes once, after the first price", async () => {
+  const sb = mia();
+  const r1 = await say(sb, "how much for a 3 bed?", script({ text: "First clean is a deep clean: $380." }));
+  assert.match(r1.reply, /normal condition/);
+  const r2 = await say(sb, "and a 2 bed?", script({ text: "A 2-bed deep clean is $290." }));
+  assert.doesNotMatch(r2.reply, /normal condition/);
+});
+
+await test("G4 F6: the masking warning is said once", async () => {
+  const sb = mia();
+  const r = await say(sb, "lockbox code is 4471", script({ text: "Please don't send your lockbox code here. Which suburb are you in?" }));
+  assert.equal((r.reply.match(/code/gi) ?? []).length, 2, r.reply);
+  assert.match(r.reply, /Which suburb/);
+});
+
+await test("G4 F7: frequency, bedrooms, access and notes need the customer's own words", async () => {
+  const sb = mia();
+  await say(sb, "Hi, I'm Mia in Newtown", script({ tool: "save_contact", input: { first_name: "Mia", frequency: "fortnightly", bedrooms: 3, access: "lockbox", notes: "Prefers eco products and the same cleaner" } }, { text: "Thanks." }));
+  const c = sb.contacts.find((x) => x.id === sb.conv.contactId);
+  assert.equal(c.frequency, null);
+  assert.equal(c.bedrooms, null);
+  assert.equal(c.access, null);
+  assert.equal(c.notes, null);
+  await say(sb, "3 bedrooms, fortnightly please, I'll leave a key in the lockbox", script({ tool: "save_contact", input: { frequency: "fortnightly", bedrooms: 3, access: "lockbox", notes: "key in the lockbox" } }, { text: "Thanks." }));
+  assert.equal(c.frequency, "fortnightly");
+  assert.equal(c.bedrooms, 3);
+  assert.equal(c.access, "lockbox");
+});
+
+await test("G4 F8: typed customers get their own numbers, and a match never renames or moves the wrong booking", async () => {
+  const sb = seedSandbox();
+  startConversation(sb, null, 1);
+  const first = sb.contacts.at(-1).phone;
+  startConversation(sb, null, 2);
+  const second = sb.contacts.at(-1).phone;
+  assert.notEqual(first, second);
+  for (const p of [first, second]) assert.ok(!Object.values(CARDS).some((card) => card.phone === p || card.mobile === p), p);
+  // Tom's booking, matched from a typed conversation: the name stays Tom.
+  startConversation(sb, null, 3);
+  await say(sb, "move my booking, it's under 0491 570 313", script({ tool: "save_contact", input: { first_name: "Jo" } }, { text: "Found it." }));
+  assert.equal(sb.contacts.find((c) => c.id === sb.conv.verifiedContactId)?.firstName, "Tom");
+  // Mia twice: the newest Mia and her newest booking are the ones changed.
+  const s2 = seedSandbox();
+  for (const round of [0, 1]) {
+    startConversation(s2, "mia", 10 + round);
+    await ready(s2);
+    await say(s2, s2.conv.offers[round].label, script({ text: "Booked." }));
+  }
+  const newest = s2.visits.filter((v) => v.isNew).at(-1);
+  startConversation(s2, "mia", 20);
+  await say(s2, "can I change my booking? it's under 0491 570 156", script({ text: "Found it." }));
+  assert.equal(s2.conv.verifiedContactId, newest.contactId);
+});
+
+await test("G4 F9: a second change after a move is settled by the server, and a named day narrows the search", async () => {
+  const sb = seedSandbox();
+  startConversation(sb, "tom", 1);
+  await say(sb, "It's 0491 570 313, can I move my Thursday clean?", script({ tool: "get_open_slots", input: {} }, { text: "Which suits?" }));
+  await say(sb, sb.conv.offers[0].label, script({ text: "Done." }));
+  assert.ok(sb.conv.jobDone);
+  await say(sb, "Actually, anything on Friday?", script({ tool: "get_open_slots", input: {} }, { text: "Here you go." }));
+  const fresh = sb.conv.offers.filter((o) => o.turn === sb.conv.turn);
+  assert.ok(fresh.length && fresh.every((o) => o.day === "fri" || o.day === "next-fri"), JSON.stringify(fresh.map((o) => o.day)));
+  const m = script({ text: "Sure." });
+  const r = await say(sb, fresh[0].label, m);
+  assert.equal(m.calls.length, 0);
+  assert.match(r.reply, /^Thanks Tom\. Moved to/);
+  assert.equal(sb.visits.filter((v) => v.customer === "Tom" && v.isNew).length, 1);
+});
+
+await test("G4 F10: fixed rules never book the wrong job and close a finished conversation", async () => {
+  for (const [line, reason] of [["I'm Sam, 4 bed in Newtown", "size"], ["I'm Sam, bond clean, 2 bed in Newtown", "question"]]) {
+    const sb = seedSandbox();
+    startConversation(sb, null, 1);
+    await say(sb, line, null);
+    await say(sb, "I'll be home", null);
+    assert.ok(!sb.visits.some((v) => v.isNew), line);
+    assert.ok(sb.handoffs.some((h) => h.reason === reason && h.items.length), line);
+  }
+  const sb = seedSandbox();
+  startConversation(sb, "priya", 1);
+  await say(sb, "Hi, do you clean the common areas of a strata building in Glebe?", null);
+  const r = await say(sb, "It's 40 units and we'd want it weekly. I'm Priya.", null);
+  assert.doesNotMatch(r.reply, /bedrooms/i);
+  assert.ok(sb.handoffs[0].items.some((i) => /40 units/.test(i)), JSON.stringify(sb.handoffs[0]));
+  const r2 = await say(sb, "Thanks!", null);
+  assert.match(r2.reply, /You're welcome/);
+});
+
+await test("G4 F11: everyday danger words fire with no model, lookalikes do not", () => {
+  for (const t of ["Smoke's pouring out of the oven", "the curtains caught alight", "I think he's having a heart attack", "sparks and a burning smell from the power point", "there's blood on the tiles", "my son drank some dishwashing liquid", "the dog is frothing after the rat bait", "I can't catch my breath"]) assert.ok(isDanger(t), t);
+  for (const t of ["can you fit me in on Friday", "we had some dishwasher tablets left over", "the gas oven needs a deep clean", "burnt-on grease in the oven", "the smoke alarm beeps", "the fireplace is dusty", "I hurt my back last week", "it's sparkling clean"]) assert.ok(!isDanger(t), t);
+});
+
+await test("G4 F13: masking reads the ways Australians actually text it", async () => {
+  const cases = [
+    ["12 The Boulevarde, Lewisham", /Boulevarde/],
+    ["Keypad is 4471", /4471/],
+    ["card 4111/1111/1111/1111", /1111/],
+    ["email sam @ gmail.com", /gmail/],
+    ["sam at gmail dot com", /gmail/],
+    ["the code is four four seven one", /four four seven/],
+    ["combo 2580", /2580/],
+    ["key safe 1​2​3​4", /1.?2.?3.?4/],
+    ["8 Rose Grove", /Rose Grove/],
+  ];
+  for (const [input, leak] of cases) {
+    const sb = mia();
+    const m = script({ text: "Thanks." });
+    await say(sb, input, m);
+    assert.doesNotMatch(JSON.stringify(m.calls[0] ?? {}) + JSON.stringify(sb), leak, input);
+  }
+  assert.equal(maskPersonal("Inspection is 12/11 at 10").text, "Inspection is 12/11 at 10");
 });
 
 assert.ok(NOW > 0);

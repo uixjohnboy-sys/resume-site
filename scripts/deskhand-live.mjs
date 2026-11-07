@@ -41,7 +41,7 @@ console.log("stage:", r.sb?.contacts.find((c) => c.id === r.sb.conv.contactId)?.
 console.log("\n=== Tom: move");
 s = await post({ start: "tom" });
 await say("Hi it's Tom, can I move my Thursday clean?");
-await say("It's under 0491 570 808");
+await say("It's under 0491 570 159");
 r = await say("Sorry, 0491 570 313");
 if (!r.sb?.conv.offers.length) r = await say("What's open?");
 r = await say(`${offered(r.sb)} works`);

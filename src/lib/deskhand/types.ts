@@ -81,7 +81,7 @@ export type Message = { from: "customer" | "agent"; text: string };
 export type LedgerEntry =
   | { kind: "booked"; visitId: string }
   | { kind: "moved"; visitId: string; fee: number; fromLabel: string }
-  | { kind: "handoff"; reason: HandoffReason }
+  | { kind: "handoff"; reason: HandoffReason; added?: boolean }
   | { kind: "slots"; offerIds: string[] }
   | { kind: "refused"; code: string };
 
@@ -100,6 +100,8 @@ export type Conversation = {
   noToolTurns: number;
   rulesOnly: boolean;
   jobDone: boolean;
+  /** The turn the job was done in. A window offered after it can still be picked (a second change, G4 QA M4). */
+  doneTurn?: number;
   closed: boolean;
 };
 

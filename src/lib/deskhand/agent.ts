@@ -1,9 +1,11 @@
-import { AREA, CLOCK_LABEL, BUSINESS, DAYS, FACTS, FIRST_TEXT, HANDOFF_KEYS, HANDOFF_PROMISE, HANDOFF_REASONS, HANDOFF_RULES, INTAKE, JOBS, JOB_KEYS, BOOKABLE_DAYS, OWNER, type HandoffReason } from "./pack.ts";
+import { AREA, CLOCK_LABEL, BUSINESS, CONDITION_LINE, DAYS, FACTS, FIRST_TEXT, HANDOFF_KEYS, HANDOFF_REASONS, HANDOFF_RULES, INTAKE, JOBS, JOB_KEYS, BOOKABLE_DAYS, OWNER, type HandoffReason } from "./pack.ts";
 import { addLog, checkPhone, currentContact, executeTool, slotLabel, type ExecCtx } from "./execute.ts";
 import { guardReply } from "./guard.ts";
 import { CHEMICAL_TEXT, DANGER_TEXT, MASK_TEXT, isChemicalQuestion, isDanger, maskPersonal } from "./safety.ts";
 import { CARDS, freshConversation, type CardId } from "./seed.ts";
-import type { Contact, LedgerEntry, LogEntry, Sandbox } from "./types.ts";
+import type { Contact, LedgerEntry, LogEntry, Sandbox, Visit } from "./types.ts";
+
+const sentences = (t: string) => t.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean);
 
 // One customer message, start to finish, in the spec's order: danger line on the raw words, masking, phone check, the model loop,
 // the hand-off backstop, the reply guard, then receipts written from what really happened. The model is passed in, so tests and
@@ -118,45 +120,77 @@ function stateBlock(sb: Sandbox): string {
   ].filter(Boolean).join("\n");
 }
 
+/** "Next Monday" mid-sentence reads as a typo: day labels are lower case after the first word (G3 m12, G4 UX). */
+const dayPhrase = (day: Visit["day"], start: number) => slotLabel(day, start).replace(/^Next /, "next ");
+
+/** Why this one is Dana's, in the customer's terms, so a hand-off still answers what was asked (G4 UX Writer M3). */
+const HANDOFF_LEAD: Partial<Record<HandoffReason, string>> = {
+  person: "I'm the booking assistant, not a person.",
+  size: "A home that size is one Dana prices herself.",
+  commercial: "Strata, office and Airbnb cleans are ones Dana quotes herself.",
+  funding: "Funded cleans are set up by Dana herself.",
+  leaseDates: "There's no window free before your inspection.",
+  cancel: "Your clean stays booked until Dana confirms. Moving or cancelling is free up to 24 hours before.",
+};
+
 const receiptFor = (sb: Sandbox, entry: LedgerEntry): string | null => {
   const c = currentContact(sb);
   if (entry.kind === "booked") {
     const v = sb.visits.find((x) => x.id === entry.visitId);
     if (!v) return null;
     const job = JOBS[v.jobKey];
-    const parts = [`Booked for ${DAYS[v.day].label}, arriving between ${slotLabel(v.day, v.start).split("arriving between ")[1]}. ${job.kind === "deep" ? "Deep clean" : job.kind === "lease" ? "End of lease clean" : "Regular clean"}, ${job.beds}-bed, $${v.price}. Ref ${v.ref}. We'll text if we're running late.`];
+    const parts = [`Booked for ${DAYS[v.day].label}, arriving between ${slotLabel(v.day, v.start).split("arriving between ")[1]}. ${job.kind === "deep" ? "Deep clean" : job.kind === "lease" ? "End of lease clean" : "Regular clean"}, ${job.beds}-bed, $${v.price}. Ref ${v.ref}.`];
+    // Only the first clean is booked: the regular price is a fact, the regular day is Dana's to confirm (G4 UX M2, PL m6).
     const regular = Object.values(JOBS).find((j) => j.kind === "regular" && j.beds === job.beds);
-    if (c?.frequency && regular) parts.push(`After that, your ${c.frequency} clean is the same day and window, $${regular.price}.`);
-    parts.push("We'll text you a secure link for your address, access and parking, so they never go through this chat.");
+    if (c?.frequency && regular && job.kind !== "lease") parts.push(`After this first clean it's $${regular.price} a ${c.frequency === "weekly" ? "week" : "fortnight"}, and ${OWNER} will confirm your regular day.`);
+    parts.push("We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late.");
     return parts.join(" ");
   }
   if (entry.kind === "moved") {
     const v = sb.visits.find((x) => x.id === entry.visitId);
     if (!v) return null;
-    return `Moved to ${slotLabel(v.day, v.start).replace(", arriving", ", arriving")}.${entry.fee ? ` A $${entry.fee} late fee applies.` : ""} Ref ${v.ref}. We'll text if we're running late.`;
+    return `Moved to ${dayPhrase(v.day, v.start)}.${entry.fee ? ` A $${entry.fee} late fee applies.` : ""} Ref ${v.ref}. We'll text if we're running late.`;
   }
   if (entry.kind === "handoff") {
-    if (entry.reason === "pet") return `${OWNER} will sort out a plan for your dog with you. She'll text you back by 5 pm today.`;
-    return HANDOFF_REASONS[entry.reason].ends ? `I've passed this to ${OWNER} with a summary. ${HANDOFF_PROMISE}` : `I'll ask ${OWNER} and she'll text you back by 5 pm today.`;
+    if (entry.added) return `I've added that to ${OWNER}'s card.`;
+    if (entry.reason === "pet") return `${OWNER} will sort out a plan for your pet with you. She'll text you back by 5 pm today.`;
+    const lead = HANDOFF_LEAD[entry.reason];
+    if (HANDOFF_REASONS[entry.reason].ends) return `${lead ? `${lead} ` : ""}I've passed this to ${OWNER} with a summary. She's on a job and will text you back by 5 pm today.`;
+    return `${lead ? `${lead} ` : ""}I'll ask ${OWNER} and she'll text you back by 5 pm today.`;
   }
   return null;
 };
 
-function template(sb: Sandbox, ledger: LedgerEntry[]): string {
+/**
+ * What the customer gets when the model's reply is replaced. It never opens with a yes-word, because it may stand in for a refusal
+ * (G4 NP M1: "Could you do $300 cash?" got "Sure."), and a price or time trip gets the true answer, not a change of subject.
+ */
+function template(sb: Sandbox, ledger: LedgerEntry[], reason = ""): string {
+  const c = currentContact(sb);
   const slots = [...ledger].reverse().find((l) => l.kind === "slots");
   if (slots && slots.kind === "slots") {
     const offers = sb.conv.offers.filter((o) => slots.offerIds.includes(o.id));
     if (offers.length) return `Here's what's open: ${offers.map((o) => o.label).join("; ")}. The price is $${offers[0].price}. Which suits you?`;
   }
   if (ledger.some((l) => l.kind === "booked" || l.kind === "moved" || l.kind === "handoff")) return "";
-  if (sb.conv.verifiedContactId) return "I've found your booking. Which day suits you better?";
-  return nextQuestion(currentContact(sb));
+  const lead =
+    /price/.test(reason)
+      ? c?.bedrooms && c.bedrooms <= 3
+        ? `Our prices are fixed: a first clean for a ${c.bedrooms}-bed is a deep clean, $${JOBS[`deep-${c.bedrooms}` as keyof typeof JOBS].price} including GST, invoiced after the clean.`
+        : "Our prices are fixed and include GST, invoiced after the clean."
+      : /time/.test(reason)
+        ? "We give arrival windows rather than exact times: 8 to 9 am, 11 am to 12 pm, or 1 to 2 pm."
+        : /cash/.test(reason)
+          ? "We invoice every job, paid by card or bank transfer."
+          : "";
+  if (sb.conv.verifiedContactId) return `${lead ? `${lead} ` : ""}I've found your booking. Which day suits you better?`;
+  return `${lead ? `${lead} ` : ""}${nextQuestion(c)}`;
 }
 
 function nextQuestion(c: Contact | null): string {
-  if (!c?.firstName) return "Sure. What's your first name?";
+  if (!c?.firstName) return "What's your first name?";
   if (!c.suburb) return "Which suburb are you in?";
-  if (!c.bedrooms) return "How many bedrooms and bathrooms is it?";
+  if (!c.bedrooms) return "How many bedrooms and bathrooms are there?";
   if (!c.access) return "Will you be home on the day, or will you use a lockbox?";
   return "Would you like me to check the next open windows?";
 }
@@ -166,9 +200,13 @@ const STRONG_HANDOFF: [RegExp, HandoffReason][] = [
   [/\b(speak|talk) (to|with) (a |an )?(person|human|real person|someone)\b|\b(speak|talk) (to|with) (dana|the owner|your boss)\b/i, "person"],
   [/\b(make|lodge|have) a complaint\b|\byou (damaged|broke|ruined)\b|\bfair trading\b/i, "complaint"],
   [/\b(stole|stolen|theft)\b/i, "theft"],
-  [/\bblack mou?ld\b|\basbestos\b|\bneedles\b|\bbed ?bugs\b|\bhoard(ing|er)\b|\bsqualor\b/i, "condition"],
+  // Black mould on walls or ceilings is Dana's. On grout, silicone, the shower or tiles it is ordinary deep clean work (G4 NP, M2).
+  [/(?<!\b(grout|silicone|shower|tiles?|caulk(ing)?)\b[^.?!]{0,30})\bblack mou?ld\b(?![^.?!]{0,40}\b(grout|silicone|shower|tiles?|caulk(ing)?|bath)\b)|\basbestos\b|\bneedles\b|\bbed ?bugs\b|\bhoard(ing|er)\b|\bsqualor\b/i, "condition"],
   [/\b(bitten|bites|nipped|nips|snapped at|aggressive)\b|(?<!\ba (little )?)\bbit\b(?! of\b)/i, "pet"],
 ];
+
+/** ACMA's mobile numbers reserved for fiction, less the ones the cards and Tom's wrong number use. */
+const TYPED_PHONES = ["0491 570 110", "0491 570 157", "0491 570 158", "0491 571 266", "0491 571 491", "0491 571 804", "0491 572 549", "0491 572 665", "0491 572 983", "0491 573 770", "0491 573 087", "0491 574 118", "0491 574 632", "0491 575 254", "0491 575 789", "0491 576 398", "0491 576 801", "0491 577 426", "0491 577 644", "0491 578 957", "0491 578 148", "0491 578 888", "0491 579 212", "0491 579 760", "0491 579 455"];
 
 export function startConversation(sb: Sandbox, card: CardId | null, at: number): LogEntry[] {
   const from = sb.log.length;
@@ -176,7 +214,9 @@ export function startConversation(sb: Sandbox, card: CardId | null, at: number):
   sb.convNo += 1;
   sb.conv.card = card;
   const info = card ? CARDS[card] : null;
-  const contact: Contact = { id: `n${sb.nextRef + sb.contacts.length}`, firstName: null, suburb: null, phone: info ? info.phone : "0491 570 110", bedrooms: null, access: null, frequency: null, notes: null, stage: "New enquiry", existing: false };
+  // A typed customer gets a number of their own from ACMA's list for fiction, never one another customer has (G4 QA, M1).
+  const own = TYPED_PHONES.find((p) => !sb.contacts.some((x) => x.phone === p)) ?? TYPED_PHONES[sb.convNo % TYPED_PHONES.length];
+  const contact: Contact = { id: `n${sb.nextRef + sb.contacts.length}`, firstName: null, suburb: null, phone: info ? info.phone : own, bedrooms: null, access: null, frequency: null, notes: null, stage: "New enquiry", existing: false };
   sb.contacts.push(contact);
   sb.conv.contactId = contact.id;
   addLog(sb, { at, actor: "server", tool: "missed_call", status: "done", text: info ? `Missed call from ${info.phone}. Dana's on a job. Texted back.` : "Missed call. Dana's on a job. Texted back." });
@@ -248,7 +288,9 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     if (access) executeTool(sb, "save_contact", { access }, { ...ctx, actor: "server" });
   }
   // Picking a window that was offered in an earlier message books it (or moves it, for a customer with a booking).
-  const picked = conv.jobDone ? undefined : [...conv.offers].reverse().find((o) => o.turn < conv.turn && masked.text.toLowerCase().includes(o.label.toLowerCase()));
+  // After a job is done, only a window offered since then can be picked: a second change in one conversation (G4 QA, M4).
+  const pickable = (o: { turn: number }) => o.turn < conv.turn && (!conv.jobDone || (conv.doneTurn !== undefined && o.turn > conv.doneTurn));
+  const picked = [...conv.offers].reverse().find((o) => pickable(o) && masked.text.toLowerCase().includes(o.label.toLowerCase()));
   if (picked) executeTool(sb, "book_visit", { slot_id: picked.id }, { ...ctx, actor: "server" });
 
   let model = opts.callModel;
@@ -340,10 +382,22 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   let reply = text;
   // A turn the server settled had no model reply to check, and must not count as a turn without a tool.
   if (!usedRules && !settledByServer) {
-    if (usedTool) conv.noToolTurns = 0;
+    // A question answered from the facts is the job, not chat: it does not count toward turning the AI off (G1 N2, G4 AI Quality M6).
+    if (usedTool || masked.text.includes("?")) conv.noToolTurns = 0;
     else conv.noToolTurns += 1;
     const said = conv.messages.filter((m) => m.from === "customer").map((m) => m.text).join(" ");
-    const trip = text ? guardReply(text, { ledger, offers: conv.offers, bedrooms: currentContact(sb)?.bedrooms ?? null, customerText: said, firstName: currentContact(sb)?.firstName ?? null }) : { reason: "no text", strike: false };
+    const mine = currentContact(sb)?.id ?? null;
+    // The guard knows the whole conversation, so a true mention of an earlier hand-off or booking is not a false claim (G4 AIQ M3).
+    const trip = text
+      ? guardReply(text, {
+          ledger,
+          offers: conv.offers,
+          bedrooms: currentContact(sb)?.bedrooms ?? null,
+          customerText: said,
+          firstName: currentContact(sb)?.firstName ?? null,
+          earlier: { handoff: sb.handoffs.some((h) => h.contactId === mine), booked: conv.jobDone && sb.visits.some((v) => v.contactId === (conv.verifiedContactId ?? mine) && v.isNew) },
+        })
+      : { reason: "no text", strike: false };
     if (trip) {
       if (trip.strike) conv.strikes += 1;
       if (text) addLog(sb, { at: now, actor: trip.safety ? "safety" : "server", tool: "reply_guard", status: "flagged", code: trip.reason, text: `Reply replaced: ${trip.reason}` });
@@ -352,7 +406,7 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
         executeTool(sb, "hand_off", { reason: "chemicals", summary: masked.text.slice(0, 200) }, { ...ctx, actor: "server" });
         reply = "I can't advise on that here.";
       } else {
-        reply = template(sb, ledger);
+        reply = template(sb, ledger, trip.reason);
       }
     }
     if (conv.strikes >= STRIKE_LIMIT || conv.noToolTurns >= NO_TOOL_LIMIT) {
@@ -362,21 +416,31 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   }
 
   // One hand-off line is enough: if the job has gone to Dana, the lighter "I'll ask Dana" line is dropped.
-  const ending = ledger.some((l) => l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends);
+  const ending = ledger.some((l) => l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends && !l.added);
   const seen = new Set<string>();
-  const receipts = ledger
-    .filter((l) => !(ending && l.kind === "handoff" && !HANDOFF_REASONS[l.reason].ends))
-    // One receipt per visit, however many entries the turn holds for it.
-    .filter((l) => !("visitId" in l) || (!seen.has(l.visitId) && Boolean(seen.add(l.visitId))))
-    .map((l) => receiptFor(sb, l))
-    .filter(Boolean)
-    .join(" ");
-  // Once something real has happened, the receipt is the message. The model's own version of it would only repeat or blur it.
-  const settled = ledger.some((l) => l.kind === "booked" || l.kind === "moved" || (l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends));
+  const receipts = [
+    ...new Set(
+      ledger
+        .filter((l) => !(ending && l.kind === "handoff" && (!HANDOFF_REASONS[l.reason].ends || l.added)))
+        // One receipt per visit, however many entries the turn holds for it.
+        .filter((l) => !("visitId" in l) || (!seen.has(l.visitId) && Boolean(seen.add(l.visitId))))
+        .map((l) => receiptFor(sb, l))
+        .filter((r): r is string => Boolean(r)),
+    ),
+  ].join(" ");
+  // Once a booking or move has happened, the receipt is the message. The model's own version of it would only repeat or blur it.
+  const booked = ledger.some((l) => l.kind === "booked" || l.kind === "moved");
   const name = currentContact(sb)?.firstName;
-  // A passed-on question gets its promise from the receipt. A model line about Dana beside it would only say it twice.
-  if (ledger.some((l) => l.kind === "handoff") && /\bdana\b/i.test(reply)) reply = "";
-  const finalText = (settled ?[prefix.trim(), name ? `Thanks ${name}.` : "", receipts] : [prefix.trim(), reply.trim(), receipts]).filter(Boolean).join(" ").trim();
+  // A passed-on question gets its promise from the receipt, so only the model's sentences about Dana go. Its answer stays: the
+  // customer asked something, and a hand-off must not swallow the reply (G4 UX M3, NP M3).
+  if (ledger.some((l) => l.kind === "handoff")) reply = sentences(reply).filter((s) => !/\b(dana|the owner|pass(ed|ing)? (it|this|that)|she'?ll|get back to you|text you back)\b/i.test(s)).join(" ");
+  // The server has already warned about a code or an address. A second warning from the model reads as nagging (G4 UX M5).
+  if (masked.hitAccess) reply = sentences(reply).filter((s) => !/\b(codes?|address|secure link|lockbox code)\b/i.test(s)).join(" ");
+  const parts = booked ? [prefix.trim(), name ? `Thanks ${name}.` : "", receipts] : [prefix.trim(), reply.trim(), receipts];
+  let finalText = parts.filter(Boolean).join(" ").trim();
+  // The first price a customer is given carries the condition line, once, from the server.
+  const quoted = [...finalText.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])));
+  if (quoted && !booked &&!conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) finalText = `${finalText} ${CONDITION_LINE}`;
   return done(finalText || "Sorry, I missed that. What can I help you with?", modelCalls, usedRules);
 }
 
@@ -391,9 +455,9 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   // With no AI there is no second route to the danger line, so the fixed rules lean the safe way on a wider list of words.
   // A few false alarms here are the price of not missing a real one while the AI is unavailable.
   // Words about a body in trouble, not the cleaning words around it ("gas oven", "burnt-on" and "fireplace" stay ordinary).
-  const body = /\b(fumes?|poison\w*|swallow\w*|drank|can'?t breathe|breathing|breathless|gasping|choking|wheez\w*|dizzy|faint\w*|unconscious|out cold|not moving|won'?t wake|can'?t wake|collapsed|fell|fallen|a fall|hit (his|her|my|their) head|bleed\w*|blood|gash|injur\w*|chest (pain|is|hurts)|blue (in the )?lips|vomit\w*|blister\w*|burnt (him|her|me|my|his)|burns on|electrocut\w*|smell gas|gas leak|on fire|smoke (is )?(coming|everywhere|filling))\b/i;
+  const body = /\b(fumes?|poison\w*|swallow\w*|drank|can'?t breathe|breathing|breathless|gasping|choking|wheez\w*|dizzy|faint\w*|unconscious|out cold|not moving|won'?t wake|can'?t wake|collapsed|fell|fallen|a fall|hit (his|her|my|their) head|bleed\w*|blood|gash|injur\w*|chest (pain|is|hurts)|blue (in the )?lips|vomit\w*|blister\w*|burnt (him|her|me|my|his)|burns on|electrocut\w*|smell gas|gas leak|on fire|alight|ablaze|sparks?|heart attack|having a stroke|seizure|having a fit|frothing|foaming|unresponsive|not responding|catch (my|his|her|their) breath|smoke'?s? (is )?(coming|everywhere|filling|pouring))\b/i;
   if (body.test(text) && !/\bhurt my (back|knee|shoulder|wrist|hip|neck)\b|\b(last (week|month|year)|years? ago|was fine)\b/i.test(text)) {
-    executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
+    executeTool(sb, "hand_off", { reason: "question", summary: text.slice(0, 200) }, ctx);
     addLog(sb, { at: base.at, actor: "safety", tool: "danger_line", status: "flagged", text: "AI paused, so words that might mean danger got the fixed safety message" });
     return `${lead}${DANGER_TEXT}`;
   }
@@ -406,19 +470,22 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
     const r = executeTool(sb, "book_visit", { slot_id: pick.id }, ctx);
     if (r.ok) return lead;
   }
-  // A verified customer is moving the booking they have: their own job, their own price, so no first-clean line (G3 QA, M4).
-  // Already moved: no more windows to offer (asking would refuse UNKNOWN_JOB), so whatever they ask next goes to Dana.
-  if (sb.conv.verifiedContactId && sb.conv.jobDone) {
-    executeTool(sb, "hand_off", { reason: "question", summary: text.slice(0, 200) }, ctx);
+  // The job is done (booked, moved, or with Dana). A thank-you gets a polite close, not windows or a hand-off; anything else is
+  // added to Dana's card in the customer's words (G4 QA, M2: Priya was asked her bedrooms after her request went to Dana).
+  if (sb.conv.jobDone) {
+    if (/^\W*(thanks?|thank you|ta|cheers|great|perfect|lovely|awesome|ok(ay)?|sounds good|see you( then)?|bye|no worries)\b[\w\s,.!']{0,30}$/i.test(t)) return `${lead}You're welcome. If anything changes, just text this number.`;
+    const ended = sb.handoffs.find((h) => h.contactId === (sb.conv.verifiedContactId ?? c.id) && HANDOFF_REASONS[h.reason].ends);
+    executeTool(sb, "hand_off", { reason: ended?.reason ?? "question", summary: text.slice(0, 200) }, ctx);
     return lead;
   }
+  // A verified customer is moving the booking they have: their own job, their own price, so no first-clean line (G3 QA, M4).
   if (sb.conv.verifiedContactId) {
     const r = executeTool(sb, "get_open_slots", {}, ctx);
     if (r.ok && (r.data.slots as unknown[]).length) {
       const slots = r.data.slots as { label: string }[];
       return `${lead}Here's what's open for your clean: ${slots.map((s) => s.label).join("; ")}. Reply with the one that suits.`;
     }
-    executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
+    executeTool(sb, "hand_off", { reason: "question", summary: text.slice(0, 200) }, ctx);
     return lead;
   }
   // Read every detail a message carries, wherever it sits ("3 bed in Marrickville", "I'm Mia. 2 bathrooms..."), so a customer
@@ -442,12 +509,12 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
   if (Object.keys(found).length) executeTool(sb, "save_contact", found, ctx);
   // "What's open?" is asking for windows, not a question for Dana; nor is a message that just gave us details.
   if (!Object.keys(found).length && !/\b(clean|book|price|quote|bedroom|bed|deep|regular|lease|bond|open|available|free|times?|windows?|days?|when|home|lock ?box)\b/i.test(t) && (t.includes("?") || t.split(/\s+/).length > 5)) {
-    executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
+    executeTool(sb, "hand_off", { reason: "question", summary: text.slice(0, 200) }, ctx);
     return announce ? lead : `${SAFETY_NOTE} `;
   }
   if (!c.firstName) return `${lead}What's your first name?`;
   if (!c.suburb) return `${lead}Which suburb are you in?`;
-  if (c.suburb === "other") return `${lead}Sorry, we don't get out there.`;
+  if (c.suburb === "other") return `${lead}Sorry, we don't get out to your area. We cover ${AREA.slice(0, 5).join(", ")} and nearby inner west suburbs.`;
   if (!c.bedrooms) return `${lead}How many bedrooms? Just the number, 1 to 4.`;
   if (!c.access) {
     if (/\block\s?box\b/i.test(t)) executeTool(sb, "save_contact", { access: "lockbox" }, ctx);
@@ -459,10 +526,21 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
     if (m) executeTool(sb, "save_contact", { phone: m[0] }, ctx);
     else return `${lead}What's the best mobile for you?`;
   }
-  const beds = Math.min(3, c.bedrooms ?? 3);
+  // The fixed rules book only a deep clean of 1 to 3 bedrooms. A bigger home or a bond clean is priced by Dana, never booked as
+  // something it is not (G4 AI Quality, M1: a 4-bed was booked as a 3-bed deep, a bond clean as a $290 deep clean).
+  const all = sb.conv.messages.filter((m) => m.from === "customer").map((m) => m.text).join(" ");
+  if ((c.bedrooms ?? 0) >= 4) {
+    executeTool(sb, "hand_off", { reason: "size", summary: `${c.bedrooms}-bed home. ${text.slice(0, 160)}` }, ctx);
+    return lead;
+  }
+  if (/\b(bond|end of (the )?lease|vacat\w*|move[- ]?out|moving out|exit clean)\b/i.test(all)) {
+    executeTool(sb, "hand_off", { reason: "question", summary: `End of lease clean, ${c.bedrooms}-bed, ${c.suburb}. ${text.slice(0, 140)}` }, ctx);
+    return `${lead}An end of lease clean is booked around your move-out and inspection days.`;
+  }
+  const beds = c.bedrooms ?? 3;
   const r = executeTool(sb, "get_open_slots", { job_key: `deep-${beds}` }, ctx);
   if (!r.ok) {
-    executeTool(sb, "hand_off", { reason: "question", summary: "" }, ctx);
+    executeTool(sb, "hand_off", { reason: "question", summary: text.slice(0, 200) }, ctx);
     return lead;
   }
   const slots = r.data.slots as { label: string }[];
