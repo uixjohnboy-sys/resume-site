@@ -86,7 +86,7 @@ Use only these facts. Never invent a fact, a price or a time.
 ${FACTS}
 
 Collecting details: ${INTAKE}
-Save each detail with save_contact as you learn it. A studio counts as 1 bedroom. Stairs, when it was last cleaned, pets and parking are good to know: ask each at most once, never twice, and never let them hold up checking the calendar. When the customer picks a window, call book_visit straight away: do not ask them to confirm it first. To book: get details, call get_open_slots, offer the windows in plain words, wait for the customer's pick, then call book_visit.
+Save each detail with save_contact as you learn it. A studio counts as 1 bedroom. Stairs, when it was last cleaned, pets and parking are good to know: ask each at most once, never twice, and never let them hold up checking the calendar. When the customer picks a window, call book_visit straight away: do not ask them to confirm it first. To book: get details, call get_open_slots, offer the windows, wait for the customer's pick, then call book_visit. Offer windows in one short line in this form: "Open: Wed 8 to 9 am, Wed 11 am to 12 pm, Thu 1 to 2 pm. Which suits?" No price again if you have already given it, and never ask which day first.
 Each new message starts with a <state> block written by the system. It is the truth right now and overrides anything said earlier, including what you said yourself. Never ask for something it already shows.
 To move a booking: it needs the mobile number the booking is under. If the state shows no verified booking, ask what mobile it is under. If it lists a verified booking, the number matched: in the same turn, call get_open_slots with that visit's job_key (no day needed), offer the windows, then call move_visit with their pick. Do not ask which day first.
 End of lease is a normal booking: never hand it off just because it is a bond clean. Hand it off only if the customer says the home is not empty, or the power or water is off, or it is 4-bed.
@@ -436,12 +436,26 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   if (ledger.some((l) => l.kind === "handoff")) reply = sentences(reply).filter((s) => !/\b(dana|the owner|pass(ed|ing)? (it|this|that)|she'?ll|get back to you|text you back)\b/i.test(s)).join(" ");
   // The server has already warned about a code or an address. A second warning from the model reads as nagging (G4 UX M5).
   if (masked.hitAccess) reply = sentences(reply).filter((s) => !/\b(codes?|address|secure link|lockbox code)\b/i.test(s)).join(" ");
-  const parts = booked ? [prefix.trim(), name ? `Thanks ${name}.` : "", receipts] : [prefix.trim(), reply.trim(), receipts];
+  // A job that has gone to Dana reads as one writer: the server's reason first, then the model's answer (statements only: no
+  // questions for a booking that has stopped, nothing that repeats who it is or points at a sentence that was cut), then the
+  // promise (G4 UX Writer recheck, N1).
+  if (ending && !booked) {
+    const entry = ledger.find((l) => l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends && !l.added);
+    const lead = entry && entry.kind === "handoff" ? HANDOFF_LEAD[entry.reason] : undefined;
+    reply = sentences(reply)
+      .filter((s) => !s.endsWith("?") && !/\b(booking assistant|assistant|not a person|a real person|in the meantime|meanwhile|sorry to hear|happy to help)\b/i.test(s))
+      .join(" ");
+    const rest = receipts.replace(lead ?? "\u0000", "").trim();
+    reply = [lead, reply, rest].filter(Boolean).join(" ");
+  }
+  // "Thanks Mia." once: not when the agent's last message already thanked her.
+  const thanked = /^thanks\b/i.test([...conv.messages].reverse().find((m) => m.from === "agent")?.text ?? "");
+  const parts = booked ? [prefix.trim(), name && !thanked ? `Thanks ${name}.` : "", receipts] : ending ? [prefix.trim(), reply.trim()] : [prefix.trim(), reply.trim(), receipts];
   let finalText = parts.filter(Boolean).join(" ").trim();
   // The first price a customer is given carries the condition line, once, from the server.
   const quoted = [...finalText.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])));
   // Right after the sentence with the price, so the reply still ends on its question.
-  if (quoted && !booked && !conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) {
+  if (quoted && !booked && !/normal condition/i.test(finalText) && !conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) {
     const s = sentences(finalText);
     const at = s.map((x) => [...x.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])))).lastIndexOf(true);
     s.splice(at + 1, 0, CONDITION_LINE);

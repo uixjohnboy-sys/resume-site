@@ -79,8 +79,10 @@ const luhn = (d: string) => {
 };
 
 // Australian street types as people text them, including the ones with no abbreviation (G4 Security, M1).
-const STREET = "st|street|rd|road|ave|avenue|av|lane|ln|dr|drive|cres|crescent|cr|pl|place|tce|terrace|pde|parade|hwy|highway|way|ct|crt|court|cl|close|blvd|boulevard|boulevarde|bvd|gr|grove|cct|circuit|esp|esplanade|mews|row|sq|square|walk|loop|rise|grn|green|pkwy|parkway|track|trail|alley|link|glade|gardens|gdns|retreat|vista|ridge|chase|quay";
-const CODE_WORD = "code|pin|passcode|password|alarm|lockbox|lock box|key safe|keysafe|key box|gate|intercom|fob|keypad|key pad|combo|combination|padlock|garage remote|garage door|door code";
+const STREET = "st|street|rd|road|ave|avenue|av|lane|ln|dr|drive|cres|crescent|cr|pl|place|tce|terrace|pde|parade|hwy|highway|way|ct|crt|court|cl|close|blvd|boulevard|boulevarde|bvd|gr|grove|cct|circuit|esp|esplanade|mews|row|sq|square|pkwy|parkway|alley|glade|gardens|gdns|quay";
+// Street types that are also everyday words ("2 weeks in a row") count only after a capitalised street name.
+const STREET_WORDLIKE = "Row|Walk|Loop|Rise|Green|Link|Track|Trail|Retreat|Vista|Ridge|Chase|Grove";
+const CODE_WORD = "code|pin|passcode|password|alarm|lockbox|lock box|lock-box|key safe|keysafe|key-safe|key box|gate|intercom|fob|keypad|key pad|combo|combination|padlock|garage remote|garage door|door code|buzzer|access number|entry number|door number";
 const SPELLED = "zero|oh|one|two|three|four|five|six|seven|eight|nine";
 
 export type Masked = { text: string; hit: boolean; hitAccess: boolean };
@@ -94,7 +96,7 @@ export function maskPersonal(raw: string): Masked {
   let hitAccess = false;
   let text = stripFormat(raw);
   // "sam@x.com", "sam @ x . com" and "sam at x dot com".
-  text = text.replace(/[^\s@]+\s*@\s*[^\s@]+(\s*\.\s*[a-z]{2,})+|\b[\w.+-]+\s+at\s+[\w-]+(\s+dot\s+[a-z]{2,})+\b/gi, () => {
+  text = text.replace(/[^\s@]+\s*@\s*[^\s@]+(\s*\.\s*[a-z]{2,})+|\b[\w.+-]+\s*(\s|[([]\s*)at(\s|\s*[)\]])\s*[\w-]+((\s+|\s*[([]\s*)dot(\s+|\s*[)\]]\s*)[a-z]{2,}|\s*\.\s*[a-z]{2,})+\b/gi, () => {
     hit = true;
     return "[email removed]";
   });
@@ -112,10 +114,19 @@ export function maskPersonal(raw: string): Masked {
     hit = hitAccess = true;
     return `[code removed] ${word}`;
   });
-  text = text.replace(new RegExp(`\\b(unit |apt |flat )?\\d{1,5}[a-z]?(\\/\\d{1,5}[a-z]?)?\\s+([a-z'-]+\\s+){1,3}(${STREET})\\b\\.?`, "gi"), () => {
-    hit = hitAccess = true;
-    return "[address removed]";
-  });
+  // A number then a street type, but not "3 bed place" or "2 storey terrace": a count of rooms, levels or time is not a house number
+  // (G4 UX Writer recheck, N2).
+  const NOT_NUMBER_OF = "(?!\\s*-?\\s*(bed|beds|bedroom|bedrooms|bdr|br|bath|baths|bathroom|bathrooms|storey|storeys|story|level|levels|minutes?|mins?|hours?|hrs?|weeks?|days?|months?|years?|units?|dogs?|cats?|kids?|people|times?|x)\\b)";
+  const address = (types: string, flags: string) =>
+    new RegExp(`\\b(unit |apt |flat )?\\d{1,5}[a-z]?(\\/\\d{1,5}[a-z]?)?${NOT_NUMBER_OF}\\s+([A-Za-z'-]+\\s+){1,3}(${types})\\b\\.?`, flags);
+  for (const re of [address(STREET, "gi"), address(STREET_WORDLIKE, "g")]) {
+    text = text.replace(re, (m) => {
+      // A word-like street type needs a capitalised name before it ("8 Rose Row", not "2 weeks in a row").
+      if (re.flags === "g" && !/\d\S*\s+[A-Z]/.test(m)) return m;
+      hit = hitAccess = true;
+      return "[address removed]";
+    });
+  }
   // A card can come with any separator ("4111/1111/1111/1111"). A slash never makes a phone number, so dates stay as they are.
   text = text.replace(/(?<![\d])(\+?\d[\d\s()./_-]{7,24}\d)(?![\d])/g, (m) => {
     const d = m.replace(/\D/g, "");
@@ -125,6 +136,8 @@ export function maskPersonal(raw: string): Masked {
       return "[card removed]";
     }
     if (/[/_]/.test(m)) return m;
+    // A date with dashes or dots ("12-11-2026") is not a phone number.
+    if (/^\d{1,2}[-.]\d{1,2}[-.]\d{2,4}$/.test(m.trim())) return m;
     if (d.length >= 8 && d.length <= 13) {
       hit = true;
       return `04xx xxx ${d.slice(-3)}`;

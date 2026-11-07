@@ -724,5 +724,21 @@ await test("G4 F13: masking reads the ways Australians actually text it", async 
   assert.equal(maskPersonal("Inspection is 12/11 at 10").text, "Inspection is 12/11 at 10");
 });
 
+await test("G4 recheck: an ending hand-off reads as one writer, reason first, no stray question", async () => {
+  const sb = mia();
+  const r = await say(sb, "Are you a real person? I want to talk to a person", script({ text: "I'm the booking assistant. In the meantime, what's your first name?" }));
+  assert.match(r.reply, /^I'm the booking assistant, not a person\. I've passed this to Dana/, r.reply);
+  assert.doesNotMatch(r.reply, /\?|In the meantime/);
+  assert.equal((r.reply.match(/assistant/g) ?? []).length, 1);
+  const s2 = mia();
+  const r2 = await say(s2, "can you do a deep clean of a 4 bed house?", script({ tool: "hand_off", input: { reason: "size", summary: "4-bed deep" } }, { text: "We clean homes up to 3 bedrooms by text. What suburb are you in?" }));
+  assert.match(r2.reply, /^A home that size is one Dana prices herself\. We clean homes up to 3 bedrooms by text\. I've passed this/, r2.reply);
+});
+
+await test("G4 recheck: counts of rooms and time are not addresses; word-like street types need a name", () => {
+  for (const t of ["our 5 bedroom place in Annandale", "a 2 bed place", "3 bed terrace in Glebe", "can you come 2 weeks in a row?", "a 2 storey terrace", "12-11-2026 is the inspection"]) assert.equal(maskPersonal(t).text, t, t);
+  for (const t of ["8 Rose Row", "14 Kent Walk", "lock-box 7741", "building buzzer 1402", "access number 8812", "jane(at)gmail.com", "jane [at] gmail [dot] com"]) assert.notEqual(maskPersonal(t).text, t, t);
+});
+
 assert.ok(NOW > 0);
 console.log(`${passed} passed${process.exitCode ? ", with failures" : ""}`);

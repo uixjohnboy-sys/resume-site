@@ -27,7 +27,8 @@ export const CAPS = {
   siteModelCalls: 8000,
   // Review budget: back to 150 when G4 closes. Today's evals spent the 150, which left real visitors on the fixed rules.
   siteSandboxes: 1000,
-  ipReads: 600,
+  // Review budget too: back to 600 the day G4 closes (eight reviewers on one network spent 600 page loads on 2026-11-07).
+  ipReads: 20000,
   siteMicrodollars: 2_000_000,
 };
 
