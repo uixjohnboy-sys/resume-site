@@ -755,8 +755,7 @@ await test("G4 AIQ recheck: with the AI paused every reply carries the 000 line;
     const r = await say(sb, line, null);
     assert.match(r.reply, /\b000\b/, r.reply);
   }
-  assert.equal(sb.contacts.find((c) => c.id === sb.conv.contactId).bedrooms, 4);
-  assert.ok(sb.handoffs.some((h) => h.reason === "size"));
+  assert.ok(sb.handoffs.some((h) => h.reason === "size" && h.items.some((i) => /4-bed/.test(i))), JSON.stringify(sb.handoffs));
   for (const words of ["end of tenancy clean", "we hand the keys back to the agent on Friday"]) {
     const s = seedSandbox();
     startConversation(s, null, 1);
@@ -775,6 +774,18 @@ await test("G4 AIQ recheck: questions typed without a question mark do not turn 
   const sb = mia();
   for (const q of ["do you bring products", "are you insured", "how do I pay", "can you do inside windows", "do I need to be home", "how long does a 2 bed take", "can you do Saturdays", "what about pets", "do you do ovens"]) await say(sb, q, script({ text: "We do." }));
   assert.equal(sb.conv.rulesOnly, false);
+});
+
+await test("G4 UX recheck 2: a 5-bed is passed to Dana even when the model only says so", async () => {
+  const sb = mia();
+  const r = await say(sb, "Need a spring clean for our 5 bedroom place in Annandale", script({ text: "Dana needs to quote a 5-bedroom spring clean herself. Could I get your first name while we wait?" }));
+  assert.ok(sb.handoffs.some((h) => h.reason === "size"));
+  assert.match(r.reply, /^A home that size is one Dana prices herself\. I've passed this to Dana/, r.reply);
+  assert.doesNotMatch(r.reply, /\?/);
+  // A 2-bed with four bathrooms is not a big home.
+  const s2 = mia();
+  await say(s2, "2 bedrooms and 4 bathrooms, in Newtown", script({ text: "Thanks." }));
+  assert.ok(!s2.handoffs.some((h) => h.reason === "size"));
 });
 
 assert.ok(NOW > 0);

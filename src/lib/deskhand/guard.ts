@@ -93,7 +93,7 @@ function checkClaims(text: string, ctx: GuardCtx): Trip | null {
     if (/\b(cancel+ed|cancel+ing it)\b/i.test(s) && !/\bif\b/i.test(s) && !/\b(free|fee|before)\b/i.test(s)) {
       return { reason: "claimed a cancellation", strike: true };
     }
-    if (/\b(passed|passing|sent|forwarded|flagged|told|let) .{0,20}\bdana\b|\bdana\b.{0,30}\b(will|'ll|she'?ll) (call|ring|text|contact|reply|get back)\b|\bshe'?ll (call|ring|text)\b/i.test(s) && !/\b(afternoon before|lockbox|address|on the day|before we start)\b/i.test(s) && !handedOff) {
+    if (/\b(passed|passing|sent|forwarded|flagged|told|let) .{0,20}\bdana\b|\bdana\b.{0,30}\b(will|'ll|she'?ll) (call|ring|text|contact|reply|get back)\b|\bshe'?ll (call|ring|text)\b|\bdana (needs|will need|has|would need) to (quote|price|look at|see)\b|\bwhile we wait\b/i.test(s) && !/\b(afternoon before|lockbox|address|on the day|before we start)\b/i.test(s) && !handedOff) {
       return { reason: "claimed a hand-off that did not happen", strike: true };
     }
   }

@@ -80,7 +80,7 @@ export const TOOLS = [
 ];
 
 const SYSTEM = `You do the front-desk job at ${BUSINESS}, a home cleaning business in inner west Sydney, by SMS. ${OWNER}, the owner, is on jobs all day.
-Sound like a friendly, capable local. Australian English. Short texts: under 45 words, no lists, no markdown, no exclamation marks, no em dashes. Say you are the booking assistant if asked, never that you are ${OWNER} or a person.
+Sound like a friendly, capable local. Australian English. No filler openers such as "Happy to help" or "Great question". Short texts: under 45 words, no lists, no markdown, no exclamation marks, no em dashes. Say you are the booking assistant if asked, never that you are ${OWNER} or a person.
 
 Use only these facts. Never invent a fact, a price or a time.
 ${FACTS}
@@ -366,6 +366,13 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     }
   }
 
+  // Size backstop: a new customer's first clean is a deep clean, and a deep or end of lease clean of 4 bedrooms or more is Dana's
+  // to price. Saying so without passing it on left the customer waiting on nobody (G4 UX Writer recheck 2, N3).
+  const bigSaid = masked.text.match(/\b([4-9]|four|five|six|seven|eight|nine)\s*-?\s*(?:bed|beds|bedroom|bedrooms|br)\b/i);
+  const bigBeds = bigSaid ? ({ four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9 } as Record<string, number>)[bigSaid[1].toLowerCase()] ?? Number(bigSaid[1]) : (currentContact(sb)?.bedrooms ?? 0);
+  if (bigBeds >= 4 && !currentContact(sb)?.existing && !conv.verifiedContactId && !conv.jobDone && !ledger.some((l) => l.kind === "handoff" && l.reason === "size")) {
+    executeTool(sb, "hand_off", { reason: "size", summary: `${bigBeds}-bed home. ${masked.text.slice(0, 160)}` }, { ...ctx, actor: "server" });
+  }
   // The hand-off backstop: strong phrases only, because a bond customer says "refund", "owner" and "manager".
   for (const [re, reason] of STRONG_HANDOFF) {
     // The server's reading wins over a softer one from the model: "common areas" is a strata job even if the model filed a question.
@@ -445,7 +452,7 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     const entry = ledger.find((l) => l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends && !l.added);
     const lead = entry && entry.kind === "handoff" ? HANDOFF_LEAD[entry.reason] : undefined;
     reply = sentences(reply)
-      .filter((s) => !s.endsWith("?") && !/\b(booking assistant|assistant|not a person|a real person|in the meantime|meanwhile|sorry to hear|happy to help)\b/i.test(s))
+      .filter((s) => !s.endsWith("?") && !/\b(booking assistant|assistant|not a person|a real person|in the meantime|meanwhile|while we wait|sorry to hear|happy to help|thanks for|thank you for)\b/i.test(s))
       .join(" ");
     const rest = receipts.replace(lead ?? "\u0000", "").trim();
     reply = [lead, reply, rest].filter(Boolean).join(" ");
@@ -457,8 +464,9 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   // The first price a customer is given carries the condition line, once, from the server.
   const quoted = [...finalText.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])));
   // Right after the sentence with the price, so the reply still ends on its question.
-  if (quoted && !booked && !/normal condition/i.test(finalText) && !conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) {
-    const s = sentences(finalText);
+  if (quoted && !booked && !/very different on the day/i.test(finalText) && !conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) {
+    // The model's own half-version ("assuming a home in normal condition") gives way to the full line, so it is said once and whole.
+    const s = sentences(finalText).filter((x) => !/normal condition/i.test(x) || /\$\d/.test(x));
     const at = s.map((x) => [...x.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])))).lastIndexOf(true);
     s.splice(at + 1, 0, CONDITION_LINE);
     finalText = s.join(" ");
