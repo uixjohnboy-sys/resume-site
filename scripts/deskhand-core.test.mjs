@@ -801,5 +801,18 @@ await test("G4 UX recheck 2: a 5-bed is passed to Dana even when the model only 
   assert.ok(!s2.handoffs.some((h) => h.reason === "size"));
 });
 
+await test("G4 UX recheck 3: the condition line is said once, and an ending hand-off promises once", async () => {
+  for (const said of ["A 2-bed deep clean is $290, GST included, for a home in normal condition.", "A 2-bed deep clean is $290, assuming a home in normal condition. Prices include GST and assume a home in normal condition."]) {
+    const sb = mia();
+    const r = await say(sb, "how much for a 2 bed", script({ text: said }));
+    assert.equal((r.reply.match(/normal condition/g) ?? []).length, 1, r.reply);
+    assert.match(r.reply, /\$290/);
+  }
+  const sb = seedSandbox();
+  startConversation(sb, "priya", 1);
+  const r = await say(sb, "Hi, do you clean the common areas of a strata building in Glebe?", script({ tool: "hand_off", input: { reason: "commercial", summary: "Strata common areas, Glebe" } }, { text: "Strata cleans are quoted separately. Her reply should come by 5 pm today." }));
+  assert.equal((r.reply.match(/5 pm/g) ?? []).length, 1, r.reply);
+});
+
 assert.ok(NOW > 0);
 console.log(`${passed} passed${process.exitCode ? ", with failures" : ""}`);

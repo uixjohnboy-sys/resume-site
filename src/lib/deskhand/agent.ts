@@ -444,7 +444,7 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   const name = currentContact(sb)?.firstName;
   // A passed-on question gets its promise from the receipt, so only the model's sentences about Dana go. Its answer stays: the
   // customer asked something, and a hand-off must not swallow the reply (G4 UX M3, NP M3).
-  if (ledger.some((l) => l.kind === "handoff")) reply = sentences(reply).filter((s) => !/\b(dana|the owner|pass(ed|ing)? (it|this|that)|she'?ll|get back to you|text you back)\b/i.test(s)).join(" ");
+  if (ledger.some((l) => l.kind === "handoff")) reply = sentences(reply).filter((s) => !/\b(dana|the owner|pass(ed|ing)? (it|this|that)|she'?ll|she will|her reply|reply (should|will)|by \d{1,2} ?(am|pm)|get back to you|text you back|hear back)\b/i.test(s)).join(" ");
   // The server has already warned about a code or an address. A second warning from the model reads as nagging (G4 UX M5).
   if (masked.hitAccess) reply = sentences(reply).filter((s) => !/\b(codes?|address|secure link|lockbox code)\b/i.test(s)).join(" ");
   // A job that has gone to Dana reads as one writer: the server's reason first, then the model's answer (statements only: no
@@ -454,7 +454,7 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
     const entry = ledger.find((l) => l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends && !l.added);
     const lead = entry && entry.kind === "handoff" ? HANDOFF_LEAD[entry.reason] : undefined;
     reply = sentences(reply)
-      .filter((s) => !s.endsWith("?") && !/\b(booking assistant|assistant|not a person|a real person|in the meantime|meanwhile|while we wait|sorry to hear|happy to help|thanks for|thank you for)\b/i.test(s))
+      .filter((s) => !s.endsWith("?") && !/^(thanks|thank you|great|lovely|good news)\b/i.test(s) && !/\b(booking assistant|assistant|not a person|a real person|in the meantime|meanwhile|while we wait|sorry to hear|happy to help|thanks for|thank you for|in our area)\b/i.test(s))
       .join(" ");
     const rest = receipts.replace(lead ?? "\u0000", "").trim();
     reply = [lead, reply, rest].filter(Boolean).join(" ");
@@ -468,7 +468,10 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   // Right after the sentence with the price, so the reply still ends on its question.
   if (quoted && !booked && !/very different on the day/i.test(finalText) && !conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) {
     // The model's own half-version ("assuming a home in normal condition") gives way to the full line, so it is said once and whole.
-    const s = sentences(finalText).filter((x) => !/normal condition/i.test(x) || /\$\d/.test(x));
+    // A price sentence keeps its price and loses its own condition clause ("$290, GST included, for a home in normal condition").
+    const s = sentences(finalText)
+      .map((x) => (/\$\d/.test(x) ? x.replace(/,?\s*(and |which |that )?(for|assum\w*|based on|in) (a |the )?(home|house|place|unit) (in|of) normal condition/i, "") : x))
+      .filter((x) => !/normal condition/i.test(x));
     const at = s.map((x) => [...x.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])))).lastIndexOf(true);
     s.splice(at + 1, 0, CONDITION_LINE);
     finalText = s.join(" ");
