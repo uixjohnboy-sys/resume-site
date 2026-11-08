@@ -95,6 +95,9 @@ export const HANDOFF_KEYS = Object.keys(HANDOFF_REASONS) as HandoffReason[];
 
 export const FIRST_TEXT = `Hi, it's the automated booking assistant at ${BUSINESS}. Sorry we missed your call, ${OWNER}'s on a job. I can sort a price and booking here if you like.`;
 export const HANDOFF_PROMISE = `${OWNER}'s on a job. She'll text you back by 5 pm today.`;
+/** The fixed rules' two questions, answered by tap (Desk.tsx offers the replies). In pack, so the page never loads the prompt. */
+export const MOVE_OUT_Q = "Is this a move-out (end of lease) clean? Reply yes or no.";
+export const EXTRAS_Q = "Any extras? Oven $60, inside the fridge $40. Reply oven, fridge, both or none.";
 /** Said once, by the server, after the first price a customer is given (SPEC; G4 UX Writer M4). */
 export const CONDITION_LINE = `That's for a home in normal condition. If it's very different on the day, ${OWNER} will talk to you before we start.`;
 

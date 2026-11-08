@@ -1,4 +1,4 @@
-// Runs before everything else, on the customer's raw words. Neither of these ever calls a model.
+// Runs before everything else, on the customer's raw words. None of these ever calls a model.
 
 // Format characters (zero-width spaces and joiners) are removed first, so "sme​ll g​as" reads as it looks (G4 Security, m7).
 export const stripFormat = (s: string) => s.replace(/\p{Cf}/gu, "");
@@ -44,12 +44,34 @@ const OVER = /\b(last (week|month|year|time)|yesterday|years? ago|months? ago|a 
 const NOW = /\b(right now|still|now|just|getting worse)\b/;
 const NOT_DANGER: RegExp[] = [/\bsmoke alarm\b(?!.*\b(fire|burning)\b)/];
 
-export function isDanger(raw: string): boolean {
+// Two tiers, the pattern Tapline settled on at its G4 (STUDIO.md): a short list that is an emergency whatever the sentence around it
+// fires at once with no model; every other match is only a sign, and fires when the model agrees (flag_danger) or when there is no
+// model to ask. "The fridge smells like rotten eggs", "the kettle's been hissing", "we all had food poisoning" and "the bookshelf
+// collapsed" each fired the fixed line on one tier (G4 AI Quality recheck 3, M5: 15 of 54 lookalikes).
+const STRONG: RegExp[] = [
+  DANGER[0],
+  DANGER[1],
+  DANGER[3],
+  /\b(not breathing|stopped breathing|unconscious|won't wake|can't wake (him|her|them))\b/,
+  /\b(in danger|call(ing)? (an )?ambulance|need (an )?ambulance|call 000|calling 000)\b/,
+];
+
+function matches(raw: string, list: RegExp[]): boolean {
   const t = norm(raw);
-  if (!DANGER.some((r) => r.test(t))) return false;
+  if (!list.some((r) => r.test(t))) return false;
   if (OVER.test(t) && !NOW.test(t.replace(/\ball good now\b/, ""))) return false;
   if (NOT_DANGER.some((r) => r.test(t)) && !DANGER.slice(0, 3).some((r) => r.test(t))) return false;
   return true;
+}
+
+/** An emergency whatever else is said: the fixed line, no model. */
+export function isDanger(raw: string): boolean {
+  return matches(raw, STRONG);
+}
+
+/** Words that may mean danger. Not enough alone: the model is told and judges, and with no model the fixed line goes. */
+export function isDangerSign(raw: string): boolean {
+  return !isDanger(raw) && matches(raw, DANGER);
 }
 
 // Asking about mixing products is not an emergency: it needs one fixed, true sentence and Dana, not a call to 000.

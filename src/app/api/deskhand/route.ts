@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { cookies } from "next/headers";
 import { runTurn, startConversation, MAX_CUSTOMER_MESSAGES, type CallModel, type ModelBlock } from "@/lib/deskhand/agent";
 import { CARDS, freshConversation, seedSandbox, type CardId } from "@/lib/deskhand/seed";
-import { DANGER_TEXT, isDanger } from "@/lib/deskhand/safety";
+import { DANGER_TEXT, isDanger, isDangerSign } from "@/lib/deskhand/safety";
 import { CAPS, allowMessage, allowRead, claimSandbox, freeLock, hasStore, loadSandbox, newId, priceOf, reserveCall, saveSandbox, settleCall, takeLock, validId } from "@/lib/deskhand/store";
 import { network } from "@/lib/tapline/store";
 import { clientIp, hashKey } from "@/lib/twin/gate";
@@ -107,14 +107,14 @@ export async function POST(req: Request) {
   const raw = typeof body.text === "string" ? body.text.normalize("NFKC").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").replace(/\p{Cf}/gu, "").trim() : null;
 
   // The danger line never depends on the store, a cap or the model.
-  if (raw && isDanger(raw) && !hasStore()) return json({ reply: DANGER_TEXT });
+  if (raw && (isDanger(raw) || isDangerSign(raw)) && !hasStore()) return json({ reply: DANGER_TEXT });
   if (!hasStore()) return json({ error: PAUSED }, 503);
 
   const id = await sandboxId();
   const ipKey = hashKey(network(clientIp(req)));
   // Every way of saving a new sandbox (start, reset, a message) is counted first. Over the cap nothing is saved.
   if (!(await claimSandbox(id, ipKey))) {
-    if (raw && isDanger(raw)) return json({ reply: DANGER_TEXT });
+    if (raw && (isDanger(raw) || isDangerSign(raw))) return json({ reply: DANGER_TEXT });
     return json({ error: BUSY }, 503);
   }
   const lock = await takeLock(id);

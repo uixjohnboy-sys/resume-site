@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BUSINESS, CLOCK_LABEL, DAYS, HANDOFF_REASONS, JOBS, JOB_KIND_LABEL, RULES, TEAMS, WINDOWS, type DayKey, type Team } from "@/lib/deskhand/pack";
+import { BUSINESS, CLOCK_LABEL, DAYS, EXTRAS_Q, HANDOFF_REASONS, JOBS, JOB_KIND_LABEL, MOVE_OUT_Q, RULES, TEAMS, WINDOWS, type DayKey, type Team } from "@/lib/deskhand/pack";
 import { CARDS, type CardId } from "@/lib/deskhand/seed";
 import type { Contact, Conversation, LogEntry, Offer, Sandbox, Visit } from "@/lib/deskhand/types";
 import Guide from "@/components/guide/Guide";
@@ -39,6 +39,9 @@ function nextReplies(conv: Conversation, contact: Contact | null): Reply[] {
     const needAccess = contact && !contact.access && !conv.verifiedContactId;
     return needAccess ? [{ label: "I'll be home on the day", send: "I'll be home on the day" }, { label: "I'll leave a key in a lockbox", send: "I'll leave a key in a lockbox" }, ...windows] : windows;
   }
+  // The fixed rules ask two questions of their own; their answers are taps for every customer, typed or carded.
+  if (!conv.jobDone && lastAgent.includes(MOVE_OUT_Q)) return [{ label: "No, a regular home clean", send: "No, a regular home clean" }, { label: "Yes, a move-out clean", send: "Yes, a move-out clean" }];
+  if (!conv.jobDone && lastAgent.includes(EXTRAS_Q)) return [{ label: "No extras", send: "No extras" }, { label: "The oven", send: "The oven please" }, { label: "Oven and fridge", send: "Both, the oven and fridge" }];
   if (!conv.card) return [];
   if (conv.card === "mia") {
     if (conv.jobDone) return [];

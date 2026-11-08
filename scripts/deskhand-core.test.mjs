@@ -6,7 +6,7 @@ import { JOBS, NOW } from "../src/lib/deskhand/pack.ts";
 import { seedSandbox, CARDS } from "../src/lib/deskhand/seed.ts";
 import { executeTool, teamFree } from "../src/lib/deskhand/execute.ts";
 import { guardReply } from "../src/lib/deskhand/guard.ts";
-import { isDanger, maskPersonal, DANGER_TEXT } from "../src/lib/deskhand/safety.ts";
+import { isDanger, isDangerSign, maskPersonal, DANGER_TEXT } from "../src/lib/deskhand/safety.ts";
 import { runTurn, startConversation } from "../src/lib/deskhand/agent.ts";
 
 let passed = 0;
@@ -247,7 +247,7 @@ await test("guard: never-say terms, safety, links, code, address requests", () =
 
 await test("danger line: fires on present danger, and no model is called", async () => {
   for (const s of ["I can smell gas", "the kitchen is on fire", "I mixed bleach and ammonia and I can't breathe", "my toddler drank the spray", "smoke is coming out of the oven", "someone is hurt", "he's unconscious", "I've got toxic fumes in the bathroom", "my son got burnt", "I mixed bleach and ammonia and now the fumes are awful"]) {
-    assert.ok(isDanger(s), s);
+    assert.ok(isDanger(s) || isDangerSign(s), s);
   }
   const sb = mia();
   const m = script({ text: "no" });
@@ -384,7 +384,9 @@ await test("fallback: no model still books through the same gates, and says so o
   await say(sb, "Mia", null);
   await say(sb, "Marrickville", null);
   await say(sb, "3", null);
-  const list = await say(sb, "home", null);
+  await say(sb, "home", null);
+  await say(sb, "No, a regular home clean", null);
+  const list = await say(sb, "No extras", null);
   assert.match(list.reply, /\$380/);
   const pick = sb.conv.offers[0].label;
   const done = await say(sb, pick, null);
@@ -529,6 +531,8 @@ await test("G3 QA recheck 3 N2: with the AI paused, Mia's tap script still ends 
     "Hi, how much for a fortnightly clean? 3 bed in Marrickville",
     "I'm Mia. 2 bathrooms, a house, no stairs. Last cleaned about two months ago. No pets. Street parking is fine.",
     "I'll be home on the day",
+    "No, a regular home clean",
+    "No extras",
     "Can you check what's open?",
   ];
   let r;
@@ -703,7 +707,8 @@ await test("G4 F10: fixed rules never book the wrong job and close a finished co
 
 await test("G4 F11: everyday danger words fire with no model, lookalikes do not", () => {
   // Only context-free phrases fire on the net alone; "blood on the tiles" and "frothing" are the model's to judge (G4 AIQ recheck 2).
-  for (const t of ["Smoke's pouring out of the oven", "the curtains caught alight", "I think he's having a heart attack", "sparks and a burning smell from the power point", "my son drank some dishwashing liquid", "the dog is foaming at the mouth after the rat bait", "I can't catch my breath"]) assert.ok(isDanger(t), t);
+  // Two tiers since G4 AIQ recheck 3: these are signs at least (the model judges; with no model the fixed line goes).
+  for (const t of ["Smoke's pouring out of the oven", "the curtains caught alight", "I think he's having a heart attack", "sparks and a burning smell from the power point", "my son drank some dishwashing liquid", "the dog is foaming at the mouth after the rat bait", "I can't catch my breath"]) assert.ok(isDanger(t) || isDangerSign(t), t);
   for (const t of ["There's blood on the sheets from my period", "My mum will be having a fit when she sees the oven", "The dog goes frothing mad at the vacuum", "My son is bleeding us dry", "Our dog's not responding to commands"]) assert.ok(!isDanger(t), t);
   for (const t of ["can you fit me in on Friday", "we had some dishwasher tablets left over", "the gas oven needs a deep clean", "burnt-on grease in the oven", "the smoke alarm beeps", "the fireplace is dusty", "I hurt my back last week", "it's sparkling clean"]) assert.ok(!isDanger(t), t);
 });
@@ -747,7 +752,27 @@ await test("G4 recheck: counts of rooms and time are not addresses; word-like st
 
 await test("G4 AIQ recheck: the widened net leaves machines, taps and landlords alone", () => {
   for (const t of ["my landlord's not responding to my emails", "the washing machine is frothing", "kids ate their lunch next to the washing liquid cupboard", "the tap's been bleeding rust stains", "she's not responding to my texts"]) assert.ok(!isDanger(t), t);
-  for (const t of ["the dog is frothing at the mouth", "the baby swallowed a dishwasher tablet"]) assert.ok(isDanger(t), t);
+  for (const t of ["the dog is frothing at the mouth", "the baby swallowed a dishwasher tablet"]) assert.ok(isDanger(t) || isDangerSign(t), t);
+});
+
+await test("G4 AIQ recheck 3: two tiers. A sign goes to the model; the model or no model decides", async () => {
+  // Lookalikes aimed at phrases still in the net never fire the fixed line on their own.
+  for (const t of ["The fridge smells like rotten eggs", "The kettle's been hissing", "We've all had food poisoning", "The bookshelf collapsed"]) assert.ok(!isDanger(t), t);
+  // The short list fires at once, no model.
+  for (const t of ["I can smell gas", "the kitchen is on fire", "he's not breathing", "she's unconscious", "call an ambulance"]) assert.ok(isDanger(t), t);
+  // A sign with the model: the model is told, and its flag_danger sends the fixed line; its "carry on" is respected.
+  const sb = mia();
+  const m = script({ tool: "flag_danger" });
+  const r = await say(sb, "I mixed bleach and ammonia and I can't breathe", m);
+  assert.equal(r.reply, DANGER_TEXT);
+  assert.match(JSON.stringify(m.calls[0].messages), /may mean someone is in danger/);
+  const s2 = mia();
+  const r2 = await say(s2, "The fridge smells like rotten eggs, can you do inside it?", script({ text: "Yes, inside the fridge is $40." }));
+  assert.notEqual(r2.reply, DANGER_TEXT);
+  // A sign with no model: the fixed line.
+  const s3 = mia();
+  const r3 = await say(s3, "I mixed bleach and ammonia and I can't breathe", null);
+  assert.equal(r3.reply, DANGER_TEXT);
 });
 
 await test("G4 AIQ recheck: with the AI paused every reply carries the 000 line; lease words, number words and extras", async () => {
@@ -768,14 +793,25 @@ await test("G4 AIQ recheck: with the AI paused every reply carries the 000 line;
   const s = seedSandbox();
   startConversation(s, null, 1);
   await say(s, "I'm Kate in Leichhardt, 3 bed, 3 bathrooms, deep clean with the oven", null);
-  const r = await say(s, "I'll be home", null);
+  const asked = await say(s, "I'll be home", null);
+  assert.match(asked.reply, /move-out/, asked.reply);
+  await say(s, "No, a regular home clean", null);
+  const r = await say(s, "The oven please", null);
   assert.match(r.reply, /\$480/, r.reply);
-  // A no to the oven is a no; "three-bedder" is 3 beds; the agent's inspection is a bond clean (G4 AIQ recheck 2).
+  // The fixed rules ask instead of reading free text: "no extras" is $380 whatever was said before; "yes" to move-out goes to Dana.
   const s3 = seedSandbox();
   startConversation(s3, null, 1);
   await say(s3, "I'm Kate in Leichhardt, a three-bedder, no need to do the oven", null);
-  const r3 = await say(s3, "I'll be home", null);
+  await say(s3, "I'll be home", null);
+  await say(s3, "No, a regular home clean", null);
+  const r3 = await say(s3, "No extras", null);
   assert.match(r3.reply, /\$380/, r3.reply);
+  const s5 = seedSandbox();
+  startConversation(s5, null, 1);
+  await say(s5, "I'm Kate in Leichhardt, 2 bed, our lease is up at the end of the month", null);
+  await say(s5, "I'll be home", null);
+  await say(s5, "Yes, a move-out clean", null);
+  assert.ok(!s5.visits.some((v) => v.isNew) && s5.handoffs.length);
   const s4 = seedSandbox();
   startConversation(s4, null, 1);
   await say(s4, "I'm Kate in Leichhardt, 1 bed, for the agent's inspection next week when we go", null);
