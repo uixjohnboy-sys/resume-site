@@ -48,12 +48,15 @@ const NOT_DANGER: RegExp[] = [/\bsmoke alarm\b(?!.*\b(fire|burning)\b)/];
 // fires at once with no model; every other match is only a sign, and fires when the model agrees (flag_danger) or when there is no
 // model to ask. "The fridge smells like rotten eggs", "the kettle's been hissing", "we all had food poisoning" and "the bookshelf
 // collapsed" each fired the fixed line on one tier (G4 AI Quality recheck 3, M5: 15 of 54 lookalikes).
+// Narrowed by G4 AI Quality recheck 4: "the gas cooktop smells of burnt fat", "the flames blackened the fence", "my veggie patch is
+// in danger from the possums" and "the baby won't wake if you're quiet" each fired. Gas only as a smell of gas or a leak; fire only
+// as something on fire now; danger only about a person, never "in danger of"; "won't wake" is a sign, not this tier.
 const STRONG: RegExp[] = [
-  DANGER[0],
-  DANGER[1],
-  DANGER[3],
-  /\b(not breathing|stopped breathing|unconscious|won't wake|can't wake (him|her|them))\b/,
-  /\b(in danger|call(ing)? (an )?ambulance|need (an )?ambulance|call 000|calling 000)\b/,
+  /\b(smell(s|ing)? (of |like )?gas|smelt gas|gas leak\w*|leaking gas|gas is leaking|gas (is )?escaping)\b/,
+  /\b(is|are|it's|its|caught|on) fire\b(?! (alarm|place|pit|door|blanket|brigade|safety|extinguisher))|\b(caught|catching) alight\b|\bablaze\b/,
+  /\b(not breathing|stopped breathing|unconscious)\b/,
+  /\b(someone|somebody|he|she|they|we|i|you|my (\w+ )?(mum|dad|son|daughter|wife|husband|partner|kid|kids|child|baby|cleaner|neighbour|friend)|the (kids?|baby|children|people))\b.{0,15}\b(is|are|'s|'re|am|'m) in danger\b(?! of)/,
+  /\b(call(ing)? (an )?ambulance|need (an )?ambulance|call 000|calling 000)\b/,
 ];
 
 function matches(raw: string, list: RegExp[]): boolean {

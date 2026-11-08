@@ -128,7 +128,8 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
   const notSaid = (what: string) => refuse(sb, ctx, "save_contact", "NOT_SAID", `${what} not saved: the customer has not said it`, `Ask the customer about ${what.toLowerCase()}.`);
   if (typeof input.bedrooms === "number" && Number.isInteger(input.bedrooms) && input.bedrooms >= 1 && input.bedrooms <= 8 && input.bedrooms !== c.bedrooms) {
     const n = input.bedrooms;
-    if (!new RegExp(`\\b(${n}|${NUMBER_WORDS[n]})\\b`).test(said) && !(n === 1 && /\bstudio\b/.test(said))) return notSaid("Bedrooms");
+    // "3br" counts: the digit stands alone among digits, it need not end a word (G4 AI Quality recheck 4).
+    if (!new RegExp(`(?<!\\d)${n}(?!\\d)|\\b${NUMBER_WORDS[n]}\\b`).test(said) && !(n === 1 && /\bstudio\b/.test(said))) return notSaid("Bedrooms");
     c.bedrooms = n;
     changed.bedrooms = n;
   }

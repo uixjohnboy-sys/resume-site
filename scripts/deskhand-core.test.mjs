@@ -770,6 +770,15 @@ await test("G4 AIQ recheck 3: two tiers. A sign goes to the model; the model or 
   const s2 = mia();
   const r2 = await say(s2, "The fridge smells like rotten eggs, can you do inside it?", script({ text: "Yes, inside the fridge is $40." }));
   assert.notEqual(r2.reply, DANGER_TEXT);
+  // The strong tier, narrowed (G4 AIQ recheck 4): these are signs for the model, not the fixed line on their own.
+  for (const t of ["The gas cooktop smells of burnt fat", "the flames blackened the back fence", "My veggie patch is in danger from the possums", "The baby won't wake if you're quiet"]) assert.ok(!isDanger(t), t);
+  for (const t of ["it smells like gas in here", "my son is in danger"]) assert.ok(isDanger(t), t);
+  // "3br" is 3 bedrooms on the fixed rules.
+  const s4 = seedSandbox();
+  startConversation(s4, null, 1);
+  await say(s4, "I'm Sam in Newtown", null);
+  await say(s4, "3br townhouse", null);
+  assert.equal(s4.contacts.find((c) => c.id === s4.conv.contactId).bedrooms, 3);
   // A sign with no model: the fixed line.
   const s3 = mia();
   const r3 = await say(s3, "I mixed bleach and ammonia and I can't breathe", null);
