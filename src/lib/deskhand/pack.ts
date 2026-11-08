@@ -85,7 +85,7 @@ export const HANDOFF_REASONS = {
   condition: { label: "Hoarding, vermin, needles, black mould or asbestos", ends: true },
   theft: { label: "Theft allegation", ends: true },
   chemicals: { label: "Question about using or mixing chemicals", ends: false },
-  pet: { label: "A dog that has bitten or is aggressive", ends: false },
+  pet: { label: "A pet that has bitten or is aggressive", ends: false },
   lease: { label: "End of lease home not empty, or no power or water", ends: true },
   leaseDates: { label: "End of lease with no free window before the inspection", ends: true },
   question: { label: "A question with no approved answer", ends: false },

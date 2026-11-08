@@ -139,7 +139,7 @@ function saveContact(sb: Sandbox, input: Record<string, unknown>, ctx: ExecCtx):
     changed.access = input.access;
   }
   if ((input.frequency === "weekly" || input.frequency === "fortnightly") && input.frequency !== c.frequency) {
-    const heard = input.frequency === "weekly" ? /\bweekly\b|\bevery week\b|\beach week\b|\bonce a week\b/ : /\bfortnight\w*\b|\bevery (two|2) weeks\b|\bevery other week\b/;
+    const heard = input.frequency === "weekly" ? /\bweekly\b|\bevery week\b|\beach week\b|\bonce a week\b/ : /\bfortnight\w*\b|\bevery (two|2) weeks\b|\bevery (other|second) week\b/;
     if (!heard.test(said)) return notSaid("How often");
     c.frequency = input.frequency;
     changed.frequency = input.frequency;

@@ -702,7 +702,9 @@ await test("G4 F10: fixed rules never book the wrong job and close a finished co
 });
 
 await test("G4 F11: everyday danger words fire with no model, lookalikes do not", () => {
-  for (const t of ["Smoke's pouring out of the oven", "the curtains caught alight", "I think he's having a heart attack", "sparks and a burning smell from the power point", "there's blood on the tiles", "my son drank some dishwashing liquid", "the dog is frothing after the rat bait", "I can't catch my breath"]) assert.ok(isDanger(t), t);
+  // Only context-free phrases fire on the net alone; "blood on the tiles" and "frothing" are the model's to judge (G4 AIQ recheck 2).
+  for (const t of ["Smoke's pouring out of the oven", "the curtains caught alight", "I think he's having a heart attack", "sparks and a burning smell from the power point", "my son drank some dishwashing liquid", "the dog is foaming at the mouth after the rat bait", "I can't catch my breath"]) assert.ok(isDanger(t), t);
+  for (const t of ["There's blood on the sheets from my period", "My mum will be having a fit when she sees the oven", "The dog goes frothing mad at the vacuum", "My son is bleeding us dry", "Our dog's not responding to commands"]) assert.ok(!isDanger(t), t);
   for (const t of ["can you fit me in on Friday", "we had some dishwasher tablets left over", "the gas oven needs a deep clean", "burnt-on grease in the oven", "the smoke alarm beeps", "the fireplace is dusty", "I hurt my back last week", "it's sparkling clean"]) assert.ok(!isDanger(t), t);
 });
 
@@ -745,7 +747,7 @@ await test("G4 recheck: counts of rooms and time are not addresses; word-like st
 
 await test("G4 AIQ recheck: the widened net leaves machines, taps and landlords alone", () => {
   for (const t of ["my landlord's not responding to my emails", "the washing machine is frothing", "kids ate their lunch next to the washing liquid cupboard", "the tap's been bleeding rust stains", "she's not responding to my texts"]) assert.ok(!isDanger(t), t);
-  for (const t of ["my dad is not responding", "the dog is frothing at the mouth", "the baby swallowed a dishwasher tablet"]) assert.ok(isDanger(t), t);
+  for (const t of ["the dog is frothing at the mouth", "the baby swallowed a dishwasher tablet"]) assert.ok(isDanger(t), t);
 });
 
 await test("G4 AIQ recheck: with the AI paused every reply carries the 000 line; lease words, number words and extras", async () => {
@@ -768,6 +770,17 @@ await test("G4 AIQ recheck: with the AI paused every reply carries the 000 line;
   await say(s, "I'm Kate in Leichhardt, 3 bed, 3 bathrooms, deep clean with the oven", null);
   const r = await say(s, "I'll be home", null);
   assert.match(r.reply, /\$480/, r.reply);
+  // A no to the oven is a no; "three-bedder" is 3 beds; the agent's inspection is a bond clean (G4 AIQ recheck 2).
+  const s3 = seedSandbox();
+  startConversation(s3, null, 1);
+  await say(s3, "I'm Kate in Leichhardt, a three-bedder, no need to do the oven", null);
+  const r3 = await say(s3, "I'll be home", null);
+  assert.match(r3.reply, /\$380/, r3.reply);
+  const s4 = seedSandbox();
+  startConversation(s4, null, 1);
+  await say(s4, "I'm Kate in Leichhardt, 1 bed, for the agent's inspection next week when we go", null);
+  await say(s4, "I'll be home", null);
+  assert.ok(!s4.visits.some((v) => v.isNew));
 });
 
 await test("G4 AIQ recheck: questions typed without a question mark do not turn the AI off", async () => {

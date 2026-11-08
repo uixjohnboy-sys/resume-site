@@ -8,8 +8,6 @@ const norm = (s: string) => stripFormat(s).toLowerCase().replace(/[‘’]/g, "'
 // This is the first layer and it runs with no model at all. It cannot catch every way of saying it, so the agent has a second route:
 // flag_danger, which can only raise to this same fixed line. A blind corpus measures both (scripts/deskhand-safety.test.mjs).
 const CHEM = "bleach|ammonia|chlorine|domestos|drain cleaner|oven cleaner|toilet cleaner|floor cleaner|mould spray|cleaning (stuff|spray|products?|chemicals?)|chemicals?|detergent|descaler|tile stripper|stripper|vapou?rs?|dishwasher (tablets?|pods?)|rat bait|snail bait|eucalyptus oil|turps|acid|caustic|fumes?";
-// People and animals, for words that are only an emergency about one.
-const WHO = "he|she|he's|she's|i'm|someone|somebody|mum|dad|mother|father|nan|grandma|grandpa|son|daughter|wife|husband|partner|kid|kids|child|baby|toddler|boy|girl|cleaner|neighbour|flatmate|friend|dog|puppy|cat|kitten|pet";
 const SYMPTOM = "dizzy|faint\\w*|pass(ing)? out|twitching|wheez\\w*|cough\\w*|choking|breath\\w*|burns?|burning|blister\\w*|foaming|drows\\w*|sleepy|gone pale|vomit\\w*|throw\\w* up|sting\\w*|eyes (are )?(streaming|watering|red)|can't see|lips?|throat|screaming|wobbly|overcome|rash|swollen";
 const DANGER: RegExp[] = [
   /\bgas\b.{0,45}\b(smell\w*|stink\w*|reek\w*|whiff|leak\w*|hiss\w*|pouring|on for ages|escap\w*)\b/,
@@ -21,12 +19,11 @@ const DANGER: RegExp[] = [
   // Electrical: sparks with burning or smoke, or a burning smell from a power point or wiring (G4 AI Quality, M5).
   /\bsparks?\b.{0,40}\b(burning|smok\w*|smell\w*)\b|\bburning (plastic|rubber|wires?|smell (from|coming from|out of) (the )?(power ?point|plug|wall|switch|wiring|outlet))\b/,
   // A body in trouble right now, in everyday words.
-  // Words that also describe machines, taps and landlords count only about a person or an animal (G4 AI Quality recheck, M5:
-  // "the washing machine is frothing", "my landlord's not responding" and "the tap's been bleeding rust" fired on their own).
-  /\b(heart attack|having a stroke|seizure|having a fit|turning blue|blue lips|foaming at the mouth|frothing at the mouth)\b/,
-  new RegExp(`\\b(${WHO})\\b.{0,30}\\b(not responding|unresponsive|frothing|foaming|bleeding)\\b(?! to (my|our|the|any|her|his) (emails?|texts?|messages?|calls?))`),
+  // Only phrases that mean a body in trouble whatever the sentence around them. Words that need context ("bleeding", "frothing",
+  // "not responding", "having a fit", blood) are left to the model's flag_danger and, with no model, to the 000 line on every
+  // fixed-rules reply: two rounds of patching them each passed only their own probe set (G4 AI Quality recheck 2, M5).
+  /\b(heart attack|having a stroke|seizure|turning blue|blue lips|foaming at the mouth|frothing at the mouth)\b/,
   /\b(can't|cant|cannot|can not|struggling to) (catch|get) (my|his|her|their|a) breath\b/,
-  /\bblood (everywhere|all over)\b|\bthere'?s blood (on|all over|everywhere)\b|\bbleeding (badly|a lot|heavily|everywhere|and (won't|will not) stop)\b/,
   /\b(toxic |chemical |strong )?fumes\b/,
   new RegExp("\\b(" + CHEM + ")\\b.{0,120}\\b(" + SYMPTOM + ")\\b"),
   new RegExp("\\b(" + SYMPTOM + ")\\b.{0,120}\\b(" + CHEM + ")\\b"),
