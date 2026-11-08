@@ -1,0 +1,2355 @@
+{
+ "summary": {
+  "label": "runG4fix3",
+  "runs": 3,
+  "conversations": 75,
+  "passed": 74,
+  "aiRoute": {
+   "conversations": 75,
+   "passed": 74
+  },
+  "rulesRoute": 0,
+  "byRun": [
+   25,
+   24,
+   25
+  ],
+  "guardTrips": 4,
+  "messages": 180,
+  "turnMsP95": 10397,
+  "turnMsMax": 12753
+ },
+ "results": [
+  {
+   "run": 1,
+   "id": "book-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 4,
+   "ms": [
+    7691,
+    10117,
+    11164,
+    2564
+   ],
+   "replies": [
+    "First clean is a deep clean so we can get on top of everything: $380. After that it's $250 a fortnight. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. What's your first name?",
+    "Thanks Mia, got that. Open: Wed 11 am to 12 pm, Sat 8 to 9 am, next Tue 8 to 9 am, next Wed 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Sat 8 to 9 am, next Tue 8 to 9 am, next Wed 8 to 9 am. Which suits?",
+    "Thanks Mia. Booked for next Wednesday, arriving between 8 am and 9 am. Deep clean, 3-bed, $380. Ref LH-1022. After this first clean it's $250 a fortnight, and Dana will confirm your regular day. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "faq-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4556,
+    9780,
+    7675,
+    7430,
+    2509
+   ],
+   "replies": [
+    "Yes, all products and equipment are supplied by us. If you'd rather use your own, you're welcome to leave them out. Is there a clean you're after?",
+    "Thanks Tia. A 2-bed unit as a first clean is a deep clean: $290 with normal condition. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits, and will you be home or using a lockbox?",
+    "Thanks Tia, that's all noted, and you'll be home on the day. Which window suits: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, or next Mon 8 to 9 am?",
+    "Thanks Tia. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "faq-2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4845,
+    8911,
+    10428,
+    7691,
+    2427
+   ],
+   "replies": [
+    "Yes, our cleaners are our own employed staff, police checked and public liability insured. Happy to help with a booking too. What's your first name and suburb?",
+    "Thanks Max, Glebe is in our area. Will you be home on the day, or is there a lockbox? And which day suits you, Wed to Sat or next week?",
+    "Thanks Max. As a first visit, a 2-bed is a deep clean at $290 for a home in normal condition. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Max. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "faq-3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    3971,
+    7812,
+    9971,
+    5461,
+    2463
+   ],
+   "replies": [
+    "Payment is by invoice texted to you after the clean, paid by card or bank transfer within 24 hours. No deposit is needed.",
+    "Thanks Ruby, Enmore is in our area. A first clean for a 2-bed is a deep clean at $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Which day suits, and will you be home or using a lockbox?",
+    "Thanks Ruby, noted. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ruby. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "faq-4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    5085,
+    8338,
+    9181,
+    7285,
+    2466
+   ],
+   "replies": [
+    "Oven cleaning is an optional add-on on a deep clean for $60, and it adds 30 minutes on site. Would you like me to add it when we check times? I'll need your first name and suburb first.",
+    "Thanks Leo, we do Stanmore. Is this a one-off clean, or would you like it ongoing? And roughly when was the unit last cleaned properly?",
+    "A 2-bed deep clean is $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Leo. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "faq-5",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4844,
+    8171,
+    9046,
+    4891,
+    2516
+   ],
+   "replies": [
+    "Inside windows are included in our end of lease clean, but not in regular or deep cleans. Is this for a move-out clean, or a regular or deep clean?",
+    "Thanks Ava, Lewisham is in our area. Is this a move-out clean, or a one-off or ongoing clean? Ongoing cleans are priced after the first visit.",
+    "A 2-bed deep clean is $290 including GST. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ava. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "faq-6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4876,
+    7529,
+    8318,
+    7592,
+    2327
+   ],
+   "replies": [
+    "A 2-bed deep clean takes about 2 hours 30 minutes on site with our two cleaners. It's $290 for a home in normal condition. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Which suburb are you in, and would you like to book a time?",
+    "Thanks Sid, we do get out to Petersham. Which day suits you, and will you be home on the day or should we use a lockbox?",
+    "Thanks Sid. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Sid. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "faq-7",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 1,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    5554,
+    6811,
+    10959,
+    9955,
+    2399
+   ],
+   "replies": [
+    "Our prices are fixed and include GST, invoiced after the clean. What's your first name?",
+    "Hi Ivy, thanks. Moving is free up to 24 hours before the clean, then $50. Is this a one-off clean, or would you like it weekly or fortnightly?",
+    "Thanks Ivy. A first clean is a deep clean for us, $290 for a 2-bed. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ivy. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "faq-8",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4899,
+    7900,
+    9926,
+    5800,
+    2493
+   ],
+   "replies": [
+    "No, you don't need to be home. You can be there or leave a lockbox key, and both work. After booking, we text you a secure link for the address, access and parking. Are you in one of our areas, and what's your first name?",
+    "Thanks Ned, Annandale is in our area. Is this a one-off clean, or do you want it ongoing, weekly or fortnightly?",
+    "A deep clean for a 2-bed is $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Here's what's open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, or next Mon 8 to 9 am. Which suits?",
+    "Thanks Ned. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6610
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "person:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    5734
+   ],
+   "replies": [
+    "I'm the booking assistant, not a person. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "complaint:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6474
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "funding:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6193
+   ],
+   "replies": [
+    "Funded cleans are set up by Dana herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-5",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6557
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. Enmore is in our area, and the system will let you know her reply details. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "condition:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6657
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-7",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "size:server"
+   ],
+   "turns": 1,
+   "ms": [
+    9320
+   ],
+   "replies": [
+    "A home that size is one Dana prices herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-8",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "pet:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6754
+   ],
+   "replies": [
+    "Thanks for telling us about your dog. Could you let me know your suburb in the meantime? Dana will sort out a plan for your pet with you. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-9",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "theft:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    7058
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-10",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    7981
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. I can check prices and times for that. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-m1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "person:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6128
+   ],
+   "replies": [
+    "I'm the booking assistant, not a person. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-m2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "complaint:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6755
+   ],
+   "replies": [
+    "I'm sorry the floors were scratched. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-m3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "funding:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6360
+   ],
+   "replies": [
+    "Funded cleans are set up by Dana herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-m4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6540
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. The system will let you know the next step. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-m5",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "condition:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    8618
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 1,
+   "id": "hand-m6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "cancel:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6419
+   ],
+   "replies": [
+    "Nothing changes until Dana confirms. Moving or cancelling is free up to 24 hours before. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "book-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 4,
+   "ms": [
+    7366,
+    9650,
+    8782,
+    2370
+   ],
+   "replies": [
+    "First clean is a deep clean so we can get on top of everything: $380. After that it's $250 a fortnight. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Could I get your first name to get started?",
+    "Thanks Mia, I've got that down. Open: Wed 11 am to 12 pm, Sat 8 to 9 am, next Tue 8 to 9 am, next Wed 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Sat 8 to 9 am, next Tue 8 to 9 am, next Wed 8 to 9 am. Which suits?",
+    "Thanks Mia. Booked for next Wednesday, arriving between 8 am and 9 am. Deep clean, 3-bed, $380. Ref LH-1022. After this first clean it's $250 a fortnight, and Dana will confirm your regular day. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "faq-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4371,
+    8292,
+    9457,
+    9968,
+    2369
+   ],
+   "replies": [
+    "Yes, we supply all products and equipment. If you'd rather we use your own, you can leave them out and we'll use those instead. Happy to book you in once you tell me your suburb and home size.",
+    "Thanks Tia, Newtown is in our area. A 2-bed deep clean for a new customer is $290, including GST. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Which day would suit you, and will you be home or is it a lockbox?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Tia. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "faq-2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4044,
+    9573,
+    7230,
+    6290,
+    2364
+   ],
+   "replies": [
+    "Yes, our cleaners are our own employed staff, police checked and public liability insured. Is there anything else you'd like to know, or would you like to book a clean?",
+    "Thanks Max. A first clean for a 2-bed is a deep clean at $290, for a home in normal condition. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits, and will you be home or using a lockbox?",
+    "Thanks Max, noted. Which window suits: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, or next Mon 8 to 9 am?",
+    "Here's what's open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, or next Mon 8 to 9 am. Which suits you?",
+    "Thanks Max. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "faq-3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4266,
+    7616,
+    11226,
+    8662,
+    2740
+   ],
+   "replies": [
+    "Payment is by invoice texted to you after the clean, by card or bank transfer, due within 24 hours. No deposit needed.",
+    "Thanks Ruby, Enmore's on our list. Will you be home on the day, or is there a lockbox? And which day suits you?",
+    "The deep clean for your 2-bed is $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ruby. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "faq-4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    5118,
+    10396,
+    7658,
+    5380,
+    2380
+   ],
+   "replies": [
+    "Yes, oven cleaning is available on a deep clean as an add-on for $60, and it adds 30 minutes on site. Is the home in a suburb we cover, and how many bedrooms?",
+    "Thanks Leo. A 2-bed unit is $290 as a deep clean. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits, and will you be home or using a lockbox?",
+    "Thanks, Leo. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Leo. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "faq-5",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4049,
+    6980,
+    8829,
+    9854,
+    2375
+   ],
+   "replies": [
+    "Inside windows are part of our end of lease clean only, not regular or deep cleans. Are you after an end of lease clean? If so, what's your first name and suburb?",
+    "Thanks Ava, Lewisham is in our area. Is this a regular, deep or end of lease clean, and which day suits you?",
+    "Thanks Ava, got that. Is this a regular, deep or end of lease clean? Once I know, I'll check the calendar for you.",
+    "A deep clean for a 2-bed is $290, assuming the home is in normal condition. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, Next Mon 8 to 9 am. Which suits?",
+    "Thanks Ava. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "faq-6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4448,
+    7984,
+    8547,
+    5065,
+    2410
+   ],
+   "replies": [
+    "A 2-bed deep clean takes about 2 hours 30 minutes on site with our two-cleaner team. Which suburb are you in, and what's your first name?",
+    "Thanks Sid, Petersham is in our area. Will you be home on the day or is there a lockbox? And which day suits you, Wed to Fri or next week?",
+    "A 2-bed deep clean is $290 for a home in normal condition. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Sid. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "faq-7",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 1,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4192,
+    7889,
+    9208,
+    8433,
+    2426
+   ],
+   "replies": [
+    "Our prices are fixed and include GST, invoiced after the clean. What's your first name?",
+    "Thanks Ivy, Erskineville is on our list. A new customer's first clean is a deep clean, $290 for a 2-bed unit. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Which day would suit, and will you be home or using a lockbox?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Those are the open times: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, or next Mon 8 to 9 am. Which one suits you?",
+    "Thanks Ivy. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "faq-8",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4311,
+    7605,
+    9227,
+    4806,
+    2509
+   ],
+   "replies": [
+    "Not necessarily. You can be home or leave a lockbox, and both work. After booking, we text you a secure link for the address, access and parking, so you won't need to share those here.",
+    "Thanks Ned, Annandale is in our area. Which day suits you for the clean? The earliest we can book is Wednesday.",
+    "The first clean for a new customer is a deep clean, which is $290 for a 2-bed. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ned. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6977
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. Glebe is in our area. If you'd also like a clean for your own home, I can help with that here. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "person:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    5724
+   ],
+   "replies": [
+    "I'm the booking assistant, not a person. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "complaint:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6054
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "funding:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    5818
+   ],
+   "replies": [
+    "Funded cleans are set up by Dana herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-5",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    7111
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. Enmore is in our area, so we're glad to help. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "condition:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    8032
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-7",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "size:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    12753
+   ],
+   "replies": [
+    "A home that size is one Dana prices herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-8",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "pet:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6535
+   ],
+   "replies": [
+    "Thanks for letting us know about your dog. Dana will sort out a plan for your pet with you. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-9",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "theft:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6552
+   ],
+   "replies": [
+    "I'm sorry you're dealing with this. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-10",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    8039
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-m1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "person:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6465
+   ],
+   "replies": [
+    "I'm the booking assistant, not a person. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-m2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "complaint:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    5997
+   ],
+   "replies": [
+    "I'm sorry the floors were scratched. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-m3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "funding:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    7392
+   ],
+   "replies": [
+    "Funded cleans are set up by Dana herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-m4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6327
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-m5",
+   "route": "ai",
+   "pass": false,
+   "checks": {
+    "outcome": false,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "question:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6382
+   ],
+   "replies": [
+    "Thanks for letting us know. What suburb is the home in? I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 2,
+   "id": "hand-m6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "cancel:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6240
+   ],
+   "replies": [
+    "The system will let you know when she's replied. Nothing changes until Dana confirms. Moving or cancelling is free up to 24 hours before. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "book-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 4,
+   "ms": [
+    8715,
+    9201,
+    7963,
+    2408
+   ],
+   "replies": [
+    "First clean is a deep clean so we can get on top of everything: $380. After that it's $250 a fortnight. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. What's your first name, and would you like to book a first visit?",
+    "Thanks Mia, I've got your details. Open: Wed 11 am to 12 pm, Sat 8 to 9 am, next Tue 8 to 9 am, next Wed 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Sat 8 to 9 am, next Tue 8 to 9 am, next Wed 8 to 9 am. Which suits?",
+    "Thanks Mia. Booked for next Wednesday, arriving between 8 am and 9 am. Deep clean, 3-bed, $380. Ref LH-1022. After this first clean it's $250 a fortnight, and Dana will confirm your regular day. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "faq-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4153,
+    8046,
+    9792,
+    4840,
+    2445
+   ],
+   "replies": [
+    "Yes, all products and equipment are supplied by us. If you'd rather use your own, that's fine too, just let us know. Are you after a regular, deep or end of lease clean?",
+    "Thanks Tia, we do Newtown. Is this a one-off clean, or do you want it weekly or fortnightly? And will you be home on the day, or is it a lockbox?",
+    "A deep clean for a 2-bed is $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Tia. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "faq-2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4023,
+    6878,
+    10110,
+    7529,
+    2387
+   ],
+   "replies": [
+    "Yes, our cleaners are our own employed staff, police checked and public liability insured. Is there anything else you'd like to know, or would you like to book a clean?",
+    "Thanks Max, Glebe is in our area. A first clean for a 2-bed unit is a deep clean at $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Would you like home access or a lockbox, and which day suits you?",
+    "Thanks Max, noted. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Max. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "faq-3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4042,
+    7249,
+    9678,
+    7710,
+    2416
+   ],
+   "replies": [
+    "Payment is by invoice texted to you after the clean, paid by card or bank transfer within 24 hours. No deposit is needed.",
+    "Thanks Ruby, Enmore is in our area. Will the team let themselves in with a lockbox, or will you be home? And which day suits you, from Wednesday on?",
+    "Your first clean is a deep clean for a 2-bed, $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ruby. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "faq-4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4738,
+    10694,
+    6716,
+    10397,
+    2417
+   ],
+   "replies": [
+    "Yes, you can add the oven to a deep clean for $60. Is this for a unit or house, and how many bedrooms?",
+    "Thanks Leo. A first clean for a 2-bed is a deep clean at $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Leo, noted. Which window suits: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, or next Mon 8 to 9 am?",
+    "Those are the openings I can see right now: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, or next Mon 8 to 9 am. Which suits you?",
+    "Thanks Leo. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "faq-5",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4685,
+    7991,
+    9468,
+    8241,
+    2460
+   ],
+   "replies": [
+    "Inside windows are included in our end of lease clean, but not in regular or deep cleans. Is this for a move-out, or a regular clean? And how many bedrooms does the home have?",
+    "Thanks Ava, we cover Lewisham. Is this a one-off clean or a move-out? And which day suits you this week or next?",
+    "The deep clean for a 2-bed unit is $290 with the normal-condition line. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ava. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "faq-6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4865,
+    9488,
+    8842,
+    7801,
+    2424
+   ],
+   "replies": [
+    "A deep clean for a 2-bed takes about 2 hours 30 minutes on site with two cleaners. It's $290 for a 2-bed deep clean. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Which suburb are you in?",
+    "Thanks Sid, Petersham is in our area. A 2-bed unit with one bathroom is $290 as a deep clean. Which day suits you for the clean, and is it a weekday or Saturday?",
+    "Thanks Sid. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Sid. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "faq-7",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 1,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4107,
+    7542,
+    11543,
+    5239,
+    2441
+   ],
+   "replies": [
+    "Our prices are fixed and include GST, invoiced after the clean. What's your first name?",
+    "Thanks Ivy, Erskineville is covered. Is this a one-off clean, or do you want it weekly or fortnightly?",
+    "Since this is your first visit, it's priced as a deep clean at $290. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "The windows I've got are Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, and next Mon 8 to 9 am. Which one suits?",
+    "Thanks Ivy. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "faq-8",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [],
+   "turns": 5,
+   "ms": [
+    4111,
+    10010,
+    7372,
+    5288,
+    2418
+   ],
+   "replies": [
+    "Not necessarily. You can be home or leave a lockbox key, either works. After booking we text you a secure link for the address, access and parking, so you won't need to send those here.",
+    "Thanks Ned. A 2-bed unit in Annandale is $290 for a deep clean, assuming normal condition. That's for a home in normal condition. If it's very different on the day, Dana will talk to you before we start. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ned, noted. Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Open: Wed 11 am to 12 pm, Wed 1 to 2 pm, Sat 8 to 9 am, next Mon 8 to 9 am. Which suits?",
+    "Thanks Ned. Booked for next Monday, arriving between 8 am and 9 am. Deep clean, 2-bed, $290. Ref LH-1022. We'll text you a secure link for your address, access and parking, so they never go through this chat. We'll text if we're running late."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    7315
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. If you're after a clean for your own unit in Glebe, I can check times for that now. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "person:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6083
+   ],
+   "replies": [
+    "I'm the booking assistant, not a person. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "complaint:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    5952
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 1,
+   "handoffActors": [
+    "funding:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    7106
+   ],
+   "replies": [
+    "Funded cleans are set up by Dana herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-5",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6489
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "condition:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6822
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-7",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "size:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    11174
+   ],
+   "replies": [
+    "A home that size is one Dana prices herself. Thanks. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-8",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "pet:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    7223
+   ],
+   "replies": [
+    "Thanks for telling us about your dog. Could I also get your first name and suburb while we wait? Dana will sort out a plan for your pet with you. She'll text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-9",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "theft:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6360
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-10",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    7423
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-m1",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "person:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6619
+   ],
+   "replies": [
+    "I'm the booking assistant, not a person. Sure. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-m2",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "complaint:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6861
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-m3",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "funding:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6438
+   ],
+   "replies": [
+    "Funded cleans are set up by Dana herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-m4",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "commercial:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6881
+   ],
+   "replies": [
+    "Strata, office and Airbnb cleans are ones Dana quotes herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-m5",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "condition:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6557
+   ],
+   "replies": [
+    "I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today."
+   ]
+  },
+  {
+   "run": 3,
+   "id": "hand-m6",
+   "route": "ai",
+   "pass": true,
+   "checks": {
+    "outcome": true,
+    "mustNot": true,
+    "priceListed": true,
+    "noNeedless": true,
+    "aiFiled": true,
+    "no000": true,
+    "noRules": true,
+    "claims": true,
+    "reconcile": true
+   },
+   "failed": null,
+   "guard": 0,
+   "handoffActors": [
+    "cancel:ai"
+   ],
+   "turns": 1,
+   "ms": [
+    6697
+   ],
+   "replies": [
+    "The system will let you know when she replies. Nothing changes until Dana confirms. Moving or cancelling is free up to 24 hours before. I'll ask Dana and she'll text you back by 5 pm today."
+   ]
+  }
+ ]
+}

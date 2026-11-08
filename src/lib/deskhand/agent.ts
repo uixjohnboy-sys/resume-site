@@ -203,7 +203,7 @@ const STRONG_HANDOFF: [RegExp, HandoffReason][] = [
   [/\b(make|lodge|have) a complaint\b|\byou (damaged|broke|ruined)\b|\bfair trading\b/i, "complaint"],
   [/\b(stole|stolen|theft)\b/i, "theft"],
   // Black mould on walls or ceilings is Dana's. On grout, silicone, the shower or tiles it is ordinary deep clean work (G4 NP, M2).
-  [/(?<!\b(grout|silicone|shower|tiles?|caulk(ing)?)\b[^.?!]{0,30})\bblack mou?ld\b(?![^.?!]{0,40}\b(grout|silicone|shower|tiles?|caulk(ing)?|bath)\b)|\basbestos\b|\bneedles\b|\bbed ?bugs\b|\bhoard(ing|er)\b|\bsqualor\b/i, "condition"],
+  [/(?<!\b(grout|silicone|shower|tiles?|caulk(ing)?)\b[^.?!]{0,30})\bblack mou?ld\b(?![^.?!]{0,40}\b(grout|silicone|shower|tiles?|caulk(ing)?|bath)\b)|\basbestos\b|\bneedles\b|\bbed ?bugs\b|\bhoard(ing|er)\b|\bsqualor\b|\b(rats?|mice|droppings|vermin|infestation|infested|maggots)\b/i, "condition"],
   [/\b(bitten|bites|nipped|nips|snapped at|aggressive)\b|(?<!\ba (little )?)\bbit\b(?! of\b)/i, "pet"],
 ];
 
