@@ -461,18 +461,19 @@ export async function runTurn(sb: Sandbox, rawText: string, opts: TurnOptions): 
   if (ending && !booked) {
     const entry = ledger.find((l) => l.kind === "handoff" && HANDOFF_REASONS[l.reason].ends && !l.added);
     const lead = entry && entry.kind === "handoff" ? HANDOFF_LEAD[entry.reason] : undefined;
-    reply = sentences(reply)
-      .filter((s) => !s.endsWith("?") && !/^(thanks|thank you|great|lovely|good news)\b/i.test(s) && !/\b(booking assistant|assistant|not a person|a real person|in the meantime|meanwhile|while we wait|sorry to hear|happy to help|thanks for|thank you for|in our area)\b/i.test(s))
-      .join(" ");
+    // None of the model's sentences: four rounds of filters each caught one wording and the model wrote another (G4 UX Writer
+    // recheck 4, N6). The server's reason and promise read complete on their own. A question that does not end the job (non-ending
+    // hand-offs, "I'll ask Dana") still keeps the model's answer, below.
     const rest = receipts.replace(lead ?? "\u0000", "").trim();
-    reply = [lead, reply, rest].filter(Boolean).join(" ");
+    reply = [lead, rest].filter(Boolean).join(" ");
   }
   // "Thanks Mia." once: not when the agent's last message already thanked her.
   const thanked = /^thanks\b/i.test([...conv.messages].reverse().find((m) => m.from === "agent")?.text ?? "");
   const parts = booked ? [prefix.trim(), name && !thanked ? `Thanks ${name}.` : "", receipts] : ending ? [prefix.trim(), reply.trim()] : [prefix.trim(), reply.trim(), receipts];
   let finalText = parts.filter(Boolean).join(" ").trim();
   // The first price a customer is given carries the condition line, once, from the server.
-  const quoted = [...finalText.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])));
+  // A job price, or a total the calendar offered (a job with extras), is a quote.
+  const quoted = [...finalText.matchAll(/\$(\d+)/g)].some((m) => Object.values(JOBS).some((j) => j.price === Number(m[1])) || conv.offers.some((o) => o.price === Number(m[1])));
   // Right after the sentence with the price, so the reply still ends on its question.
   if (quoted && !booked && !/very different on the day/i.test(finalText) && !conv.messages.some((m) => m.from === "agent" && m.text.includes(CONDITION_LINE))) {
     // The model's own half-version ("assuming a home in normal condition") gives way to the full line, so it is said once and whole.
@@ -622,5 +623,6 @@ function rulesReply(sb: Sandbox, text: string, base: ExecCtx, announce: boolean)
     return lead;
   }
   const slots = r.data.slots as { label: string }[];
-  return `${lead}First clean is a deep clean: $${r.data.price}. Open: ${slots.map((s) => s.label).join("; ")}. Reply with the one that suits.`;
+  const withWhat = [extras.add_oven && "the oven", extras.add_fridge && "inside the fridge", extras.extra_bathrooms && `${extras.extra_bathrooms} extra bathroom${extras.extra_bathrooms > 1 ? "s" : ""}`].filter(Boolean).join(" and ");
+  return `${lead}First clean is a deep clean${withWhat ? ` with ${withWhat}` : ""}: $${r.data.price}. Open: ${slots.map((s) => s.label).join("; ")}. Reply with the one that suits.`;
 }

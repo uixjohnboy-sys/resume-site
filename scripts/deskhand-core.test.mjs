@@ -742,7 +742,8 @@ await test("G4 recheck: an ending hand-off reads as one writer, reason first, no
   assert.equal((r.reply.match(/assistant/g) ?? []).length, 1);
   const s2 = mia();
   const r2 = await say(s2, "can you do a deep clean of a 4 bed house?", script({ tool: "hand_off", input: { reason: "size", summary: "4-bed deep" } }, { text: "We clean homes up to 3 bedrooms by text. What suburb are you in?" }));
-  assert.match(r2.reply, /^A home that size is one Dana prices herself\. We clean homes up to 3 bedrooms by text\. I've passed this/, r2.reply);
+  // Ending hand-offs keep none of the model's sentences (G4 UX Writer recheck 4, N6).
+  assert.equal(r2.reply, "A home that size is one Dana prices herself. I've passed this to Dana with a summary. She's on a job and will text you back by 5 pm today.");
 });
 
 await test("G4 recheck: counts of rooms and time are not addresses; word-like street types need a name", () => {
@@ -794,7 +795,7 @@ await test("G4 AIQ recheck: with the AI paused every reply carries the 000 line;
   startConversation(s, null, 1);
   await say(s, "I'm Kate in Leichhardt, 3 bed, 3 bathrooms, deep clean with the oven", null);
   const asked = await say(s, "I'll be home", null);
-  assert.match(asked.reply, /move-out/, asked.reply);
+  assert.match(asked.reply, /end of lease clean/, asked.reply);
   await say(s, "No, a regular home clean", null);
   const r = await say(s, "The oven please", null);
   assert.match(r.reply, /\$480/, r.reply);

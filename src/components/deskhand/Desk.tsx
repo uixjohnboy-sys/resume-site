@@ -40,8 +40,8 @@ function nextReplies(conv: Conversation, contact: Contact | null): Reply[] {
     return needAccess ? [{ label: "I'll be home on the day", send: "I'll be home on the day" }, { label: "I'll leave a key in a lockbox", send: "I'll leave a key in a lockbox" }, ...windows] : windows;
   }
   // The fixed rules ask two questions of their own; their answers are taps for every customer, typed or carded.
-  if (!conv.jobDone && lastAgent.includes(MOVE_OUT_Q)) return [{ label: "No, a regular home clean", send: "No, a regular home clean" }, { label: "Yes, a move-out clean", send: "Yes, a move-out clean" }];
-  if (!conv.jobDone && lastAgent.includes(EXTRAS_Q)) return [{ label: "No extras", send: "No extras" }, { label: "The oven", send: "The oven please" }, { label: "Oven and fridge", send: "Both, the oven and fridge" }];
+  if (!conv.jobDone && lastAgent.includes(MOVE_OUT_Q)) return [{ label: "No, a regular home clean", send: "No, a regular home clean" }, { label: "Yes, an end of lease clean", send: "Yes, an end of lease clean" }];
+  if (!conv.jobDone && lastAgent.includes(EXTRAS_Q)) return [{ label: "No extras", send: "No extras" }, { label: "The oven", send: "The oven please" }, { label: "Inside the fridge", send: "Inside the fridge please" }, { label: "Both", send: "Both, the oven and fridge" }];
   if (!conv.card) return [];
   if (conv.card === "mia") {
     if (conv.jobDone) return [];
