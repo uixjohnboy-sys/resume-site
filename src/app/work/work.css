@@ -1,0 +1,295 @@
+/* The work index on the homepage and the /work/<slug> pages. Same tokens as the v4 homepage (black, white, greys; Anton
+   heads, Plex Mono labels, Host body). Rows and hairlines, not rounded cards (DESIGN-STANDARD C2, C3). Spec:
+   PortfolioProjects/work-cards/SPEC.md and review-design-director.md (2026-11-13). */
+
+/* ---------- home index ---------- */
+.wk-home h2 {
+  margin-bottom: 48px;
+}
+.wk-index {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1.5px solid var(--ink);
+}
+.wk-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 5fr) minmax(0, 6fr) 32px;
+  gap: 32px;
+  align-items: start;
+  padding: 36px 16px;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.2s;
+}
+.wk-row:hover {
+  background: var(--panel);
+}
+.wk-n {
+  font-family: var(--label);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--ink-2);
+  padding-top: 10px;
+}
+.v4 .wk-what h3 {
+  font-size: 40px;
+  line-height: 1.02;
+}
+.wk-title {
+  text-decoration: none;
+}
+/* The service name is the row's one link; it covers the whole row. */
+.wk-title::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.wk-title:focus-visible {
+  outline: none;
+}
+.wk-row:has(.wk-title:focus-visible) {
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
+}
+.wk-promise {
+  margin: 14px 0 0;
+  max-width: 36ch;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.wk-proof {
+  padding-top: 8px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.wk-proof p {
+  margin: 0;
+}
+.wk-proof .wk-tag {
+  margin-bottom: 8px;
+}
+.wk-arrow {
+  padding-top: 6px;
+  font-size: 22px;
+  line-height: 1;
+  text-align: right;
+  transition: transform 0.2s;
+}
+.wk-row:hover .wk-arrow {
+  transform: translateX(4px);
+}
+
+/* ---------- /work/<slug> ---------- */
+.wk-page {
+  padding-bottom: 96px;
+}
+.wk-head {
+  position: relative;
+  padding-top: 72px;
+  padding-bottom: 56px;
+}
+/* The rule sits on the content width, not the padded box. */
+.wk-head::after {
+  content: "";
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  bottom: 0;
+  border-bottom: 1.5px solid var(--ink);
+}
+.v4 .wk-head h1 {
+  font-size: clamp(48px, 6vw, 88px);
+  max-width: 14ch;
+}
+.wk-head .v4-ctas {
+  margin-top: 28px;
+}
+.wk-h {
+  margin: 0 0 20px;
+  font-family: var(--label) !important;
+  font-size: 13px !important;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1.5 !important;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.wk-body {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 64px;
+  padding-top: 56px;
+}
+.wk-covers ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.wk-covers li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.wk-list ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.wk-list li {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line);
+}
+.wk-list li p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.wk-list li p.v4-case-tag {
+  margin-bottom: 8px;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.wk-live {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: var(--label);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.wk-live::after {
+  content: " →";
+}
+.wk-shot {
+  margin-top: 56px;
+}
+.wk-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top left;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.wk-steps {
+  margin-top: 64px;
+}
+.wk-steps ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+  border-top: 1.5px solid var(--ink);
+}
+.wk-steps li {
+  padding: 20px 24px 20px 0;
+}
+.wk-steps li b {
+  display: block;
+  margin: 6px 0 6px;
+  font-size: 17px;
+}
+.wk-steps li p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.wk-steps .wk-n {
+  padding: 0;
+}
+.wk-others {
+  margin-top: 72px;
+}
+.wk-others ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.wk-others li a {
+  display: flex;
+  gap: 24px;
+  align-items: baseline;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--display);
+  font-size: 28px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.wk-others li a:hover {
+  background: var(--panel);
+}
+.wk-others .wk-n {
+  padding: 0;
+}
+
+@media (max-width: 860px) {
+  .wk-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 12px 16px;
+    padding: 24px 0;
+  }
+  .wk-proof {
+    grid-column: 2;
+  }
+  .wk-arrow {
+    display: none;
+  }
+  .v4 .wk-what h3 {
+    font-size: 26px;
+  }
+  .wk-n {
+    padding-top: 4px;
+  }
+  .wk-body {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .wk-steps ol {
+    grid-template-columns: 1fr;
+  }
+  .wk-steps li {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .wk-others li a {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 560px) {
+  .wk-head::after {
+    left: 16px;
+    right: 16px;
+  }
+  .wk-head {
+    padding-top: 48px;
+    padding-bottom: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-row,
+  .wk-arrow {
+    transition: none;
+  }
+  .wk-row:hover .wk-arrow {
+    transform: none;
+  }
+}
