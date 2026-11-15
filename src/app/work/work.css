@@ -71,6 +71,31 @@
 .wk-proof .wk-tag {
   margin-bottom: 8px;
 }
+/* Planned demos: a small outlined "Soon" label, no link (JB 2026-11-15). Outline, not a filled pill, so it reads as a
+   status and not as a button. */
+.wk-soon {
+  margin-top: 12px !important;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.wk-soon-tag {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border: 1px solid var(--ink-2);
+  border-radius: 3px;
+  font-family: var(--label);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+.v4-case-tag .wk-soon-tag {
+  margin: 0 0 0 10px;
+}
 .wk-arrow {
   padding-top: 6px;
   font-size: 22px;

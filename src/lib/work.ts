@@ -1,5 +1,6 @@
-// The work index (spec: C:\PortfolioProjects\work-cards\SPEC.md, 2026-11-13). Four kinds of work, ordered by how often
-// AU and UK job posts ask for them, each with its own page at /work/<slug> so an application can link the one that fits.
+// The work index (spec: C:\PortfolioProjects\work-cards\SPEC.md, 2026-11-13). Seven kinds of work since 2026-11-15 (JB:
+// add every planned card, planned demos marked Soon), ordered by how often AU and UK job posts ask for them (research\
+// Most requested app builds.md), each with its own page at /work/<slug> so an application can link the one that fits.
 // Same rules as the CV (src/lib/resume.ts): client work only as written there, demos labelled as demos, no invented
 // results, prices or policies, the NDA client never described. JB's GoHighLevel account has no SMS (LC Phone is not
 // available to him in the Philippines), so nothing here says or implies that a demo sends real texts.
@@ -11,6 +12,9 @@ export type Proof = {
   line: string;
   href?: string;
   cta?: string;
+  /** A planned demo from the job-post research (PortfolioProjects\research\Most requested app builds.md), not public
+   * yet. Shown with a "Soon" label and no link; no date is promised. */
+  soon?: true;
 };
 
 export type Work = {
@@ -65,6 +69,12 @@ export const work: Work[] = [
         href: "/demo/deskhand",
         cta: "Try it",
       },
+      {
+        kind: "My own demo",
+        name: "Speed-to-lead for a trades business",
+        line: "A quote enquiry gets an email reply with a booking link within seconds, then follow-ups on day 1, 3 and 7 until they book. Built in GoHighLevel for a made-up roofing business; the text messages are built but switched off.",
+        soon: true,
+      },
     ],
   },
   {
@@ -103,11 +113,54 @@ export const work: Work[] = [
         href: "/coach-os",
         cta: "Case study",
       },
+      {
+        kind: "My own demo",
+        name: "AI inbox to CRM",
+        line: "AI reads each enquiry email, sorts it, and creates the contact and the right task in GoHighLevel.",
+        soon: true,
+      },
     ],
     shot: { src: "/projects/tapline/board.png", alt: "Tapline's repairs board with AI triage", w: 2880, h: 1800 },
   },
   {
     n: "03",
+    slug: "funnels",
+    title: "Funnels and landing pages",
+    promise: "Pages that turn visitors into enquiries, built in GoHighLevel and wired to your follow-up from the first click.",
+    lead: { kind: "Client work", name: "Wrldinvsn", when: "Dec 2025 to Feb 2026", line: "Landing pages and VSL pages for lead capture, wired to an automated booking system." },
+    covers: [
+      "Funnels, landing pages and websites built in GoHighLevel",
+      "Forms and surveys that tag the lead and start the right follow-up",
+      "Booking and payment steps inside the funnel",
+      "Tracking on every page, so you know which one brings the enquiries",
+      "Built from your design, or a clean layout if you don't have one",
+    ],
+    proof: [
+      {
+        kind: "Client work",
+        name: "Wrldinvsn",
+        line: "Designed landing pages and VSL pages for lead capture, and an automated booking system with calendar sync, reminders and cancellation handling.",
+      },
+      {
+        kind: "Client work",
+        name: "Chaos to Closing",
+        line: "Built the client's entire business inside GoHighLevel from scratch, centred on social media lead capture and ManyChat nurture sequences.",
+      },
+      {
+        kind: "Client work",
+        name: "Virtualasting",
+        line: "On the Masterpiece Las Vegas account: conversion-focused page design, with lead-capture forms connected to automated CRM workflows.",
+      },
+      {
+        kind: "My own demo",
+        name: "Quote form for a trades business",
+        line: "A quote form for a made-up roofing business that saves the job type and where the lead heard about you, then starts the follow-up.",
+        soon: true,
+      },
+    ],
+  },
+  {
+    n: "04",
     slug: "integrations",
     title: "Integrations and tracking",
     promise: "A change in one tool reaches your CRM. If an update fails, it waits in a log instead of going missing.",
@@ -140,10 +193,76 @@ export const work: Work[] = [
         name: "Wrldinvsn",
         line: "Built end-to-end lead tracking from first click to close, so no opportunity was lost between tools.",
       },
+      {
+        kind: "My own demo",
+        name: "Lead-source tracker",
+        line: "Every booking shows which ad or channel it came from.",
+        soon: true,
+      },
+      {
+        kind: "My own demo",
+        name: "Paid-invoice sync",
+        line: "When a customer pays, GoHighLevel stops chasing and sends a thank-you.",
+        soon: true,
+      },
     ],
   },
   {
-    n: "04",
+    n: "05",
+    slug: "fixes-and-audits",
+    title: "GoHighLevel fixes and audits",
+    promise: "I find what's broken in your GoHighLevel account, fix it, and give you a written list of every change.",
+    lead: { kind: "Client work", name: "K Australia Design", when: "Sep 2024 to Sep 2025", line: "Managed A2P 10DLC registration (US SMS registration) to protect deliverability." },
+    covers: [
+      "Workflows that misfire, loop or send twice",
+      "Calendars, forms and pipelines that don't connect",
+      "Triggers that fire for the wrong contacts",
+      "Email and SMS deliverability: sending domains and A2P registration",
+      "A written list of every change, before and after",
+    ],
+    proof: [
+      {
+        kind: "Client work",
+        name: "K Australia Design",
+        line: "Built always-on nurture automation across SMS, email and voicemail drop, and managed A2P 10DLC registration (US SMS registration) to protect deliverability.",
+      },
+      {
+        kind: "My own demo",
+        name: "GHL Rescue",
+        line: "A broken GoHighLevel account, then the same account fixed, with the written list of every change.",
+        soon: true,
+      },
+    ],
+  },
+  {
+    n: "06",
+    slug: "agency-snapshots",
+    title: "Agency setup and snapshots",
+    promise: "A sub-account set up once and saved as a snapshot, so each new client starts ready to run.",
+    lead: { kind: "Client work", name: "K Australia Design", when: "Sep 2024 to Sep 2025", line: "GoHighLevel infrastructure that let the agency onboard new clients without technical work each time." },
+    covers: [
+      "A sub-account built for one niche, saved as a snapshot",
+      "Pipelines, calendars, forms and workflows named so your team can find them",
+      "Custom fields and values, so one snapshot fits many clients",
+      "A setup guide and a test checklist with every snapshot",
+      "SaaS mode and white-label setup for agencies",
+    ],
+    proof: [
+      {
+        kind: "Client work",
+        name: "K Australia Design",
+        line: "Engineered scalable GoHighLevel infrastructure that let the agency onboard new clients without technical work each time.",
+      },
+      {
+        kind: "My own demo",
+        name: "Speed-to-lead snapshot for trades",
+        line: "Form, calendar, pipeline and the follow-up workflows in one snapshot, with a one-page setup guide.",
+        soon: true,
+      },
+    ],
+  },
+  {
+    n: "07",
     slug: "custom-apps",
     title: "Custom apps",
     promise: "When GoHighLevel can't do the job, I build the app you need and connect it back to GoHighLevel.",

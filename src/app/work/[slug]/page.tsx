@@ -96,9 +96,10 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
                 <li key={p.name + p.kind} data-rv>
                   <p className="v4-case-tag">
                     {p.kind} · {p.name}
+                    {p.soon && <span className="wk-soon-tag">Soon</span>}
                   </p>
                   <p>{p.line}</p>
-                  {p.href && (
+                  {p.href && !p.soon && (
                     <a href={p.href} className="wk-live">
                       {p.cta ?? "Open"}
                     </a>
