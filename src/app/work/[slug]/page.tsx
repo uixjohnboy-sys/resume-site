@@ -100,7 +100,11 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
                   </p>
                   <p>{p.line}</p>
                   {p.href && !p.soon && (
-                    <a href={p.href} className="wk-live">
+                    <a
+                      href={p.href}
+                      className="wk-live"
+                      {...(p.href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})}
+                    >
                       {p.cta ?? "Open"}
                     </a>
                   )}
