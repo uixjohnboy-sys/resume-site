@@ -9,8 +9,8 @@ import "../../v4/v4.css";
 import "../work.css";
 
 // One kind of work: what it usually covers, the proof (client work first, demos labelled), and how a job starts. Each
-// page has its own link so an application can point at the one that fits the job post. Preview: noindex until JB signs
-// off (spec C:\PortfolioProjects\work-cards\SPEC.md).
+// page has its own link so an application can point at the one that fits the job post. Public and indexed since
+// 2026-11-15, when the work index moved to the homepage (spec C:\PortfolioProjects\work-cards\SPEC.md).
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${w.title} · John Boy Roxas`,
     description: w.promise,
-    robots: { index: false, follow: false },
+    alternates: { canonical: `/work/${w.slug}` },
   };
 }
 
@@ -51,12 +51,12 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
       <Reveal />
       <header className="v4-nav">
         <div className="v4-nav-in">
-          <Link className="v4-mark" href="/v6">
+          <Link className="v4-mark" href="/">
             <b>John Boy Roxas</b>
             <span>Systems and automation</span>
           </Link>
           <nav className="v4-links" aria-label="Sections">
-            <Link href="/v6#work">All work</Link>
+            <Link href="/#work">All work</Link>
             <a href="/John-Boy-Roxas-Resume.pdf">CV</a>
           </nav>
           <a className="v4-btn v4-btn-dark v4-nav-cta" href={BOOK}>

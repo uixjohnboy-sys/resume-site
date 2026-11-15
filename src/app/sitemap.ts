@@ -1,7 +1,15 @@
 import type { MetadataRoute } from "next";
+import { work } from "@/lib/work";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
+    // One page per kind of work (homepage work index, since 2026-11-15).
+    ...work.map((w) => ({
+      url: `https://www.johnboydesign.com/work/${w.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.85,
+    })),
     {
       url: "https://www.johnboydesign.com",
       lastModified: new Date(),

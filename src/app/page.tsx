@@ -3,10 +3,13 @@ import Image from "next/image";
 import { anton, host, plex } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
 import IntroVideo from "@/components/v4/IntroVideo";
+import WorkIndex from "@/components/work/WorkIndex";
 import "./v4/v4.css";
+import "./work/work.css";
 
-// Four sections since 2026-11-06, at JB's request: hero, intro video with the live builds as its chapters, who he is, and the
-// call to action. The video is the explainer; everything else that used to be here lives in the video, the demos and the CV.
+// Homepage since 2026-11-15 (JB signed off the /v6 preview): the work index sits right under the hero, one row per kind of
+// work, each opening /work/<slug> (spec in PortfolioProjects/work-cards/SPEC.md). Before that, since 2026-11-06: hero,
+// intro video with the live builds as its chapters, who he is, and the call to action. The video is the explainer; everything else that used to be here lives in the video, the demos and the CV.
 // White poster look on JB's reference (xgensgrowth.com), his own words and proof. Short, direct, confident copy.
 //
 // Rules: no confidential client is named or described (the NDA client appears only as "Confidential client (NDA)", no country
@@ -30,7 +33,7 @@ const LINKEDIN = "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-special
 const CV = "/John-Boy-Roxas-Resume.pdf";
 const BOOK = "/book";
 
-// Set once the intro is recorded and uploaded. Until then the frame says so plainly, and the chapters below still work.
+// Set once the intro is recorded and uploaded. Until then the frame says so plainly, and the work above still works.
 const INTRO_VIDEO = "";
 const INTRO_CAPTIONS = "";
 
@@ -50,51 +53,6 @@ const badges = [
   { img: "/badge-course-community-expert.png", name: "Course & Community Expert" },
 ];
 
-// The video's chapters. Each one is something a visitor can open and use, not a picture of it.
-const chapters = [
-  {
-    n: "01",
-    tag: "My own demo · Fictional data",
-    title: "Tapline, a repairs desk",
-    line: "AI triage a person confirms, after-hours dispatch, owner approvals and a real signed webhook.",
-    before: "Tenants ring and text at all hours. Jobs live in inboxes and memory.",
-    after: "Every report triaged, sent to the right trade, approved and on the record.",
-    img: "/projects/tapline/board.png",
-    alt: "Tapline's repairs board",
-    w: 2880,
-    h: 1800,
-    href: "/demo/tapline?tour=manager",
-    cta: "Try it live",
-  },
-  {
-    n: "02",
-    tag: "My own product · Demo data",
-    title: "Coach OS, built around GoHighLevel",
-    line: "Client portal, AI companion, e-signed agreements and Stripe, synced with GoHighLevel both ways.",
-    before: "Clients chased across email, shared docs and payment links.",
-    after: "One portal for the work, the agreement and the payment, in step with the CRM.",
-    img: "/coach-os-shots/app-dash-kanban.jpg",
-    alt: "Coach OS owner pipeline",
-    w: 1440,
-    h: 760,
-    href: "https://coachos.johnboydesign.com/tour",
-    cta: "Open the tour",
-  },
-  {
-    n: "03",
-    tag: "What you get for a brief",
-    title: "A plan for your whole system",
-    line: "Send me what you need. I send back a written plan: agents, workflows and integrations. Free.",
-    before: "You know something is manual, but not what to build.",
-    after: "A written plan for the whole system, before you spend a cent.",
-    img: null,
-    alt: "",
-    w: 0,
-    h: 0,
-    href: "/sample-plan",
-    cta: "See a sample plan",
-  },
-];
 
 export default function Home() {
   return (
@@ -111,6 +69,7 @@ export default function Home() {
             <span>Systems and automation</span>
           </a>
           <nav className="v4-links" aria-label="Sections">
+            <a href="#work">Work</a>
             <a href="#intro">Intro</a>
             <a href="#about">About</a>
             <a href={CV}>CV</a>
@@ -134,8 +93,8 @@ export default function Home() {
               </h1>
               <p className="v4-lede">GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time, from AUD 15/hr.</p>
               <div className="v4-ctas">
-                <a className="v4-btn v4-btn-dark" href="#intro">
-                  Try it live
+                <a className="v4-btn v4-btn-dark" href="#work">
+                  See what I build
                 </a>
                 <a className="v4-btn v4-btn-line" href={BOOK}>
                   Book a 15-min call
@@ -145,15 +104,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ---------- 2. INTRO VIDEO, WITH THE LIVE BUILDS AS ITS CHAPTERS ---------- */}
+        {/* ---------- 2. WHAT I BUILD: the work index, one row per kind of work, each with its own page ---------- */}
+        <section className="v4-sec wk-home" id="work">
+          <div className="v4-in">
+            <p className="v4-kicker" data-rv>
+              What I build
+            </p>
+            <h2 data-rv>Pick the job you need done.</h2>
+            <WorkIndex />
+          </div>
+        </section>
+
+        {/* ---------- 2b. INTRO VIDEO ---------- */}
         <section className="v4-sec v4-intro" id="intro">
           <div className="v4-in">
-            <div className="v4-center">
-              <p className="v4-kicker" data-rv>
-                Intro
-              </p>
-              <h2 data-rv>See what I build, then use it.</h2>
-            </div>
             <div className="v4-film" data-rv>
               {INTRO_VIDEO ? (
                 <video controls preload="metadata" playsInline poster="/projects/tapline/board.png">
@@ -166,47 +130,11 @@ export default function Home() {
                   <span className="v4-film-play" aria-hidden="true" />
                   <div>
                     <p className="v4-kicker">Intro video · being recorded</p>
-                    <p>A short walk-through of these builds, from me. Until it&apos;s up, open each one below and use it yourself.</p>
+                    <p>A short walk-through of this work, from me. Until it&apos;s up, open any row above and use the demos yourself.</p>
                   </div>
                 </div>
               )}
             </div>
-            <ol className="v4-chapters">
-              {chapters.map((c) => (
-                <li key={c.n} data-rv>
-                  <a href={c.href} className="v4-chapter">
-                    <div className="v4-chapter-shot">
-                      {c.img ? (
-                        <Image src={c.img} alt={c.alt} width={c.w} height={c.h} sizes="(max-width: 860px) 90vw, 380px" />
-                      ) : (
-                        <span className="v4-chapter-plan" aria-hidden="true">
-                          <b>Your brief</b>
-                          <i />
-                          <i />
-                          <i />
-                          <b>Your plan</b>
-                        </span>
-                      )}
-                    </div>
-                    <span className="v4-chapter-n">{c.n}</span>
-                    <span className="v4-case-tag">{c.tag}</span>
-                    <h3>{c.title}</h3>
-                    <p>{c.line}</p>
-                    <dl className="v4-ba">
-                      <div>
-                        <dt>Before</dt>
-                        <dd>{c.before}</dd>
-                      </div>
-                      <div>
-                        <dt>After</dt>
-                        <dd>{c.after}</dd>
-                      </div>
-                    </dl>
-                    <span className="v4-chapter-cta">{c.cta}</span>
-                  </a>
-                </li>
-              ))}
-            </ol>
           </div>
         </section>
 
