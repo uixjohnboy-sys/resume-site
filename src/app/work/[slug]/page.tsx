@@ -20,10 +20,15 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const w = workBySlug((await params).slug);
   if (!w) return {};
+  const title = w.seoTitle;
+  const description = w.seoDescription;
+  const url = `/work/${w.slug}`;
   return {
-    title: `${w.title} · John Boy Roxas`,
-    description: w.promise,
-    alternates: { canonical: `/work/${w.slug}` },
+    title: { absolute: title },
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url, siteName: "John Boy Roxas", type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

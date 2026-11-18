@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteTitle = "John Boy Roxas · GoHighLevel Specialist";
+const siteTitle = "GoHighLevel Specialist for Hire, GHL Expert | John Boy Roxas";
 const siteDescription =
   "GoHighLevel specialist who also ships the custom software beside the CRM: Next.js, Firebase, Stripe, and the Claude API. 5 years in CRM and automation, in GoHighLevel since 2023, with live systems you can open right now.";
 
@@ -20,24 +20,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.johnboydesign.com"),
   title: siteTitle,
   description: siteDescription,
-  keywords: [
-    "Johnboy Roxas",
-    "GoHighLevel Specialist",
-    "AI Automation Expert",
-    "GoHighLevel Expert",
-    "GHL Automation",
-    "n8n Automation",
-    "Zapier Expert",
-    "CRM Automation",
-    "Sales Funnel Builder",
-    "Manila Philippines",
-  ],
   authors: [{ name: "John Boy Roxas" }],
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://www.johnboydesign.com" },
   openGraph: {
     title: siteTitle,
-    description: "GoHighLevel builds and fixes for agencies and small businesses.",
+    description: "GoHighLevel specialist for agencies and small businesses: workflows, funnels, snapshots, integrations and custom apps.",
     url: "https://www.johnboydesign.com",
     siteName: "John Boy Roxas",
     type: "website",
@@ -45,7 +32,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
-    description: "GoHighLevel builds and fixes for agencies and small businesses.",
+    description: "GoHighLevel specialist for agencies and small businesses: workflows, funnels, snapshots, integrations and custom apps.",
   },
 };
 

@@ -10,6 +10,14 @@ import "../v5/v5.css";
 export const metadata: Metadata = {
   title: "Book a call · John Boy Roxas",
   description: "Book a free 15-minute call with John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines.",
+  alternates: { canonical: "/book" },
+  openGraph: {
+    title: "Book a call · John Boy Roxas",
+    description: "Book a free 15-minute call with John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines.",
+    url: "/book",
+    siteName: "John Boy Roxas",
+    type: "website",
+  },
 };
 
 const nextSteps = [

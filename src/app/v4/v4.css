@@ -1412,3 +1412,6 @@ html:has(.v4) {
 .v4-film-play {
   z-index: 2;
 }
+
+/* The kicker sits inside the hero H1 so the heading carries the role (SEO audit 2026-11-18, P1.3). */
+.v4-hero h1 .v4-kicker-in-h1 { display: block; margin-bottom: 18px; }

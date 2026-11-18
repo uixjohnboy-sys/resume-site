@@ -10,6 +10,14 @@ import "./sample-plan.css";
 export const metadata: Metadata = {
   title: "Sample system plan | John Boy Roxas",
   description: "What you get back when you send John Boy a brief: a written plan for the full system. This sample uses a made-up business.",
+  alternates: { canonical: "/sample-plan" },
+  openGraph: {
+    title: "Sample system plan | John Boy Roxas",
+    description: "What you get back when you send John Boy a brief: a written plan for the full system. This sample uses a made-up business.",
+    url: "/sample-plan",
+    siteName: "John Boy Roxas",
+    type: "website",
+  },
 };
 
 const EMAIL = "uix.johnboy@gmail.com";

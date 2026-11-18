@@ -22,6 +22,9 @@ export type Work = {
   slug: string;
   title: string;
   promise: string;
+  /** Search title (50 to 60 characters) and description (about 150), from C:\StudioHQ\seo\SEO-AUDIT-2026-11-18.md. */
+  seoTitle: string;
+  seoDescription: string;
   /** The one proof line the home index shows: the strongest real fact, client work first. */
   lead: { kind: Proof["kind"]; name: string; when?: string; line: string };
   /** The one thing to open from the index row. */
@@ -35,6 +38,8 @@ export const work: Work[] = [
   {
     n: "01",
     slug: "lead-follow-up",
+    seoTitle: "GoHighLevel Lead Follow-Up and Booking | John Boy Roxas",
+    seoDescription: "GoHighLevel lead follow-up that runs itself: an instant reply, a booking link, reminders and follow-ups until they book. For agencies and small businesses.",
     title: "Lead follow-up and booking",
     promise: "Every new enquiry gets an automatic reply and a link to book. If they don't book, the follow-up keeps going.",
     lead: { kind: "Client work", name: "K Australia Design", when: "Sep 2024 to Sep 2025", line: "One-click booking and CRM triggers that turned enquiries into confirmed appointments." },
@@ -81,6 +86,8 @@ export const work: Work[] = [
   {
     n: "02",
     slug: "ai-agents",
+    seoTitle: "GoHighLevel AI Agents on the Claude API | John Boy Roxas",
+    seoDescription: "AI agents for GoHighLevel that answer customer messages from your own prices and rules, book simple jobs in your calendar and hand the rest to a person.",
     title: "AI agents",
     promise: "An AI that answers customer messages from your prices and rules. It books the simple jobs and passes the rest to you.",
     lead: { kind: "My own demo", name: "Deskhand", line: "Books and moves cleaning jobs, and passes the rest to the owner. Prices come from the price list, never the AI. A simulation with fictional data." },
@@ -126,6 +133,8 @@ export const work: Work[] = [
   {
     n: "03",
     slug: "funnels",
+    seoTitle: "GoHighLevel Funnels and Landing Pages | John Boy Roxas",
+    seoDescription: "GoHighLevel funnels, landing pages and VSL pages wired to your follow-up from the first click. Built by a HighLevel-certified Funnel Building Expert.",
     title: "Funnels and landing pages",
     promise: "Pages that turn visitors into enquiries, built in GoHighLevel and wired to your follow-up from the first click.",
     lead: { kind: "Client work", name: "Wrldinvsn", when: "Dec 2025 to Feb 2026", line: "Landing pages and VSL pages for lead capture, wired to an automated booking system." },
@@ -164,6 +173,8 @@ export const work: Work[] = [
   {
     n: "04",
     slug: "integrations",
+    seoTitle: "GoHighLevel API and Webhook Integrations | John Boy Roxas",
+    seoDescription: "Connect GoHighLevel to your other tools with the v2 API, webhooks, n8n, Zapier or Make. Signed webhooks, no duplicate events, and a log for failed updates.",
     title: "Integrations and tracking",
     promise: "A change in one tool reaches your CRM. If an update fails, it waits in a log instead of going missing.",
     lead: { kind: "Client work", name: "Wrldinvsn", when: "Dec 2025 to Feb 2026", line: "Lead tracking from first click to close, so no opportunity was lost between tools." },
@@ -212,6 +223,8 @@ export const work: Work[] = [
   {
     n: "05",
     slug: "fixes-and-audits",
+    seoTitle: "GoHighLevel Audit and Workflow Fixes | John Boy Roxas",
+    seoDescription: "GoHighLevel audit and fixes: workflows that misfire, triggers, calendars, forms and A2P 10DLC registration. You get a written list of every change I make.",
     title: "GoHighLevel fixes and audits",
     promise: "I find what's broken in your GoHighLevel account, fix it, and give you a written list of every change.",
     lead: { kind: "Client work", name: "K Australia Design", when: "Sep 2024 to Sep 2025", line: "Managed A2P 10DLC registration (US SMS registration) to protect deliverability." },
@@ -239,6 +252,8 @@ export const work: Work[] = [
   {
     n: "06",
     slug: "agency-snapshots",
+    seoTitle: "White Label GoHighLevel Snapshots | John Boy Roxas",
+    seoDescription: "White-label GoHighLevel setup for agencies: a niche sub-account built once and saved as a snapshot, with SaaS mode, custom values and a setup guide.",
     title: "Agency setup and snapshots",
     promise: "A sub-account set up once and saved as a snapshot, so each new client starts ready to run.",
     lead: { kind: "Client work", name: "K Australia Design", when: "Sep 2024 to Sep 2025", line: "GoHighLevel infrastructure that let the agency onboard new clients without technical work each time." },
@@ -266,6 +281,8 @@ export const work: Work[] = [
   {
     n: "07",
     slug: "custom-apps",
+    seoTitle: "Custom Apps Connected to GoHighLevel | John Boy Roxas",
+    seoDescription: "When GoHighLevel can't do the job, I build the web app on Next.js, Firebase and Stripe and sync it back to your CRM. See Coach OS: 26 GHL webhook events.",
     title: "Custom apps",
     promise: "When GoHighLevel can't do the job, I build the app you need and connect it back to GoHighLevel.",
     lead: { kind: "My own product", name: "Coach OS", line: "A platform where coaches run clients, agreements, payments and an AI companion, synced with GoHighLevel. Demo data." },

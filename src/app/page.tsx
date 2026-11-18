@@ -16,9 +16,10 @@ import "./work/work.css";
 // or industry). No invented results, quotes or policies. Testimonials render only when real ones exist.
 
 export const metadata: Metadata = {
-  title: "John Boy Roxas · I build what your CRM can't",
+  title: { absolute: "GoHighLevel Specialist for Hire, GHL Expert | John Boy Roxas" },
   description:
-    "HighLevel-certified builder in the Philippines. GoHighLevel systems, custom apps and AI agents for Australian and UK agencies and small businesses. Try live builds with no sign-up. From AUD 15/hr.",
+    "HighLevel-certified GoHighLevel specialist in the Philippines, in GHL since 2023. White-label workflows, funnels and snapshots for AU, US and UK agencies.",
+  alternates: { canonical: "/" },
 };
 
 const EMAIL = "uix.johnboy@gmail.com";
@@ -85,8 +86,8 @@ export default function Home() {
         <section className="v4-hero v4-hero-center">
           <div className="v4-hero-in">
             <div className="v4-hero-copy" data-rv>
-              <p className="v4-kicker">Systems builder · HighLevel certified</p>
               <h1>
+                <span className="v4-kicker v4-kicker-in-h1">GoHighLevel specialist · HighLevel certified</span>
                 I build what{" "}
                 <br className="v4-br" />
                 your CRM can&apos;t.
