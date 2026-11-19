@@ -22,7 +22,7 @@ export const summary =
   "HighLevel-certified GoHighLevel specialist with 5 years in CRM and automation, in GoHighLevel since 2023, building client systems for businesses in the United States and Australia. I also build what most GHL contractors can't: production web apps on Next.js, Firebase, Stripe and the Claude API, wired back into GoHighLevel so the CRM and the app stay in sync.";
 
 export const availability =
-  "Available for remote part-time roles, contracts and fixed-scope builds. Part-time, 4 hours a day, starting at 8 AM in your timezone.";
+  "Available for remote part-time roles, contracts and fixed-scope builds. Part-time, 4 to 6 hours a day, in Australian business hours or US mornings (UTC+8).";
 
 export type LiveProject = {
   name: string;

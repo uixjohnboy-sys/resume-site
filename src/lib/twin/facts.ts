@@ -36,7 +36,7 @@ export const FACTS: Fact[] = [
   {
     id: "hiring",
     title: "Availability for roles",
-    text: "He is open to remote part-time roles, contracts and fixed-scope builds, 4 hours a day, starting at 8 AM in the client's timezone. He works in Slack and ClickUp and writes documentation with every build. For a role, email uix.johnboy@gmail.com; his LinkedIn is linkedin.com/in/john-boy-roxas-gohighlevel-specialist.",
+    text: "He is open to remote part-time roles, contracts and fixed-scope builds, 4 to 6 hours a day, in Australian business hours or US mornings (he is in the Philippines, UTC+8). He works in Slack and ClickUp and writes documentation with every build. For a role, email uix.johnboy@gmail.com; his LinkedIn is linkedin.com/in/john-boy-roxas-gohighlevel-specialist.",
   },
   {
     id: "certs",

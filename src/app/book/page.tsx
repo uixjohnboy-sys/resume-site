@@ -66,7 +66,7 @@ export default function BookPage() {
           <dl className="r-skills">
             <div>
               <dt>Hours</dt>
-              <dd>Part-time, 4 hours a day, starting at 8 AM in your timezone. If a launch or an urgent job needs me outside that, say so and we will work it out.</dd>
+              <dd>Part-time, 4 to 6 hours a day, in Australian business hours or US mornings (I am in the Philippines, UTC+8). If a launch or an urgent job needs me outside that, say so and we will work it out.</dd>
             </div>
             <div>
               <dt>Rate</dt>

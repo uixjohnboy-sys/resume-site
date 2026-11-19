@@ -149,7 +149,7 @@ export default function V5() {
             </div>
             <div>
               <dt>Hours</dt>
-              <dd>Part-time, 4 hours a day, starting at 8 AM in your timezone. I am in the Philippines (UTC+8).</dd>
+              <dd>Part-time, 4 to 6 hours a day, in Australian business hours or US mornings. I am in the Philippines (UTC+8).</dd>
             </div>
             <div>
               <dt>Your data</dt>

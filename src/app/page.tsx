@@ -150,7 +150,7 @@ export default function Home() {
             </p>
             <h2 data-rv>I&apos;m John Boy. I build the systems your business runs on.</h2>
             <p className="v4-lede" data-rv>
-              From the Philippines, working with past clients in the US and Australia. UK businesses welcome. I work part-time, 4 hours a day from 8 AM your time,
+              From the Philippines, working with past clients in the US and Australia. UK businesses welcome. I work part-time, 4 to 6 hours a day in Australian business hours or US mornings,
               white-label for agencies, inside your tools: Slack, ClickUp, Asana, Loom. I invoice fortnightly, and I will sign an NDA before you share anything about
               your business.
             </p>
@@ -164,8 +164,8 @@ export default function Home() {
                 <span>From, per hour. About £8, or a fixed quote</span>
               </li>
               <li>
-                <b>4 hours</b>
-                <span>A day, from 8 AM your time</span>
+                <b>4-6 hours</b>
+                <span>A day, AU hours or US mornings</span>
               </li>
             </ul>
           </div>
