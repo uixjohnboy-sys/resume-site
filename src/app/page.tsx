@@ -41,7 +41,7 @@ const INTRO_CAPTIONS = "";
 const clients = [
   { name: "K Australia Design", note: "Lead GHL Automation Architect · Sep 2024 to Sep 2025" },
   { name: "Confidential client (NDA)", note: "GoHighLevel Specialist · Apr 2026 to present" },
-  { name: "Chaos to Closing", note: "GoHighLevel Systems Builder · Ended Mar 2026" },
+  { name: "Chaos to Closing", note: "GoHighLevel Systems Builder · Mar 2026 to Sep 2026" },
   { name: "Wrldinvsn", note: "Lead Flow and Funnel Operations · Dec 2025 to Feb 2026" },
   { name: "Masterpiece Las Vegas", note: "US, through Virtualasting" },
   { name: "Virtualasting", note: "Automation and CRM Support · Feb 2021 to Jul 2024" },

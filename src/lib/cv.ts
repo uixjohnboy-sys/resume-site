@@ -48,7 +48,7 @@ export const cvJobs: Job[] = [
         role: "GoHighLevel Systems Builder",
         org: "Chaos to Closing",
         where: "United States",
-        when: "Project, ended Mar 2026",
+        when: "Mar 2026 to Sep 2026",
         points: ["Built the client's GoHighLevel account from scratch: social media lead capture and ManyChat nurture sequences."],
       },
       {
