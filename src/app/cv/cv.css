@@ -56,4 +56,5 @@
   .cv-role { break-inside: auto; }
   .cv-role-head, .cv li { break-inside: avoid; break-after: avoid-page; }
   .cv li { break-after: auto; }
+  .cv-job > .cv-role:not(.cv-sub) { break-inside: avoid; }
 }
