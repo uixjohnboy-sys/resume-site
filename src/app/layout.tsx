@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   description: siteDescription,
   authors: [{ name: "John Boy Roxas" }],
   robots: { index: true, follow: true },
+  // Google Search Console, URL-prefix property https://www.johnboydesign.com/ (2026-11-19). Keep it, or the property unverifies.
+  verification: { google: "WMMNUbaJo62SUAKrypU30D8TxBBX3CZ52uO3KCa7KoI" },
   openGraph: {
     title: siteTitle,
     description: "GoHighLevel specialist for agencies and small businesses: workflows, funnels, snapshots, integrations and custom apps.",
