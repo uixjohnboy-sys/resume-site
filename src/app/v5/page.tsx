@@ -10,7 +10,7 @@ import "./v5.css";
 
 export const metadata: Metadata = {
   title: "John Boy Roxas · GoHighLevel specialist · Resume",
-  description: "The resume you can click. HighLevel-certified GoHighLevel specialist in the Philippines, available to Australian and UK agencies and small businesses.",
+  description: "The resume you can click. HighLevel-certified GoHighLevel specialist in the Philippines, available to agencies and small businesses in Australia and the US.",
   robots: { index: false, follow: false },
 };
 
@@ -47,7 +47,7 @@ export default function V5() {
         </header>
 
         <p className="r-promise r-no-print">
-          GoHighLevel builds and fixes for Australian and UK agencies and small businesses, tested before handover and documented so your team can run them.
+          GoHighLevel builds and fixes for agencies and small businesses in Australia and the US, tested before handover and documented so your team can run them.
         </p>
 
         <section className="r-sec r-no-print" aria-labelledby="r-who">
@@ -62,7 +62,6 @@ export default function V5() {
                 <li>Your tools and your process: Slack, ClickUp, Asana, time tracking</li>
                 <li>Loom updates and handover notes your clients never see me in</li>
               </ul>
-              <p className="r-door-price">From AUD 15/hr, or a monthly block of hours.</p>
             </article>
             <article>
               <h3>For business owners</h3>
@@ -73,7 +72,6 @@ export default function V5() {
                 <li>Follow-up emails that stop the moment someone books</li>
                 <li>A pipeline that shows where every lead is, at a glance</li>
               </ul>
-              <p className="r-door-price">A fixed quote after a free 15-minute call.</p>
             </article>
           </div>
         </section>
@@ -145,7 +143,7 @@ export default function V5() {
           <dl className="r-skills">
             <div>
               <dt>Rate</dt>
-              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start and billed fortnightly.</dd>
+              <dd>Hourly, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start and billed fortnightly.</dd>
             </div>
             <div>
               <dt>Hours</dt>

@@ -1,4 +1,5 @@
-// Prints the /v5 resume page to public/John-Boy-Roxas-Resume.pdf, so the PDF always matches the site.
+// Prints the /cv page (redesigned 2026-11-19) to public/John-Boy-Roxas-Resume.pdf (A4) and
+// public/John-Boy-Roxas-Resume-Letter.pdf (US Letter), and sets the PDF title, author, subject and keywords.
 // Run with the site up: node scripts/make-resume-pdf.mjs [baseUrl]
 // Refuses to write if the page contains an NDA term (local, gitignored scripts/.nda-terms), a price or an em dash,
 // or if the PDF runs past two pages. Web paths become full URLs so every link in the PDF works.
@@ -20,7 +21,7 @@ const terms = readFileSync(ndaFile, "utf8").split(/\r?\n/).map((x) => x.trim().t
 
 const browser = await puppeteer.launch({ executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true, args: ["--no-first-run", "--disable-extensions"] });
 const page = await browser.newPage();
-await page.goto(`${BASE}/v5`, { waitUntil: "networkidle2", timeout: 90000 });
+await page.goto(`${BASE}/cv`, { waitUntil: "networkidle2", timeout: 90000 });
 await page.emulateMediaType("print");
 await page.evaluate((site) => {
   for (const a of document.querySelectorAll("a[href^='/']")) a.href = site + a.getAttribute("href");
@@ -32,9 +33,22 @@ for (const t of terms) if (lower.includes(t)) throw new Error("NDA term on the p
 if (text.includes("\u2014")) throw new Error("Em dash on the page. No PDF written.");
 if (/\b(aud|usd|gbp|php)\s?\d|\$\s?\d/i.test(text)) throw new Error("A price on the page. No PDF written.");
 
-const pdf = await page.pdf({ format: "A4", printBackground: true, preferCSSPageSize: true });
-const pages = (Buffer.from(pdf).toString("latin1").match(/\/Type\s*\/Page[^s]/g) ?? []).length;
+const { PDFDocument } = require("C:/HarperQuinn-CoachOS/node_modules/pdf-lib");
+const outs = [["A4", OUT], ["Letter", OUT.replace(".pdf", "-Letter.pdf")]];
+const made = [];
+for (const [format, file] of outs) {
+  const raw = await page.pdf({ format, printBackground: true });
+  const doc = await PDFDocument.load(raw);
+  const pages = doc.getPageCount();
+  if (pages > 2) throw new Error(`The ${format} PDF is ${pages} pages. Keep it to two. No PDF written.`);
+  doc.setTitle("John Boy Roxas, GoHighLevel Specialist, CV");
+  doc.setAuthor("John Boy Roxas");
+  doc.setSubject("CV: HighLevel-certified GoHighLevel (GHL) specialist, automation, API integrations and custom apps");
+  doc.setKeywords(["GoHighLevel", "GHL", "HighLevel", "CRM automation", "workflows", "snapshots", "A2P 10DLC", "API integrations", "webhooks", "Next.js"]);
+  made.push([file, await doc.save(), pages, format]);
+}
 await browser.close();
-if (pages > 2) throw new Error(`The PDF is ${pages} pages. Keep it to two. No PDF written.`);
-writeFileSync(OUT, pdf);
-console.log(`Wrote ${OUT}: ${pages} pages, ${Math.round(pdf.length / 1024)} KB`);
+for (const [file, bytes, pages, format] of made) {
+  writeFileSync(file, bytes);
+  console.log(`Wrote ${file} (${format}): ${pages} pages, ${Math.round(bytes.length / 1024)} KB`);
+}

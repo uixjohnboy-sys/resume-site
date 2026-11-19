@@ -39,7 +39,7 @@ export type LiveProject = {
 export const projects: LiveProject[] = [
   {
     name: "Tapline",
-    kind: "Repairs desk for Australian property managers and UK letting agents. My own demo, with fictional data.",
+    kind: "Repairs desk for property managers. My own demo, with fictional data.",
     points: [
       "Takes a repair from the tenant's report to the bill: AI triage with the property's history, after-hours dispatch, owner approval and invoice checks.",
       "The AI suggests and a person decides. Emergency wording is fixed and checked, and each market has its own trades, notice periods and compliance rules.",
