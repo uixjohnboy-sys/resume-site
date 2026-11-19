@@ -137,4 +137,4 @@ export const skills: [string, string][] = [
 
 export const certifications = ["Workflow Automation Expert", "Funnel Building Expert", "AI Employee Specialist", "Course and Community Expert"];
 
-export const education = { degree: "Bachelor's Degree in Computer Science", place: "Manila, Philippines", when: "2013 to 2018" };
+export const education = { degree: "Bachelor's Degree in Computer Science", place: "Manila, Philippines", when: "2012 to 2016" };
