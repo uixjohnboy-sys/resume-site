@@ -1238,8 +1238,23 @@ html:has(.v4) {
 
 /* ---------- responsive ---------- */
 @media (max-width: 1040px) {
+  /* The section links used to be hidden here, which left CV unreachable on phones and at 200% zoom (WCAG 1.4.10,
+     G2 review of the lead-source tracker). They now wrap to a second row under the name and the booking button. */
+  .v4-nav-in {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
   .v4-links {
-    display: none;
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+  .v4-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
   }
   .v4-nav-cta {
     margin-left: auto;
