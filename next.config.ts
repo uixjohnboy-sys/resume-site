@@ -44,6 +44,9 @@ const nextConfig: NextConfig = {
       { source: "/v4", destination: "/", permanent: false },
       // The old AI twin home is retired: it repeated a client count JB can't stand behind.
       { source: "/v3", destination: "/", permanent: false },
+      // /notify is retired (JB 2026-11-20): its copy said he was "fully loaded with client projects", the opposite of
+      // what he tells clients now, and nothing linked to it. Old links land on the booking page.
+      { source: "/notify", destination: "/book", permanent: true },
       // The Coach OS walkthrough booking page moved to the coachos
       // subdomain so the whole prospect journey (fit assessment ->
       // booking) lives under one brand. Old links in already-sent
