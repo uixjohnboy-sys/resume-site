@@ -49,7 +49,8 @@ const personJsonLd = {
   image: "https://www.johnboydesign.com/johnboy.png",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Tarlac",
+    addressLocality: "Paniqui",
+    addressRegion: "Tarlac",
     addressCountry: "PH",
   },
   knowsAbout: ["GoHighLevel", "AI Automation", "n8n", "Zapier", "CRM Systems", "Sales Funnels", "Next.js", "Firebase", "Stripe", "Claude API"],
@@ -57,6 +58,8 @@ const personJsonLd = {
     "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-specialist",
     "https://www.instagram.com/uix.johnboy/",
     "https://www.facebook.com/uix.johnboy",
+    "https://www.upwork.com/freelancers/~01353626f45076c78f",
+    "https://www.onlinejobs.ph/jobseekers/info/4412723",
   ],
 };
 

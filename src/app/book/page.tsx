@@ -8,11 +8,11 @@ import "../v5/v5.css";
 // visitor came for; the answers people usually want sit underneath it. The calendar itself is a GoHighLevel widget.
 
 export const metadata: Metadata = {
-  title: "Book a call · John Boy Roxas",
+  title: "Book a Free GoHighLevel Call | John Boy Roxas",
   description: "Book a free 15-minute call with John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines.",
   alternates: { canonical: "/book" },
   openGraph: {
-    title: "Book a call · John Boy Roxas",
+    title: "Book a Free GoHighLevel Call | John Boy Roxas",
     description: "Book a free 15-minute call with John Boy Roxas, a HighLevel-certified GoHighLevel specialist in the Philippines.",
     url: "/book",
     siteName: "John Boy Roxas",

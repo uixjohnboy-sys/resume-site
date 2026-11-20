@@ -18,7 +18,7 @@ import "./work/work.css";
 export const metadata: Metadata = {
   title: { absolute: "GoHighLevel Specialist for Hire, GHL Expert | John Boy Roxas" },
   description:
-    "HighLevel-certified GoHighLevel specialist in the Philippines, in GHL since 2023. White-label workflows, funnels and snapshots for AU, US and UK agencies.",
+    "HighLevel-certified GoHighLevel specialist in the Philippines, in GHL since 2023. White-label workflows, funnels and snapshots for agencies in Australia and the US.",
   alternates: { canonical: "/" },
 };
 
@@ -150,7 +150,7 @@ export default function Home() {
             </p>
             <h2 data-rv>I&apos;m John Boy. I build the systems your business runs on.</h2>
             <p className="v4-lede" data-rv>
-              From the Philippines, working with past clients in the US and Australia. UK businesses welcome. I work part-time, 4 to 6 hours a day in Australian business hours or US mornings,
+              From the Philippines, working with past clients in the US and Australia. I work part-time, 4 to 6 hours a day in Australian business hours or US mornings,
               white-label for agencies, inside your tools: Slack, ClickUp, Asana, Loom. I invoice fortnightly, and I will sign an NDA before you share anything about
               your business.
             </p>
@@ -247,7 +247,7 @@ export default function Home() {
           </div>
           <div className="v4-foot-end">
             <span>&copy; 2026 John Boy Roxas · Paniqui, Tarlac, Philippines</span>
-            <span>HighLevel certified · For Australian and UK businesses</span>
+            <span>HighLevel certified · For Australian and US businesses</span>
           </div>
         </div>
       </footer>
