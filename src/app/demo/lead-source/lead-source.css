@@ -108,6 +108,10 @@ html:has(.ls) body {
   min-height: 68px;
 }
 .ls .top .name {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 44px;
   text-decoration: none;
 }
 .ls .top .name b {

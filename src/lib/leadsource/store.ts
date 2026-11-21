@@ -96,8 +96,15 @@ export async function getBookings(provider: Provider, now: number): Promise<Got>
   }
 }
 
+/** RATE_MAX, or LEADSOURCE_RATE_MAX for a review day (a whole number from 1 to 10000; anything else is ignored). */
+export function rateMax(env: Record<string, string | undefined> = process.env): number {
+  const v = env.LEADSOURCE_RATE_MAX;
+  return v && /^\d{1,5}$/.test(v) && Number(v) >= 1 && Number(v) <= 10000 ? Number(v) : RATE_MAX;
+}
+
 /** Per-connection limit, fixed window. Fails CLOSED when Redis errors, like every cap on the site's demos. */
 export async function allowRequest(ipKey: string, now: number): Promise<boolean> {
+  const max = rateMax();
   const win = Math.floor(now / (RATE_WINDOW_SECONDS * 1000));
   const k = `leadsource:rl:${ipKey}:${win}`;
   const redis = getRedis();
@@ -106,12 +113,12 @@ export async function allowRequest(ipKey: string, now: number): Promise<boolean>
     const n = (c?.n ?? 0) + 1;
     mem.counters.set(k, { n, until: (win + 1) * RATE_WINDOW_SECONDS * 1000 });
     if (mem.counters.size > 5000) for (const [kk, v] of mem.counters) if (v.until <= now) mem.counters.delete(kk);
-    return n <= RATE_MAX;
+    return n <= max;
   }
   try {
     const n = await redis.incr(k);
     if (n === 1) await redis.expire(k, RATE_WINDOW_SECONDS);
-    return n <= RATE_MAX;
+    return n <= max;
   } catch {
     return false;
   }

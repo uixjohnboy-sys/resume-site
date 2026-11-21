@@ -22,7 +22,7 @@ export default function Ads({ paused, bookingBase }: { paused: boolean; bookingB
     return (
       <div className="paused">
         <p>
-          <b>Demo paused.</b> The demo ads are switched off for now. The report and the recording still work.
+          <b>Demo paused.</b>{" "}The demo ads are switched off for now. The report and the recording still work.
         </p>
       </div>
     );
@@ -119,7 +119,7 @@ export default function Ads({ paused, bookingBase }: { paused: boolean; bookingB
               <span className="sr"> from the Instagram demo ad (opens a new tab)</span>
             </a>
             <div className="cap">
-              <b>kestrelphysio</b> Initial consultations with a physiotherapist, 45 minutes. Choose a time online.
+              <b>kestrelphysio</b>{" "}Initial consultations with a physiotherapist, 45 minutes. Choose a time online.
             </div>
           </article>
           <div className="kv">
@@ -162,7 +162,7 @@ export default function Ads({ paused, bookingBase }: { paused: boolean; bookingB
               <p>{MEASURED.googleResult}</p>
             ) : (
               <p>
-                <span className="ph">Google, cpc</span> measured at G3
+                <span className="ph">Google, cpc</span>{" "}measured at G3
               </p>
             )}
           </div>
@@ -192,7 +192,7 @@ export default function Ads({ paused, bookingBase }: { paused: boolean; bookingB
               <p>{PLAIN_TEXT[MEASURED.plainResult]}</p>
             ) : (
               <p>
-                <span className="ph">Referral</span> measured at G3
+                <span className="ph">Referral</span>{" "}measured at G3
               </p>
             )}
             <p className="note">This booking cannot be marked as yours. No tags, so the report cannot tell which one is yours. That is the point.</p>

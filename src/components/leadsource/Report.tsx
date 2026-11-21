@@ -127,7 +127,8 @@ export default function Report() {
   const rows = data?.rows ?? [];
   const latest = data?.latest ?? [];
   const empty = status === "ok" && data !== null && data.total.booked === 0;
-  const showTables = status === "loading" || (status === "ok" && !empty);
+  // A rate limit on the very first load: the status line says so, and no "Loading" rows sit there forever.
+  const showTables = (status === "loading" && !limited) || (status === "ok" && !empty);
   const fixture = data?.mode === "fixture";
 
   return (
@@ -136,7 +137,7 @@ export default function Report() {
         <p>
           {data ? (
             <>
-              <b>Updated {data.updated}</b> · Checks GoHighLevel again every {data.cacheWindow}
+              <b>Updated {data.updated}</b>{" · "}Checks GoHighLevel again every {data.cacheWindow}
             </>
           ) : (
             <>Checks GoHighLevel again every {CACHE_WINDOW_LABEL}</>
@@ -181,7 +182,7 @@ export default function Report() {
       {empty && (
         <div className="state">
           <p>
-            No bookings in the last 4 weeks. Book from <a href="/demo/lead-source#ads">a demo ad</a> and yours will be the first.
+            No bookings in the last 4 weeks. Book from <a href="/demo/lead-source#ads">a demo ad</a>{" "}and yours will be the first.
           </p>
         </div>
       )}
@@ -195,19 +196,19 @@ export default function Report() {
             </div>
             <div className="notes">
               <p>
-                <b>Upcoming</b> means the booking is not yet marked Attended, No-show or Cancelled. Cancelled bookings stay counted.
+                <b>Upcoming</b>{" "}means the booking is not yet marked Attended, No-show or Cancelled. Cancelled bookings stay counted.
               </p>
               <p>
-                <b>Attended and No-show</b> come from the appointment status the front desk sets in GoHighLevel (Showed or No show).{" "}
+                <b>Attended and No-show</b>{" "}come from the appointment status the front desk sets in GoHighLevel (Showed or No show).{" "}
                 {MEASURED.stageWorkflowProven ? "A workflow then moves the booking." : <span className="ph prose">A workflow then moves the booking.</span>} In this
                 demo, John Boy sets them on his test bookings.
               </p>
               <p>
-                <b>Ads rows</b> count bookings with a paid tag or a Google click ID. Free visits from Google, Facebook or Instagram get their own rows when there are
+                <b>Ads rows</b>{" "}count bookings with a paid tag or a Google click ID. Free visits from Google, Facebook or Instagram get their own rows when there are
                 any. Facebook adds a click ID to free posts too, so the tag decides.
               </p>
               <p>
-                <b>Referral</b> means no tags, but the browser said which site sent you (here, johnboydesign.com). <b>Unknown</b> means no tags and no referring
+                <b>Referral</b>{" "}means no tags, but the browser said which site sent you (here, johnboydesign.com). <b>Unknown</b>{" "}means no tags and no referring
                 site. Both are counted, never dropped. GoHighLevel&apos;s own reports call Unknown Direct traffic.
               </p>
             </div>
@@ -294,7 +295,7 @@ function YoursBox({ mine, code, data }: { mine: Exclude<Mine, "none" | "pending"
       <span className="tag">Your booking</span>
       <div>
         <p>
-          Waiting for test code <b>{code}</b> to appear in GoHighLevel.
+          Waiting for test code <b>{code}</b>{" "}to appear in GoHighLevel.
         </p>
         <p className="sub">
           This page checks again on its own.{MEASURED.lagSeconds !== null ? ` Usually ${MEASURED.lagSeconds} seconds.` : ""}

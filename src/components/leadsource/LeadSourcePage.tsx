@@ -63,7 +63,7 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
       <div className="watch" id="watch">
         <p>Rather not book?</p>
         <p className="small">
-          <span className="ph">Recording, its length and the transcript link are added at G3</span>
+          <span className="ph prose">Recording, its length and the transcript link are added at G3</span>
         </p>
       </div>
     </section>
@@ -96,7 +96,7 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
       <main id="main" tabIndex={-1}>
         <div className="wrap">
           <p className="crumb">
-            <Link href="/#work">Work</Link> / <Link href="/work/integrations">Integrations and tracking</Link> / Lead-source tracker
+            <Link href="/#work">Work</Link>{" / "}<Link href="/work/integrations">Integrations and tracking</Link>{" / "}Lead-source tracker
           </p>
 
           {reportFirst ? (

@@ -12,7 +12,7 @@ import { FIXTURE_FIELDS, FIXTURE_OPPORTUNITIES, FIXTURE_PIPELINES, fillerBooking
 import { ghlProvider, mapOpportunity, parseFieldIds, pickPipeline } from "../src/lib/leadsource/ghl.ts";
 import { adHref, adQuery, adSends } from "../src/lib/leadsource/links.ts";
 import { liveConfigured, pageConfig, selectProvider } from "../src/lib/leadsource/provider.ts";
-import { allowRequest, getBookings, resetMemory } from "../src/lib/leadsource/store.ts";
+import { allowRequest, getBookings, rateMax, resetMemory } from "../src/lib/leadsource/store.ts";
 import { CACHE_SECONDS, RATE_MAX } from "../src/lib/leadsource/config.ts";
 
 let passed = 0;
@@ -432,6 +432,12 @@ await test("rate limit: the request after the limit is refused, per connection, 
   assert.equal(await allowRequest("ipA", t), false);
   assert.equal(await allowRequest("ipB", t), true);
   assert.equal(await allowRequest("ipA", t + 600_000), true);
+});
+
+await test("rate limit override for a review day: whole numbers 1 to 10000 only", () => {
+  assert.equal(rateMax({}), RATE_MAX);
+  assert.equal(rateMax({ LEADSOURCE_RATE_MAX: "500" }), 500);
+  for (const v of ["0", "-5", "1e9", "abc", "99999", " 50"]) assert.equal(rateMax({ LEADSOURCE_RATE_MAX: v }), RATE_MAX, v);
 });
 
 // ---------- 8. Copy: no em or en dashes in any lead-source source file ----------
