@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/demo/:path*", headers: demo },
       { source: "/api/tapline/:path*", headers: demo },
+      { source: "/api/lead-source/:path*", headers: demo },
     ];
   },
   async rewrites() {
