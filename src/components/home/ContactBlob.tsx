@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
+// No name tags under the circles (JB 2026-11-22): the figure says YOU on its body, and John Boy's face needs no label.
 // The contact section's slider (JB 2026-11-22, on a "gooey blob" reference, black and white): the visitor's circle ("You")
 // on the left, John Boy's photo on the right, and a handle stuck to the left circle. Drag (or tap) the handle across: it
 // stretches like liquid, lets go of "You", joins John Boy, and the four ways to reach him come up underneath.
@@ -207,6 +208,9 @@ export default function ContactBlob({ book, brief, email, whatsapp }: Props) {
             <circle cx={LX} cy={CY} r={INNER} fill="url(#cb-you)" />
             <circle cx={LX} cy={CY - 14} r={21} fill="#8a8a86" />
             <ellipse cx={LX} cy={CY + 52} rx={44} ry={38} fill="#8a8a86" />
+            <text className="cb-you" x={LX} y={CY + 47} textAnchor="middle">
+              YOU
+            </text>
           </g>
 
           {/* John Boy */}
@@ -243,12 +247,6 @@ export default function ContactBlob({ book, brief, email, whatsapp }: Props) {
           </g>
         </svg>
 
-        <p className="cb-chip cb-chip-l">
-          You <span>Your brief</span>
-        </p>
-        <p className="cb-chip cb-chip-r">
-          John Boy <span>GHL</span>
-        </p>
       </div>
 
       <p className="cb-hint" aria-hidden={open}>
