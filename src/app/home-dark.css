@@ -1,0 +1,96 @@
+/* The homepage in black (JB 2026-11-22: "yung dark background sa Hero, gawin mo para sa lahat ng section, mas premium").
+   Same black, white and greys as the cover-flow hero (home-flow.css); only the homepage root carries .v4-dark, so the
+   /work pages, /book and the CV keep the white poster look. Tokens first, then the few places v4.css hard-codes white. */
+
+.v4.v4-dark {
+  --paper: #0b0b0b;
+  --panel: #131313;
+  --card: #181818;
+  --ink: #f2f2ef;
+  --ink-2: #c8c8c4;
+  --muted: #9b9b97;
+  --line: #2a2a28;
+  background: var(--paper);
+  color: var(--ink);
+  color-scheme: dark;
+}
+
+/* top bar and sticky nav */
+.v4-dark .v4-bar {
+  background: #000;
+  color: #c8c8c4;
+}
+.v4-dark .v4-nav {
+  background: rgba(11, 11, 11, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* buttons: the "dark" button turns white on black, the line button keeps a light outline */
+.v4-dark .v4-btn-dark {
+  background: #f2f2ef;
+  border-color: #f2f2ef;
+  color: #0a0a0a !important;
+}
+.v4-dark .v4-btn-dark:hover {
+  background: #d6d6d2;
+  border-color: #d6d6d2;
+}
+.v4-dark .v4-btn-line {
+  color: #f2f2ef;
+  border-color: rgba(255, 255, 255, 0.55);
+}
+.v4-dark .v4-btn-line:hover {
+  background: #f2f2ef;
+  color: #0a0a0a;
+}
+.v4-dark .v4-btn:focus-visible {
+  outline-color: #fff;
+}
+
+/* the soft light that used to be a grey glow on white is now a faint white glow on black */
+.v4-dark .v4-contact {
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 100%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%),
+    var(--paper);
+}
+.v4-dark .wk-home {
+  background:
+    radial-gradient(ellipse 50% 40% at 50% 0%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%),
+    var(--paper);
+}
+.v4-dark .v4-about {
+  background:
+    radial-gradient(ellipse 50% 60% at 85% 20%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 100%),
+    var(--paper);
+}
+
+/* the intro video frame was ink-on-white; keep it a deep panel */
+.v4-dark .v4-film {
+  background: #111;
+  border: 1px solid var(--line);
+}
+.v4-dark .v4-film-wait {
+  background: radial-gradient(ellipse 70% 80% at 80% 20%, #2a2a28 0%, #0f0f0f 70%);
+}
+
+/* the big JB in the footer is a faint shape, not a white block */
+.v4-dark .v4-foot {
+  background: #050505;
+}
+.v4-dark .v4-foot-mark {
+  color: #151515;
+}
+
+/* the HighLevel badges and the portrait sit on light grounds; give them a soft frame so they don't look cut out */
+.v4-dark .v4-badges img {
+  border-radius: 12px;
+  background: #f2f2ef;
+  padding: 4px;
+}
+
+/* text selection and links */
+.v4-dark ::selection {
+  background: #f2f2ef;
+  color: #0a0a0a;
+}

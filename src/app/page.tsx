@@ -9,6 +9,7 @@ import { work } from "@/lib/work";
 import "./v4/v4.css";
 import "./work/work.css";
 import "./home-flow.css";
+import "./home-dark.css";
 
 // One card per kind of work, art made for each (scripts/home-cards, black and white).
 const flowCards: FlowCard[] = work.map((w) => ({ n: w.n, slug: w.slug, title: w.title, promise: w.promise, art: `/home/cards/${w.slug}.webp` }));
@@ -63,7 +64,7 @@ const badges = [
 
 export default function Home() {
   return (
-    <div id="v4-root" className={`v4 ${anton.variable} ${host.variable} ${plex.variable}`}>
+    <div id="v4-root" className={`v4 v4-dark ${anton.variable} ${host.variable} ${plex.variable}`}>
       <Reveal />
 
       <p className="v4-bar">
