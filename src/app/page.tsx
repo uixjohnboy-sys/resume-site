@@ -107,15 +107,8 @@ export default function Home() {
               GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time, from AUD 15/hr.
             </p>
           </div>
+          {/* No buttons under the cards (JB 2026-11-22): Book a call is in the nav, and the intro video is the next section. */}
           <SkillFlow cards={flowCards} />
-          <div className="v4-ctas sf-ctas">
-            <a className="v4-btn v4-btn-dark" href={BOOK}>
-              Book a 15-min call
-            </a>
-            <a className="v4-btn v4-btn-line" href="#intro">
-              Watch the intro
-            </a>
-          </div>
         </section>
 
         {/* ---------- 2. INTRO VIDEO ---------- */}
