@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { anton, host, plex } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
-import IntroVideo from "@/components/v4/IntroVideo";
+import AboutStory from "@/components/home/AboutStory";
 import SkillFlow, { type FlowCard } from "@/components/home/SkillFlow";
 import { work } from "@/lib/work";
 import "./v4/v4.css";
 import "./work/work.css";
 import "./home-flow.css";
 import "./home-dark.css";
+import "./about-story.css";
 
 // One card per kind of work, art made for each (scripts/home-cards, black and white). Each card carries what the old
 // work index row carried: the promise, the strongest real proof with its label, and the link to /work/<slug>.
@@ -136,34 +137,8 @@ export default function Home() {
 
         {/* ---------- 3. WHO I AM ---------- */}
         <section className="v4-statement v4-about" id="about">
-          <div className="v4-in">
-            <div className="v4-about-photo" data-rv>
-              <IntroVideo />
-            </div>
-            <p className="v4-kicker" data-rv>
-              About
-            </p>
-            <h2 data-rv>I&apos;m John Boy. I build the systems your business runs on.</h2>
-            <p className="v4-lede" data-rv>
-              From the Philippines, working with past clients in the US and Australia. I work part-time, 4 to 6 hours a day in Australian business hours or US mornings,
-              white-label for agencies, inside your tools: Slack, ClickUp, Asana, Loom. I invoice fortnightly, and I will sign an NDA before you share anything about
-              your business.
-            </p>
-            <ul className="v4-facts" aria-label="At a glance" data-rv>
-              <li>
-                <b>5 years</b>
-                <span>CRM and automation. GoHighLevel since 2023</span>
-              </li>
-              <li>
-                <b>AUD 15</b>
-                <span>From, per hour. About £8, or a fixed quote</span>
-              </li>
-              <li>
-                <b>4-6 hours</b>
-                <span>A day, AU hours or US mornings</span>
-              </li>
-            </ul>
-          </div>
+          {/* Three cards in a folder; on scroll they rise, the folder fades and the text comes up (JB 2026-11-22). */}
+          <AboutStory />
           <div className="v4-strip v4-strip-flat" aria-label="Clients and certifications">
             <p className="v4-strip-h">Worked with</p>
             <ul className="v4-clients v4-clients-grid">
