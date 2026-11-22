@@ -6,6 +6,7 @@ import AboutStory from "@/components/home/AboutStory";
 import ContactBlob from "@/components/home/ContactBlob";
 import SkillFlow, { type FlowCard } from "@/components/home/SkillFlow";
 import { work } from "@/lib/work";
+import { clients } from "@/lib/about";
 import "./v4/v4.css";
 import "./work/work.css";
 import "./home-flow.css";
@@ -56,22 +57,6 @@ const BOOK = "/book";
 // Set once the intro is recorded and uploaded. Until then the frame says so plainly, and the work above still works.
 const INTRO_VIDEO = "";
 const INTRO_CAPTIONS = "";
-
-const clients = [
-  { name: "K Australia Design", note: "Lead GHL Automation Architect · Sep 2024 to Sep 2025" },
-  { name: "Confidential client (NDA)", note: "GoHighLevel Specialist · Apr 2026 to present" },
-  { name: "Chaos to Closing", note: "GoHighLevel Systems Builder · Mar 2026 to Sep 2026" },
-  { name: "Wrldinvsn", note: "Lead Flow and Funnel Operations · Dec 2025 to Feb 2026" },
-  { name: "Masterpiece Las Vegas", note: "US, through Virtualasting" },
-  { name: "Virtualasting", note: "Automation and CRM Support · Feb 2021 to Jul 2024" },
-];
-
-const badges = [
-  { img: "/badge-workflow-automation-expert.png", name: "Workflow Automation Expert" },
-  { img: "/badge-funnel-building-expert.png", name: "Funnel Building Expert" },
-  { img: "/badge-ai-employee-specialist.png", name: "AI Employee Specialist" },
-  { img: "/badge-course-community-expert.png", name: "Course & Community Expert" },
-];
 
 
 export default function Home() {
@@ -141,21 +126,14 @@ export default function Home() {
         <section className="v4-statement v4-about" id="about">
           {/* Three cards in a folder; on scroll they rise, the folder fades and the text comes up (JB 2026-11-22). */}
           <AboutStory />
-          <div className="v4-strip v4-strip-flat" aria-label="Clients and certifications">
+          {/* The certification badges strip is gone (JB 2026-11-22): the certificates card's Know more shows them. */}
+          <div className="v4-strip v4-strip-flat" aria-label="Clients">
             <p className="v4-strip-h">Worked with</p>
             <ul className="v4-clients v4-clients-grid">
               {clients.map((c) => (
                 <li key={c.name}>
                   <b>{c.name}</b>
                   <span>{c.note}</span>
-                </li>
-              ))}
-            </ul>
-            <ul className="v4-badges" aria-label="HighLevel certifications">
-              {badges.map((b) => (
-                <li key={b.name}>
-                  <Image src={b.img} alt="" width={64} height={64} />
-                  <span>{b.name}</span>
                 </li>
               ))}
             </ul>

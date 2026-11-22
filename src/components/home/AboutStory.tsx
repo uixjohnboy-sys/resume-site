@@ -6,14 +6,10 @@ import { useEffect, useRef, useState } from "react";
 // three cards sit in a folder; as the section scrolls to the middle of the screen the cards rise and fan out, the
 // folder fades away, and the About text comes up under the cards. All the text is in the page from the start (search
 // engines and screen readers read it all); only how it looks changes. Phones and short screens play it as the cards
-// scroll by, with no pinning; visitors who ask for less motion get the finished layout.
+// scroll by, with no pinning; visitors who ask for less motion get the finished layout. The years card and the certificates card each have a "Know more" button
+// (on hover, always shown on touch screens) that opens a pop-up: the 5-year story, and the certificates.
 
-const BADGES = [
-  { img: "/badge-workflow-automation-expert.png", name: "Workflow Automation Expert" },
-  { img: "/badge-funnel-building-expert.png", name: "Funnel Building Expert" },
-  { img: "/badge-ai-employee-specialist.png", name: "AI Employee Specialist" },
-  { img: "/badge-course-community-expert.png", name: "Course and Community Expert" },
-];
+import { certs, story, timeline } from "@/lib/about";
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const ease = (x: number) => 1 - Math.pow(1 - x, 3);
@@ -21,6 +17,17 @@ const ease = (x: number) => 1 - Math.pow(1 - x, 3);
 export default function AboutStory() {
   const track = useRef<HTMLDivElement>(null);
   const [mode, setModeState] = useState<"static" | "pinned" | "flow">("static");
+  const [pop, setPop] = useState<"story" | "certs">("story");
+  const dlg = useRef<HTMLDialogElement>(null);
+  const openPop = (which: "story" | "certs") => {
+    setPop(which);
+    const d = dlg.current;
+    if (d && !d.open) {
+      d.showModal();
+      document.documentElement.classList.add("ab-lock");
+    }
+  };
+  const closePop = () => dlg.current?.close();
 
   useEffect(() => {
     const el = track.current;
@@ -88,27 +95,39 @@ export default function AboutStory() {
           <p className="ab-pill">GoHighLevel since 2023</p>
         </div>
 
-        <div className="ab-stage" aria-hidden="true">
-          <div className="ab-folder-back" />
+        <div className="ab-stage">
+          <div className="ab-folder-back" aria-hidden="true" />
           <div className="ab-card ab-c1">
-            <span className="ab-stat-n">5</span>
-            <span className="ab-stat-u">Years</span>
-            <span className="ab-stat-l">CRM and automation</span>
-            <span className="ab-stat-s">GoHighLevel since 2023</span>
+            <span className="ab-cc" aria-hidden="true">
+              <span className="ab-stat-n">5</span>
+              <span className="ab-stat-u">Years</span>
+              <span className="ab-stat-l">CRM and automation</span>
+              <span className="ab-stat-s">GoHighLevel since 2023</span>
+            </span>
+            <button type="button" className="ab-more" onClick={() => openPop("story")} aria-haspopup="dialog">
+              Know more <span aria-hidden="true">→</span>
+              <span className="ab-sr"> about my 5 years</span>
+            </button>
           </div>
           <div className="ab-card ab-c3">
-            <span className="ab-cert-h">HighLevel certified</span>
-            <span className="ab-cert-grid">
-              {BADGES.map((b) => (
-                <Image key={b.img} src={b.img} alt="" width={64} height={64} />
-              ))}
+            <span className="ab-cc" aria-hidden="true">
+              <span className="ab-cert-h">HighLevel certified</span>
+              <span className="ab-cert-grid">
+                {certs.map((b) => (
+                  <Image key={b.img} src={b.img} alt="" width={64} height={80} />
+                ))}
+              </span>
+              <span className="ab-cert-s">{certs.length} certifications</span>
             </span>
-            <span className="ab-cert-s">4 certifications</span>
+            <button type="button" className="ab-more" onClick={() => openPop("certs")} aria-haspopup="dialog">
+              Know more <span aria-hidden="true">→</span>
+              <span className="ab-sr"> about my HighLevel certifications</span>
+            </button>
           </div>
-          <div className="ab-card ab-c2">
+          <div className="ab-card ab-c2" aria-hidden="true">
             <Image src="/jb-portrait.png" alt="" width={1000} height={1000} sizes="240px" />
           </div>
-          <div className="ab-folder-front">
+          <div className="ab-folder-front" aria-hidden="true">
             <span className="ab-tab" />
             <dl className="ab-list">
               <div>
@@ -156,6 +175,59 @@ export default function AboutStory() {
           </ul>
         </div>
       </div>
+
+      <dialog
+        ref={dlg}
+        className="ab-pop"
+        aria-labelledby="ab-pop-h"
+        onClose={() => document.documentElement.classList.remove("ab-lock")}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) closePop();
+        }}
+      >
+        <div className="ab-pop-in">
+          <button type="button" className="ab-pop-x" onClick={closePop} aria-label="Close">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+          {pop === "story" ? (
+            <>
+              <p className="v4-kicker">5 years · CRM and automation</p>
+              <h3 id="ab-pop-h">How I got here</h3>
+              {story.length > 0 ? (
+                story.map((p) => <p key={p.slice(0, 24)} className="ab-pop-p">{p}</p>)
+              ) : (
+                <p className="ab-pop-p">Five years in CRM and automation, in GoHighLevel since 2023. Where I have worked, newest first:</p>
+              )}
+              <ol className="ab-tl">
+                {timeline.map((t) => (
+                  <li key={t.name}>
+                    <span className="ab-tl-when">{t.when}</span>
+                    <b>{t.name}</b>
+                    <span className="ab-tl-role">{t.role}</span>
+                    {t.note && <span className="ab-tl-note">{t.note}</span>}
+                  </li>
+                ))}
+              </ol>
+            </>
+          ) : (
+            <>
+              <p className="v4-kicker">Issued by HighLevel</p>
+              <h3 id="ab-pop-h">HighLevel certified</h3>
+              <p className="ab-pop-p">{certs.length} HighLevel certifications, earned on the platform I build in every day.</p>
+              <ul className="ab-certs">
+                {certs.map((c) => (
+                  <li key={c.img}>
+                    <Image src={c.img} alt="" width={240} height={300} sizes="140px" />
+                    <span>{c.name}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      </dialog>
     </div>
   );
 }
