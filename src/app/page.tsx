@@ -3,6 +3,7 @@ import Image from "next/image";
 import { anton, host, plex } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
 import AboutStory from "@/components/home/AboutStory";
+import ContactBlob from "@/components/home/ContactBlob";
 import SkillFlow, { type FlowCard } from "@/components/home/SkillFlow";
 import { work } from "@/lib/work";
 import "./v4/v4.css";
@@ -10,6 +11,7 @@ import "./work/work.css";
 import "./home-flow.css";
 import "./home-dark.css";
 import "./about-story.css";
+import "./contact-blob.css";
 
 // One card per kind of work, art made for each (scripts/home-cards, black and white). Each card carries what the old
 // work index row carried: the promise, the strongest real proof with its label, and the link to /work/<slug>.
@@ -165,14 +167,8 @@ export default function Home() {
           <div className="v4-in" data-rv>
             <h2>Tell me what you need built or fixed.</h2>
             <p className="v4-lede">15 minutes, and a straight answer. Or send your brief and get a written plan back, free.</p>
-            <div className="v4-ctas">
-              <a className="v4-btn v4-btn-dark" href={BOOK}>
-                Book a 15-min call
-              </a>
-              <a className="v4-btn v4-btn-line" href={BRIEF_MAIL}>
-                Send me your brief
-              </a>
-            </div>
+            {/* No buttons here (JB 2026-11-22): slide from You to me and the four ways to reach me come up. */}
+            <ContactBlob book={BOOK} brief={BRIEF_MAIL} email={`mailto:${EMAIL}`} whatsapp={WHATSAPP} />
           </div>
         </section>
       </main>

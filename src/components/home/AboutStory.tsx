@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 // The About section as a scroll story (JB 2026-11-22, on a "folder of three cards" reference, black and white):
 // three cards sit in a folder; as the section scrolls to the middle of the screen the cards rise and fan out, the
 // folder fades away, and the About text comes up under the cards. All the text is in the page from the start (search
-// engines and screen readers read it all); only how it looks changes. Phones, short screens and visitors who ask for
-// less motion get the finished layout with no pinning.
+// engines and screen readers read it all); only how it looks changes. Phones and short screens play it as the cards
+// scroll by, with no pinning; visitors who ask for less motion get the finished layout.
 
 const BADGES = [
   { img: "/badge-workflow-automation-expert.png", name: "Workflow Automation Expert" },
@@ -20,45 +20,59 @@ const ease = (x: number) => 1 - Math.pow(1 - x, 3);
 
 export default function AboutStory() {
   const track = useRef<HTMLDivElement>(null);
-  const [pinned, setPinned] = useState(false);
+  const [mode, setModeState] = useState<"static" | "pinned" | "flow">("static");
 
   useEffect(() => {
     const el = track.current;
     if (!el) return;
-    const mq = window.matchMedia("(min-width: 861px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)");
+    // Pinned: big screens, the section holds still while the story plays. Flow: phones and short screens, the story plays
+    // as the cards scroll up through the screen, nothing holds. Static: visitors who ask for less motion.
+    const mqPin = window.matchMedia("(min-width: 861px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)");
+    const mqMotion = window.matchMedia("(prefers-reduced-motion: no-preference)");
+    const stage = el.querySelector<HTMLElement>(".ab-stage");
     let raf = 0;
+    const set = (rise: number, fold: number, msg: number) => {
+      el.style.setProperty("--rise", rise.toFixed(4));
+      el.style.setProperty("--fold", fold.toFixed(4));
+      el.style.setProperty("--msg", msg.toFixed(4));
+    };
     const paint = () => {
       raf = 0;
-      if (!mq.matches) return;
-      // the sticky nav is one row on wide screens and two on narrower ones; the pinned stage sits under it
-      const nav = document.querySelector<HTMLElement>(".v4-nav");
-      el.style.setProperty("--navh", (nav ? nav.offsetHeight : 70) + "px");
-      const r = el.getBoundingClientRect();
-      const span = r.height - window.innerHeight;
-      const p = span > 0 ? clamp01(-r.top / span) : 1;
-      // 0 to 0.15: the folder as it is. 0.15 to 0.55: the cards rise and fan out. 0.35 to 0.6: the folder fades.
-      // 0.55 to 0.85: the text comes up under the cards. The rest: hold, so it can be read before the section moves on.
-      el.style.setProperty("--rise", ease(clamp01((p - 0.15) / 0.4)).toFixed(4));
-      el.style.setProperty("--fold", clamp01((p - 0.35) / 0.25).toFixed(4));
-      el.style.setProperty("--msg", ease(clamp01((p - 0.55) / 0.3)).toFixed(4));
+      const vh = window.innerHeight;
+      if (mqPin.matches) {
+        // the sticky nav is one row on wide screens and two on narrower ones; the pinned stage sits under it
+        const nav = document.querySelector<HTMLElement>(".v4-nav");
+        el.style.setProperty("--navh", (nav ? nav.offsetHeight : 70) + "px");
+        const r = el.getBoundingClientRect();
+        const span = r.height - vh;
+        const p = span > 0 ? clamp01(-r.top / span) : 1;
+        // 0 to 0.15: the folder as it is. 0.15 to 0.55: the cards rise and fan out. 0.35 to 0.6: the folder fades.
+        // 0.55 to 0.85: the text comes up under the cards. The rest: hold, so it can be read before the section moves on.
+        set(ease(clamp01((p - 0.15) / 0.4)), clamp01((p - 0.35) / 0.25), ease(clamp01((p - 0.55) / 0.3)));
+      } else if (mqMotion.matches && stage) {
+        // the folder enters at the bottom of the screen; by the time it reaches a third of the way down, it is done
+        const top = stage.getBoundingClientRect().top;
+        const p = clamp01((vh * 0.88 - top) / (vh * 0.5));
+        set(ease(clamp01(p / 0.6)), clamp01((p - 0.3) / 0.4), ease(clamp01((p - 0.5) / 0.5)));
+      }
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(paint);
     };
     const setMode = () => {
-      setPinned(mq.matches);
-      if (!mq.matches) {
-        el.style.setProperty("--rise", "1");
-        el.style.setProperty("--fold", "1");
-        el.style.setProperty("--msg", "1");
-      } else paint();
+      const m = mqPin.matches ? "pinned" : mqMotion.matches ? "flow" : "static";
+      setModeState(m);
+      if (m === "static") set(1, 1, 1);
+      else paint();
     };
     setMode();
-    mq.addEventListener("change", setMode);
+    mqPin.addEventListener("change", setMode);
+    mqMotion.addEventListener("change", setMode);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
-      mq.removeEventListener("change", setMode);
+      mqPin.removeEventListener("change", setMode);
+      mqMotion.removeEventListener("change", setMode);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
@@ -66,7 +80,7 @@ export default function AboutStory() {
   }, []);
 
   return (
-    <div ref={track} className={`ab-track${pinned ? " is-pinned" : ""}`}>
+    <div ref={track} className={`ab-track is-${mode}`}>
       <div className="ab-pin">
         <div className="ab-title">
           <p className="v4-kicker">About</p>

@@ -108,8 +108,6 @@
   box-shadow:
     0 30px 60px -24px rgba(0, 0, 0, 0.9),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   transform: translateY(calc(var(--fold) * 60 * var(--u))) scale(calc(1 - var(--fold) * 0.04));
   padding: calc(30 * var(--u)) calc(30 * var(--u));
   text-align: left;
@@ -317,13 +315,24 @@
   font-size: 15.5px;
 }
 
-/* ---------- not pinned: phones, short screens, less motion ---------- */
+/* ---------- not pinned: phones and short screens (flow), less motion (static) ---------- */
 .ab-track:not(.is-pinned) .ab-pin {
   padding-top: 8px;
 }
-.ab-track:not(.is-pinned) .ab-folder-back,
-.ab-track:not(.is-pinned) .ab-folder-front {
+.ab-track.is-static .ab-folder-back,
+.ab-track.is-static .ab-folder-front {
   display: none;
+}
+/* in flow the cards, folder and text move with the scroll; only transform and opacity change, so it stays smooth */
+.is-flow .ab-card,
+.is-flow .ab-folder-front,
+.is-flow .ab-folder-back,
+.is-flow .ab-msg,
+.is-pinned .ab-card,
+.is-pinned .ab-folder-front,
+.is-pinned .ab-folder-back,
+.is-pinned .ab-msg {
+  will-change: transform, opacity;
 }
 @media (max-width: 700px) {
   .ab-track:not(.is-pinned) .ab-stage {
@@ -331,5 +340,26 @@
   }
   .v4 .ab-title h2 {
     font-size: 52px;
+  }
+  /* the folder is small on a phone: readable type, no footnote */
+  .ab-folder-front {
+    padding: 14px 16px;
+  }
+  .ab-list {
+    max-width: 66%;
+    gap: 6px;
+  }
+  .ab-list div {
+    padding-bottom: 6px;
+    gap: 8px;
+  }
+  .ab-list dt {
+    font-size: 11.5px;
+  }
+  .ab-list dd {
+    font-size: 10.5px;
+  }
+  .ab-note {
+    display: none;
   }
 }
