@@ -30,6 +30,9 @@ export default function AboutStory() {
     const paint = () => {
       raf = 0;
       if (!mq.matches) return;
+      // the sticky nav is one row on wide screens and two on narrower ones; the pinned stage sits under it
+      const nav = document.querySelector<HTMLElement>(".v4-nav");
+      el.style.setProperty("--navh", (nav ? nav.offsetHeight : 70) + "px");
       const r = el.getBoundingClientRect();
       const span = r.height - window.innerHeight;
       const p = span > 0 ? clamp01(-r.top / span) : 1;

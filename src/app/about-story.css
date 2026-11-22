@@ -13,7 +13,7 @@
   --rise: 0;
   --fold: 0;
   --msg: 0;
-  --u: min(1px, calc((100vh - 70px) / 900));
+  --u: min(1px, calc((100vh - var(--navh, 70px)) / 980));
   height: 300vh;
 }
 .ab-pin {
@@ -28,7 +28,7 @@
   top: 0;
   height: 100vh;
   justify-content: center;
-  padding-top: 70px; /* the sticky nav */
+  padding-top: var(--navh, 70px); /* the sticky nav */
   overflow: hidden;
 }
 
