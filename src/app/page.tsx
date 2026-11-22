@@ -3,7 +3,6 @@ import Image from "next/image";
 import { anton, host, plex } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
 import IntroVideo from "@/components/v4/IntroVideo";
-import WorkIndex from "@/components/work/WorkIndex";
 import SkillFlow, { type FlowCard } from "@/components/home/SkillFlow";
 import { work } from "@/lib/work";
 import "./v4/v4.css";
@@ -11,11 +10,21 @@ import "./work/work.css";
 import "./home-flow.css";
 import "./home-dark.css";
 
-// One card per kind of work, art made for each (scripts/home-cards, black and white).
-const flowCards: FlowCard[] = work.map((w) => ({ n: w.n, slug: w.slug, title: w.title, promise: w.promise, art: `/home/cards/${w.slug}.webp` }));
+// One card per kind of work, art made for each (scripts/home-cards, black and white). Each card carries what the old
+// work index row carried: the promise, the strongest real proof with its label, and the link to /work/<slug>.
+const flowCards: FlowCard[] = work.map((w) => ({
+  n: w.n,
+  slug: w.slug,
+  title: w.title,
+  promise: w.promise,
+  art: `/home/cards/${w.slug}.webp`,
+  tag: [w.lead.kind, w.lead.name, w.lead.when].filter(Boolean).join(" · "),
+  line: w.lead.line,
+}));
 
-// Homepage since 2026-11-15 (JB signed off the /v6 preview): the work index sits right under the hero, one row per kind of
-// work, each opening /work/<slug> (spec in PortfolioProjects/work-cards/SPEC.md). Before that, since 2026-11-06: hero,
+// Homepage since 2026-11-22 (JB): the hero is the cover-flow of the kinds of work, each card with its promise, proof and a
+// button to /work/<slug>; the work index section is gone and the intro video comes right after. The whole page is black.
+// From 2026-11-15 to 11-22 the work index sat under the hero, one row per kind of work (PortfolioProjects/work-cards/SPEC.md). Before that, since 2026-11-06: hero,
 // intro video with the live builds as its chapters, who he is, and the call to action. The video is the explainer; everything else that used to be here lives in the video, the demos and the CV.
 // White poster look on JB's reference (xgensgrowth.com), his own words and proof. Short, direct, confident copy.
 //
@@ -90,7 +99,7 @@ export default function Home() {
 
       <main id="top">
         {/* ---------- 1. HERO: what I build, as a cover-flow of cards (JB 2026-11-22), black and white ---------- */}
-        <section className="sf-hero" aria-labelledby="hero-h">
+        <section className="sf-hero" id="work" aria-labelledby="hero-h">
           <div className="sf-head">
             <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
             <h1 id="hero-h">I build what your CRM can&apos;t.</h1>
@@ -103,24 +112,13 @@ export default function Home() {
             <a className="v4-btn v4-btn-dark" href={BOOK}>
               Book a 15-min call
             </a>
-            <a className="v4-btn v4-btn-line" href="#work">
-              See the details
+            <a className="v4-btn v4-btn-line" href="#intro">
+              Watch the intro
             </a>
           </div>
         </section>
 
-        {/* ---------- 2. WHAT I BUILD, IN DETAIL: the work index, one row per kind of work, each with its own page ---------- */}
-        <section className="v4-sec wk-home" id="work">
-          <div className="v4-in">
-            <p className="v4-kicker" data-rv>
-              What I build, in detail
-            </p>
-            <h2 data-rv>Pick the job you need done.</h2>
-            <WorkIndex />
-          </div>
-        </section>
-
-        {/* ---------- 2b. INTRO VIDEO ---------- */}
+        {/* ---------- 2. INTRO VIDEO ---------- */}
         <section className="v4-sec v4-intro" id="intro">
           <div className="v4-in">
             <div className="v4-film" data-rv>

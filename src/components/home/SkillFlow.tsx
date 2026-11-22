@@ -3,21 +3,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// The first section of the homepage (JB 2026-11-22: "umpisa palang highlighted na mga kaya kong gawin, card style na
-// na-sscroll", reference: a cover-flow music player, in black and white). One card per kind of work from src/lib/work.ts;
-// the centre card is the one in focus, the side cards turn away. Click a side card to bring it forward; click the centre
-// card (or Open) to read that work. Arrow keys, swipe and the control bar move it. It advances on its own every few
-// seconds until the visitor touches it, hovers it, or asks for less motion. Without JavaScript the centre card still links
-// to its work, and the full list sits right below in the work index.
+// The first section of the homepage (JB 2026-11-22): the kinds of work as a cover-flow of cards, black and white. Since
+// the same night each card carries what the old work index row carried (the promise, the strongest real proof with its
+// label, and a button to the work page), so the index section is gone. The centre card is in focus; a side card comes
+// forward when clicked. It moves on its own every 5 seconds, stops while the pointer is on a card or a card has focus,
+// and starts again when the pointer leaves. Two arrows under it move it by hand; arrow keys and swipe work too.
 
-export type FlowCard = { n: string; slug: string; title: string; promise: string; art: string };
+export type FlowCard = {
+  n: string;
+  slug: string;
+  title: string;
+  promise: string;
+  art: string;
+  tag: string;
+  line: string;
+};
 
-const AUTO_MS = 4800;
+const AUTO_MS = 5000;
 
 export default function SkillFlow({ cards }: { cards: FlowCard[] }) {
   const [i, setI] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const [hover, setHover] = useState(false);
+  const [hold, setHold] = useState(false);
   const [reduced, setReduced] = useState(false);
   const [announce, setAnnounce] = useState("");
   const drag = useRef<{ x: number; moved: boolean } | null>(null);
@@ -25,45 +31,29 @@ export default function SkillFlow({ cards }: { cards: FlowCard[] }) {
   const wrap = useCallback((k: number) => ((k % n) + n) % n, [n]);
 
   const go = useCallback(
-    (k: number, user = true) => {
+    (k: number) => {
       const next = wrap(k);
       setI(next);
-      if (user) {
-        setPlaying(false);
-        setAnnounce(`${cards[next].n} of 0${n}: ${cards[next].title}`);
-      }
+      setAnnounce(`${cards[next].n} of ${String(n).padStart(2, "0")}: ${cards[next].title}`);
     },
     [wrap, cards, n],
   );
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const set = () => {
-      setReduced(mq.matches);
-      if (mq.matches) setPlaying(false);
-    };
+    const set = () => setReduced(mq.matches);
     set();
     mq.addEventListener("change", set);
     return () => mq.removeEventListener("change", set);
   }, []);
 
+  // Every 5 seconds, unless a card is under the pointer or focused, or the visitor asks for less motion.
   useEffect(() => {
-    if (!playing || hover || reduced) return;
+    if (hold || reduced) return;
     const t = window.setTimeout(() => setI((k) => wrap(k + 1)), AUTO_MS);
     return () => window.clearTimeout(t);
-  }, [i, playing, hover, reduced, wrap]);
+  }, [i, hold, reduced, wrap]);
 
-  const onKey = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowRight") {
-      e.preventDefault();
-      go(i + 1);
-    } else if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      go(i - 1);
-    }
-  };
-
-  // The shortest way round the ring, so card 07 sits to the left of card 01.
   const offsetOf = (k: number) => {
     let d = k - i;
     if (d > n / 2) d -= n;
@@ -71,19 +61,21 @@ export default function SkillFlow({ cards }: { cards: FlowCard[] }) {
     return d;
   };
 
-  const cur = cards[i];
-
   return (
     <div
       className="sf"
       role="region"
       aria-roledescription="carousel"
       aria-label="What I build"
-      onKeyDown={onKey}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onKeyDown={(e) => {
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          go(i + 1);
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          go(i - 1);
+        }
+      }}
     >
       <div
         className="sf-stage"
@@ -95,10 +87,8 @@ export default function SkillFlow({ cards }: { cards: FlowCard[] }) {
         }}
         onPointerUp={(e) => {
           const d = drag.current;
-          drag.current = null;
-          if (!d || !d.moved) return;
-          const dx = e.clientX - d.x;
-          if (Math.abs(dx) > 40) go(dx < 0 ? i + 1 : i - 1);
+          if (d && d.moved && Math.abs(e.clientX - d.x) > 40) go(e.clientX < d.x ? i + 1 : i - 1);
+          window.setTimeout(() => (drag.current = null), 0);
         }}
       >
         <ol className="sf-ring">
@@ -111,94 +101,57 @@ export default function SkillFlow({ cards }: { cards: FlowCard[] }) {
                 key={c.slug}
                 className={`sf-card${focus ? " is-focus" : ""}`}
                 data-off={Math.max(-3, Math.min(3, o))}
-                aria-hidden={abs > 2 ? true : undefined}
+                aria-hidden={focus ? undefined : true}
                 style={{ zIndex: 10 - abs }}
+                onPointerEnter={() => setHold(true)}
+                onPointerLeave={() => setHold(false)}
+                onFocus={() => setHold(true)}
+                onBlur={() => setHold(false)}
+                onClick={() => {
+                  if (!focus && !drag.current?.moved) go(k);
+                }}
               >
-                <Link
-                  href={`/work/${c.slug}`}
-                  className="sf-link"
-                  tabIndex={focus ? 0 : -1}
-                  aria-label={`${c.n} of 0${n}: ${c.title}. ${c.promise}`}
-                  onClick={(e) => {
-                    // A side card (or the end of a swipe) brings that card forward instead of leaving the page.
-                    if (!focus || drag.current?.moved) {
-                      e.preventDefault();
-                      if (!focus) go(k);
-                    }
-                  }}
-                  draggable={false}
-                >
+                <article className="sf-body" aria-label={focus ? `${c.n} of ${String(n).padStart(2, "0")}: ${c.title}` : undefined}>
                   <span className="sf-art">
-                    <Image src={c.art} alt="" width={1200} height={960} sizes="(max-width: 700px) 78vw, 400px" priority={k < 3} draggable={false} />
+                    <Image src={c.art} alt="" width={1200} height={960} sizes="(max-width: 700px) 78vw, 380px" priority={k < 3 || k === n - 1} draggable={false} />
                   </span>
-                  <span className="sf-meta">
-                    <span className="sf-n">{c.n}</span>
-                    <span className="sf-title">{c.title}</span>
-                    <span className="sf-promise">{c.promise}</span>
-                  </span>
-                </Link>
+                  <div className="sf-meta">
+                    <h3 className="sf-title">{c.title}</h3>
+                    <p className="sf-promise">{c.promise}</p>
+                    <div className="sf-proof">
+                      <p className="sf-tag">{c.tag}</p>
+                      <p className="sf-line">{c.line}</p>
+                    </div>
+                    <Link
+                      href={`/work/${c.slug}`}
+                      className="sf-cta"
+                      tabIndex={focus ? 0 : -1}
+                      onClick={(e) => {
+                        if (!focus || drag.current?.moved) e.preventDefault();
+                      }}
+                      draggable={false}
+                    >
+                      See the work <span aria-hidden="true">→</span>
+                    </Link>
+                  </div>
+                </article>
               </li>
             );
           })}
         </ol>
       </div>
 
-      <div className="sf-bar">
-        <div className="sf-ctrl">
-          <button type="button" className="sf-btn" onClick={() => go(i - 1)} aria-label="Previous">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 6 5 12l6 6M19 6l-6 6 6 6" /></svg>
-          </button>
-          <button
-            type="button"
-            className="sf-btn"
-            onClick={() => setPlaying((p) => !p)}
-            aria-label={playing && !reduced ? "Pause the slides" : "Play the slides"}
-            aria-pressed={!(playing && !reduced)}
-            disabled={reduced}
-          >
-            {playing && !reduced ? (
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" /></svg>
-            ) : (
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7z" /></svg>
-            )}
-          </button>
-          <button type="button" className="sf-btn" onClick={() => go(i + 1)} aria-label="Next">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 6l6 6-6 6M5 6l6 6-6 6" /></svg>
-          </button>
-        </div>
-
-        <Link href={`/work/${cur.slug}`} className="sf-now">
-          <span className="sf-now-thumb">
-            <Image src={cur.art} alt="" width={120} height={96} sizes="56px" />
-          </span>
-          <span className="sf-now-text">
-            <b>{cur.title}</b>
-            <span>Open the work and the demos</span>
-          </span>
-          <span className="sf-now-go" aria-hidden="true">
-            →
-          </span>
-          <span className="sf-progress" aria-hidden="true">
-            <span key={`${i}-${playing && !hover && !reduced}`} className={playing && !hover && !reduced ? "is-run" : ""} style={{ animationDuration: `${AUTO_MS}ms` }} />
-          </span>
-        </Link>
-
-        <div className="sf-dots" role="tablist" aria-label="Choose a card">
-          {cards.map((c, k) => (
-            <button
-              key={c.slug}
-              type="button"
-              role="tab"
-              aria-selected={k === i}
-              aria-label={`${c.n}: ${c.title}`}
-              className={k === i ? "is-on" : ""}
-              onClick={() => go(k)}
-            />
-          ))}
-          <span className="sf-count">
-            {cur.n} / 0{n}
-          </span>
-        </div>
+      <div className="sf-arrows">
+        <button type="button" className="sf-arrow" onClick={() => go(i - 1)} aria-label="Previous card">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+        </button>
+        <button type="button" className="sf-arrow" onClick={() => go(i + 1)} aria-label="Next card">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
 
       <p className="sf-sr" aria-live="polite">
