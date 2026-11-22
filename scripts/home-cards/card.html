@@ -1,0 +1,473 @@
+<!doctype html>
+<!--
+  Homepage cover-flow card art, johnboydesign.com.
+  One file, seven cards: open card.html?card=<slug>. 1200 x 960, black and white only.
+  Rendered by render.mjs (headless Chrome, then greyscale PNG + WebP into public/home/cards).
+  Family rules: same background light, same index + rule header, same 2px hero / 1.5px secondary lines,
+  Anton (display), IBM Plex Mono (labels), Host Grotesk (body). No em or en dashes anywhere.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Host+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #0b0b0b; }
+  body { width: 1200px; height: 960px; overflow: hidden; -webkit-font-smoothing: antialiased; }
+  svg { display: block; text-rendering: geometricPrecision; }
+  /* Warm the fonts so document.fonts.ready waits for every face the SVG uses. */
+  .warm { position: absolute; left: -9999px; top: 0; }
+</style>
+</head>
+<body>
+<div class="warm">
+  <span style="font-family:Anton">A</span>
+  <span style="font-family:'IBM Plex Mono';font-weight:400">A</span>
+  <span style="font-family:'IBM Plex Mono';font-weight:500">A</span>
+  <span style="font-family:'Host Grotesk';font-weight:400">A</span>
+  <span style="font-family:'Host Grotesk';font-weight:500">A</span>
+  <span style="font-family:'Host Grotesk';font-weight:600">A</span>
+</div>
+<div id="root"></div>
+<script>
+const W = 1200, H = 960;
+const K = {
+  white: '#f2f2f2', ink: '#0b0b0b', hi: '#e6e6e6', soft: '#bdbdbd', mid: '#8c8c8c',
+  low: '#5e5e5e', dim: '#3c3c3c', faint: '#262626', panel: '#131313', panel2: '#181818'
+};
+const FAM = { mono: "'IBM Plex Mono', monospace", display: "'Anton', sans-serif", body: "'Host Grotesk', sans-serif" };
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function t(x, y, s, o = {}) {
+  const { size = 20, font = 'mono', fill = K.mid, weight = 400, anchor = 'start', ls = 0, op = 1, cls = '' } = o;
+  return `<text x="${x}" y="${y}" font-family="${FAM[font]}" font-size="${size}" font-weight="${weight}" fill="${fill}" text-anchor="${anchor}" letter-spacing="${ls}" opacity="${op}"${cls ? ` class="${cls}"` : ''}>${esc(s)}</text>`;
+}
+// Rounded rect path, radii [tl, tr, br, bl].
+function rr(x, y, w, h, r) {
+  const [a, b, c, d] = Array.isArray(r) ? r : [r, r, r, r];
+  return `M${x + a},${y} H${x + w - b} A${b},${b} 0 0 1 ${x + w},${y + b} V${y + h - c} A${c},${c} 0 0 1 ${x + w - c},${y + h} H${x + d} A${d},${d} 0 0 1 ${x},${y + h - d} V${y + a} A${a},${a} 0 0 1 ${x + a},${y} Z`;
+}
+const path = (d, o = {}) => `<path d="${d}" fill="${o.fill || 'none'}" stroke="${o.stroke || 'none'}" stroke-width="${o.sw || 0}"${o.dash ? ` stroke-dasharray="${o.dash}"` : ''}${o.op != null ? ` opacity="${o.op}"` : ''} stroke-linecap="round" stroke-linejoin="round"/>`;
+const rect = (x, y, w, h, o = {}) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${o.r || 0}" fill="${o.fill || 'none'}" stroke="${o.stroke || 'none'}" stroke-width="${o.sw || 0}"${o.dash ? ` stroke-dasharray="${o.dash}"` : ''}${o.op != null ? ` opacity="${o.op}"` : ''}/>`;
+const circ = (cx, cy, r, o = {}) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${o.fill || 'none'}" stroke="${o.stroke || 'none'}" stroke-width="${o.sw || 0}"${o.op != null ? ` opacity="${o.op}"` : ''}/>`;
+const line = (x1, y1, x2, y2, o = {}) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${o.stroke || K.dim}" stroke-width="${o.sw || 1}"${o.dash ? ` stroke-dasharray="${o.dash}"` : ''} stroke-linecap="round"/>`;
+// A drawn check mark inside a box or circle centred on (cx, cy).
+const check = (cx, cy, s, stroke, sw = 2) => path(`M${cx - s * 0.45},${cy + s * 0.02} L${cx - s * 0.12},${cy + s * 0.32} L${cx + s * 0.48},${cy - s * 0.34}`, { stroke, sw });
+// Chat bubble: rounded with one tight corner ("tail") on the speaker's side.
+function bubble(x, y, w, h, side, o) {
+  const R = Math.min(h / 2, o.r || 28), tight = 6;
+  const r = side === 'left' ? [R, R, R, tight] : [R, R, tight, R];
+  return path(rr(x, y, w, h, r), o);
+}
+
+/* ---------- shared frame: background light, index, rule, label, caption, grain ---------- */
+function frame(n, label, caption, body, defs = '') {
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#171717"/><stop offset="1" stop-color="#0c0c0c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.02" r="0.78" gradientTransform="translate(0.5 0.02) scale(1 0.9) translate(-0.5 -0.02)">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.13"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.035"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vig" cx="0.5" cy="0.45" r="0.75">
+      <stop offset="0.6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/>
+    </radialGradient>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.33 0.33 0.33 0 -0.36"/>
+    </filter>
+    ${defs}
+  </defs>
+  <rect width="${W}" height="${H}" fill="url(#bg)"/>
+  <rect width="${W}" height="${H}" fill="url(#glow)"/>
+  ${t(72, 157, n, { size: 92, font: 'display', fill: K.white, ls: 1 })}
+  ${line(190, 154, 1128, 154, { stroke: '#2e2e2e', sw: 1 })}
+  ${t(1128, 136, label, { size: 15, weight: 500, fill: K.mid, anchor: 'end', ls: 3.5 })}
+  ${body}
+  ${t(72, 900, caption, { size: 15, fill: K.low, ls: 1.2 })}
+  ${line(1112, 894, 1128, 894, { stroke: K.low, sw: 1.5 })}${line(1120, 886, 1120, 902, { stroke: K.low, sw: 1.5 })}
+  <rect width="${W}" height="${H}" fill="url(#vig)"/>
+  <rect width="${W}" height="${H}" filter="url(#grain)" opacity="0.22"/>
+</svg>`;
+}
+
+/* ---------- 01 lead follow-up: the thread ends in a booked slot ---------- */
+function leadFollowUp() {
+  let s = '';
+  // timeline spine
+  s += line(140, 264, 140, 700, { stroke: K.dim, sw: 1.5 });
+  const ev = [
+    { y: 220, w: 330, title: 'New enquiry', meta: 'Form  ·  9:02 AM', st: 'in' },
+    { y: 330, w: 372, title: 'Reply sent', meta: '9:02 AM  ·  link to book', st: 'out' },
+    { y: 440, w: 300, title: 'Follow-up 1', meta: 'Day 2  ·  10:00 AM', st: 'ghost' },
+    { y: 550, w: 300, title: 'Follow-up 2', meta: 'Day 4  ·  10:00 AM', st: 'ghost' },
+  ];
+  const sty = {
+    in: { stroke: K.mid, sw: 1.5, fill: K.panel, title: K.hi },
+    out: { stroke: K.white, sw: 2, fill: '#1c1c1c', title: K.white },
+    ghost: { stroke: K.low, sw: 1.5, fill: K.panel, title: K.soft },
+  };
+  for (const e of ev) {
+    const c = sty[e.st];
+    s += bubble(170, e.y, e.w, 88, 'left', { stroke: c.stroke, sw: c.sw, fill: c.fill });
+    s += t(200, e.y + 42, e.title, { size: 30, font: 'body', weight: 500, fill: c.title });
+    s += t(200, e.y + 68, e.meta, { size: 15, fill: K.mid, ls: 0.5 });
+    s += circ(140, e.y + 44, 6, { fill: e.st === 'ghost' ? K.panel : K.white, stroke: K.white, sw: 1.5 });
+  }
+  s += circ(140, 700, 6, { fill: K.panel, stroke: K.low, sw: 1.5 });
+  s += t(170, 706, 'until they book', { size: 15, fill: K.low, ls: 0.5 });
+
+  // calendar panel
+  const cx = 600, cy = 210, cw = 528, ch = 590;
+  s += path(rr(cx, cy, cw, ch, 16), { fill: K.panel, stroke: K.dim, sw: 1.5 });
+  s += t(cx + 28, cy + 46, 'THIS WEEK', { size: 14, weight: 500, fill: K.mid, ls: 3 });
+  s += t(cx + cw - 28, cy + 46, 'BOOKING LINK', { size: 14, weight: 500, fill: K.low, ls: 3, anchor: 'end' });
+  const days = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
+  const gx = cx + 28, gw = (cw - 56) / 5, gy = 330, gh = 88, rows = 5;
+  days.forEach((d, i) => s += t(gx + gw * i + gw / 2, cy + 100, d, { size: 15, weight: 500, fill: i === 1 ? K.white : K.low, anchor: 'middle', ls: 2 }));
+  s += line(gx + gw * 1 + 22, cy + 112, gx + gw * 2 - 22, cy + 112, { stroke: K.white, sw: 2 });
+  // grid
+  for (let r = 0; r <= rows; r++) s += line(gx, gy + gh * r, gx + gw * 5, gy + gh * r, { stroke: K.faint, sw: 1 });
+  for (let c = 0; c <= 5; c++) s += line(gx + gw * c, gy, gx + gw * c, gy + gh * rows, { stroke: K.faint, sw: 1 });
+  // taken slots: quiet hatch
+  const taken = [[0, 0], [2, 1], [3, 3], [4, 0], [0, 3], [2, 4], [4, 2]];
+  for (const [c, r] of taken) s += rect(gx + gw * c + 6, gy + gh * r + 6, gw - 12, gh - 12, { r: 6, fill: 'url(#hatch)' });
+  // the booked slot, lifted out of the grid
+  const bx = gx + gw * 1 - 16, by = gy + gh * 1 - 18, bw = 312, bh = 150;
+  s += path(rr(bx + 10, by + 14, bw, bh, 12), { fill: '#000', op: 0.55 });
+  s += path(rr(bx, by, bw, bh, 12), { fill: K.white });
+  s += t(bx + 26, by + 44, 'BOOKED', { size: 15, weight: 500, fill: '#3a3a3a', ls: 3.5 });
+  s += check(bx + bw - 38, by + 38, 22, K.ink, 2.5);
+  s += t(bx + 24, by + 118, 'TUE 10:00 AM', { size: 52, font: 'display', fill: K.ink, ls: 0.5 });
+  // connector from the last follow-up into the slot
+  s += path(`M470,594 C560,594 600,${by + bh / 2} ${bx - 4},${by + bh / 2}`, { stroke: K.white, sw: 2 });
+  s += circ(470, 594, 4, { fill: K.white });
+  const defs = `<pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="#2c2c2c" stroke-width="1.5"/></pattern>`;
+  return frame('01', 'FOLLOW-UP', 'enquiry  >  reply  >  follow-up  >  booked', s, defs);
+}
+
+/* ---------- 02 ai agents: the answer is being written ---------- */
+function aiAgents() {
+  let s = '';
+  s += bubble(120, 214, 540, 96, 'left', { stroke: K.mid, sw: 1.5, fill: K.panel });
+  s += t(152, 273, 'Do you do Saturday jobs?', { size: 32, font: 'body', weight: 500, fill: K.hi });
+  s += t(122, 344, 'CUSTOMER  ·  7:41 PM', { size: 14, weight: 500, fill: K.low, ls: 2.5 });
+
+  // hero: the typing bubble
+  const hx = 420, hy = 384, hw = 660, hh = 240;
+  s += t(hx + hw, hy - 22, 'AI AGENT  ·  TYPING', { size: 14, weight: 500, fill: K.mid, ls: 2.5, anchor: 'end' });
+  s += path(rr(hx + 12, hy + 16, hw, hh, [120, 120, 14, 120]), { fill: '#000', op: 0.5 });
+  s += path(rr(hx, hy, hw, hh, [120, 120, 14, 120]), { fill: K.white });
+  const dc = hx + hw / 2, dy = hy + hh / 2;
+  [[-128, 1], [0, 0.5], [128, 0.2]].forEach(([dx, op]) => s += circ(dc + dx, dy, 38, { fill: K.ink, op }));
+
+  // grounding: the reply is read from the business's own sources
+  const chips = [['prices', 560], ['rules', 750], ['hours', 940]];
+  for (const [name, x] of chips) {
+    s += line(x, hy + hh, x, 704, { stroke: K.low, sw: 1.5 });
+    s += circ(x, hy + hh, 4, { fill: K.white });
+    s += path(rr(x - 82, 704, 164, 54, 27), { fill: K.panel, stroke: K.soft, sw: 1.5 });
+    s += t(x, 738, name, { size: 19, weight: 500, fill: K.hi, anchor: 'middle', ls: 0.5 });
+  }
+  s += t(122, 738, 'READS FROM', { size: 14, weight: 500, fill: K.low, ls: 2.5 });
+  s += line(270, 731, 470, 731, { stroke: K.dim, sw: 1.5, dash: '2 7' });
+
+  // hand-off
+  s += path(rr(560 - 82, 800, 544, 54, 27), { fill: 'none', stroke: K.low, sw: 1.5, dash: '6 7' });
+  s += t(750, 834, 'anything else  >  passed to a person', { size: 17, fill: K.mid, anchor: 'middle', ls: 0.3 });
+  return frame('02', 'AI AGENT', 'answers  ·  books simple jobs  ·  hands off the rest', s);
+}
+
+/* ---------- 03 funnels: pages narrow into one enquiry ---------- */
+function funnels() {
+  let s = '';
+  // funnel edges, behind everything
+  s += line(160, 376, 420, 838, { stroke: '#3e3e3e', sw: 1.5 });
+  s += line(1040, 376, 780, 838, { stroke: '#3e3e3e', sw: 1.5 });
+
+  // page A: landing page
+  const ax = 160, ay = 196, aw = 880, ah = 180;
+  s += path(rr(ax, ay, aw, ah, 12), { fill: K.panel, stroke: K.low, sw: 1.5 });
+  s += line(ax, ay + 36, ax + aw, ay + 36, { stroke: K.dim, sw: 1 });
+  [0, 1, 2].forEach((i) => s += circ(ax + 24 + i * 18, ay + 18, 4.5, { stroke: K.low, sw: 1.5 }));
+  s += path(rr(ax + 200, ay + 10, 300, 16, 8), { stroke: K.dim, sw: 1 });
+  s += rect(ax + 44, ay + 66, 420, 24, { r: 3, fill: '#d6d6d6' });
+  s += rect(ax + 44, ay + 102, 300, 24, { r: 3, fill: '#d6d6d6' });
+  s += rect(ax + 44, ay + 142, 150, 12, { r: 3, fill: K.dim });
+  s += rect(ax + 560, ay + 60, 280, 98, { r: 8, fill: 'url(#hatchF)', stroke: K.dim, sw: 1 });
+
+  // page B: the form
+  const bx = 290, by = 404, bw = 620, bh = 286;
+  s += path(rr(bx + 10, by + 14, bw, bh, 12), { fill: '#000', op: 0.45 });
+  s += path(rr(bx, by, bw, bh, 12), { fill: K.panel2, stroke: K.soft, sw: 1.5 });
+  s += t(bx + 40, by + 44, 'NAME', { size: 13, weight: 500, fill: K.mid, ls: 3 });
+  s += path(rr(bx + 40, by + 56, bw - 80, 46, 8), { stroke: K.low, sw: 1.5 });
+  s += line(bx + 58, by + 68, bx + 58, by + 90, { stroke: K.white, sw: 2 });
+  s += t(bx + 40, by + 130, 'EMAIL', { size: 13, weight: 500, fill: K.mid, ls: 3 });
+  s += path(rr(bx + 40, by + 142, bw - 80, 46, 8), { stroke: K.low, sw: 1.5 });
+  s += path(rr(bx + 40, by + 212, bw - 80, 52, 8), { fill: K.white });
+  s += t(bx + bw / 2, by + 246, 'Send enquiry', { size: 22, font: 'body', weight: 600, fill: K.ink, anchor: 'middle' });
+  // cursor
+  const px = bx + bw - 120, py = by + 236;
+  s += path(`M${px},${py} L${px},${py + 34} L${px + 9},${py + 26} L${px + 16},${py + 41} L${px + 22},${py + 38} L${px + 15},${py + 24} L${px + 26},${py + 24} Z`, { fill: K.ink, stroke: K.white, sw: 1.5 });
+
+  // page C: the enquiry
+  const cx = 420, cy = 718, cw = 360, ch = 120;
+  s += line(600, by + bh, 600, cy, { stroke: K.white, sw: 2 });
+  s += path(rr(cx, cy, cw, ch, 12), { fill: K.white });
+  s += t(cx + 30, cy + 52, 'Enquiry received', { size: 30, font: 'body', weight: 600, fill: K.ink });
+  s += t(cx + 30, cy + 86, 'follow-up starts now', { size: 16, weight: 500, fill: '#444', ls: 0.3 });
+  s += check(cx + cw - 40, cy + 42, 20, K.ink, 2.5);
+  const defs = `<pattern id="hatchF" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="12" stroke="#2c2c2c" stroke-width="1.5"/></pattern>`;
+  return frame('03', 'FUNNEL', 'visit  >  form  >  enquiry  >  follow-up', s, defs);
+}
+
+/* ---------- 04 integrations: a change travels to the CRM ---------- */
+function integrations() {
+  let s = '';
+  const ny = 560;
+  // payload card
+  const jx = 400, jy = 196, jw = 400, jh = 222;
+  s += path(rr(jx, jy, jw, jh, 12), { fill: K.panel, stroke: K.soft, sw: 1.5 });
+  s += t(jx + 28, jy + 40, 'POST  /hooks/contact', { size: 14, weight: 500, fill: K.low, ls: 1.5 });
+  s += line(jx, jy + 58, jx + jw, jy + 58, { stroke: K.dim, sw: 1 });
+  const J = [['{', 0, K.mid], ['"event": "contact.updated",', 1, K.hi], ['"tag": "new-enquiry",', 1, K.hi], ['"source": "form"', 1, K.hi], ['}', 0, K.mid]];
+  J.forEach(([txt, ind, fill], i) => s += t(jx + 28 + ind * 24, jy + 92 + i * 26, txt, { size: 18, fill }));
+  s += line(600, jy + jh, 600, ny - 46, { stroke: K.low, sw: 1.5, dash: '2 6' });
+
+  // source node
+  s += circ(220, ny, 90, { fill: K.panel, stroke: K.soft, sw: 2 });
+  s += t(220, ny + 9, 'Source', { size: 28, font: 'body', weight: 500, fill: K.hi, anchor: 'middle' });
+  s += t(220, ny + 128, 'form.submitted', { size: 15, fill: K.mid, anchor: 'middle' });
+  // router
+  s += path(rr(554, ny - 46, 92, 92, 16), { fill: K.panel2, stroke: K.white, sw: 2 });
+  [-16, 0, 16].forEach((dy, i) => { s += line(574, ny + dy, 600 + (i === 1 ? 12 : 0), ny + dy, { stroke: K.white, sw: 2 }); s += circ(616 + (i === 1 ? 6 : 0), ny + dy, 4, { fill: K.white }); });
+  // CRM node
+  s += circ(990 + 10, ny + 14, 112, { fill: '#000', op: 0.5 });
+  s += circ(990, ny, 112, { fill: K.white });
+  s += t(990, ny + 24, 'CRM', { size: 66, font: 'display', fill: K.ink, anchor: 'middle', ls: 1 });
+  // wires + packets
+  s += line(310, ny, 554, ny, { stroke: K.white, sw: 2 });
+  s += line(646, ny, 878, ny, { stroke: K.white, sw: 2 });
+  s += rect(424, ny - 6, 12, 12, { fill: K.white });
+  s += rect(744, ny - 6, 12, 12, { fill: K.white });
+  s += t(762, ny - 24, 'webhook.received', { size: 15, fill: K.mid, anchor: 'middle' });
+  s += path(rr(708, ny + 20, 108, 36, 18), { stroke: K.white, sw: 1.5, fill: K.panel });
+  s += t(762, ny + 44, '200 OK', { size: 16, weight: 500, fill: K.white, anchor: 'middle', ls: 1 });
+
+  // failure branch into the retry log
+  s += line(600, ny + 46, 600, 706, { stroke: K.low, sw: 1.5, dash: '6 6' });
+  s += t(614, 668, 'if it fails', { size: 14, fill: K.low });
+  const lx = 400, ly = 706, lw = 400, lh = 144;
+  s += path(rr(lx, ly, lw, lh, 12), { fill: K.panel, stroke: K.dim, sw: 1.5 });
+  s += t(lx + 28, ly + 38, 'RETRY LOG', { size: 13, weight: 500, fill: K.mid, ls: 3 });
+  s += line(lx, ly + 54, lx + lw, ly + 54, { stroke: K.faint, sw: 1 });
+  s += rect(lx + 28, ly + 76, 12, 12, { stroke: K.soft, sw: 1.5 });
+  s += t(lx + 54, ly + 87, 'update.failed', { size: 16, fill: K.hi });
+  s += t(lx + lw - 28, ly + 87, 'waiting', { size: 16, fill: K.mid, anchor: 'end' });
+  s += rect(lx + 28, ly + 110, 12, 12, { fill: K.white });
+  s += t(lx + 54, ly + 121, 'retry.sent  2:15 PM', { size: 16, fill: K.hi });
+  s += t(lx + lw - 28, ly + 121, '200 OK', { size: 16, fill: K.mid, anchor: 'end' });
+  return frame('04', 'INTEGRATION', 'a change in one tool  >  webhook  >  CRM', s);
+}
+
+/* ---------- 05 fixes and audits: the lens on what was broken ---------- */
+function fixesAudits() {
+  const rows = [
+    ['Form not tagging leads', true],
+    ['Workflow fires twice', true],
+    ['Calendar not linked', true],
+    ['Reminder at wrong time', true],
+    ['Unused tags', false],
+    ['No opt-out line in SMS', false],
+    ['Stage skipped in pipeline', false],
+    ['Sending domain unverified', false],
+  ];
+  let list = `<g id="list">`;
+  list += path(rr(120, 206, 560, 640, 14), { fill: K.panel, stroke: K.dim, sw: 1.5 });
+  list += t(150, 250, 'ACCOUNT AUDIT', { size: 14, weight: 500, fill: K.mid, ls: 3 });
+  list += t(650, 250, 'p.1', { size: 14, fill: K.low, anchor: 'end' });
+  list += line(120, 272, 680, 272, { stroke: K.faint, sw: 1 });
+  rows.forEach(([txt, done], i) => {
+    const y = 330 + i * 64;
+    if (done) {
+      list += rect(150, y - 19, 22, 22, { r: 4, fill: K.white });
+      list += check(161, y - 8, 14, K.ink, 2.2);
+    } else list += rect(150, y - 19, 22, 22, { r: 4, stroke: K.low, sw: 1.5 });
+    list += t(192, y, txt, { size: 23, font: 'body', weight: 500, fill: done ? K.mid : K.hi, cls: done ? 'strike' : '' });
+    list += line(150, y + 22, 650, y + 22, { stroke: '#1e1e1e', sw: 1 });
+  });
+  list += `</g>`;
+
+  let s = list;
+  // the lens: magnifies row 3 ("Calendar not linked")
+  const L = { x: 650, y: 476, r: 222 }, S = { x: 276, y: 450 }, z = 1.6;
+  s += circ(L.x + 12, L.y + 16, L.r, { fill: '#000', op: 0.5 });
+  s += circ(L.x, L.y, L.r, { fill: '#171717' });
+  // inside the glass: only the row under inspection, enlarged, with faint ruled lines above and below
+  let mag = '';
+  [-1, 0, 1, 2].forEach((k) => mag += line(130, 330 + 2 * 64 + 22 + (k - 1) * 64, 670, 330 + 2 * 64 + 22 + (k - 1) * 64, { stroke: '#262626', sw: 1 }));
+  const ry = 330 + 2 * 64;
+  mag += rect(150, ry - 19, 22, 22, { r: 4, fill: K.white });
+  mag += check(161, ry - 8, 14, K.ink, 2.2);
+  mag += t(192, ry, rows[2][0], { size: 23, font: 'body', weight: 500, fill: K.hi, cls: 'strike' });
+  s += `<g clip-path="url(#lensClip)"><g transform="translate(${L.x} ${L.y}) scale(${z}) translate(${-S.x} ${-S.y})">${mag}</g></g>`;
+  s += circ(L.x, L.y, L.r, { stroke: K.white, sw: 2 });
+  s += circ(L.x, L.y, L.r - 14, { stroke: '#ffffff', sw: 1, op: 0.18 });
+  const a = Math.PI / 4, hx = L.x + L.r * Math.cos(a), hy = L.y + L.r * Math.sin(a);
+  s += `<g transform="translate(${hx} ${hy}) rotate(45)">${path(rr(6, -15, 196, 30, 15), { fill: K.panel2, stroke: K.white, sw: 2 })}</g>`;
+  s += path(rr(L.x - 62, L.y + L.r - 20, 124, 40, 20), { fill: K.white });
+  s += t(L.x + 2, L.y + L.r + 6, 'FIXED', { size: 15, weight: 500, fill: K.ink, anchor: 'middle', ls: 4 });
+
+  // the written list of changes
+  const cx = 900, cy = 206, cw = 228, ch = 250;
+  s += path(rr(cx, cy, cw, ch, 12), { fill: K.panel, stroke: K.soft, sw: 1.5 });
+  s += t(cx + 22, cy + 40, 'CHANGES', { size: 13, weight: 500, fill: K.mid, ls: 3 });
+  s += line(cx, cy + 56, cx + cw, cy + 56, { stroke: K.faint, sw: 1 });
+  ['form tag added', 'duplicate off', 'calendar linked', 'reminder moved'].forEach((c, i) => {
+    s += t(cx + 22, cy + 96 + i * 40, String(i + 1).padStart(2, '0'), { size: 14, fill: K.low });
+    s += t(cx + 54, cy + 96 + i * 40, c, { size: 14, fill: K.hi });
+  });
+  const defs = `<clipPath id="lensClip"><circle cx="${L.x}" cy="${L.y}" r="${L.r - 1}"/></clipPath>`;
+  return frame('05', 'AUDIT', 'find  ·  fix  ·  write down every change', s, defs);
+}
+
+/* ---------- 06 agency snapshots: one master, every client starts ready ---------- */
+function snapshots() {
+  let s = '';
+  const items = ['Pipelines', 'Workflows', 'Calendars', 'Forms', 'Templates', 'Custom fields'];
+  // master
+  const mx = 120, my = 222, mw = 400, mh = 580;
+  s += path(rr(mx + 12, my + 16, mw, mh, 16), { fill: '#000', op: 0.5 });
+  s += path(rr(mx, my, mw, mh, 16), { fill: K.white });
+  s += t(mx + 32, my + 50, 'MASTER', { size: 14, weight: 500, fill: '#555', ls: 3.5 });
+  s += t(mx + 32, my + 124, 'SNAPSHOT', { size: 64, font: 'display', fill: K.ink, ls: 1 });
+  s += line(mx + 32, my + 150, mx + mw - 32, my + 150, { stroke: '#bcbcbc', sw: 1 });
+  items.forEach((it, i) => {
+    const y = my + 206 + i * 60;
+    s += circ(mx + 46, y - 7, 12, { fill: K.ink });
+    s += check(mx + 46, y - 7, 11, K.white, 2);
+    s += t(mx + 72, y, it, { size: 23, font: 'body', weight: 500, fill: K.ink });
+    s += rect(mx + mw - 112, y - 12, 80, 8, { r: 4, fill: '#cfcfcf' });
+  });
+  // copy arrow
+  s += line(mx + mw + 14, 512, 574, 512, { stroke: K.white, sw: 2 });
+  s += path(`M566,504 L576,512 L566,520`, { stroke: K.white, sw: 2 });
+  s += t(mx + mw + 38, 494, 'copy', { size: 14, fill: K.mid, anchor: 'middle' });
+  // copies: same skeleton, each new client
+  const cw = 260, ch = 470, cy = 277;
+  const xs = [590, 680, 770, 860];
+  xs.forEach((x, k) => {
+    const front = k === xs.length - 1;
+    s += path(rr(x, cy, cw, ch, 14), { fill: front ? '#1a1a1a' : K.panel, stroke: front ? K.white : ['#5a5a5a', '#727272', '#909090'][k], sw: front ? 2 : 1.5 });
+    s += t(x + 22, cy + 42, String(k + 1).padStart(2, '0'), { size: 15, weight: 500, fill: front ? K.white : K.mid, ls: 1 });
+    items.forEach((it, i) => {
+      const y = cy + 104 + i * 50;
+      s += circ(x + 32, y - 6, 9, { stroke: front ? K.soft : K.low, sw: 1.5 });
+      if (front) {
+        s += check(x + 32, y - 6, 9, K.soft, 1.5);
+        s += t(x + 54, y, it, { size: 17, font: 'body', weight: 500, fill: K.hi });
+      }
+    });
+  });
+  const fx = xs[xs.length - 1];
+  s += t(fx + cw - 22, cy + 42, 'NEW CLIENT', { size: 13, weight: 500, fill: K.mid, anchor: 'end', ls: 2.5 });
+  s += path(rr(fx + 22, cy + ch - 66, cw - 44, 40, 20), { fill: K.white });
+  s += t(fx + cw / 2, cy + ch - 40, 'ready on day one', { size: 15, weight: 500, fill: K.ink, anchor: 'middle', ls: 0.3 });
+  return frame('06', 'SNAPSHOT', 'build once  ·  save  ·  every client starts ready', s);
+}
+
+/* ---------- 07 custom apps: a real app, synced back to the CRM ---------- */
+function customApps() {
+  let s = '';
+  const fx = 120, fy = 206, fw = 960, fh = 644;
+  s += path(rr(fx + 12, fy + 16, fw, fh, 16), { fill: '#000', op: 0.45 });
+  s += path(rr(fx, fy, fw, fh, 16), { fill: K.panel, stroke: K.soft, sw: 1.5 });
+  s += t(fx + 30, fy + 36, 'app / dashboard', { size: 15, fill: K.mid });
+  s += t(fx + fw - 30, fy + 36, 'synced to CRM', { size: 15, fill: K.hi, anchor: 'end' });
+  s += circ(fx + fw - 170, fy + 31, 5, { fill: K.white });
+  s += line(fx, fy + 58, fx + fw, fy + 58, { stroke: K.dim, sw: 1 });
+  // sidebar
+  s += line(fx + 170, fy + 58, fx + 170, fy + fh, { stroke: K.faint, sw: 1 });
+  [0, 1, 2, 3, 4].forEach((i) => {
+    const y = fy + 104 + i * 50, on = i === 0;
+    s += rect(fx + 28, y - 9, 18, 18, { r: 4, fill: on ? K.white : 'none', stroke: on ? 'none' : K.low, sw: 1.5 });
+    s += rect(fx + 60, y - 4, on ? 82 : [0, 70, 60, 76, 52][i], 8, { r: 4, fill: on ? K.white : K.dim });
+  });
+  // tiles (labels, no numbers)
+  const tx = fx + 200, tw = 230, tg = 20;
+  ['BOOKINGS', 'PAYMENTS', 'MEMBERS'].forEach((lab, i) => {
+    const x = tx + i * (tw + tg), y = fy + 84;
+    s += path(rr(x, y, tw, 110, 10), { stroke: K.dim, sw: 1.5, fill: K.panel2 });
+    s += t(x + 20, y + 32, lab, { size: 13, weight: 500, fill: K.mid, ls: 2.5 });
+    s += rect(x + 20, y + 54, [118, 92, 136][i], 22, { r: 4, fill: '#d6d6d6' });
+    const sp = [[[0, 18], [20, 12], [40, 15], [60, 6], [80, 9], [100, 2]], [[0, 10], [20, 14], [40, 6], [60, 9], [80, 4], [100, 8]], [[0, 16], [20, 16], [40, 10], [60, 11], [80, 5], [100, 3]]][i];
+    s += path('M' + sp.map(([a, b]) => `${x + 20 + a},${y + 84 + b}`).join(' L'), { stroke: K.low, sw: 1.5 });
+  });
+  // chart tile
+  const cx = tx, cy = fy + 214, cw = 480, ch = 400;
+  s += path(rr(cx, cy, cw, ch, 10), { fill: K.white });
+  s += t(cx + 24, cy + 38, 'THIS WEEK', { size: 13, weight: 500, fill: '#555', ls: 2.5 });
+  const px0 = cx + 30, px1 = cx + cw - 30, py0 = cy + 80, py1 = cy + ch - 60;
+  for (let i = 0; i <= 3; i++) s += line(px0, py0 + (py1 - py0) * i / 3, px1, py0 + (py1 - py0) * i / 3, { stroke: '#d2d2d2', sw: 1 });
+  const v = [0.22, 0.38, 0.31, 0.55, 0.48, 0.8, 0.68];
+  const P = v.map((val, i) => [px0 + (px1 - px0) * i / (v.length - 1), py1 - (py1 - py0) * val]);
+  let d = `M${P[0][0]},${P[0][1]}`;
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(P.length - 1, i + 2)];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0]},${c1[1]} ${c2[0]},${c2[1]} ${p2[0]},${p2[1]}`;
+  }
+  s += path(`${d} L${px1},${py1} L${px0},${py1} Z`, { fill: 'url(#area)' });
+  s += path(d, { stroke: K.ink, sw: 3 });
+  const hp = P[5];
+  s += line(hp[0], hp[1] + 12, hp[0], py1, { stroke: '#8a8a8a', sw: 1, dash: '3 5' });
+  s += circ(hp[0], hp[1], 10, { fill: K.white, stroke: K.ink, sw: 3 });
+  ['M', 'T', 'W', 'T', 'F', 'S', 'S'].forEach((dl, i) => s += t(P[i][0], py1 + 34, dl, { size: 13, fill: i === 5 ? K.ink : '#8a8a8a', anchor: 'middle', weight: 500 }));
+  // CRM sync list
+  const lx = cx + cw + 20, lw = fx + fw - 30 - lx;
+  s += path(rr(lx, cy, lw, ch, 10), { stroke: K.dim, sw: 1.5, fill: K.panel2 });
+  s += t(lx + 22, cy + 38, 'CRM SYNC', { size: 13, weight: 500, fill: K.mid, ls: 2.5 });
+  ['contact.created', 'booking.made', 'payment.paid', 'tag.added', 'note.added'].forEach((ev, i) => {
+    const y = cy + 92 + i * 60;
+    s += circ(lx + 32, y - 5, 10, { stroke: K.soft, sw: 1.5 });
+    s += check(lx + 32, y - 5, 10, K.soft, 1.5);
+    s += t(lx + 54, y, ev, { size: 15, fill: K.hi });
+  });
+  const defs = `<linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.2"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>`;
+  return frame('07', 'CUSTOM APP', 'built where the CRM stops  ·  synced back to it', s, defs);
+}
+
+const CARDS = {
+  'lead-follow-up': leadFollowUp,
+  'ai-agents': aiAgents,
+  'funnels': funnels,
+  'integrations': integrations,
+  'fixes-and-audits': fixesAudits,
+  'agency-snapshots': snapshots,
+  'custom-apps': customApps,
+};
+const slug = new URLSearchParams(location.search).get('card') || 'lead-follow-up';
+document.getElementById('root').innerHTML = (CARDS[slug] || CARDS['lead-follow-up'])();
+
+// After fonts load: strike through finished audit rows using their real measured width.
+window.__cardReady = document.fonts.ready.then(() => {
+  document.querySelectorAll('text.strike').forEach((el) => {
+    const b = el.getBBox();
+    const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    const y = b.y + b.height * 0.56;
+    ln.setAttribute('x1', b.x - 4); ln.setAttribute('x2', b.x + b.width + 6);
+    ln.setAttribute('y1', y); ln.setAttribute('y2', y);
+    ln.setAttribute('stroke', '#f2f2f2'); ln.setAttribute('stroke-width', '2'); ln.setAttribute('stroke-linecap', 'round');
+    el.after(ln);
+  });
+  const txt = document.getElementById('root').textContent;
+  return { slug, dash: /[–—]/.test(txt), fonts: ['Anton', 'IBM Plex Mono', 'Host Grotesk'].map((f) => document.fonts.check(`20px "${f}"`)) };
+});
+</script>
+</body>
+</html>

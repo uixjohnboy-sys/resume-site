@@ -4,8 +4,14 @@ import { anton, host, plex } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
 import IntroVideo from "@/components/v4/IntroVideo";
 import WorkIndex from "@/components/work/WorkIndex";
+import SkillFlow, { type FlowCard } from "@/components/home/SkillFlow";
+import { work } from "@/lib/work";
 import "./v4/v4.css";
 import "./work/work.css";
+import "./home-flow.css";
+
+// One card per kind of work, art made for each (scripts/home-cards, black and white).
+const flowCards: FlowCard[] = work.map((w) => ({ n: w.n, slug: w.slug, title: w.title, promise: w.promise, art: `/home/cards/${w.slug}.webp` }));
 
 // Homepage since 2026-11-15 (JB signed off the /v6 preview): the work index sits right under the hero, one row per kind of
 // work, each opening /work/<slug> (spec in PortfolioProjects/work-cards/SPEC.md). Before that, since 2026-11-06: hero,
@@ -82,34 +88,31 @@ export default function Home() {
       </header>
 
       <main id="top">
-        {/* ---------- 1. HERO ---------- */}
-        <section className="v4-hero v4-hero-center">
-          <div className="v4-hero-in">
-            <div className="v4-hero-copy" data-rv>
-              <h1>
-                <span className="v4-kicker v4-kicker-in-h1">GoHighLevel specialist · HighLevel certified</span>
-                I build what{" "}
-                <br className="v4-br" />
-                your CRM can&apos;t.
-              </h1>
-              <p className="v4-lede">GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time, from AUD 15/hr.</p>
-              <div className="v4-ctas">
-                <a className="v4-btn v4-btn-dark" href="#work">
-                  See what I build
-                </a>
-                <a className="v4-btn v4-btn-line" href={BOOK}>
-                  Book a 15-min call
-                </a>
-              </div>
-            </div>
+        {/* ---------- 1. HERO: what I build, as a cover-flow of cards (JB 2026-11-22), black and white ---------- */}
+        <section className="sf-hero" aria-labelledby="hero-h">
+          <div className="sf-head">
+            <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
+            <h1 id="hero-h">I build what your CRM can&apos;t.</h1>
+            <p className="v4-lede">
+              GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time, from AUD 15/hr.
+            </p>
+          </div>
+          <SkillFlow cards={flowCards} />
+          <div className="v4-ctas sf-ctas">
+            <a className="v4-btn v4-btn-dark" href={BOOK}>
+              Book a 15-min call
+            </a>
+            <a className="v4-btn v4-btn-line" href="#work">
+              See the details
+            </a>
           </div>
         </section>
 
-        {/* ---------- 2. WHAT I BUILD: the work index, one row per kind of work, each with its own page ---------- */}
+        {/* ---------- 2. WHAT I BUILD, IN DETAIL: the work index, one row per kind of work, each with its own page ---------- */}
         <section className="v4-sec wk-home" id="work">
           <div className="v4-in">
             <p className="v4-kicker" data-rv>
-              What I build
+              What I build, in detail
             </p>
             <h2 data-rv>Pick the job you need done.</h2>
             <WorkIndex />

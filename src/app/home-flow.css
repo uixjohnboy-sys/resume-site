@@ -1,0 +1,423 @@
+/* The homepage's first section: the cover-flow of what I build (src/components/home/SkillFlow.tsx).
+   Black and white only. The rest of the page stays the white v4 poster look; this section is the dark opening. */
+
+.v4 .sf-hero {
+  position: relative;
+  overflow: hidden;
+  color: #f5f5f3;
+  background:
+    radial-gradient(60% 55% at 50% 38%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(40% 40% at 85% 90%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(35% 35% at 8% 80%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 70%),
+    #0b0b0b;
+  padding: clamp(40px, 6vw, 72px) 0 clamp(44px, 6vw, 72px);
+}
+.v4 .sf-hero::after {
+  /* fine grain, like the reference's soft blur, without colour */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.v4 .sf-head {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.v4 .sf-head .v4-kicker {
+  color: #b9b9b5;
+}
+.v4 .sf-head h1 {
+  color: #fff;
+  font-size: clamp(40px, 6.4vw, 84px);
+  line-height: 0.95;
+  margin: 10px 0 12px;
+}
+.v4 .sf-head .v4-lede {
+  color: #c9c9c5;
+  margin: 0 auto;
+  max-width: 640px;
+}
+
+/* ---------- the stage ---------- */
+.sf {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(22px, 3.5vw, 40px);
+  outline: none;
+}
+.sf-stage {
+  position: relative;
+  height: clamp(400px, 46vw, 520px);
+  perspective: 1400px;
+  touch-action: pan-y;
+  user-select: none;
+}
+.sf-ring {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.sf-card {
+  --w: clamp(250px, 30vw, 380px);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--w);
+  margin-left: calc(var(--w) / -2);
+  transform: translateY(-50%);
+  transition:
+    transform 0.6s cubic-bezier(0.22, 0.8, 0.24, 1),
+    opacity 0.6s ease,
+    filter 0.6s ease;
+  will-change: transform;
+}
+.sf-card[data-off="0"] {
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+.sf-card[data-off="-1"] {
+  transform: translateY(-50%) translateX(-74%) scale(0.84) rotateY(16deg);
+  filter: brightness(0.62);
+}
+.sf-card[data-off="1"] {
+  transform: translateY(-50%) translateX(74%) scale(0.84) rotateY(-16deg);
+  filter: brightness(0.62);
+}
+.sf-card[data-off="-2"] {
+  transform: translateY(-50%) translateX(-128%) scale(0.7) rotateY(22deg);
+  filter: brightness(0.42);
+}
+.sf-card[data-off="2"] {
+  transform: translateY(-50%) translateX(128%) scale(0.7) rotateY(-22deg);
+  filter: brightness(0.42);
+}
+.sf-card[data-off="-3"],
+.sf-card[data-off="3"] {
+  transform: translateY(-50%) scale(0.6);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sf-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 20px;
+  padding: 10px;
+  /* nearly solid, so the cards behind never show through the one in front */
+  background: linear-gradient(180deg, #2b2b2b, #161616);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+}
+.sf-card.is-focus .sf-link {
+  border-color: rgba(255, 255, 255, 0.42);
+}
+.sf-link:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+.sf-art {
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 5 / 4;
+  background: #161616;
+}
+.sf-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sf-meta {
+  display: grid;
+  gap: 4px;
+  padding: 14px 8px 8px;
+  text-align: center;
+}
+.sf-n {
+  /* the art already carries the big number; kept for screen readers via the link label */
+  display: none;
+  font-family: var(--label);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: #9a9a96;
+}
+.sf-title {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.02;
+  color: #fff;
+}
+.sf-promise {
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: #bdbdb9;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.8em;
+}
+.sf-card:not(.is-focus) .sf-promise {
+  opacity: 0.6;
+}
+
+/* ---------- the control bar ---------- */
+.sf-bar {
+  position: relative;
+  margin: clamp(10px, 2vw, 22px) auto 0;
+  width: min(980px, calc(100% - 32px));
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.sf-ctrl {
+  display: flex;
+  gap: 4px;
+}
+.sf-btn {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #e9e9e6;
+  cursor: pointer;
+}
+.sf-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.sf-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.sf-btn:focus-visible,
+.sf-dots button:focus-visible,
+.sf-now:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.sf-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sf-now {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px 8px 6px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+}
+.sf-now-thumb {
+  width: 56px;
+  height: 45px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.sf-now-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.sf-now-text {
+  display: grid;
+  min-width: 0;
+}
+.sf-now-text b {
+  font-weight: 600;
+  font-size: 14.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sf-now-text span {
+  font-size: 12.5px;
+  color: #a9a9a5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sf-now-go {
+  font-size: 20px;
+  transition: transform 0.2s ease;
+}
+.sf-now:hover .sf-now-go {
+  transform: translateX(3px);
+}
+.sf-progress {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 3px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.sf-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #fff;
+}
+.sf-progress span.is-run {
+  animation-name: sf-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes sf-fill {
+  to {
+    width: 100%;
+  }
+}
+.sf-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.sf-dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.sf-dots button.is-on {
+  width: 22px;
+  border-radius: 6px;
+  background: #fff;
+}
+.sf-count {
+  margin-left: 8px;
+  font-family: var(--label);
+  font-size: 12px;
+  color: #a9a9a5;
+  letter-spacing: 0.06em;
+}
+.sf-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.v4 .sf-ctas {
+  position: relative;
+  z-index: 1;
+  justify-content: center;
+  margin-top: clamp(22px, 3vw, 32px);
+}
+.v4 .sf-ctas .v4-btn-dark {
+  background: #fff;
+  /* v4.css forces white text on dark buttons with !important; on the dark hero the button is white, so the text is black */
+  color: #0a0a0a !important;
+  border-color: #fff;
+}
+.v4 .sf-ctas .v4-btn-dark:hover {
+  background: #d9d9d6;
+}
+.v4 .sf-ctas .v4-btn-line {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.v4 .sf-ctas .v4-btn-line:hover {
+  background: #fff;
+  color: #0a0a0a;
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 700px) {
+  .sf-card {
+    --w: 74vw;
+  }
+  .sf-card[data-off="-1"] {
+    transform: translateY(-50%) translateX(-80%) scale(0.82) rotateY(14deg);
+  }
+  .sf-card[data-off="1"] {
+    transform: translateY(-50%) translateX(80%) scale(0.82) rotateY(-14deg);
+  }
+  .sf-card[data-off="-2"],
+  .sf-card[data-off="2"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .sf-stage {
+    height: 430px;
+  }
+  .sf-bar {
+    grid-template-columns: 1fr;
+    border-radius: 22px;
+    gap: 10px;
+    padding: 10px;
+  }
+  .sf-ctrl {
+    justify-content: center;
+    order: 2;
+  }
+  .sf-dots {
+    justify-content: center;
+    order: 3;
+  }
+}
+
+/* ---------- less motion: no turning, no sliding, cards just swap ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sf-card {
+    transition: none;
+  }
+  .sf-card[data-off="-1"] {
+    transform: translateY(-50%) translateX(-74%) scale(0.84);
+  }
+  .sf-card[data-off="1"] {
+    transform: translateY(-50%) translateX(74%) scale(0.84);
+  }
+  .sf-card[data-off="-2"] {
+    transform: translateY(-50%) translateX(-128%) scale(0.7);
+  }
+  .sf-card[data-off="2"] {
+    transform: translateY(-50%) translateX(128%) scale(0.7);
+  }
+  .sf-progress span.is-run {
+    animation: none;
+  }
+}
