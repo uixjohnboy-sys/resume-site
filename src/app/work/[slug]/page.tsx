@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { anton, host, plex } from "../../fonts";
 import Reveal from "@/components/v4/Reveal";
-import { work, workBySlug } from "@/lib/work";
+import { work, workBySlug, SHOW_SOON } from "@/lib/work";
 import "../../v4/v4.css";
 import "../work.css";
 
@@ -97,7 +97,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
           <div className="wk-list">
             <h2 className="wk-h">The work</h2>
             <ol>
-              {w.proof.map((p) => (
+              {w.proof.filter((p) => SHOW_SOON || !p.soon).map((p) => (
                 <li key={p.name + p.kind} data-rv>
                   <p className="v4-case-tag">
                     {p.kind} · {p.name}

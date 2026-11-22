@@ -320,4 +320,8 @@ export const work: Work[] = [
   },
 ];
 
+/** Planned demos (soon: true) stay in the data but are hidden on the site until they ship (JB 2026-11-22, after the
+ *  hiring-manager review said four Demo soon cards read as unfinished work). Set true to show them again. */
+export const SHOW_SOON = false;
+
 export const workBySlug = (slug: string) => work.find((w) => w.slug === slug);

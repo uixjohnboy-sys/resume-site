@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { work } from "@/lib/work";
+import { work, SHOW_SOON } from "@/lib/work";
 
 /** Hyphenated words never break at the hyphen in the big titles ("Follow-/up" read as two words). */
 const nb = (t: string) => t.replace(/-/g, "‑");
@@ -7,7 +7,8 @@ const nb = (t: string) => t.replace(/-/g, "‑");
 // The homepage's work index: the kinds of work as numbered rows, each opening /work/<slug>. Rows, hairlines and type,
 // not a grid of rounded cards (DESIGN-STANDARD C2 and C3). One link per row (the service name, stretched over the row);
 // demos open from the /work page. Every row carries one real proof line, labelled, and no two rows lead with the same one.
-// A planned demo shows as a small "Demo soon" line under the proof, never as the proof itself.
+// A planned demo shows as a small "Demo soon" line under the proof, never as the proof itself, and only while SHOW_SOON
+// in src/lib/work.ts is true (hidden since 2026-11-22).
 
 export default function WorkIndex() {
   return (
@@ -33,7 +34,7 @@ export default function WorkIndex() {
               {w.lead.when ? ` · ${w.lead.when}` : ""}
             </p>
             <p>{w.lead.line}</p>
-            {soon.length > 0 && (
+            {SHOW_SOON && soon.length > 0 && (
               <p className="wk-soon">
                 <span className="wk-soon-tag">Demo soon</span> {soon.join(", ")}
               </p>
