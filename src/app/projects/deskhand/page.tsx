@@ -144,7 +144,7 @@ export default function DeskhandProject() {
         <div>
           <h2>Who built this</h2>
           <p className="pj-measure">
-            I&apos;m John Boy Roxas, a HighLevel-certified builder in the Philippines (UTC+8). Five years in CRM and automation, GoHighLevel since 2023, and I build the custom apps and AI agents that go past what a CRM can do. Part-time, 4 hours a day, starting at 8 AM in your timezone. From AUD 15/hr.
+            I&apos;m John Boy Roxas, a HighLevel-certified builder in the Philippines (UTC+8). Five years in CRM and automation, GoHighLevel since 2023, and I build the custom apps and AI agents that go past what a CRM can do. Part-time, 4 to 6 hours a day, in Australian business hours or US mornings. From AUD 15/hr.
           </p>
         </div>
       </section>
