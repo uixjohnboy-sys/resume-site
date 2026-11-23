@@ -1194,3 +1194,20 @@ html:has(.ls) body {
     white-space: nowrap;
   }
 }
+
+/* the real GoHighLevel screenshots (G4 prep, 23 Nov 2026): natural height, opens full size in a new tab */
+.ls .shot.img {
+  display: block;
+  aspect-ratio: auto;
+  padding: 0;
+  overflow: hidden;
+}
+.ls .shot.img img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.ls .shot.img:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}

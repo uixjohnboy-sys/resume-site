@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import Ads from "./Ads";
 import Report from "./Report";
@@ -9,7 +10,7 @@ import { MEASURED } from "@/lib/leadsource/config";
 
 const BOOK = "/book";
 // Shown only once they exist (G3 v1 Design Director: a dashed or grey placeholder must not go live).
-const SHOTS_READY = false;
+const SHOTS_READY = true; // GoHighLevel screenshots taken 23 Nov 2026, test contacts only, emails hidden
 
 type Props = { variant: "demo" | "report"; paused: boolean; bookingBase: string };
 
@@ -198,33 +199,33 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
               </div>
             </div>
             <p className="install">
-              Installs as a GoHighLevel snapshot into any sub-account. Per clinic you set the calendar, the alert recipient and the mapping list, then book once
+              Built from fields, workflows and a Smart List an agency can rebuild in any sub-account. Per clinic you set the calendar, the alert recipient and the mapping list, then book once
               through each channel&apos;s link to check the source before the ads go live.
             </p>
             {SHOTS_READY ? (
             <div className="shots">
               <figure>
-                <div className="shot">
-                  <span>Screenshot at G3: a test contact, Lead source folder open</span>
-                </div>
+                <a className="shot img" href="/projects/lead-source/ghl-contact.jpg" target="_blank" rel="noopener">
+                  <Image src="/projects/lead-source/ghl-contact.jpg" alt="A test contact in GoHighLevel with the DEMO Booking source fields: first source Facebook, last source Google." width={1568} height={751} sizes="(max-width: 760px) 100vw, 560px" />
+                </a>
                 <figcaption>A test contact with its lead source fields.</figcaption>
               </figure>
               <figure>
-                <div className="shot">
-                  <span>Screenshot at G3: pipeline DEMO Kestrel Physio, Source on each card</span>
-                </div>
-                <figcaption>The pipeline: Booked (Upcoming on the report), Attended, No-show, Cancelled, with the source on every card.</figcaption>
+                <a className="shot img" href="/projects/lead-source/ghl-pipeline.jpg" target="_blank" rel="noopener">
+                  <Image src="/projects/lead-source/ghl-pipeline.jpg" alt="The DEMO Kestrel Physio pipeline with bookings in Booked, Attended, No-show and Cancelled." width={1568} height={751} sizes="(max-width: 760px) 100vw, 560px" />
+                </a>
+                <figcaption>The pipeline: Booked (Upcoming on the report), Attended, No-show, Cancelled. An existing contact lands as an excluded booking.</figcaption>
               </figure>
               <figure>
-                <div className="shot">
-                  <span>Screenshot at G3: Smart List &quot;Bookings by source&quot;</span>
-                </div>
-                <figcaption>The Smart List the snapshot adds, with the eight fields as columns.</figcaption>
+                <a className="shot img" href="/projects/lead-source/ghl-smartlist.png" target="_blank" rel="noopener">
+                  <Image src="/projects/lead-source/ghl-smartlist.png" alt="The DEMO Bookings by source Smart List, one row per test contact with the booking source fields as columns." width={1568} height={330} sizes="(max-width: 760px) 100vw, 560px" />
+                </a>
+                <figcaption>The Smart List the build adds, with the eight fields as columns.</figcaption>
               </figure>
               <figure>
-                <div className="shot">
-                  <span>Screenshot at G3: the booking alert email, test contact</span>
-                </div>
+                <a className="shot img" href="/projects/lead-source/ghl-alert-email.png" target="_blank" rel="noopener">
+                  <Image src="/projects/lead-source/ghl-alert-email.png" alt="The booking alert email: name, time, source Instagram and campaign." width={1548} height={368} sizes="(max-width: 760px) 100vw, 560px" />
+                </a>
                 <figcaption>The alert the clinic&apos;s team gets: first name, time, source and campaign.</figcaption>
               </figure>
             </div>
