@@ -1,0 +1,313 @@
+/* The homepage's first section: the cover-flow of what I build (src/components/home/SkillFlow.tsx).
+   Black and white only. The whole homepage is dark since 2026-11-22 (home-dark.css). */
+
+.v4 .sf-hero {
+  position: relative;
+  overflow: hidden;
+  color: #f5f5f3;
+  background:
+    radial-gradient(60% 55% at 50% 38%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(40% 40% at 85% 90%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(35% 35% at 8% 80%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 70%),
+    #0b0b0b;
+  padding: clamp(40px, 6vw, 72px) 0 clamp(44px, 6vw, 72px);
+}
+.v4 .sf-hero::after {
+  /* fine grain, like the reference's soft blur, without colour */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.v4 .sf-head {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.v4 .sf-head .v4-kicker {
+  color: #b9b9b5;
+}
+.v4 .sf-head h1 {
+  color: #fff;
+  font-size: clamp(40px, 6.4vw, 84px);
+  line-height: 0.95;
+  margin: 10px 0 12px;
+}
+.v4 .sf-head .v4-lede {
+  color: #c9c9c5;
+  margin: 0 auto;
+  max-width: 640px;
+}
+
+/* ---------- the stage ---------- */
+.sf {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(22px, 3.5vw, 40px);
+  outline: none;
+}
+.sf-stage {
+  position: relative;
+  height: clamp(600px, 52vw, 660px);
+  perspective: 1400px;
+  touch-action: pan-y;
+  user-select: none;
+}
+.sf-ring {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.sf-card {
+  --w: clamp(290px, 28vw, 380px);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--w);
+  margin-left: calc(var(--w) / -2);
+  transform: translateY(-50%);
+  transition:
+    transform 0.6s cubic-bezier(0.22, 0.8, 0.24, 1),
+    opacity 0.6s ease,
+    filter 0.6s ease;
+  will-change: transform;
+}
+.sf-card:not(.is-focus) {
+  cursor: pointer;
+}
+.sf-card[data-off="0"] {
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+.sf-card[data-off="-1"] {
+  transform: translateY(-50%) translateX(-74%) scale(0.84) rotateY(16deg);
+  filter: brightness(0.55);
+}
+.sf-card[data-off="1"] {
+  transform: translateY(-50%) translateX(74%) scale(0.84) rotateY(-16deg);
+  filter: brightness(0.55);
+}
+.sf-card[data-off="-2"] {
+  transform: translateY(-50%) translateX(-128%) scale(0.7) rotateY(22deg);
+  filter: brightness(0.38);
+}
+.sf-card[data-off="2"] {
+  transform: translateY(-50%) translateX(128%) scale(0.7) rotateY(-22deg);
+  filter: brightness(0.38);
+}
+.sf-card[data-off="-3"],
+.sf-card[data-off="3"] {
+  transform: translateY(-50%) scale(0.6);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sf-body {
+  display: block;
+  border-radius: 20px;
+  padding: 10px;
+  /* nearly solid, so the cards behind never show through the one in front */
+  background: linear-gradient(180deg, #2b2b2b, #161616);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.sf-card.is-focus .sf-body {
+  border-color: rgba(255, 255, 255, 0.42);
+}
+.sf-art {
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 5 / 4;
+  background: #161616;
+}
+.sf-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.sf-meta {
+  display: grid;
+  gap: 8px;
+  padding: 14px 10px 8px;
+  text-align: left;
+}
+.v4 .sf-title {
+  margin: 0;
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: clamp(21px, 2vw, 26px);
+  line-height: 1.02;
+  letter-spacing: 0;
+  color: #fff;
+}
+.sf-promise,
+.sf-line {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sf-promise {
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #d0d0cc;
+  -webkit-line-clamp: 3;
+  min-height: 4.35em;
+}
+.sf-proof {
+  display: grid;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.sf-tag {
+  margin: 0;
+  font-family: var(--label);
+  font-size: 10.5px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9d9d99;
+}
+.sf-line {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #b9b9b5;
+  -webkit-line-clamp: 3;
+  min-height: 4.35em;
+}
+.v4 .sf-cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #f2f2ef;
+  color: #0a0a0a;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.v4 .sf-cta:hover {
+  background: #d6d6d2;
+}
+.v4 .sf-cta span {
+  transition: transform 0.2s ease;
+}
+.v4 .sf-cta:hover span {
+  transform: translateX(3px);
+}
+.sf-cta:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+.sf-card:not(.is-focus) .sf-cta {
+  pointer-events: none;
+}
+
+/* ---------- the two arrows under the cards ---------- */
+.sf-arrows {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: clamp(4px, 1.5vw, 16px);
+}
+.sf-arrow {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f2f2ef;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.sf-arrow:hover {
+  background: #f2f2ef;
+  color: #0a0a0a;
+  border-color: #f2f2ef;
+}
+.sf-arrow:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+.sf-arrow svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sf-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 700px) {
+  .sf-card {
+    --w: 78vw;
+  }
+  .sf-card[data-off="-1"] {
+    transform: translateY(-50%) translateX(-82%) scale(0.82) rotateY(14deg);
+  }
+  .sf-card[data-off="1"] {
+    transform: translateY(-50%) translateX(82%) scale(0.82) rotateY(-14deg);
+  }
+  .sf-card[data-off="-2"],
+  .sf-card[data-off="2"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .sf-stage {
+    height: 640px;
+  }
+}
+
+/* ---------- less motion: nothing moves on its own, no turning, cards just swap ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sf-card {
+    transition: none;
+  }
+  .sf-card[data-off="-1"] {
+    transform: translateY(-50%) translateX(-74%) scale(0.84);
+  }
+  .sf-card[data-off="1"] {
+    transform: translateY(-50%) translateX(74%) scale(0.84);
+  }
+  .sf-card[data-off="-2"] {
+    transform: translateY(-50%) translateX(-128%) scale(0.7);
+  }
+  .sf-card[data-off="2"] {
+    transform: translateY(-50%) translateX(128%) scale(0.7);
+  }
+}

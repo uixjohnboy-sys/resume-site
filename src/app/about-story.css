@@ -1,0 +1,652 @@
+/* The About section as a scroll story (src/components/home/AboutStory.tsx), black and white.
+   --rise, --fold and --msg go from 0 to 1 as the section scrolls; without pinning they are all 1 (the finished layout).
+   --u is one design pixel, shrunk on short or narrow screens so the cards, folder and text all fit. */
+
+.ab-track {
+  --rise: 1;
+  --fold: 1;
+  --msg: 1;
+  --u: min(1px, calc(100vw / 700));
+  position: relative;
+}
+.ab-track.is-pinned {
+  --rise: 0;
+  --fold: 0;
+  --msg: 0;
+  --u: min(1px, calc((100vh - var(--navh, 70px)) / 980));
+  height: 300vh;
+}
+.ab-pin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px;
+}
+.is-pinned .ab-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  justify-content: center;
+  padding-top: var(--navh, 70px); /* the sticky nav */
+  overflow: hidden;
+}
+
+/* ---------- the title above the folder ---------- */
+.ab-title {
+  order: 0;
+  text-align: center;
+}
+.v4 .ab-title h2 {
+  margin: 6px 0 0;
+  font-size: calc(84 * var(--u));
+  line-height: 0.95;
+  color: #fff;
+}
+.v4 .ab-title .v4-kicker {
+  color: #b9b9b5;
+}
+.ab-pill {
+  display: inline-block;
+  margin: calc(14 * var(--u)) 0 0;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+  font-family: var(--label);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e6e6e2;
+}
+
+/* ---------- the stage: three cards in a folder ---------- */
+.ab-stage {
+  position: relative;
+  width: calc(660 * var(--u));
+  height: calc(270 * var(--u));
+  margin-top: calc(34 * var(--u));
+  flex: none;
+}
+.ab-folder-back,
+.ab-folder-front {
+  position: absolute;
+  left: 50%;
+  width: calc(560 * var(--u));
+  margin-left: calc(-280 * var(--u));
+  opacity: calc(1 - var(--fold));
+  pointer-events: none;
+}
+.ab-folder-back {
+  top: calc(84 * var(--u));
+  height: calc(320 * var(--u));
+  border-radius: calc(22 * var(--u));
+  background: linear-gradient(180deg, #262626, #121212);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transform: translateY(calc(var(--fold) * 40 * var(--u)));
+}
+.ab-folder-back::before {
+  /* the folder's tab */
+  content: "";
+  position: absolute;
+  left: calc(28 * var(--u));
+  top: calc(-22 * var(--u));
+  width: calc(150 * var(--u));
+  height: calc(30 * var(--u));
+  border-radius: calc(14 * var(--u)) calc(14 * var(--u)) 0 0;
+  background: #262626;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 0;
+}
+.ab-folder-front {
+  top: calc(158 * var(--u));
+  height: calc(250 * var(--u));
+  z-index: 5;
+  border-radius: calc(22 * var(--u));
+  background: linear-gradient(180deg, rgba(52, 52, 52, 0.94), rgba(20, 20, 20, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow:
+    0 30px 60px -24px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(calc(var(--fold) * 60 * var(--u))) scale(calc(1 - var(--fold) * 0.04));
+  padding: calc(30 * var(--u)) calc(30 * var(--u));
+  text-align: left;
+}
+.ab-list {
+  margin: 0;
+  display: grid;
+  gap: calc(10 * var(--u));
+  max-width: calc(330 * var(--u));
+}
+.ab-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: calc(10 * var(--u));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.ab-list dt {
+  font-size: calc(15 * var(--u));
+  font-weight: 600;
+  color: #f2f2ef;
+}
+.ab-list dd {
+  margin: 0;
+  font-size: calc(13 * var(--u));
+  color: #a9a9a5;
+}
+.ab-note {
+  position: absolute;
+  left: calc(30 * var(--u));
+  bottom: calc(26 * var(--u));
+  font-family: var(--label);
+  font-size: calc(11 * var(--u));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8f8f8b;
+}
+.ab-play {
+  position: absolute;
+  right: calc(30 * var(--u));
+  bottom: calc(24 * var(--u));
+  width: calc(64 * var(--u));
+  height: calc(64 * var(--u));
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f2f2ef;
+  color: #0a0a0a;
+  pointer-events: none;
+}
+.ab-play svg {
+  display: block;
+  width: 40%;
+  height: 40%;
+  fill: #0a0a0a;
+  stroke: none;
+  margin-left: 6%;
+}
+
+/* the cards: close together and sunk in the folder at --rise 0, side by side above it at --rise 1 */
+.ab-card {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: calc(196 * var(--u));
+  height: calc(256 * var(--u));
+  margin-left: calc(-98 * var(--u));
+  border-radius: calc(18 * var(--u));
+  overflow: hidden;
+  background: linear-gradient(160deg, #2e2e2e, #141414);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 24px 50px -18px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: calc(18 * var(--u));
+  text-align: left;
+  color: #f2f2ef;
+  transform-origin: 50% 100%;
+}
+.ab-c1 {
+  z-index: 1;
+  transform: translateX(calc((-64 - 152 * var(--rise)) * var(--u))) translateY(calc((1 - var(--rise)) * 80 * var(--u)))
+    rotate(calc(-9deg + 5deg * var(--rise)));
+}
+.ab-c3 {
+  z-index: 2;
+  transform: translateX(calc((64 + 152 * var(--rise)) * var(--u))) translateY(calc((1 - var(--rise)) * 80 * var(--u)))
+    rotate(calc(9deg - 5deg * var(--rise)));
+}
+.ab-c2 {
+  z-index: 3;
+  padding: 0;
+  transform: translateY(calc((1 - var(--rise)) * 64 * var(--u) - var(--rise) * 8 * var(--u))) scale(calc(1 + var(--rise) * 0.04));
+}
+.ab-c2 img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  filter: grayscale(1) contrast(1.08);
+}
+
+/* card 1: the years */
+.ab-stat-n {
+  font-family: var(--display);
+  font-size: calc(118 * var(--u));
+  line-height: 0.85;
+}
+.ab-stat-u {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: calc(26 * var(--u));
+  line-height: 1;
+  margin-top: calc(6 * var(--u));
+}
+.ab-stat-l {
+  margin-top: calc(14 * var(--u));
+  padding-top: calc(10 * var(--u));
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: calc(13 * var(--u));
+  color: #d0d0cc;
+}
+.ab-stat-s {
+  font-family: var(--label);
+  font-size: calc(10.5 * var(--u));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9d9d99;
+  margin-top: calc(4 * var(--u));
+}
+
+/* card 3: the certifications */
+.ab-c3 {
+  justify-content: space-between;
+}
+.ab-cert-h {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: calc(24 * var(--u));
+  line-height: 1;
+}
+.ab-cert-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: calc(10 * var(--u));
+  justify-items: center;
+}
+.ab-cert-grid img {
+  width: calc(64 * var(--u));
+  height: calc(64 * var(--u));
+  object-fit: contain;
+  filter: grayscale(1);
+}
+.ab-cert-s {
+  font-family: var(--label);
+  font-size: calc(10.5 * var(--u));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9d9d99;
+}
+
+/* ---------- the messages under the cards ---------- */
+.ab-msg {
+  position: relative;
+  z-index: 6;
+  width: 100%;
+  max-width: 860px;
+  margin-top: calc(30 * var(--u));
+  text-align: center;
+  opacity: var(--msg);
+  transform: translateY(calc((1 - var(--msg)) * 36px));
+}
+.v4 .ab-sub {
+  margin: 0;
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: clamp(24px, calc(38 * var(--u)), 38px);
+  line-height: 1.05;
+  color: #fff;
+}
+.v4 .ab-msg .v4-lede {
+  margin: 14px auto 0;
+  max-width: 720px;
+  font-size: 16px;
+  color: #c9c9c5;
+}
+.v4 .ab-msg .v4-facts {
+  margin-top: calc(26 * var(--u));
+}
+.v4 .ab-msg .v4-facts b {
+  font-size: clamp(30px, calc(44 * var(--u)), 44px);
+}
+.v4 .ab-msg .v4-facts li {
+  gap: 6px;
+}
+.is-pinned .ab-msg .v4-facts li {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.v4 .is-pinned .ab-msg .v4-lede {
+  max-width: 820px;
+  font-size: 15.5px;
+}
+
+/* ---------- not pinned: phones and short screens (flow), less motion (static) ---------- */
+.ab-track:not(.is-pinned) .ab-pin {
+  padding-top: 8px;
+}
+.ab-track.is-static .ab-folder-back,
+.ab-track.is-static .ab-folder-front {
+  display: none;
+}
+/* in flow the cards, folder and text move with the scroll; only transform and opacity change, so it stays smooth */
+.is-flow .ab-card,
+.is-flow .ab-folder-front,
+.is-flow .ab-folder-back,
+.is-flow .ab-msg,
+.is-pinned .ab-card,
+.is-pinned .ab-folder-front,
+.is-pinned .ab-folder-back,
+.is-pinned .ab-msg {
+  will-change: transform, opacity;
+}
+@media (max-width: 700px) {
+  .ab-track:not(.is-pinned) .ab-stage {
+    --u: calc((100vw - 24px) / 660);
+  }
+  .v4 .ab-title h2 {
+    font-size: 52px;
+  }
+  /* the folder is small on a phone: readable type, no footnote */
+  .ab-folder-front {
+    padding: 14px 16px;
+  }
+  .ab-list {
+    max-width: 66%;
+    gap: 6px;
+  }
+  .ab-list div {
+    padding-bottom: 6px;
+    gap: 8px;
+  }
+  .ab-list dt {
+    font-size: 11.5px;
+  }
+  .ab-list dd {
+    font-size: 10.5px;
+  }
+  .ab-note {
+    display: none;
+  }
+}
+
+/* ---------- Know more on the years card and the certificates card (JB 2026-11-22) ---------- */
+.ab-cc {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+.ab-c3 .ab-cc {
+  justify-content: space-between;
+}
+.ab-stat-l,
+.ab-stat-s,
+.ab-cert-s {
+  transition: opacity 0.25s ease;
+}
+.v4 .ab-more {
+  position: absolute;
+  left: calc(14 * var(--u));
+  right: calc(14 * var(--u));
+  bottom: calc(14 * var(--u));
+  min-height: max(32px, calc(40 * var(--u)));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: #f2f2ef;
+  color: #0a0a0a;
+  font: inherit;
+  font-size: max(11px, calc(12.5 * var(--u)));
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s cubic-bezier(0.22, 0.8, 0.24, 1),
+    background 0.2s;
+}
+.v4 .ab-more:hover {
+  background: #d6d6d2;
+}
+.v4 .ab-more:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+.ab-card:hover .ab-more,
+.ab-card:focus-within .ab-more {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.ab-c1:hover .ab-stat-l,
+.ab-c1:hover .ab-stat-s,
+.ab-c1:focus-within .ab-stat-l,
+.ab-c1:focus-within .ab-stat-s,
+.ab-c3:hover .ab-cert-s,
+.ab-c3:focus-within .ab-cert-s {
+  opacity: 0;
+}
+.ab-c1,
+.ab-c3 {
+  transition: border-color 0.25s ease;
+}
+.ab-c1:hover,
+.ab-c3:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+/* touch screens have no hover: the button is always there */
+@media (hover: none) {
+  .v4 .ab-more {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .ab-stat-l,
+  .ab-stat-s,
+  .ab-cert-s {
+    opacity: 0;
+  }
+}
+.ab-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- the pop-up ---------- */
+html.ab-lock {
+  overflow: hidden;
+}
+.v4 .ab-pop {
+  padding: 0;
+  margin: auto;
+  width: min(640px, calc(100vw - 32px));
+  max-height: min(86vh, 780px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #1a1a1a, #0f0f0f);
+  color: #f2f2ef;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.95);
+}
+.v4 .ab-pop[open] {
+  animation: ab-pop-in 0.42s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+.v4 .ab-pop::backdrop {
+  background: rgba(0, 0, 0, 0.74);
+  animation: ab-fade 0.3s ease;
+}
+@keyframes ab-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ab-fade {
+  from {
+    opacity: 0;
+  }
+}
+.ab-pop-in {
+  position: relative;
+  padding: clamp(26px, 4vw, 42px);
+  text-align: left;
+}
+.v4 .ab-pop .v4-kicker {
+  color: #9b9b97;
+  padding-right: 48px;
+}
+.v4 .ab-pop h3 {
+  margin: 8px 0 14px;
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(34px, 5vw, 50px);
+  line-height: 0.95;
+  color: #fff;
+}
+.v4 .ab-pop-p {
+  margin: 0 0 12px;
+  font-size: 16px;
+  line-height: 1.65;
+  color: #c9c9c5;
+}
+.v4 .ab-pop-x {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #f2f2ef;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.v4 .ab-pop-x:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.ab-pop-x svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.v4 .ab-pop-x:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* the years, newest first */
+.ab-tl {
+  list-style: none;
+  margin: 22px 0 0 5px;
+  padding: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+}
+.ab-tl li {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 0 0 22px 24px;
+}
+.ab-tl li:last-child {
+  padding-bottom: 2px;
+}
+.ab-tl li::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f2f2ef;
+}
+.ab-tl-when {
+  font-family: var(--label);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9b9b97;
+}
+.ab-tl b {
+  font-size: 17px;
+  color: #fff;
+}
+.ab-tl-role {
+  font-size: 14.5px;
+  color: #c9c9c5;
+}
+.ab-tl-note {
+  font-size: 13px;
+  color: #9b9b97;
+}
+
+/* the certificates */
+.ab-certs {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.ab-certs li {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 20px 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: #181818;
+  text-align: center;
+}
+.ab-certs img {
+  width: min(120px, 70%);
+  height: auto;
+}
+.ab-certs span {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v4 .ab-pop[open],
+  .v4 .ab-pop::backdrop {
+    animation: none;
+  }
+}
+@media (max-width: 700px) {
+  .v4 .ab-more {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    min-height: 30px;
+    padding: 0 6px;
+    gap: 4px;
+    font-size: 10px;
+    letter-spacing: 0.03em;
+  }
+  .v4 .ab-more > span[aria-hidden] {
+    display: none;
+  }
+}
