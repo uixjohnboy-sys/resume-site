@@ -1,0 +1,49 @@
+/* /intro: the intro video on its own page (2026-11-23). Black like the homepage. */
+.v4-dark .ip-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 24px 72px;
+  min-height: 100vh;
+}
+.v4-dark .ip-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+.v4-dark .ip-head .v4-kicker {
+  margin: 0;
+}
+.v4-dark .ip-film {
+  margin-top: 32px;
+  max-width: none;
+}
+.v4-dark .ip-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 32px;
+  margin-top: 28px;
+}
+.v4-dark .ip-foot p {
+  margin: 0;
+  max-width: 620px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.v4-dark .ip-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .v4-dark .ip-page {
+    padding: 24px 16px 56px;
+  }
+  .v4-dark .ip-film {
+    margin-top: 24px;
+  }
+}

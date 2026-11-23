@@ -25,6 +25,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: "https://www.johnboydesign.com/intro",
+      lastModified: new Date("2026-11-23"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: "https://www.johnboydesign.com/book",
       lastModified: new Date("2026-11-20"),
       changeFrequency: "monthly",
