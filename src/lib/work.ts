@@ -138,6 +138,7 @@ export const work: Work[] = [
     title: "Funnels and landing pages",
     promise: "Pages that turn visitors into enquiries, built in GoHighLevel and wired to your follow-up from the first click.",
     lead: { kind: "Client work", name: "Wrldinvsn", when: "Dec 2025 to Feb 2026", line: "Landing pages and VSL pages for lead capture, wired to an automated booking system." },
+    live: { label: "Open the Lumiere demo site", href: "https://lumiereaesthetic.johnboydesign.com/home" },
     covers: [
       "Funnels, landing pages and websites built in GoHighLevel",
       "Forms and surveys that tag the lead and start the right follow-up",
@@ -160,6 +161,20 @@ export const work: Work[] = [
         kind: "Client work",
         name: "Virtualasting",
         line: "On the Masterpiece Las Vegas account: conversion-focused page design, with lead-capture forms connected to automated CRM workflows.",
+      },
+      {
+        kind: "My own demo",
+        name: "Lumiere Aesthetic",
+        line: "A booking website for a made-up aesthetic clinic, built in GoHighLevel around one action: book a private assessment. I designed the logo and the layout; the photos are stock.",
+        href: "https://lumiereaesthetic.johnboydesign.com/home",
+        cta: "Open the site",
+      },
+      {
+        kind: "My own demo",
+        name: "How I built Lumiere",
+        line: "A screen recording where I walk through the Lumiere build in GoHighLevel, page by page.",
+        href: "https://drive.google.com/file/d/1MfN7JlZdr9jzJutqL36mKz29GjWOKWId/view",
+        cta: "Watch",
       },
       {
         kind: "My own demo",
