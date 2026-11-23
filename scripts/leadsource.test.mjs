@@ -126,7 +126,7 @@ await test("no tracking tags, pasted: Unknown, none, counted in the Unknown row 
   assert.equal(reportRow(t.source, t.medium), "Unknown");
 });
 
-await test("no tracking tags, clicked on this site: Referral (the browser sends the referrer)", () => {
+await test("normaliser only: a referrer maps to Referral for an install that adds referrer rules (the live demo ignores the referrer, so it shows Unknown)", () => {
   const t = normaliseTouch(touchFromUrl("https://book.example.invalid/x", "https://www.johnboydesign.com/demo/lead-source"));
   assert.deepEqual([t.source, t.medium, t.ref], ["Referral", "referral", ""]);
   assert.equal(reportRow(t.source, t.medium), "Referral");
