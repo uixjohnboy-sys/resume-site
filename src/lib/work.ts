@@ -287,9 +287,10 @@ export const work: Work[] = [
       },
       {
         kind: "My own demo",
-        name: "Speed-to-lead snapshot for trades",
-        line: "Form, calendar, pipeline and the follow-up workflows in one snapshot, with a one-page setup guide.",
-        soon: true,
+        name: "Speed-to-lead kit for trades",
+        line: "The live Tallowood Roofing build (form, calendar, pipeline and three follow-up workflows) with a one-page guide to set it up in any sub-account.",
+        href: "/guides/speed-to-lead-kit.pdf",
+        cta: "Read the guide",
       },
     ],
   },
