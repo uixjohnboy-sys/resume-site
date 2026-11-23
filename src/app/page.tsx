@@ -58,7 +58,7 @@ const BOOK = "/book";
 // The intro (recorded 2026-11-23, edited in C:\PortfolioProjects\intro-video\edit). Voice only, no music, so no
 // Content ID claims; the captions are burned into the picture, so no separate caption track is needed.
 const INTRO_VIDEO = "/intro/john-boy-roxas-intro.mp4";
-const INTRO_POSTER = "/intro/poster.webp";
+const INTRO_POSTER = "/intro/poster-v2.webp";
 
 
 export default function Home() {

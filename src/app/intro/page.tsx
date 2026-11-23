@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     url: "/intro",
     siteName: "John Boy Roxas",
     type: "video.other",
-    images: [{ url: "/intro/poster.jpg", width: 1200, height: 675, alt: "John Boy Roxas, Systems and Automation" }],
+    images: [{ url: "/intro/poster-v2.jpg", width: 1200, height: 675, alt: "John Boy Roxas, Systems and Automation" }],
     videos: [{ url: "/intro/john-boy-roxas-intro.mp4", type: "video/mp4", width: 1920, height: 1080 }],
   },
 };
@@ -41,7 +41,7 @@ export default function IntroPage() {
         </header>
 
         <div className="v4-film ip-film">
-          <IntroPlayer src="/intro/john-boy-roxas-intro.mp4" poster="/intro/poster.webp" length="1:21" />
+          <IntroPlayer src="/intro/john-boy-roxas-intro.mp4" poster="/intro/poster-v2.webp" length="1:21" />
         </div>
 
         <div className="ip-foot">
