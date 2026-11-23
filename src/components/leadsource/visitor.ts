@@ -13,7 +13,10 @@ const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 let tabCode = "";
 let tabClick: Click | null = null;
 
-export type Click = { ch: Channel; at: number };
+/** A click on a demo ad, with the test code that link carried (empty for the plain link). After each tagged click the
+ *  browser gets a fresh code, so a second test never finds the first booking (G3 v1 QA M1). */
+export type Click = { ch: Channel; at: number; code: string };
+const REF = /^ref-[A-Z0-9]{4}$/;
 
 function random(n: number): string {
   const bytes = new Uint8Array(n);
@@ -40,8 +43,10 @@ export function readClick(): Click | null {
   try {
     const raw = localStorage.getItem(CLICK_KEY);
     if (raw) {
-      const c = JSON.parse(raw) as { ch?: unknown; at?: unknown };
-      if (isChannel(c.ch) && typeof c.at === "number" && Number.isFinite(c.at)) return { ch: c.ch, at: c.at };
+      const c = JSON.parse(raw) as { ch?: unknown; at?: unknown; code?: unknown };
+      if (isChannel(c.ch) && typeof c.at === "number" && Number.isFinite(c.at)) {
+        return { ch: c.ch, at: c.at, code: typeof c.code === "string" && REF.test(c.code) ? c.code : "" };
+      }
     }
   } catch {}
   return tabClick;
@@ -53,7 +58,7 @@ let tabClickId = "";
 export function visitorSnapshot(): string {
   if (!tabClickId) tabClickId = demoClickId();
   const c = readClick();
-  return `${getCode()}|${tabClickId}|${c ? `${c.ch}:${c.at}` : ""}`;
+  return `${getCode()}|${tabClickId}|${c ? `${c.ch}:${c.at}:${c.code}` : ""}`;
 }
 export const serverSnapshot = () => "";
 
@@ -72,14 +77,28 @@ export function subscribe(fn: () => void): () => void {
 export type Visitor = { code: string; clickId: string; click: Click | null };
 export function parseVisitor(s: string): Visitor {
   const [code = "", clickId = "", c = ""] = s.split("|");
-  const [ch, at] = c.split(":");
-  return { code, clickId, click: isChannel(ch) && Number.isFinite(Number(at)) ? { ch, at: Number(at) } : null };
+  const [ch, at, clickCode = ""] = c.split(":");
+  return {
+    code,
+    clickId,
+    click: isChannel(ch) && Number.isFinite(Number(at)) ? { ch, at: Number(at), code: REF.test(clickCode) ? clickCode : "" } : null,
+  };
 }
 
+/** Saves the click with the code its link carried, then gives the next link a new code. The new code is written after
+ *  the browser has followed this link (the click handler runs first), so the opened booking page keeps this code. */
 export function saveClick(ch: Channel) {
-  tabClick = { ch, at: Date.now() };
+  const code = ch === "plain" ? "" : getCode();
+  tabClick = { ch, at: Date.now(), code };
   try {
     localStorage.setItem(CLICK_KEY, JSON.stringify(tabClick));
   } catch {}
-  window.dispatchEvent(new Event(CLICK_EVENT));
+  if (ch !== "plain") {
+    tabCode = `ref-${random(4)}`;
+    try {
+      localStorage.setItem(CODE_KEY, tabCode);
+    } catch {}
+  }
+  // Re-render after the navigation has started, so the href of the link being followed is not swapped mid-click.
+  setTimeout(() => window.dispatchEvent(new Event(CLICK_EVENT)), 0);
 }

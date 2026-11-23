@@ -211,8 +211,7 @@ await test("fixture report matches the design's seed (six John Boy rows; the gua
     "Facebook ads": [1, 0, 0, 0, 1],
     "Instagram ads": [1, 0, 0, 1, 0],
     "Google Ads": [2, 1, 1, 0, 0],
-    Referral: [1, 0, 1, 0, 0],
-    Unknown: [1, 1, 0, 0, 0],
+    Unknown: [2, 1, 1, 0, 0],
   });
   assert.deepEqual([r.total.booked, r.total.upcoming, r.total.attended, r.total.noShow, r.total.cancelled], [6, 2, 2, 1, 1]);
   assert.equal(r.latest.length, 6);
@@ -261,12 +260,12 @@ await test("a booking with no source is counted as Unknown, never dropped; Exclu
   assert.equal(r.rows.find((x) => x.name === "Unknown").booked, 1);
 });
 
-await test("Booked at: rounded to 15 minutes, Brisbane; createdAt when the field has no time", () => {
+await test("Booked at: rounded down to 15 minutes, Brisbane; createdAt when the field has no time", () => {
   const b = mapOpportunity(opp({ source: "Facebook", medium: "paid_social" }), pipe.stages, FIXTURE_FIELDS);
   assert.equal(brisbaneStamp(b.bookedAt), "Fri 20 Nov, 11:30 pm"); // 13:37Z = 11:37 pm Brisbane, rounds to 11:30
   const dateOnly = mapOpportunity(opp({ source: "Facebook", bookedAt: "2026-11-20" }), pipe.stages, FIXTURE_FIELDS);
   assert.equal(dateOnly.bookedAt, b.bookedAt);
-  assert.equal(brisbaneStamp(roundQuarter(Date.parse("2026-11-20T13:38:00Z"))), "Fri 20 Nov, 11:45 pm");
+  assert.equal(brisbaneStamp(roundQuarter(Date.parse("2026-11-20T13:44:00Z"))), "Fri 20 Nov, 11:30 pm"); // down, never later than now
   assert.equal(brisbaneTime(Date.parse("2026-11-20T02:05:00Z")), "12:05 pm");
   assert.equal(brisbaneTime(Date.parse("2026-11-20T14:05:00Z")), "12:05 am");
 });
@@ -292,7 +291,7 @@ await test("allowlists: sources and campaigns", () => {
 await test("optional rows show only when above 0, in the design's order, before Total", () => {
   const mk = (q, ref = "") => ({ ...normaliseTouch(touchFromUrl(`?${q}`)), ref, stage: "Upcoming", bookedAt: NOW - 3600e3, seed: false });
   const r = buildReport([mk("utm_source=fb&utm_medium=email"), mk("ttclid=x"), mk("fbclid=x"), mk("utm_source=google&utm_medium=organic")], { now: NOW, updatedAt: NOW, stale: false, mode: "live" });
-  assert.deepEqual(r.rows.map((x) => x.name), ["Facebook ads", "Instagram ads", "Google Ads", "Referral", "Unknown", "Google, free", "Facebook, free", "TikTok", "Other"]);
+  assert.deepEqual(r.rows.map((x) => x.name), ["Facebook ads", "Instagram ads", "Google Ads", "Unknown", "Google, free", "Facebook, free", "TikTok", "Other"]);
   assert.equal(r.total.booked, 4);
 });
 
@@ -328,7 +327,7 @@ await test("Your booking: waiting, found and marked, then pushed out of the late
 await test("a plain-link booking has no code and cannot be marked as yours", () => {
   const now = Date.now();
   const b = simulatedBooking("plain", "ref-K7Q2", 60, now);
-  assert.deepEqual([b.ref, b.source, b.medium], ["", "Referral", "referral"]);
+  assert.deepEqual([b.ref, b.source, b.medium], ["", "Unknown", "none"]);
   const r = buildReport([b], { now, updatedAt: now, stale: false, mode: "fixture", ref: "ref-K7Q2" });
   assert.equal(r.latest[0].code, "No code");
   assert.equal(r.latest[0].yours, undefined);

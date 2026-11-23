@@ -13,7 +13,7 @@ import { getCode, parseVisitor, readClick, serverSnapshot, subscribe, visitorSna
 type Status = "loading" | "ok" | "error";
 type Mine = "none" | "pending" | "plain" | "waiting" | "found" | "still";
 
-const FIXED = ["Facebook ads", "Instagram ads", "Google Ads", "Referral", "Unknown"];
+const FIXED = ["Facebook ads", "Instagram ads", "Google Ads", "Unknown"];
 const lag = MEASURED.lagSeconds ?? PROVISIONAL_LAG_SECONDS;
 
 const fxParam = () => {
@@ -30,10 +30,14 @@ export default function Report() {
   const [data, setData] = useState<PublicReport | null>(null);
   const [clientStale, setClientStale] = useState(false);
   const [limited, setLimited] = useState<string | null>(null);
-  const { code, click } = parseVisitor(useSyncExternalStore(subscribe, visitorSnapshot, serverSnapshot));
-  // Checking runs for 3 times the lag from this page load, or from the latest click, whichever is later.
-  const [startedAt, setStartedAt] = useState(() => Date.now());
-  const deadline = Math.max(startedAt, click?.at ?? 0) + 3 * lag * 1000;
+  const v = parseVisitor(useSyncExternalStore(subscribe, visitorSnapshot, serverSnapshot));
+  const click = v.click;
+  // The code to look for is the one the clicked link carried; the page may already show the next one (G3 v1 QA M1).
+  const code = click?.code || v.code;
+  // Checking runs for 3 times the lag from the latest click, or from a Try again, whichever is later. An old click does
+  // not start a new wait on a later visit (G3 v1 QA minor).
+  const [startedAt, setStartedAt] = useState(0);
+  const deadline = Math.max(click?.at ?? 0, startedAt) + 3 * lag * 1000;
   const [nowTick, setNowTick] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const busy = useRef(false);
@@ -47,7 +51,7 @@ export default function Report() {
       else setStatus("error");
     };
     const c = readClick();
-    const ref = getCode();
+    const ref = (c && c.code) || getCode();
     const q = new URLSearchParams({ ref });
     if (c) {
       q.set("sim", c.ch);
@@ -118,6 +122,13 @@ export default function Report() {
     }, Math.max(1000, Math.min(wait, until + 50)));
   }, [mine, status, limited, deadline, nowTick, load]);
 
+  // A rate limit when nothing is being waited for: ask once more after the window, as the message promises (G3 v1 QA minor).
+  useEffect(() => {
+    if (!limited || mine === "waiting") return;
+    const t = setTimeout(load, RATE_WINDOW_SECONDS * 1000);
+    return () => clearTimeout(t);
+  }, [limited, mine, load]);
+
   const retry = () => {
     setStatus("loading");
     setStartedAt(Date.now());
@@ -137,10 +148,10 @@ export default function Report() {
         <p>
           {data ? (
             <>
-              <b>Updated {data.updated}</b>{" · "}Checks GoHighLevel again every {data.cacheWindow}
+              <b>Updated {data.updated}</b>{" · "}Read from GoHighLevel at most once every {data.cacheWindow}
             </>
           ) : (
-            <>Checks GoHighLevel again every {CACHE_WINDOW_LABEL}</>
+            <>Read from GoHighLevel at most once every {CACHE_WINDOW_LABEL}</>
           )}
         </p>
         {limited ? (
@@ -172,9 +183,11 @@ export default function Report() {
             <button className="pill" type="button" onClick={retry}>
               Try again
             </button>
-            <a className="textlink" href="#watch">
-              Watch the recording
-            </a>
+            {MEASURED.recording ? (
+              <a className="textlink" href="#watch">
+                Watch the recording
+              </a>
+            ) : null}
           </div>
         </div>
       )}
@@ -208,8 +221,8 @@ export default function Report() {
                 any. Facebook adds a click ID to free posts too, so the tag decides.
               </p>
               <p>
-                <b>Referral</b>{" "}means no tags, but the browser said which site sent you (here, johnboydesign.com). <b>Unknown</b>{" "}means no tags and no referring
-                site. Both are counted, never dropped. GoHighLevel&apos;s own reports call Unknown Direct traffic.
+                <b>Unknown</b>{" "}means the link had no tags and no click ID, like a link pasted into a message or the plain link on this page. It is counted,
+                never dropped. The tracker does not guess from the referring site. GoHighLevel&apos;s own reports call it Direct traffic.
               </p>
             </div>
           </div>
@@ -267,7 +280,7 @@ function YoursBox({ mine, code, data }: { mine: Exclude<Mine, "none" | "pending"
         <div>
           <p>Your last click was the plain link, so there is no code to look for.</p>
           <p className="sub">
-            If you booked from it, it is counted as {MEASURED.plainResult ?? <span className="ph">Referral or Unknown</span>}, like any untagged booking. No
+            If you booked from it, it is counted as {MEASURED.plainResult ?? "Unknown"}, like any untagged booking. No
             tags, so the report cannot tell which one is yours. That is the point.
           </p>
         </div>

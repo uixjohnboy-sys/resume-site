@@ -93,6 +93,7 @@ export function mapOpportunity(opp: RawOpp, stageNames: ReadonlyMap<string, stri
     stage: publicStage(stageNames.get(stageId), opp.status),
     bookedAt: roundQuarter(bookedAt),
     seed: tags.some((t) => t === SEED_TAG),
+    sortAt: bookedAt,
   };
 }
 
@@ -111,6 +112,11 @@ export function pickPipeline(pipelines: unknown, pipelineId?: string): { id: str
 }
 
 export type GhlConfig = { token: string; location: string; pipelineId?: string; fields: FieldIds | null; fetchImpl?: typeof fetch };
+
+// The pipeline and its stage names rarely change: kept per location for 10 minutes across requests, so a refresh is one
+// search call (SPEC 6.3; G3 v1 QA minor). Holds ids and stage names only, no contact data.
+const pipeCache = new Map<string, { at: number; pipe: { id: string; stages: Map<string, string> } }>();
+const PIPE_TTL = 10 * 60 * 1000;
 
 export function ghlProvider(cfg: GhlConfig): Provider {
   const doFetch = cfg.fetchImpl ?? fetch;
@@ -142,9 +148,14 @@ export function ghlProvider(cfg: GhlConfig): Provider {
     mode: "live",
     async list() {
       if (!cfg.fields) throw new GhlError("GHL_LEADSOURCE_FIELDS missing or invalid");
-      const pipes = await call("/opportunities/pipelines", { locationId: cfg.location });
-      const pipe = pickPipeline(pipes.pipelines, cfg.pipelineId);
-      if (!pipe) throw new GhlError("demo pipeline not found");
+      const hit = pipeCache.get(cfg.location);
+      let pipe = hit && Date.now() - hit.at < PIPE_TTL ? hit.pipe : null;
+      if (!pipe) {
+        const pipes = await call("/opportunities/pipelines", { locationId: cfg.location });
+        pipe = pickPipeline(pipes.pipelines, cfg.pipelineId);
+        if (!pipe) throw new GhlError("demo pipeline not found");
+        pipeCache.set(cfg.location, { at: Date.now(), pipe });
+      }
       const out: Booking[] = [];
       for (let page = 1; page <= MAX_PAGES; page++) {
         const r = await call("/opportunities/search", { location_id: cfg.location, pipeline_id: pipe.id, limit: String(PAGE_SIZE), page: String(page) });

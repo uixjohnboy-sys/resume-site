@@ -55,7 +55,8 @@ const QUARTER = 15 * 60 * 1000;
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export const roundQuarter = (ms: number) => Math.round(ms / QUARTER) * QUARTER;
+// Down to the quarter hour, so a booking time is never later than the Updated time (G3 v1 QA minor).
+export const roundQuarter = (ms: number) => Math.floor(ms / QUARTER) * QUARTER;
 
 function clock(d: Date) {
   const h = d.getUTCHours();

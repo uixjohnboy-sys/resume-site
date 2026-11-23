@@ -1,12 +1,15 @@
 import Link from "next/link";
 import Ads from "./Ads";
 import Report from "./Report";
+import { MEASURED } from "@/lib/leadsource/config";
 
 // The Lead-source tracker demo page (DESIGN.md v0.3). One component, two entry points: /demo/lead-source (hero first)
 // and /demo/lead-source/report (the booking confirmation redirect: one line instead of the hero, the report first).
 // Kestrel Physio is a made-up clinic. Only the four demo ad links open a new tab.
 
 const BOOK = "/book";
+// Shown only once they exist (G3 v1 Design Director: a dashed or grey placeholder must not go live).
+const SHOTS_READY = false;
 
 type Props = { variant: "demo" | "report"; paused: boolean; bookingBase: string };
 
@@ -35,7 +38,7 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
   const ads = (
     <section className={`blk${reportFirst ? "" : " first"}`} id="ads" aria-labelledby="ads-h">
       <div className="sechead">
-        <span className="secno lbl">01</span>
+        <span className="secno lbl">{reportFirst ? "02" : "01"}</span>
         <div>
           <h2 id="ads-h">Pick a demo ad</h2>
           <p className="secsub">
@@ -50,7 +53,7 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
   const report = (
     <section className={`blk${reportFirst ? " first" : ""}`} id="report" aria-labelledby="rep-h">
       <div className="sechead">
-        <span className="secno lbl">02</span>
+        <span className="secno lbl">{reportFirst ? "01" : "02"}</span>
         <div>
           <h2 id="rep-h">The live report</h2>
           <p className="secsub">
@@ -60,12 +63,20 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
         </div>
       </div>
       <Report />
-      <div className="watch" id="watch">
-        <p>Rather not book?</p>
-        <p className="small">
-          <span className="ph prose">Recording, its length and the transcript link are added at G3</span>
-        </p>
-      </div>
+      {MEASURED.recording ? (
+        <div className="watch" id="watch">
+          <p>Rather not book?</p>
+          <p className="small">
+            <a className="textlink" href={MEASURED.recording.href}>
+              Watch the recording ({MEASURED.recording.length})
+            </a>
+            {" · "}
+            <a className="textlink" href={MEASURED.recording.transcript}>
+              Transcript
+            </a>
+          </p>
+        </div>
+      ) : null}
     </section>
   );
 
@@ -103,7 +114,7 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
             <div className="hero lite">
               <div>
                 <p className="kick lbl">Live demo · GoHighLevel</p>
-                <h1>Your booking and the live report</h1>
+                <h1>Your booking</h1>
                 <a className="textlink" href="/demo/lead-source#ads">
                   Back to the demo ads
                 </a>
@@ -129,9 +140,11 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
                       Try a demo ad
                     </a>
                   )}
-                  <a className="textlink" href="#watch">
-                    Rather watch? See the recording
-                  </a>
+                  {MEASURED.recording ? (
+                    <a className="textlink" href="#watch">
+                      Rather watch? See the recording
+                    </a>
+                  ) : null}
                 </div>
               </div>
               <aside className="howto" aria-labelledby="howto-h">
@@ -180,7 +193,7 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
               <div>
                 <h2 id="ghl-h">What the agency sees in GoHighLevel</h2>
                 <p className="secsub">
-                  The same booking inside GoHighLevel, as the clinic&apos;s team would see it. Screenshots from the demo account, test contacts only.
+                  The same booking inside GoHighLevel, as the clinic&apos;s team would see it{SHOTS_READY ? ". Screenshots from the demo account, test contacts only." : ": the fields it saves and where they sit."}
                 </p>
               </div>
             </div>
@@ -188,6 +201,7 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
               Installs as a GoHighLevel snapshot into any sub-account. Per clinic you set the calendar, the alert recipient and the mapping list, then book once
               through each channel&apos;s link to check the source before the ads go live.
             </p>
+            {SHOTS_READY ? (
             <div className="shots">
               <figure>
                 <div className="shot">
@@ -214,6 +228,7 @@ export default function LeadSourcePage({ variant, paused, bookingBase }: Props) 
                 <figcaption>The alert the clinic&apos;s team gets: first name, time, source and campaign.</figcaption>
               </figure>
             </div>
+            ) : null}
             <div className="fields">
               <div>
                 <h3>First touch (saved once, never overwritten)</h3>

@@ -10,7 +10,7 @@ import { parseVisitor, saveClick, serverSnapshot, subscribe, visitorSnapshot } f
 
 const PLAIN_TEXT = {
   Referral: "Referral. Your browser tells GoHighLevel you came from this site.",
-  Unknown: "Unknown. GoHighLevel gets no tags and no referring site.",
+  Unknown: "Unknown. No tags and no click ID, so nothing says where it came from.",
 } as const;
 
 export default function Ads({ paused, bookingBase }: { paused: boolean; bookingBase: string }) {

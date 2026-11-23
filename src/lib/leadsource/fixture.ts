@@ -29,7 +29,6 @@ type Record_ = {
   contact: { name: string; email: string; tags: string[]; addedAt?: string };
 };
 
-const SITE = "https://www.johnboydesign.com/demo/lead-source";
 const seedTags = [DEMO_TAG, SEED_TAG];
 
 // John Boy's own test bookings in the live build; here, made-up stand-ins with the same shape (times are Brisbane in
@@ -45,8 +44,8 @@ const RECORDS: Record_[] = [
   { link: "utm_source=fb&utm_medium=paid_social&utm_campaign=kp-initial-consult&utm_content=ref-T8C3&fbclid=demoT8C3nb", at: "2026-11-17T06:30:00Z", stage: "Cancelled", contact: { name: "Test Drew", email: "drew.test@example.invalid", tags: seedTags } },
   // Mon 16 Nov, 7:15 pm: Google ad.
   { link: "gclid=demoT5H1kd&utm_content=ref-T5H1", at: "2026-11-16T09:15:00Z", stage: "Booked", contact: { name: "Test Emery", email: "emery.test@example.invalid", tags: seedTags } },
-  // Sun 15 Nov, 12:30 pm: the plain link clicked on this site, so the browser sent the referrer.
-  { link: "", referrer: SITE, at: "2026-11-15T02:30:00Z", stage: "Attended", contact: { name: "Test Finley", email: "finley.test@example.invalid", tags: seedTags } },
+  // Sun 15 Nov, 12:30 pm: the plain link clicked on this site. The live workflow ignores the referrer, so it is Unknown too.
+  { link: "", referrer: "", at: "2026-11-15T02:30:00Z", stage: "Attended", contact: { name: "Test Finley", email: "finley.test@example.invalid", tags: seedTags } },
   // Sat 14 Nov, 9:00 am: an email that was already a contact (a non-demo tag). The guard stamps nothing and the
   // opportunity Source is "Excluded", so the report leaves it out.
   {
@@ -106,7 +105,7 @@ export function simulatedBooking(channel: Channel, code: string, secondsAgo: num
   if (secondsAgo < FIXTURE_LAG_SECONDS) return null;
   const at = now - Math.min(secondsAgo, 3600) * 1000;
   const link = adQuery(channel, channel === "plain" ? "" : code, "demoSIM");
-  const opp = toOpportunity({ link, referrer: channel === "plain" ? SITE : "", at: new Date(at).toISOString(), stage: "Booked", contact: { name: "Test Visitor", email: "visitor.test@example.invalid", tags: [DEMO_TAG] } }, 9000);
+  const opp = toOpportunity({ link, referrer: "", at: new Date(at).toISOString(), stage: "Booked", contact: { name: "Test Visitor", email: "visitor.test@example.invalid", tags: [DEMO_TAG] } }, 9000);
   return project([opp])[0] ?? null;
 }
 
@@ -116,7 +115,7 @@ export function fillerBookings(now: number): Booking[] {
   return shapes.map((ch, i) => {
     const code = ch === "plain" ? "" : `ref-F${i}Q${(i * 7) % 10}`;
     const at = now - (i + 1) * 60 * 1000;
-    const opp = toOpportunity({ link: adQuery(ch, code, "demoFILL"), referrer: ch === "plain" ? SITE : "", at: new Date(at).toISOString(), stage: "Booked", contact: { name: "Test Filler", email: "filler.test@example.invalid", tags: [DEMO_TAG] } }, 9100 + i);
+    const opp = toOpportunity({ link: adQuery(ch, code, "demoFILL"), referrer: "", at: new Date(at).toISOString(), stage: "Booked", contact: { name: "Test Filler", email: "filler.test@example.invalid", tags: [DEMO_TAG] } }, 9100 + i);
     return project([opp])[0]!;
   });
 }

@@ -27,6 +27,8 @@ export type Booking = {
   stage: Stage;
   bookedAt: number;
   seed: boolean;
+  /** The exact booking time, server side only, for ordering bookings inside one 15-minute slot. Never sent to the page. */
+  sortAt?: number;
 };
 
 export type Counts = { booked: number; upcoming: number; attended: number; noShow: number; cancelled: number };

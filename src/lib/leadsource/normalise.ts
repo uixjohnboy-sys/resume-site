@@ -185,8 +185,10 @@ export function reportRow(source: Source, medium: Medium): RowName {
 }
 
 /** Rows always shown, in this order; then the optional rows, only when their count is above 0. */
-export const FIXED_ROWS: readonly RowName[] = ["Facebook ads", "Instagram ads", "Google Ads", "Referral", "Unknown"];
-export const OPTIONAL_ROWS: readonly RowName[] = ["Google, free", "Facebook, free", "Instagram, free", "TikTok", "Other"];
+// Referral is optional since G3 v1 (QA M2): the live GoHighLevel workflow classifies from tags and click IDs only and never
+// reads the referring site, so an untagged booking is Unknown. A Referral row appears only if an install adds referrer rules.
+export const FIXED_ROWS: readonly RowName[] = ["Facebook ads", "Instagram ads", "Google Ads", "Unknown"];
+export const OPTIONAL_ROWS: readonly RowName[] = ["Referral", "Google, free", "Facebook, free", "Instagram, free", "TikTok", "Other"];
 
 // First touch and last touch on the contact (SPEC 5.2). First touch = the first booking this workflow captured: written
 // only while Lead source is empty. Last touch: written on every booking.

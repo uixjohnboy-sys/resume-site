@@ -25,7 +25,7 @@ export function buildReport(
   bookings: readonly Booking[],
   opts: { now: number; updatedAt: number; stale: boolean; mode: "fixture" | "live"; ref?: string },
 ): PublicReport {
-  const counted = inWindow(bookings, opts.now).sort((a, b) => b.bookedAt - a.bookedAt || a.ref.localeCompare(b.ref));
+  const counted = inWindow(bookings, opts.now).sort((a, b) => (b.sortAt ?? b.bookedAt) - (a.sortAt ?? a.bookedAt) || a.ref.localeCompare(b.ref));
   const by = new Map<RowName, Counts>();
   const total = zero();
   for (const b of counted) {
