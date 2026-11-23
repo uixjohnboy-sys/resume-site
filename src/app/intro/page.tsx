@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     url: "/intro",
     siteName: "John Boy Roxas",
     type: "video.other",
-    images: [{ url: "/intro/poster.webp", width: 1600, height: 900, alt: "John Boy Roxas, Systems and Automation" }],
+    images: [{ url: "/intro/poster.jpg", width: 1200, height: 675, alt: "John Boy Roxas, Systems and Automation" }],
     videos: [{ url: "/intro/john-boy-roxas-intro.mp4", type: "video/mp4", width: 1920, height: 1080 }],
   },
 };
