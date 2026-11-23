@@ -34,10 +34,14 @@ export default function Report() {
   const click = v.click;
   // The code to look for is the one the clicked link carried; the page may already show the next one (G3 v1 QA M1).
   const code = click?.code || v.code;
-  // Checking runs for 3 times the lag from the latest click, or from a Try again, whichever is later. An old click does
-  // not start a new wait on a later visit (G3 v1 QA minor).
+  // Checking runs for 3 times the lag. It starts at this page load when the click is recent (the visitor still had to
+  // pick a time and fill the form, G3 v1 QA R1), at the click itself when it is older than 30 minutes (an old click does
+  // not start a new wait on a later visit), or at a Try again, whichever is latest.
+  const [loadedAt] = useState(() => Date.now());
   const [startedAt, setStartedAt] = useState(0);
-  const deadline = Math.max(click?.at ?? 0, startedAt) + 3 * lag * 1000;
+  const RECENT_MS = 30 * 60 * 1000;
+  const from = click ? (loadedAt - click.at < RECENT_MS ? Math.max(loadedAt, click.at) : click.at) : 0;
+  const deadline = Math.max(from, startedAt) + 3 * lag * 1000;
   const [nowTick, setNowTick] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const busy = useRef(false);
@@ -128,6 +132,19 @@ export default function Report() {
     const t = setTimeout(load, RATE_WINDOW_SECONDS * 1000);
     return () => clearTimeout(t);
   }, [limited, mine, load]);
+
+  // Back on this tab after booking in the other one: if the click is recent and the booking is not found yet, look again
+  // and wait once more (the same gap as R1, for the demo page where the report sits under the ads).
+  useEffect(() => {
+    const onShow = () => {
+      if (document.visibilityState !== "visible" || !click || mine === "found" || mine === "plain") return;
+      if (Date.now() - click.at > RECENT_MS) return;
+      setStartedAt(Date.now());
+      load();
+    };
+    document.addEventListener("visibilitychange", onShow);
+    return () => document.removeEventListener("visibilitychange", onShow);
+  }, [click, mine, load, RECENT_MS]);
 
   const retry = () => {
     setStatus("loading");
