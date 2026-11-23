@@ -57,8 +57,8 @@ export const MEASURED: {
   lagSeconds: null,
   lagDate: null,
   plainResult: null,
-  googleResult: null,
-  stageWorkflowProven: false,
+  googleResult: "Google, cpc", // measured 23 Nov 2026: test booking 3 (click ID only) read as Google / cpc
+  stageWorkflowProven: true, // measured 23 Nov 2026: Showed moved the booking to Attended, No show to No-show
   recording: null,
 };
 
