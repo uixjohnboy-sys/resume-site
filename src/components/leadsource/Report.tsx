@@ -45,6 +45,7 @@ export default function Report() {
   const [nowTick, setNowTick] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const busy = useRef(false);
+  const lastShowLoad = useRef(0);
   const dataRef = useRef<PublicReport | null>(null);
 
   const load = useCallback(async () => {
@@ -139,6 +140,9 @@ export default function Report() {
     const onShow = () => {
       if (document.visibilityState !== "visible" || !click || mine === "found" || mine === "plain") return;
       if (Date.now() - click.at > RECENT_MS) return;
+      // No more than one extra check every 15 seconds, so a visitor who switches tabs a lot cannot hit the rate limit.
+      if (Date.now() - lastShowLoad.current < 15_000) return;
+      lastShowLoad.current = Date.now();
       setStartedAt(Date.now());
       load();
     };
