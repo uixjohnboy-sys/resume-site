@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/demo/:path*", headers: demo },
       { source: "/api/tapline/:path*", headers: demo },
+      // The report JSON stays out of search results (G3 v1 QA minor).
+      { source: "/api/lead-source/:path*", headers: [...demo, { key: "X-Robots-Tag", value: "noindex, nofollow" }] },
     ];
   },
   async rewrites() {
