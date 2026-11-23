@@ -4,6 +4,7 @@ import { anton, host, plex } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
 import AboutStory from "@/components/home/AboutStory";
 import ContactBlob from "@/components/home/ContactBlob";
+import IntroPlayer from "@/components/home/IntroPlayer";
 import SkillFlow, { type FlowCard } from "@/components/home/SkillFlow";
 import { work } from "@/lib/work";
 import { clients } from "@/lib/about";
@@ -54,9 +55,10 @@ const LINKEDIN = "https://www.linkedin.com/in/john-boy-roxas-gohighlevel-special
 const CV = "/John-Boy-Roxas-Resume.pdf";
 const BOOK = "/book";
 
-// Set once the intro is recorded and uploaded. Until then the frame says so plainly, and the work above still works.
-const INTRO_VIDEO = "";
-const INTRO_CAPTIONS = "";
+// The intro (recorded 2026-11-23, edited in C:\PortfolioProjects\intro-video\edit). Voice only, no music, so no
+// Content ID claims; the captions are burned into the picture, so no separate caption track is needed.
+const INTRO_VIDEO = "/intro/john-boy-roxas-intro.mp4";
+const INTRO_POSTER = "/intro/poster.webp";
 
 
 export default function Home() {
@@ -104,10 +106,7 @@ export default function Home() {
           <div className="v4-in">
             <div className="v4-film" data-rv>
               {INTRO_VIDEO ? (
-                <video controls preload="metadata" playsInline poster="/projects/tapline/board.png">
-                  <source src={INTRO_VIDEO} />
-                  {INTRO_CAPTIONS && <track kind="captions" src={INTRO_CAPTIONS} srcLang="en" label="English" default />}
-                </video>
+                <IntroPlayer src={INTRO_VIDEO} poster={INTRO_POSTER} length="1:21" />
               ) : (
                 <div className="v4-film-wait">
                   <Image className="v4-film-still" src="/projects/tapline/board.png" alt="" width={2880} height={1800} sizes="(max-width: 860px) 100vw, 1040px" />

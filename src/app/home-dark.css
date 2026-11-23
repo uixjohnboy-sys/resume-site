@@ -73,6 +73,61 @@
 .v4-dark .v4-film-wait {
   background: radial-gradient(ellipse 70% 80% at 80% 20%, #2a2a28 0%, #0f0f0f 70%);
 }
+/* the recorded intro (2026-11-23): poster + one play mark over the whole frame until it starts */
+.v4-dark .v4-film {
+  position: relative;
+}
+.v4-dark .ip-start {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.45) 100%);
+  color: var(--ink);
+  cursor: pointer;
+}
+.v4-dark .ip-start .v4-film-play {
+  top: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.v4-dark .ip-start:hover .v4-film-play,
+.v4-dark .ip-start:focus-visible .v4-film-play {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: rgba(0, 0, 0, 0.55);
+}
+.v4-dark .ip-start:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -4px;
+}
+.v4-dark .ip-label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 66px);
+  transform: translateX(-50%);
+  font-family: var(--label);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+@media (max-width: 860px) {
+  .v4-dark .ip-start .v4-film-play {
+    top: 50%;
+  }
+  .v4-dark .ip-label {
+    top: calc(50% + 46px);
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v4-dark .ip-start .v4-film-play {
+    transition: none;
+  }
+}
 
 /* the big JB in the footer is a faint shape, not a white block */
 .v4-dark .v4-foot {
