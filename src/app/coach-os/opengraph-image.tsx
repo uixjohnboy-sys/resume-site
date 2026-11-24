@@ -59,7 +59,7 @@ export default function Image() {
 
         <div style={{ display: "flex", alignItems: "center", gap: 12, color: "#D5FE38", fontSize: 21, letterSpacing: 4 }}>
           <div style={{ width: 11, height: 11, borderRadius: 11, background: "#D5FE38", display: "flex" }} />
-          CASE STUDY · JOHNBOY ROXAS
+          CASE STUDY · JOHN BOY ROXAS
         </div>
 
         <div
