@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Old_Standard_TT, Source_Serif_4 } from "next/font/google";
+import localFont from "next/font/local";
 import { corrections, EMPTY_STATE, type Correction } from "./corrections";
 import styles from "./errata.module.css";
 
@@ -48,23 +48,33 @@ export const metadata: Metadata = {
   },
 };
 
-const display = Old_Standard_TT({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
+// Self-hosted (src/fonts) since 2026-11-24: Google Fonts fetches during Vercel builds kept failing deploys.
+const display = localFont({
+  src: [
+    { path: "../../fonts/old-standard-tt-normal-400.woff2", weight: "400", style: "normal" },
+    { path: "../../fonts/old-standard-tt-italic-400.woff2", weight: "400", style: "italic" },
+    { path: "../../fonts/old-standard-tt-normal-700.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--errata-display",
+  display: "swap",
 });
 
-const text = Source_Serif_4({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
+const text = localFont({
+  src: [
+    { path: "../../fonts/source-serif-4-normal-200-900.woff2", weight: "200 900", style: "normal" },
+    { path: "../../fonts/source-serif-4-italic-200-900.woff2", weight: "200 900", style: "italic" },
+  ],
   variable: "--errata-text",
+  display: "swap",
 });
 
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const mono = localFont({
+  src: [
+    { path: "../../fonts/ibm-plex-mono-normal-400.woff2", weight: "400", style: "normal" },
+    { path: "../../fonts/ibm-plex-mono-normal-500.woff2", weight: "500", style: "normal" },
+  ],
   variable: "--errata-mono",
+  display: "swap",
 });
 
 type Row = Correction & { no: number };

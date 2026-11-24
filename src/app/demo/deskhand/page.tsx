@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Public_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import Desk from "@/components/deskhand/Desk";
 import "./deskhand.css";
 
-const font = Public_Sans({ subsets: ["latin"], variable: "--font-desk" });
+const font = localFont({
+  src: [{ path: "../../../fonts/public-sans-normal-100-900.woff2", weight: "100 900", style: "normal" }],
+  variable: "--font-desk",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Deskhand demo: an AI front desk for a cleaning business",

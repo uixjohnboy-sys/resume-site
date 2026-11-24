@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
+// Self-hosted (src/fonts) since 2026-11-24: Google Fonts fetches during Vercel builds kept failing deploys.
+const geistSans = localFont({
+  src: [{ path: "../fonts/geist-normal-100-900.woff2", weight: "100 900", style: "normal" }],
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: [{ path: "../fonts/geist-mono-normal-100-900.woff2", weight: "100 900", style: "normal" }],
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 const siteTitle = "GoHighLevel Specialist for Hire, GHL Expert | John Boy Roxas";
