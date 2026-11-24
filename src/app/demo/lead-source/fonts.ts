@@ -12,11 +12,13 @@ const mono = localFont({
   ],
   variable: "--font-lsmono",
   display: "swap",
+  preload: false,
 });
 const figtree = localFont({
   src: [{ path: "../../../fonts/figtree-normal-300-900.woff2", weight: "300 900", style: "normal" }],
   variable: "--font-figtree",
   display: "swap",
+  preload: false,
 });
 
 export const fontVars = `${anton.variable} ${host.variable} ${mono.variable} ${figtree.variable}`;

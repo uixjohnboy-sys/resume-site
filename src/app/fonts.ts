@@ -13,6 +13,7 @@ export const archivo = localFont({
   src: [{ path: "../fonts/archivo-normal-100-900.woff2", weight: "100 900", style: "normal" }],
   variable: "--font-archivo",
   display: "swap",
+  preload: false, // older pages only; still loads where used
   declarations: [{ prop: "font-stretch", value: "62% 125%" }],
 });
 
@@ -26,6 +27,7 @@ export const serif = localFont({
   ],
   variable: "--font-serif",
   display: "swap",
+  preload: false,
 });
 
 // The homepage: tall condensed headlines, a clean body face and mono labels.
@@ -54,4 +56,5 @@ export const jetmono = localFont({
   src: [{ path: "../fonts/jetbrains-mono-normal-100-800.woff2", weight: "100 800", style: "normal" }],
   variable: "--font-mono",
   display: "swap",
+  preload: false,
 });
