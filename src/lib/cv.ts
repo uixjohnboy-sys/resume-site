@@ -102,7 +102,7 @@ export const cvProjects: CvProject[] = [
     name: "Coach OS",
     kind: "Client-management platform for one-to-one coaches, built from zero and synced with GoHighLevel both ways. My own product.",
     points: ["Stripe subscription lifecycle with webhook signature checks, in-browser e-signature with write-once records, and an AI client companion on the Claude API."],
-    stats: "26 GoHighLevel webhook events · 84 email templates · 10 scheduled jobs · 36 API endpoints",
+    stats: "25 GoHighLevel webhook events · 84 email templates · 10 scheduled jobs · 35 API endpoints",
     cta: "Live tour",
     links: [{ label: "coachos.johnboydesign.com/tour", href: "https://coachos.johnboydesign.com/tour" }],
   },

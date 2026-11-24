@@ -11,7 +11,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const stats = [
-  ["30,275", "lines of code"],
+  ["29,709", "lines of code"],
   ["26", "GHL webhook events"],
   ["84", "automated emails"],
   ["10", "scheduled jobs"],

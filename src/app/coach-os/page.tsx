@@ -11,7 +11,7 @@ import "../home.css";
 
 const title = "Coach OS · Case Study";
 const description =
-  "A case study on Coach OS, a client-management platform built from zero: 30,275 lines of code, 26 GoHighLevel webhook events, 84 automated email templates, Stripe subscription billing, and an AI companion trained on each client's own history.";
+  "A case study on Coach OS, a client-management platform built from zero: 29,709 lines of code, 25 GoHighLevel webhook events, 84 automated email templates, Stripe subscription billing, and an AI companion trained on each client's own history.";
 
 export const metadata: Metadata = {
   title,
@@ -73,7 +73,7 @@ const shots = [
 ];
 
 const stats = [
-  { v: "30,275", l: "Lines of code" },
+  { v: "29,709", l: "Lines of code" },
   { v: "26", l: "GoHighLevel webhook events sent" },
   { v: "84", l: "Automated email templates" },
   { v: "26", l: "Page routes" },
@@ -108,7 +108,7 @@ const modules = [
     k: "The automation layer",
     t: "What runs by itself",
     items: [
-      "26 distinct webhook events sent from the app into GoHighLevel, plus handlers that take GoHighLevel's booking, payment and pipeline updates back into the app.",
+      "25 distinct webhook events sent from the app into GoHighLevel, plus handlers that take GoHighLevel's booking, payment and pipeline updates back into the app.",
       "10 scheduled jobs, including onboarding weeks, check-in reminders, access expiry, no-show recovery, and a weekly digest.",
       "84 email templates, including follow-up sequences that escalate on day 2 and again on day 5 instead of firing once.",
       "Booking and pipeline stage changes sync back from the CRM, so nobody keeps two systems in their head.",

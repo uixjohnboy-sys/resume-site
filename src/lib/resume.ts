@@ -58,7 +58,7 @@ export const projects: LiveProject[] = [
     points: [
       "Full Stripe subscription lifecycle with webhook signature checks, in-browser e-signature with write-once records, and an AI client companion on the Claude API.",
     ],
-    stats: "30,275 lines of code · 26 pages · 36 API endpoints · 10 scheduled jobs · 84 email templates · 26 GHL webhook events",
+    stats: "29,709 lines of code · 26 pages · 35 API endpoints · 10 scheduled jobs · 84 email templates · 25 GHL webhook events",
     img: "/coach-os-shots/app-dash-overview.jpg",
     imgAlt: "The Coach OS dashboard",
     links: [

@@ -51,7 +51,7 @@ export const FACTS: Fact[] = [
   {
     id: "coachos",
     title: "Coach OS, the flagship",
-    text: "Coach OS is a complete client-management platform for one-to-one coaches that he designed and built from zero, wired into GoHighLevel in both directions. It runs live on a labelled sample practice (the Harper Quinn demo). Counted from the repository: 30,275 lines of code, 26 pages, 36 API endpoints, 10 scheduled background jobs, 84 automated email templates, and 26 GoHighLevel webhook events sent from the app. Case study: johnboydesign.com/coach-os. Live tour: coachos.johnboydesign.com/tour.",
+    text: "Coach OS is a complete client-management platform for one-to-one coaches that he designed and built from zero, wired into GoHighLevel in both directions. It runs live on a labelled sample practice (the Harper Quinn demo). Counted from the repository: 29,709 lines of code, 26 pages, 35 API endpoints, 10 scheduled background jobs, 84 automated email templates, and 25 GoHighLevel webhook events sent from the app. Case study: johnboydesign.com/coach-os. Live tour: coachos.johnboydesign.com/tour.",
   },
   {
     id: "coachos-parts",

@@ -205,7 +205,7 @@ export const work: Work[] = [
       {
         kind: "My own product",
         name: "Coach OS",
-        line: "Synced with GoHighLevel in both directions across 26 webhook events, with Stripe subscriptions handled from sign-up to cancel and every webhook signature checked.",
+        line: "Synced with GoHighLevel in both directions across 25 webhook events, with Stripe subscriptions handled from sign-up to cancel and every webhook signature checked.",
         href: "/coach-os",
         cta: "Case study",
       },
@@ -298,7 +298,7 @@ export const work: Work[] = [
     n: "07",
     slug: "custom-apps",
     seoTitle: "Custom Apps Connected to GoHighLevel | John Boy Roxas",
-    seoDescription: "When GoHighLevel can't do the job, I build the web app on Next.js, Firebase and Stripe and sync it back to your CRM. See Coach OS: 26 GHL webhook events.",
+    seoDescription: "When GoHighLevel can't do the job, I build the web app on Next.js, Firebase and Stripe and sync it back to your CRM. See Coach OS: 25 GHL webhook events.",
     title: "Custom apps",
     promise: "When GoHighLevel can't do the job, I build the app you need and connect it back to GoHighLevel.",
     lead: { kind: "My own product", name: "Coach OS", line: "A platform where coaches run clients, agreements, payments and an AI companion, synced with GoHighLevel. Demo data." },
@@ -313,7 +313,7 @@ export const work: Work[] = [
       {
         kind: "My own product",
         name: "Coach OS",
-        line: "A client-management platform for one-to-one coaches: 30,275 lines of code, 26 pages, 36 API endpoints, 10 scheduled jobs and 84 email templates (counted Sept 2026).",
+        line: "A client-management platform for one-to-one coaches: 29,709 lines of code, 26 pages, 35 API endpoints, 10 scheduled jobs and 84 email templates (counted Nov 2026).",
         href: "/coach-os",
         cta: "Case study",
       },

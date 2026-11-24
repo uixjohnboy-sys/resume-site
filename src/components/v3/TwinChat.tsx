@@ -74,7 +74,7 @@ const FAQ: { q: string; a: string; facts: string[] }[] = [
   },
   {
     q: "What is Coach OS?",
-    a: "Coach OS is a client-management platform for one-to-one coaches that he built from zero and wired into GoHighLevel in both directions: four lead tools, a passwordless client portal with an AI companion, e-signed agreements and Stripe subscriptions. It's 30,275 lines of code with 36 API endpoints and 10 scheduled jobs, running live on a labelled sample practice. Case study: johnboydesign.com/coach-os. Live tour: coachos.johnboydesign.com/tour.",
+    a: "Coach OS is a client-management platform for one-to-one coaches that he built from zero and wired into GoHighLevel in both directions: four lead tools, a passwordless client portal with an AI companion, e-signed agreements and Stripe subscriptions. It's 29,709 lines of code with 35 API endpoints and 10 scheduled jobs, running live on a labelled sample practice. Case study: johnboydesign.com/coach-os. Live tour: coachos.johnboydesign.com/tour.",
     facts: ["coachos", "coachos-parts", "billing"],
   },
   {
