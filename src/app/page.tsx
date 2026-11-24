@@ -5,6 +5,7 @@ import Reveal from "@/components/v4/Reveal";
 import AboutStory from "@/components/home/AboutStory";
 import ContactBlob from "@/components/home/ContactBlob";
 import IntroPlayer from "@/components/home/IntroPlayer";
+import IntroChip from "@/components/home/IntroChip";
 import SkillFlow, { type FlowCard } from "@/components/home/SkillFlow";
 import { work } from "@/lib/work";
 import { clients } from "@/lib/about";
@@ -95,6 +96,11 @@ export default function Home() {
             <h1 id="hero-h">I build what your CRM can&apos;t.</h1>
             <p className="v4-lede">
               GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time, from AUD 15/hr.
+            </p>
+            {/* Face on the first screen + how client data is handled (hiring review 2026-11-24). */}
+            <IntroChip length="1:21" />
+            <p className="sf-trust">
+              <span>NDA before I see anything</span> · <span>My own user login, never your password</span> · <span>Tested on test contacts, never real client or patient data</span>
             </p>
           </div>
           {/* No buttons under the cards (JB 2026-11-22): Book a call is in the nav, and the intro video is the next section. */}

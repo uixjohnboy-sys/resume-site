@@ -311,3 +311,76 @@
     transform: translateY(-50%) translateX(128%) scale(0.7);
   }
 }
+
+/* ---------- first-screen intro chip and data line (2026-11-24) ---------- */
+.v4 .sf-head .ic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px auto 0;
+  padding: 5px 16px 5px 5px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-family: var(--label);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.v4 .sf-head .ic-chip:hover,
+.v4 .sf-head .ic-chip:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.v4 .sf-head .ic-chip:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.v4 .sf-head .ic-chip img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.v4 .sf-head .ic-play {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent transparent transparent #fff;
+  margin-left: 2px;
+}
+.v4 .sf-head .sf-trust {
+  margin: 14px auto 0;
+  max-width: 760px;
+  font-family: var(--label);
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: #a3a39f;
+}
+@media (max-width: 600px) {
+  .v4 .sf-head .ic-chip {
+    font-size: 12px;
+  }
+  .v4 .sf-head .sf-trust {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v4 .sf-head .ic-chip {
+    transition: none;
+  }
+}
+.v4 .sf-head .sf-trust span {
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .v4 .sf-head .sf-trust span {
+    white-space: normal;
+  }
+}
