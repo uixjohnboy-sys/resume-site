@@ -74,10 +74,10 @@ const shots = [
 
 const stats = [
   { v: "29,709", l: "Lines of code" },
-  { v: "26", l: "GoHighLevel webhook events sent" },
+  { v: "25", l: "GoHighLevel webhook events sent" },
   { v: "84", l: "Automated email templates" },
   { v: "26", l: "Page routes" },
-  { v: "36", l: "API endpoints" },
+  { v: "35", l: "API endpoints" },
   { v: "10", l: "Scheduled background jobs" },
 ];
 
