@@ -70,7 +70,7 @@ export default function BookPage() {
             </div>
             <div>
               <dt>Rate</dt>
-              <dd>From AUD 15/hr, a monthly block of hours, or a fixed quote for a defined build. Agreed before I start and billed fortnightly.</dd>
+              <dd>Agreed together on our first call: hourly, a monthly block of hours, or a fixed quote for a defined build. Billed fortnightly.</dd>
             </div>
           </dl>
         </section>

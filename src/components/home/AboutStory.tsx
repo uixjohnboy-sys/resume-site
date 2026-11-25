@@ -165,8 +165,8 @@ export default function AboutStory() {
               <span>CRM and automation. GoHighLevel since 2023</span>
             </li>
             <li>
-              <b>AUD 15</b>
-              <span>From, per hour. About £8, or a fixed quote</span>
+              <b>4</b>
+              <span>HighLevel certifications</span>
             </li>
             <li>
               <b>4-6 hours</b>

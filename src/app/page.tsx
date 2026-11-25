@@ -95,7 +95,7 @@ export default function Home() {
             <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
             <h1 id="hero-h">I build what your CRM can&apos;t.</h1>
             <p className="v4-lede">
-              GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time, from AUD 15/hr.
+              GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time.
             </p>
             {/* Face on the first screen + how client data is handled (hiring review 2026-11-24). */}
             <IntroChip length="1:21" />
