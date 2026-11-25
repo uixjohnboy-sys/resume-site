@@ -66,7 +66,8 @@
   gap: 4px 0;
   margin: calc(16 * var(--u)) auto 0;
   padding: 0;
-  max-width: calc(760 * var(--u));
+  width: max-content;
+  max-width: min(92vw, 980px);
   list-style: none;
   font-size: clamp(14px, calc(19 * var(--u)), 19px);
   font-weight: 600;
@@ -75,7 +76,8 @@
 .ab-roles li {
   white-space: nowrap;
 }
-.ab-roles li + li::before {
+/* the dot trails each role, so a wrapped line never starts with a dot */
+.ab-roles li:not(:last-child)::after {
   content: "·";
   margin: 0 10px;
   color: #8f8f8a;
