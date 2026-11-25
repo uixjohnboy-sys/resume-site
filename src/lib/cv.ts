@@ -10,7 +10,7 @@ export { certifications, education, person };
 // Same skills as the site; shorter labels so they never wrap in the print column (ATS round 2).
 export const skills: [string, string][] = baseSkills.map(([k, v]) => [k === "Automation and integration" ? "Integrations" : k, v.replace("failure-path design", "failure handling")]);
 
-export const cvTitle = "GoHighLevel (GHL) Specialist · HighLevel Certified · Automation, API Integrations and Custom Apps";
+export const cvTitle = "GoHighLevel (GHL) Specialist · AI Specialist · Full Stack Developer · Integration Engineer · Graphic Designer · HighLevel Certified";
 
 export const contact = [
   { label: "Paniqui, Tarlac, Philippines (UTC+8)" },

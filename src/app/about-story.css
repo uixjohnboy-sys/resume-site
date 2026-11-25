@@ -59,6 +59,27 @@
   text-transform: uppercase;
   color: #e6e6e2;
 }
+.ab-roles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 0;
+  margin: calc(16 * var(--u)) auto 0;
+  padding: 0;
+  max-width: calc(760 * var(--u));
+  list-style: none;
+  font-size: clamp(14px, calc(19 * var(--u)), 19px);
+  font-weight: 600;
+  color: #f2f2ee;
+}
+.ab-roles li {
+  white-space: nowrap;
+}
+.ab-roles li + li::before {
+  content: "·";
+  margin: 0 10px;
+  color: #8f8f8a;
+}
 
 /* ---------- the stage: three cards in a folder ---------- */
 .ab-stage {

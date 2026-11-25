@@ -92,6 +92,11 @@ export default function AboutStory() {
         <div className="ab-title">
           <p className="v4-kicker">About</p>
           <h2>I&apos;m John Boy.</h2>
+          <ul className="ab-roles" aria-label="Roles">
+            {["GoHighLevel Specialist", "AI Specialist", "Full Stack Developer", "Integration Engineer", "Graphic Designer"].map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
           <p className="ab-pill">GoHighLevel since 2023</p>
         </div>
 

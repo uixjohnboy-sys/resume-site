@@ -5,7 +5,7 @@
 
 export const person = {
   name: "John Boy Roxas",
-  title: "GoHighLevel Specialist · Automation and Custom App Development",
+  title: "GoHighLevel Specialist · AI Specialist · Full Stack Developer · Integration Engineer · Graphic Designer",
   location: "Paniqui, Tarlac, Philippines (UTC+8)",
   email: "uix.johnboy@gmail.com",
   phone: "+63 977 365 9548",
