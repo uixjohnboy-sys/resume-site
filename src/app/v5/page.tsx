@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MailLink from "@/components/MailLink";
 import Image from "next/image";
 import { availability, certifications, education, jobs, person, projects, skills, summary } from "@/lib/resume";
 import { archivo } from "../fonts";
@@ -27,7 +28,7 @@ export default function V5() {
             <p className="r-title">{person.title}</p>
             <p className="r-contact">
               <span>{person.location}</span>
-              <a href={mail}>{person.email}</a>
+              <MailLink href={mail} title="Email John Boy">{person.email}</MailLink>
               <a href={person.whatsapp}>WhatsApp {person.phone}</a>
               <a href={person.linkedin}>LinkedIn</a>
               <a href={person.onlinejobs}>OnlineJobs.ph</a>
@@ -193,9 +194,9 @@ export default function V5() {
             <a className="r-btn" href={person.book}>
               Book a call
             </a>
-            <a className="r-btn r-quiet" href={mail}>
+            <MailLink className="r-btn r-quiet" href={mail} title="Email John Boy">
               Email me
-            </a>
+            </MailLink>
             <a className="r-btn r-quiet" href={person.pdf} download>
               Download PDF
             </a>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MailLink from "@/components/MailLink";
 import Image from "next/image";
 import Link from "next/link";
 import "../project.css";
@@ -153,9 +154,9 @@ export default function DeskhandProject() {
         <h2>Want one for your business?</h2>
         <p>Send me a short brief: what your business does and the job you want off your plate. I&apos;ll send back a written plan for the whole system, free.</p>
         <div className="pj-cta">
-          <a className="pj-btn" href={BRIEF}>
+          <MailLink className="pj-btn" href={BRIEF} title="Send me your brief">
             Send me your brief
-          </a>
+          </MailLink>
           <a className="pj-btn pj-btn-quiet" href="/book">
             Book a call
           </a>
@@ -164,7 +165,7 @@ export default function DeskhandProject() {
           </a>
         </div>
         <p className="pj-end-mail">
-          Or email <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+          Or email <MailLink href={`mailto:${EMAIL}`} title="Email John Boy">{EMAIL}</MailLink>
         </p>
       </section>
     </main>

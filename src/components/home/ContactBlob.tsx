@@ -1,4 +1,5 @@
 "use client";
+import MailLink from "@/components/MailLink";
 import { useEffect, useRef, useState } from "react";
 
 // No name tags under the circles (JB 2026-11-22): the figure says YOU on its body, and John Boy's face needs no label.
@@ -257,12 +258,12 @@ export default function ContactBlob({ book, brief, email, whatsapp }: Props) {
         <a className="v4-btn v4-btn-dark" href={book}>
           Book a 15-min call
         </a>
-        <a className="v4-btn v4-btn-line" href={brief}>
+        <MailLink className="v4-btn v4-btn-line" href={brief} title="Send me your brief">
           Send me your brief
-        </a>
-        <a className="v4-btn v4-btn-line" href={email}>
+        </MailLink>
+        <MailLink className="v4-btn v4-btn-line" href={email} title="Email John Boy">
           Email me
-        </a>
+        </MailLink>
         <a className="v4-btn v4-btn-line" href={whatsapp}>
           WhatsApp
         </a>

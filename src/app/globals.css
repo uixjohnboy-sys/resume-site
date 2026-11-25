@@ -97,3 +97,17 @@ body {
     transform: scale(1) !important;
   }
 }
+
+/* Email picker (components/MailLink.tsx, JB 2026-11-26): same black-and-white card on every page and theme. */
+dialog.mailpick { margin: auto; inset: 0; padding: 0; border: 0; background: transparent; max-width: calc(100vw - 32px); width: 380px; color: #111; }
+.mailpick::backdrop { background: rgba(0, 0, 0, 0.55); }
+.mailpick-card { background: #fff; color: #111; border-radius: 16px; padding: 24px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35); font-family: inherit; text-align: left; }
+.mailpick .mailpick-h { opacity: 1; margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2; color: #111; }
+.mailpick .mailpick-to { opacity: 1; margin: 6px 0 0; font-size: 14px; color: #555; word-break: break-all; }
+.mailpick .mailpick-note { opacity: 1; margin: 10px 0 0; font-size: 13px; color: #666; }
+.mailpick-list { display: grid; gap: 8px; margin-top: 18px; }
+.mailpick-list a, .mailpick-list button { display: flex; justify-content: space-between; align-items: center; min-height: 48px; padding: 0 16px; border: 1px solid #d6d6d2; border-radius: 10px; background: #fff; color: #111; font: inherit; font-size: 15px; font-weight: 600; text-decoration: none; cursor: pointer; }
+.mailpick-list a:hover, .mailpick-list button:hover, .mailpick-list a:focus-visible, .mailpick-list button:focus-visible { border-color: #111; background: #f4f4f1; }
+.mailpick-list a:first-child { background: #111; color: #fff; border-color: #111; }
+.mailpick-list a:first-child:hover { background: #333; }
+.mailpick-close { display: block; margin: 14px auto 0; padding: 8px 12px; border: 0; background: none; color: #555; font: inherit; font-size: 14px; text-decoration: underline; cursor: pointer; }

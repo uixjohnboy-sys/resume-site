@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MailLink from "@/components/MailLink";
 import Image from "next/image";
 import Link from "next/link";
 import "../project.css";
@@ -277,7 +278,7 @@ export default function TaplineProject() {
           </a>
         </div>
         <p className="pj-end-mail">
-          Or email <a href={MAIL}>{EMAIL}</a>
+          Or email <MailLink href={MAIL} title="Email John Boy">{EMAIL}</MailLink>
         </p>
       </section>
     </main>

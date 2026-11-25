@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MailLink from "@/components/MailLink";
 import Image from "next/image";
 import { anton, host, plex } from "./fonts";
 import Reveal from "@/components/v4/Reveal";
@@ -181,14 +182,14 @@ export default function Home() {
               <p className="v4-foot-h">Start</p>
               <ul>
                 <li><a href={BOOK}>Book a 15-min call</a></li>
-                <li><a href={BRIEF_MAIL}>Send me your brief</a></li>
+                <li><MailLink href={BRIEF_MAIL} title="Send me your brief">Send me your brief</MailLink></li>
                 <li><a href={CV}>CV (PDF)</a></li>
               </ul>
             </div>
             <div>
               <p className="v4-foot-h">Contact</p>
               <ul>
-                <li><a href={`mailto:${EMAIL}`}>{EMAIL}</a></li>
+                <li><MailLink href={`mailto:${EMAIL}`} title="Email John Boy">{EMAIL}</MailLink></li>
                 <li><a href={WHATSAPP}>WhatsApp</a></li>
                 <li><a href={LINKEDIN}>LinkedIn</a></li>
               </ul>

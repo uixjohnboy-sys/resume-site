@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MailLink from "@/components/MailLink";
 import Link from "next/link";
 import { anton, host, plex } from "../fonts";
 import "../v4/v4.css";
@@ -73,9 +74,9 @@ export default function SamplePlan() {
             <b>John Boy Roxas</b>
             <span>Systems and automation</span>
           </Link>
-          <a className="v4-btn v4-btn-dark v4-nav-cta" href={BRIEF_MAIL}>
+          <MailLink className="v4-btn v4-btn-dark v4-nav-cta" href={BRIEF_MAIL} title="Send me your brief">
             Send me your brief
-          </a>
+          </MailLink>
         </div>
       </header>
 
@@ -145,9 +146,9 @@ export default function SamplePlan() {
             <h2>Then you decide.</h2>
             <p className="v4-lede">A real plan ends with a fixed quote. The plan is free. You pay only if you want it built.</p>
             <div className="v4-ctas">
-              <a className="v4-btn v4-btn-dark" href={BRIEF_MAIL}>
+              <MailLink className="v4-btn v4-btn-dark" href={BRIEF_MAIL} title="Send me your brief">
                 Send me your brief
-              </a>
+              </MailLink>
               <Link className="v4-btn v4-btn-line" href="/">
                 Back to the portfolio
               </Link>

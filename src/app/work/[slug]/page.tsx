@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MailLink from "@/components/MailLink";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -142,9 +143,9 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
             <a className="v4-btn v4-btn-dark" href={BOOK}>
               Book a 15-min call
             </a>
-            <a className="v4-btn v4-btn-line" href={BRIEF_MAIL}>
+            <MailLink className="v4-btn v4-btn-line" href={BRIEF_MAIL} title="Send me your brief">
               Send me your brief
-            </a>
+            </MailLink>
           </div>
         </section>
 
