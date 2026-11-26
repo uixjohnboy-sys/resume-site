@@ -384,3 +384,8 @@
     white-space: normal;
   }
 }
+/* Sample-work line under the trust line (hiring review 2026-11-27). */
+.v4 .sf-head .sf-proof { margin-top: 6px; display: block; }
+.v4 .sf-head .sf-proof a { display: inline; }
+.v4 .sf-head .sf-proof a { color: #f4f4f2; text-decoration: underline; text-underline-offset: 3px; }
+.v4 .sf-head .sf-proof a:hover { color: #fff; }

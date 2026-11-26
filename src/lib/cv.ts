@@ -90,6 +90,15 @@ export type CvProject = { name: string; kind: string; points: string[]; stats?: 
 
 export const cvProjects: CvProject[] = [
   {
+    name: "Follow-up teardown",
+    kind: "GoHighLevel audit of a clinic follow-up, built broken on purpose in my own account. My own demo, live.",
+    points: [
+      "Found in the execution logs why people who had booked kept getting nudges, changed two settings with an undo for each, and proved the fix with five timed tests.",
+    ],
+    cta: "Read it",
+    links: [{ label: "johnboydesign.com/demo/followup-teardown", href: "https://www.johnboydesign.com/demo/followup-teardown" }],
+  },
+  {
     name: "Speed-to-lead for a trades business",
     kind: "GoHighLevel build for a made-up roofing business. My own demo, live.",
     points: [
