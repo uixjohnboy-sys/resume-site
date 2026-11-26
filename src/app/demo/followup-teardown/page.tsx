@@ -9,12 +9,26 @@ import "./teardown.css";
 
 // Sample teardown "the follow-up that never stops" (spec C:\PortfolioProjects\ghl-rescue\TEARDOWN-SPEC.md v0.2).
 // Every time, count and test below comes from TEARDOWN-WRITEUP.md and ASSET-REGISTER.md (the GoHighLevel logs).
-// Noindex and unlinked until it passes G2 and G4; then linked from /work/fixes-and-audits.
+// G4 round 1 (review\TD-G4-v1\FIXES.md): proof first, offer at about two minutes, the full write-up below it.
+// Note: plain text that holds an HTML entity loses its leading space after a tag, so curly quotes are typed as
+// characters, and a bold label is followed by {" "}.
 
 export const metadata: Metadata = {
-  title: { absolute: "Sample GoHighLevel teardown: a follow-up that kept emailing people who booked | John Boy Roxas" },
+  title: { absolute: "GoHighLevel teardown: a follow-up that emailed people who booked | John Boy Roxas" },
   description: "A sample GoHighLevel workflow teardown: the cause found in the logs, the change list with how to undo each change, and five tests with times.",
   robots: { index: false, follow: false },
+  openGraph: {
+    type: "article",
+    url: "https://www.johnboydesign.com/demo/followup-teardown",
+    title: "GoHighLevel teardown: a follow-up that emailed people who booked",
+    description: "The cause found in the logs, the change list with how to undo each change, and five tests with times.",
+    images: [{ url: "https://www.johnboydesign.com/demo/followup-teardown/04-as-found-log-v2.webp", width: 807, height: 201, alt: "Execution log: nudge 3 sent after the booking" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GoHighLevel teardown: a follow-up that emailed people who booked",
+    description: "The cause found in the logs, the change list with how to undo each change, and five tests with times.",
+  },
 };
 
 const BOOK = "/book";
@@ -22,53 +36,163 @@ const ASK =
   "mailto:uix.johnboy@gmail.com?subject=" +
   encodeURIComponent("A workflow that misbehaves") +
   "&body=" +
-  encodeURIComponent("Hi John Boy,\n\nThe workflow:\n\nWhat it does that it should not:\n\nScreenshots attached (no passwords).\n\n");
+  encodeURIComponent(
+    "Hi John Boy,\n\nThe workflow:\n\nWhat it does that it should not:\n\nScreenshots attached: the workflow canvas, its Settings, one execution log (no passwords).\n\n"
+  );
 const IMG = "/demo/followup-teardown/";
 
+// Screenshots never show wider than their file (no upscaling); wide ones keep their size on a phone and scroll sideways
+// instead of shrinking to unreadable, and every one links to the full-size file.
 function Shot({ src, w, h, alt, cap }: { src: string; w: number; h: number; alt: string; cap: string }) {
+  const wide = w > 600;
   return (
-    <figure className="td-shot">
-      <Image src={IMG + src} alt={alt} width={w} height={h} sizes="(max-width: 860px) 100vw, 900px" />
-      <figcaption>{cap}</figcaption>
+    <figure className={`td-shot${wide ? " wide" : ""}`} style={{ maxWidth: w }}>
+      <div className="td-shot-img" {...(wide ? { role: "group", "aria-label": `${alt} Scrolls sideways on small screens.` } : {})}>
+        <Image src={IMG + src} alt={alt} width={w} height={h} sizes={`(max-width: 860px) ${wide ? w + "px" : "100vw"}, ${w}px`} />
+      </div>
+      <figcaption>
+        {cap}{" "}
+        <a className="td-full-link" href={IMG + src} target="_blank" rel="noopener">
+          Open full size<span className="td-sr"> (opens in a new tab)</span>
+        </a>
+      </figcaption>
     </figure>
   );
 }
 
+// Tables: named by their section heading, first cell a row header, each cell carries its column name so the table can
+// stack into labelled blocks on a phone. The status mark is a span with a text alternative, not a CSS glyph.
+function Table({ id, cols, rows, mark }: { id: string; cols: string[]; rows: { cells: string[]; mark?: "in" | "kept" | "pass" | "fail" }[]; mark?: boolean }) {
+  const label: Record<string, string> = { in: "Ruled in", kept: "Kept", pass: "Pass", fail: "Fail" };
+  return (
+    <div className="td-table" role="region" aria-labelledby={id} tabIndex={0}>
+      <table aria-labelledby={id}>
+        <thead>
+          <tr>
+            {cols.map((c) => (
+              <th key={c} scope="col">
+                {c}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.cells[0]} className={r.mark ?? ""}>
+              {r.cells.map((c, i) =>
+                i === 0 ? (
+                  <th key={i} scope="row" data-label={cols[0]}>
+                    {mark && r.mark ? (
+                      <span className={`td-mark ${r.mark}`} role="img" aria-label={label[r.mark]} />
+                    ) : null}
+                    {c}
+                  </th>
+                ) : (
+                  <td key={i} data-label={cols[i]}>
+                    {c}
+                  </td>
+                )
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Offer({ again }: { again?: boolean }) {
+  return (
+    <section className={`v4-in td-sec td-offer${again ? " again" : ""}`} aria-labelledby={again ? "offer-2" : "offer-1"}>
+      <h2 className="wk-h" id={again ? "offer-2" : "offer-1"}>
+        Send me one workflow that misbehaves
+      </h2>
+      {again ? null : (
+        <p className="td-p">
+          Send screenshots of one GoHighLevel workflow that does something it should not: the canvas, its Settings and one execution log. I look for the
+          cause and send you a written fix list like this one, free, within 2 business days. I take 3 a week. Screenshots are enough; if I need more, a
+          limited user invite. Never a password.
+        </p>
+      )}
+      <div className="v4-ctas">
+        <MailLink className="v4-btn v4-btn-dark" href={ASK} title="Send me a workflow">
+          Send me a workflow
+        </MailLink>
+        <a className="v4-btn v4-btn-line" href={BOOK}>
+          Book a 15-min call
+        </a>
+      </div>
+    </section>
+  );
+}
+
 const timeline: [string, string, boolean?][] = [
-  ["12:21 PM", "Thanks for your enquiry (reply)"],
+  ["12:21 PM", "Thanks for your enquiry (first email)"],
   ["12:24 PM", "Still thinking about your assessment? (nudge 1)"],
-  ["about 12:25 PM", "They book an assessment"],
+  ["12:25 PM", "They book an assessment"],
   ["12:25 PM", "Your private assessment is booked (confirmation)"],
   ["12:27 PM", "A time that suits you (nudge 2, after booking)", true],
   ["12:30 PM", "Our last note about your assessment (nudge 3, after booking)", true],
 ];
 
-const checked: [string, string, ("in" | "out" | "kept")?][] = [
-  ["No goal step at all", "Ruled out. A goal \"booked an assessment\" exists."],
-  ["Goal watches the wrong calendar", "Ruled in. The goal watches \"Private assessment\"; bookings arrive on the newer calendar.", "in"],
-  ["Goal placed where it cannot end the sequence", "Ruled out. A goal jumps the contact to it from any step."],
-  ["Goal status list misses \"confirmed\"", "Ruled out. New and confirmed are both selected; bookings arrive as confirmed."],
-  ["Booking confirmation removes the contact from the follow-up", "Not present. It sends the confirmation only, which is why it looked handled."],
-  ["Stop on response off", "Ruled in (minor). A reply does not stop the nudges.", "in"],
-  ["Allow re-entry on", "Kept on, on purpose: a returning patient who enquires again should get the reply.", "kept"],
-  ["Replies reach GoHighLevel", "Checked: no forwarding or reply-to override, so a reply lands in the conversation."],
-  ["Another workflow also catches the booking", "Checked all 14 booking-status workflows: each is filtered to its own calendar."],
-];
+const flow = ["Tag added", "Test-contact check", "First email", "Wait", "Nudge 1", "Wait", "Nudge 2", "Wait", "Nudge 3", "Goal: booked an assessment"];
 
 const changes = [
-  ["Goal calendar", "Enquiry follow-up > Goal: booked an assessment > Select calendar", "Private assessment", "the test calendar bookings land on", "set it back"],
-  ["Stop on response", "Enquiry follow-up > Settings", "Off", "On", "toggle off"],
-  ["Contacts mid-sequence", "Enquiry follow-up > Enrollment history", "1 waiting for nudge 2", "removed from this workflow only", "re-add to the fixed workflow, or leave out"],
-  ["Old version", "Workflows list", "Published", "kept as \u201c(as found)\u201d, Draft", "publish it again"],
+  [
+    "Live workflow",
+    "Workflows list",
+    "“Enquiry follow-up (as found)” published",
+    "“Enquiry follow-up (fixed)”, a duplicate with the two changes below, published; the old one set to Draft",
+    "set “(fixed)” to Draft, then publish “(as found)”",
+  ],
+  ["Goal calendar", "Enquiry follow-up (fixed) > Goal: booked an assessment > Select calendar", "Private assessment (the old calendar)", "the new calendar (test only)", "set it back"],
+  ["Stop on response", "Enquiry follow-up (fixed) > Settings", "Off", "On", "toggle off"],
+  ["Contact still in the old version", "Enquiry follow-up (as found) > Enrollment history", "1 waiting for nudge 2, not booked", "taken out of the old version only", "add them to the fixed version"],
 ];
 
 const tests = [
   ["A, as found", "Enquiry, then book after nudge 1 (inside GoHighLevel)", "Shows the fault", "Nudges 2 and 3 sent after booking. Failed as found, as expected.", false],
-  ["D, mid-sequence", "Still in the old version when the fix goes live", "Found, counted, removed", "1 found, removed at 12:32:26; no nudge 2 at 12:33:42. Pass.", true],
-  ["E, fixed", "Enquiry, then book after nudge 1 (inside GoHighLevel)", "Goal fires, no more nudges", "Booked about 12:38; goal executed 12:38:15; removed by end of workflow 12:38:17; nothing after. Pass.", true],
+  [
+    "D, mid-sequence",
+    "Still in the old version when the fix goes live, not booked",
+    "Found, counted, out of the old version",
+    "1 found, out of the old version at 12:32:26 PM; nothing more from it (nudge 2 was due 12:33:42 PM). Pass.",
+    true,
+  ],
+  ["E, fixed", "Enquiry, then book after nudge 1 (inside GoHighLevel)", "Goal fires, no more nudges", "Booked about 12:38 PM; goal executed 12:38:15 PM; removed by end of workflow 12:38:17 PM; nothing after. Pass.", true],
   ["B, fixed", "Book on the public booking page", "Same as E", "Goal executed 1:24:59 PM, before nudge 1 was due; nothing sent after. Pass.", true],
-  ["C, fixed", "Reply to the first email instead of booking", "Reply lands, nudges stop", "First email 11:01 PM, reply 11:03 PM landed on the contact; nudges due about 11:04, 11:07 and 11:10 never sent. Pass.", true],
+  [
+    "C, fixed",
+    "Reply to the first email instead of booking",
+    "Reply lands, nudges stop",
+    "Next evening. First email 11:01 PM, reply 11:03 PM landed on the contact; nudges due about 11:04, 11:07 and 11:10 PM never sent. Pass.",
+    true,
+  ],
 ] as const;
+
+const checked: [string, string, ("in" | "kept")?][] = [
+  ["No goal step at all", "Ruled out. A goal “booked an assessment” exists."],
+  ["Goal watches the wrong calendar", "Ruled in (High). The goal watches “Private assessment”; bookings arrive on the new calendar.", "in"],
+  ["Where the gap came from", "The booking link in the nudges sends people to the new calendar, while the goal still watches the old one.", "in"],
+  ["Goal placed where it cannot end the sequence", "Ruled out. A goal pulls the contact to it from any step once it is met."],
+  ["Goal status list misses “confirmed”", "Ruled out. New and confirmed are both selected; bookings arrive as confirmed."],
+  ["Booking confirmation removes the contact from the follow-up", "Not present. It sends the confirmation only, which is why it looked handled."],
+  ["Stop on response off", "Ruled in (Medium), from the setting: a reply does not stop the nudges. Shown fixed in test C.", "in"],
+  ["Allow re-entry on", "Kept on, on purpose: a returning patient who enquires again should get the first email again.", "kept"],
+  ["Replies reach GoHighLevel", "Checked: no forwarding or reply-to override, so a reply lands in the conversation."],
+  ["Another workflow also catches the booking", "Checked all 14 booking workflows: each is filtered to a calendar, and a booking on the new calendar enters none of them."],
+  [
+    "Other workflows still on the old calendar",
+    "Found 4 (new lead opportunity, booked tag, showed, no-show). After a real calendar move each would go quiet too. Listed for your decision, not changed in this sample.",
+    "in",
+  ],
+  [
+    "Sender name",
+    "Found: each email step is set to send as the clinic, but the emails arrive under the account's default name (Johnboydesign, as in the screenshots). Left as found in this sample; on a client account I fix it first.",
+    "in",
+  ],
+  ["Calendar location", "Checked: a custom location on the booking calendar, not the default video link."],
+];
 
 export default function FollowUpTeardown() {
   return (
@@ -92,196 +216,208 @@ export default function FollowUpTeardown() {
       <main className="wk-page td-page">
         <section className="v4-in wk-head">
           <p className="v4-kicker">Sample teardown · GoHighLevel</p>
-          <h1>Booked, and still getting &ldquo;still thinking?&rdquo; emails</h1>
+          <h1>Booked, and still getting “still thinking?” emails</h1>
           <p className="v4-lede">
-            A demo clinic&apos;s enquiry follow-up kept emailing people after they had booked. Here is how I found why, what I changed, and the tests that
-            prove it stopped.
+            A demo clinic’s enquiry follow-up kept emailing people after they had booked. Here is how I found the cause, what I changed, and the tests that
+            show it stopped.
           </p>
           <p className="td-frame">
             <b>Sample, not client work.</b> Lumiere Aesthetic is a made-up clinic I built inside my own GoHighLevel account. I set this workflow up broken on
-            purpose, then audited, fixed and tested it like a client job. Wait times were shortened to 3 minutes so the test fits in one sitting. Times are
-            Manila (GMT+8), from the GoHighLevel logs.
+            purpose, then audited, fixed and tested it like a client job. The story: the clinic moved its bookings to a new calendar, and the follow-up’s goal
+            still watched the old one. Here the new calendar is a test-only copy, so my test bookings could not set off the clinic’s real booking workflows.
+            Wait times were shortened to 3 minutes so each test runs in about ten minutes. Times are Manila (GMT+8, shown as CST +08:00 in GoHighLevel).
           </p>
         </section>
 
         <section className="v4-in td-sec">
           <h2 className="wk-h">The top line</h2>
           <p className="td-p">
-            The follow-up has a &ldquo;booked&rdquo; goal, but the goal watches the old calendar while bookings now land on a different one. So the goal is
-            never met, and a person who books still gets every &ldquo;still thinking?&rdquo; email. I pointed the goal at the calendar people actually book on
-            and turned on Stop on response. Tested: the next person who booked got no more nudges (the goal fired within seconds), and the 1 contact who was
-            mid-sequence was found and removed.
+            The follow-up has a “booked” goal, but the goal watches the old calendar while bookings now land on the new one. So the goal is never met, and a
+            person who books still gets every “still thinking?” email. I pointed the goal at the new calendar and turned on Stop on response. Tested: the next
+            person who booked got no more follow-up emails (the goal fired within seconds), and the 1 contact still in the old version was found and taken out
+            of it.
           </p>
         </section>
 
         <section className="v4-in td-sec">
-          <h2 className="wk-h">What the customer saw</h2>
+          <h2 className="wk-h">What the person who booked saw</h2>
           <ol className="td-time">
             {timeline.map(([t, what, bad]) => (
               <li key={t + what} className={bad ? "bad" : ""}>
                 <span className="td-t">{t}</span>
-                <span>{what}</span>
+                <span>
+                  {what}
+                  {bad ? <span className="td-sr"> (sent after booking: the fault)</span> : null}
+                </span>
               </li>
             ))}
           </ol>
-          <p className="td-p">For a clinic this reads as pushy, and careless with consent: the person has already said yes.</p>
-          <Shot src="01-as-found-thread.webp" w={725} h={525} alt="The test contact's email thread: the booking at 12:25 PM, then nudges at 12:27 PM and 12:30 PM." cap="Test contact A's thread, as found. The booking, then two more nudges." />
+          <p className="td-p">For a clinic this reads as pushy and careless: the person has already booked.</p>
+          <Shot
+            src="01-as-found-thread-v2.webp"
+            w={725}
+            h={525}
+            alt="Test contact A's email thread: first email 12:21 PM, nudge 1 12:24 PM, the booking, the confirmation 12:25 PM, then nudge 2 at 12:27 PM and nudge 3 at 12:30 PM."
+            cap="Test contact A’s thread, as found. Booked at 12:25 PM (the grey card is the 12:30 PM appointment slot), then two more nudges."
+          />
         </section>
 
         <section className="v4-in td-sec">
           <h2 className="wk-h">The log, not a guess</h2>
-          <p className="td-p">The execution log shows the nudges running after the booking. The goal only took the contact out after the last email had gone.</p>
-          <Shot src="04-as-found-log.webp" w={1047} h={499} alt="Execution log of the as-found workflow: N3 nudge executed at 12:30:46 PM, removed by the goal at 12:30:47 PM." cap="As found: nudge 3 at 12:30:46 PM, after the booking." />
+          <p className="td-p">
+            Contact A booked at 12:25 PM. The execution log still shows nudge 3 going out at 12:30:46 PM. The “Removed by Goal Action” a second later is not
+            the goal being met: A reached the goal step at the end of the sequence, unmet, and its “if not met, end the workflow” setting closed the run.
+          </p>
+          <Shot
+            src="04-as-found-log-v2.webp"
+            w={807}
+            h={201}
+            alt="Execution log of the as-found workflow: N3 nudge executed at 12:30:46 PM (outlined), then removed by Goal Action at 12:30:47 PM."
+            cap="As found: nudge 3 at 12:30:46 PM, five minutes after the booking."
+          />
         </section>
 
         <section className="v4-in td-sec">
           <h2 className="wk-h">The cause</h2>
-          <p className="td-p">The goal step was there, with the right statuses. It was watching the wrong calendar.</p>
-          <div className="td-pair">
-            <Shot src="05-goal-before.webp" w={438} h={505} alt="Goal settings before: Select calendar is Private assessment." cap={"Before: the goal watches \u201cPrivate assessment\u201d."} />
-            <Shot src="07-goal-after.webp" w={438} h={505} alt="Goal settings after: Select calendar is the test calendar bookings land on." cap="After: the calendar people actually book on." />
-          </div>
-          <div className="td-pair td-pair-wide">
-            <Shot src="06-settings-before.webp" w={1047} h={300} alt="Workflow settings before: Stop on response is off." cap="Before: Stop on response off, so a reply did not stop the nudges." />
-            <Shot src="08-settings-after.webp" w={1047} h={300} alt="Workflow settings after: Stop on response is on." cap="After: Stop on response on." />
-          </div>
-        </section>
-
-        <section className="v4-in td-sec">
-          <h2 className="wk-h">What I checked</h2>
-          <div className="td-table" role="region" aria-label="What I checked" tabIndex={0}>
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Possible cause</th>
-                  <th scope="col">Result</th>
-                </tr>
-              </thead>
-              <tbody>
-                {checked.map(([c, r, k]) => (
-                  <tr key={c} className={k ?? ""}>
-                    <td>{c}</td>
-                    <td>{r}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="v4-in td-sec">
-          <h2 className="wk-h">The people already inside</h2>
+          <p className="td-p td-flow-label">The workflow, as found:</p>
+          <ol className="td-flow">
+            {flow.map((s, i) => (
+              <li key={i} className={i === flow.length - 1 ? "goal" : s === "Wait" ? "wait" : ""}>
+                {s}
+              </li>
+            ))}
+          </ol>
           <p className="td-p">
-            Fixing the workflow is half the job. Before switching over, I opened the old workflow&apos;s Enrollment history: 1 test contact was still waiting,
-            with nudge 2 due at 12:33:42. I removed them from that workflow only at 12:32. Nudge 2 never went out.
+            The goal step was there, with the right statuses. It was watching the old calendar, while the booking link in the nudges sends people to the new
+            one. That is how the gap opened.
           </p>
-          <Shot src="02-enrollment-before-fix.webp" w={1046} h={170} alt="Enrollment history of the old workflow: test contact D waiting for time, next execution 12:33:42 PM." cap="The old workflow at 12:32 PM: contact D still waiting." />
+          <div className="td-pair">
+            <Shot src="05-goal-before-v2.webp" w={438} h={364} alt="Goal settings before: Select calendar is Private assessment (outlined); if the goal is not met, End this workflow." cap="Before: the goal watches “Private assessment”, the old calendar." />
+            <Shot
+              src="07-goal-after-v2.webp"
+              w={438}
+              h={364}
+              alt="Goal settings after: Select calendar is DEMO Teardown · Private assessment (test only) (outlined)."
+              cap="After: the new calendar, where the booking link sends people (here the test-only copy)."
+            />
+          </div>
+          <div className="td-pair">
+            <Shot src="06-settings-before-v2.webp" w={640} h={50} alt="Workflow settings before: the Stop on response toggle is off (outlined)." cap="Before: Stop on response off, so a reply would not stop the nudges." />
+            <Shot src="08-settings-after-v2.webp" w={640} h={50} alt="Workflow settings after: the Stop on response toggle is on (outlined)." cap="After: Stop on response on." />
+          </div>
+        </section>
+
+        <section className="v4-in td-sec">
+          <h2 className="wk-h" id="h-changes">
+            Change list
+          </h2>
+          <p className="td-p">Every change, where it is, and how to undo it. Nothing deleted.</p>
+          <Table id="h-changes" cols={["What", "Where in GoHighLevel", "Before", "After", "How to undo"]} rows={changes.map((c) => ({ cells: c }))} />
+          <p className="td-small">
+            For a client I would usually edit the live workflow in place, after saving a Draft copy as the backup, so contacts already inside keep their timing
+            and anything that points at the workflow keeps working. Here I duplicated it so the broken version stays on show.
+          </p>
+        </section>
+
+        <section className="v4-in td-sec">
+          <h2 className="wk-h" id="h-tests">
+            Five tests, with times
+          </h2>
+          <p className="td-result">Result: the fault showed on A as found; D, E, B and C all passed after the fix.</p>
+          <Table
+            id="h-tests"
+            mark
+            cols={["Test", "Setup", "Expected", "Result"]}
+            rows={tests.map(([t, s, e, r, pass]) => ({ cells: [t, s, e, r], mark: pass ? "pass" : "fail" }))}
+          />
+          <Shot
+            src="03-fixed-log-test-e-v2.webp"
+            w={807}
+            h={201}
+            alt="Fixed workflow log, test E: goal executed 12:38:15 PM, then removed by end of workflow at 12:38:17 PM. The goal row is outlined."
+            cap="Test E: the goal fires seconds after the booking, and the workflow ends."
+          />
+          <Shot
+            src="10-fixed-log-test-b-v2.webp"
+            w={807}
+            h={201}
+            alt="Fixed workflow log, test B: goal executed 1:24:59 PM after a booking on the public page, removed by end of workflow at 1:25:00 PM. The goal row is outlined."
+            cap="Test B: a booking on the public page ends it before nudge 1."
+          />
+          <Shot src="09-fixed-thread-test-e-v2.webp" w={740} h={375} alt="Test contact E's thread: one nudge, the booking, the confirmation, and nothing after." cap="Test E’s thread: nothing after the confirmation." />
+          <Shot
+            src="11-fixed-thread-test-c-v2.webp"
+            w={728}
+            h={128}
+            alt="Test contact C's thread, second try: the reply at 11:03 PM, and nothing after it."
+            cap="Test C, second try (the next evening): the reply at 11:03 PM is the last message. Reply address masked."
+          />
+          <p className="td-note">
+            <b>Worth knowing:</b>{" "}a reply only stops the nudges when it comes from the address the contact is saved under. In the first try of test C the
+            reply came from a different address, GoHighLevel filed it on another contact, and the nudges kept going. Check this with any client whose customers
+            reply from a second inbox. Stop on response can also fire on an auto-reply such as an out-of-office, so an away message ends the follow-up too.
+          </p>
+        </section>
+
+        <Offer />
+
+        <div className="v4-in td-full">
+          <p className="v4-kicker">The full write-up</p>
+          <p className="td-p">Everything I checked, the contacts the fix touched, and what a client gets on top.</p>
+        </div>
+
+        <section className="v4-in td-sec">
+          <h2 className="wk-h" id="h-checked">
+            What I checked
+          </h2>
+          <Table id="h-checked" mark cols={["Possible cause or risk", "Result"]} rows={checked.map(([c, r, k]) => ({ cells: [c, r], mark: k }))} />
+        </section>
+
+        <section className="v4-in td-sec">
+          <h2 className="wk-h">Contacts already in the old workflow</h2>
+          <p className="td-p">
+            Fixing the workflow is half the job. Before switching over, I opened the old workflow’s Enrollment history: 1 test contact, D, was still waiting,
+            with nudge 2 due at 12:33:42 PM, and had not booked. I took D out of the old version only, at 12:32 PM, so it could not send again. Nudge 2 never
+            went out.
+          </p>
+          <Shot
+            src="02-enrollment-before-fix-v2.webp"
+            w={1046}
+            h={110}
+            alt="Enrollment history of the old workflow: test contact D (outlined) waiting for time, next execution 12:33:42 PM."
+            cap="The old workflow at 12:32 PM: contact D still waiting."
+          />
+          <p className="td-p">In this sample that is two test contacts. On a live clinic this is the list the owner needs most:</p>
           <ul className="td-list">
-            <li>Already through the sequence: 1 (got every nudge; an apology email is optional).</li>
-            <li>Mid-sequence when the fix went live: 1, found and removed from this workflow only.</li>
+            <li>Already through the sequence: 1, contact A (got every nudge; an apology email is optional).</li>
+            <li>
+              Still in the old version when the fix went live: 1, contact D, not booked, taken out of the old version only. For a real client, an unbooked
+              contact like D goes into the fixed version so the follow-up carries on; anyone who has already booked stays out.
+            </li>
             <li>Total enrolled before the fix: 2.</li>
           </ul>
-        </section>
-
-        <section className="v4-in td-sec">
-          <h2 className="wk-h">Change list</h2>
-          <p className="td-p">Every change, where it is, and how to undo it. Nothing deleted.</p>
-          <div className="td-table" role="region" aria-label="Change list" tabIndex={0}>
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">What</th>
-                  <th scope="col">Where in GoHighLevel</th>
-                  <th scope="col">Before</th>
-                  <th scope="col">After</th>
-                  <th scope="col">How to undo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {changes.map((r) => (
-                  <tr key={r[0]}>
-                    {r.map((c, i) => (
-                      <td key={i}>{c}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="v4-in td-sec">
-          <h2 className="wk-h">Five tests, with times</h2>
-          <div className="td-table" role="region" aria-label="Tests" tabIndex={0}>
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Test</th>
-                  <th scope="col">Setup</th>
-                  <th scope="col">Expected</th>
-                  <th scope="col">Result</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tests.map(([t, s, e, r, pass]) => (
-                  <tr key={t} className={pass ? "pass" : "fail"}>
-                    <td>{t}</td>
-                    <td>{s}</td>
-                    <td>{e}</td>
-                    <td>{r}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="td-pair">
-            <Shot src="03-fixed-log-test-e.webp" w={1047} h={499} alt="Fixed workflow log, test E: goal executed 12:38:15 PM, removed by end of workflow 12:38:17 PM." cap="Test E: the goal fires seconds after the booking." />
-            <Shot src="10-fixed-log-test-b.webp" w={1047} h={499} alt="Fixed workflow log, test B: goal executed 1:24:59 PM after a booking on the public page." cap="Test B: a booking on the public page ends it before nudge 1." />
-          </div>
-          <div className="td-pair">
-            <Shot src="09-fixed-thread-test-e.webp" w={740} h={375} alt="Test contact E's thread: one nudge, the booking, the confirmation, and nothing after." cap="Test E's thread: nothing after the confirmation." />
-            <Shot src="11-fixed-thread-test-c.webp" w={725} h={525} alt="Test contact C's thread: the first email at 11:01 PM, the reply at 11:03 PM, and no nudge after." cap="Test C: a reply stops the nudges. (The first run's nudges above were a different try.)" />
-          </div>
-          <p className="td-note">
-            <b>Worth knowing:</b> a reply only stops the nudges when it comes from the address the contact is saved under. In the first try of test C the reply
-            came from a different address, GoHighLevel filed it on another contact, and the nudges kept going. Worth checking with any client whose customers
-            reply from a second inbox.
-          </p>
         </section>
 
         <section className="v4-in td-sec">
           <h2 className="wk-h">What a client also gets</h2>
           <ul className="td-list">
             <li>
-              <b>Needs your decision:</b> real wait times (I would suggest 2, 4 and 7 days); whether a reply should also alert the owner; whether the booking
-              confirmation should also remove the contact (one step, left out so the test proves the goal alone); and an apology for the 1 person nudged after
-              booking.
+              <b>Needs your decision:</b>{" "}real wait times (I would suggest nudges on day 2, 4 and 7); whether a reply should also alert the owner; whether
+              the booking confirmation should also remove the contact (one step, left out so the test proves the goal alone); pointing the goal at every
+              calendar the nudges can send people to, so the next new calendar does not break it again; the 4 other workflows still on the old calendar;
+              whether someone who books and then cancels should go back into the follow-up; and an apology for the 1 person nudged after booking.
             </li>
             <li>
-              <b>A 7-day re-check:</b>{" "}on day 7 I open Enrollment history and the execution logs, check that everyone who booked shows &ldquo;Goal
-              executed&rdquo; and no nudge after their booking, and send you the result in two lines.
+              <b>A 7-day re-check:</b>{" "}on day 7 I open Enrollment history and the execution logs, check that everyone who booked shows “Goal executed” and
+              no nudge after their booking, and send you the result in two lines.
             </li>
             <li>
-              <b>White label:</b>{" "}the write-up can go to your client under your agency&apos;s name. I do not need to be named.
+              <b>White label:</b>{" "}the write-up can go to your client under your agency’s name. I do not need to be named.
             </li>
           </ul>
         </section>
 
-        <section className="v4-in td-sec td-offer">
-          <h2 className="wk-h">Send me one workflow that misbehaves</h2>
-          <p className="td-p">
-            Send screenshots of one GoHighLevel workflow that does something it should not. I find the cause and send you a written fix list, free, within 2
-            business days. Least access first: never a password.
-          </p>
-          <div className="v4-ctas">
-            <MailLink className="v4-btn v4-btn-dark" href={ASK} title="Send me a workflow">
-              Send me a workflow
-            </MailLink>
-            <a className="v4-btn v4-btn-line" href={BOOK}>
-              Book a 15-min call
-            </a>
-          </div>
-        </section>
+        <Offer again />
       </main>
     </div>
   );

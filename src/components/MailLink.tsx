@@ -41,6 +41,7 @@ export default function MailLink({ href, className, children, title = "Send me a
       <a
         className={className}
         href={href}
+        aria-haspopup="dialog"
         onClick={(e) => {
           if (e.metaKey || e.ctrlKey || e.shiftKey || !dlg.current?.showModal) return;
           e.preventDefault();

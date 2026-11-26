@@ -1430,3 +1430,10 @@ html:has(.v4) {
 
 /* The kicker sits inside the hero H1 so the heading carries the role (SEO audit 2026-11-18, P1.3). */
 .v4-hero h1 .v4-kicker-in-h1 { display: block; margin-bottom: 18px; }
+
+/* WCAG 2.4.11 (teardown G4 accessibility, 2026-11-27): the nav wraps to 105 to 151 px on narrow or short screens and
+   covered a focused button when tabbing backwards at 320x256 (400% zoom). There it scrolls away with the page. */
+@media (max-width: 560px), (max-height: 500px) {
+  .v4-nav { position: static; }
+  html:has(.v4) { scroll-padding-top: 16px; }
+}
