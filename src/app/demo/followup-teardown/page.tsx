@@ -22,6 +22,7 @@ export const metadata: Metadata = {
     url: "https://www.johnboydesign.com/demo/followup-teardown",
     title: "GoHighLevel teardown: a follow-up that emailed people who booked",
     description: "The cause found in the logs, the change list with how to undo each change, and five tests with times.",
+    images: [{ url: "https://www.johnboydesign.com/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
