@@ -258,9 +258,10 @@ export const work: Work[] = [
       },
       {
         kind: "My own demo",
-        name: "GHL Rescue",
-        line: "A broken GoHighLevel account, then the same account fixed, with the written list of every change.",
-        soon: true,
+        name: "Follow-up teardown",
+        line: "A clinic follow-up that kept emailing people after they booked: the cause found in the logs, every change with how to undo it, and five tests with times. Built broken on purpose in my own GoHighLevel account.",
+        href: "/demo/followup-teardown",
+        cta: "Read the teardown",
       },
     ],
   },

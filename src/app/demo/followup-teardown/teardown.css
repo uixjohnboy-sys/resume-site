@@ -99,3 +99,6 @@
 .v4 .td-page .td-sec .wk-h { max-width: var(--figure); }
 .td-mark.found { background: #b54708; }
 .td-shot-img:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* Recheck 2 (DD): on phones a wide screenshot says it scrolls before the reader has to guess. */
+.td-swipe { display: none; }
+@media (max-width: 860px) { .td-shot.wide .td-swipe { display: inline; } }

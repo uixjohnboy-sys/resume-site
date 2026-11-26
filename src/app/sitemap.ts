@@ -19,6 +19,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
+      url: "https://www.johnboydesign.com/demo/followup-teardown",
+      lastModified: new Date("2026-11-27"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: "https://www.johnboydesign.com/coach-os",
       lastModified: new Date("2026-11-04"),
       changeFrequency: "monthly",

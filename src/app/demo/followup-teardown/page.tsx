@@ -9,14 +9,14 @@ import "./teardown.css";
 
 // Sample teardown "the follow-up that never stops" (spec C:\PortfolioProjects\ghl-rescue\TEARDOWN-SPEC.md v0.2).
 // Every time, count and test below comes from TEARDOWN-WRITEUP.md and ASSET-REGISTER.md (the GoHighLevel logs).
-// G4 round 1 (review\TD-G4-v1\FIXES.md): proof first, offer at about two minutes, the full write-up below it.
+// G2 and G4 closed 2026-11-27 (ghl-rescue/review/TD-G4-v1/FIXES.md): linked from /work/fixes-and-audits and indexed since then.
 // Note: plain text that holds an HTML entity loses its leading space after a tag, so curly quotes are typed as
 // characters, and a bold label is followed by {" "}.
 
 export const metadata: Metadata = {
   title: { absolute: "GoHighLevel teardown: a follow-up that emailed people who booked | John Boy Roxas" },
   description: "A sample GoHighLevel workflow teardown: the cause found in the logs, the change list with how to undo each change, and five tests with times.",
-  robots: { index: false, follow: false },
+  alternates: { canonical: "https://www.johnboydesign.com/demo/followup-teardown" },
   openGraph: {
     type: "article",
     url: "https://www.johnboydesign.com/demo/followup-teardown",
@@ -51,6 +51,7 @@ function Shot({ src, w, h, alt, cap }: { src: string; w: number; h: number; alt:
         <Image src={IMG + src} alt={alt} width={w} height={h} sizes={`(max-width: 860px) ${wide ? w + "px" : "100vw"}, ${w}px`} />
       </div>
       <figcaption>
+        {wide ? <span className="td-swipe" aria-hidden="true">Swipe the image to see the rest. </span> : null}
         {cap}{" "}
         <a className="td-full-link" href={IMG + src} target="_blank" rel="noopener">
           Open full size<span className="td-sr"> (opens in a new tab)</span>
@@ -381,7 +382,7 @@ export default function FollowUpTeardown() {
           </p>
           <Shot
             src="02-enrollment-before-fix-v2.webp"
-            w={1046}
+            w={889}
             h={110}
             alt="Enrollment history of the old workflow: test contact D (outlined) waiting for time, next execution 12:33:42 PM."
             cap="The old version at 12:32 PM: contact D still waiting."
