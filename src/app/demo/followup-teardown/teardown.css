@@ -86,7 +86,16 @@
   .td-table tbody th,
   .td-table td { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 3px 0; border: 0; min-width: 0; }
   .td-table tbody th::before,
-  .td-table td::before { content: attr(data-label); font-family: var(--label); font-size: 11px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+  .td-table td::before { content: attr(data-label) / ""; font-family: var(--label); font-size: 11px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
   .td-table tbody th .td-mark { display: none; }
   .td-time li { grid-template-columns: 84px 1fr; font-size: 15px; }
 }
+.td-sublist { margin: 6px 0 0; padding-left: 20px; list-style: circle; display: grid; gap: 4px; }
+/* Recheck 1 (DD): on a retina phone width:auto takes the srcset's density-corrected size, so wide shots set their
+   file width explicitly and scroll sideways; label hairlines stop at the figure measure. */
+@media (max-width: 860px) {
+  .td-shot.wide .td-shot-img img { width: var(--w); max-width: none; }
+}
+.v4 .td-page .td-sec .wk-h { max-width: var(--figure); }
+.td-mark.found { background: #b54708; }
+.td-shot-img:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
