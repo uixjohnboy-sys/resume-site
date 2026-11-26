@@ -91,9 +91,9 @@ export type CvProject = { name: string; kind: string; points: string[]; stats?: 
 export const cvProjects: CvProject[] = [
   {
     name: "Follow-up teardown",
-    kind: "GoHighLevel audit of a clinic follow-up, built broken on purpose in my own account. My own demo, live.",
+    kind: "GoHighLevel audit in my own account. My own demo.",
     points: [
-      "Found in the execution logs why people who had booked kept getting nudges, changed two settings with an undo for each, and proved the fix with five timed tests.",
+      "Found in the logs why booked clients kept getting nudges; fixed and proved with five timed tests.",
     ],
     cta: "Read it",
     links: [{ label: "johnboydesign.com/demo/followup-teardown", href: "https://www.johnboydesign.com/demo/followup-teardown" }],
@@ -102,7 +102,7 @@ export const cvProjects: CvProject[] = [
     name: "Speed-to-lead for a trades business",
     kind: "GoHighLevel build for a made-up roofing business. My own demo, live.",
     points: [
-      "A quote enquiry gets an email reply with a booking link within seconds, then follow-ups on day 1, 3 and 7 until they book. Booking stops the follow-ups. The text messages are built but switched off.",
+      "A quote enquiry gets a booking link by email within seconds, then follow-ups on day 1, 3 and 7 that stop when they book. Texts built but switched off.",
     ],
     cta: "Try it",
     links: [{ label: "johnboydesign.com/work/lead-follow-up", href: "https://www.johnboydesign.com/work/lead-follow-up" }],
@@ -110,7 +110,7 @@ export const cvProjects: CvProject[] = [
   {
     name: "Coach OS",
     kind: "Client-management platform for one-to-one coaches, built from zero and synced with GoHighLevel both ways. My own product.",
-    points: ["Stripe subscription lifecycle with webhook signature checks, in-browser e-signature with write-once records, and an AI client companion on the Claude API."],
+    points: ["Stripe billing with signed webhooks, write-once e-signatures and an AI companion on the Claude API."],
     stats: "25 GoHighLevel webhook events · 84 email templates · 10 scheduled jobs · 35 API endpoints",
     cta: "Live tour",
     links: [{ label: "coachos.johnboydesign.com/tour", href: "https://coachos.johnboydesign.com/tour" }],
@@ -118,7 +118,7 @@ export const cvProjects: CvProject[] = [
   {
     name: "Tapline",
     kind: "Repairs desk demo for property managers, with fictional data. My own demo.",
-    points: ["AI triage with the property's history, owner approval and invoice checks, and a signed webhook that rejects forged and replayed requests."],
+    points: ["AI triage with property history, owner approval, invoice checks and a signed webhook."],
     cta: "Live demo",
     links: [{ label: "johnboydesign.com/demo/tapline", href: "https://www.johnboydesign.com/demo/tapline" }],
   },
