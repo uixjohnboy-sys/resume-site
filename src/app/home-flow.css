@@ -390,3 +390,4 @@
 .v4 .sf-head .sf-sample-k { display: inline-block; margin-right: 10px; font-family: var(--label); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #a3a39f; border: 1px solid #4a4a47; padding: 1px 6px; vertical-align: 1px; }
 .v4 .sf-head .sf-sample a { color: #f4f4f2; text-decoration: underline; text-underline-offset: 3px; }
 .v4 .sf-head .sf-sample a:hover { color: #fff; }
+.v4 .sf-head .sf-sample { text-wrap: balance; }

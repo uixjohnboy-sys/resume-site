@@ -119,7 +119,7 @@ function Offer({ again }: { again?: boolean }) {
             one workflow before I start.
           </p>
           <p className="td-p">
-            Blur names, emails and phone numbers before you send, or ask and I sign your NDA first. Not sure where the canvas, Settings or execution log are?
+            Blur names, emails and phone numbers before you send, or ask me to sign your NDA first. Not sure where the canvas, Settings or execution log are?
             Book the 15-minute call and I will show you on screen.
           </p>
         </>
@@ -233,10 +233,6 @@ export default function FollowUpTeardown() {
             A demo clinic’s enquiry follow-up kept emailing people after they had booked. Here is how I found the cause, what I changed, and the tests that
             show it stopped.
           </p>
-          <p className="td-frame">
-            <b>Sample, not client work.</b>{" "}Lumiere Aesthetic is a made-up clinic I built inside my own GoHighLevel account. I set this workflow up broken
-            on purpose, then audited, fixed and tested it like a client job.
-          </p>
           <dl className="td-sum">
             <div>
               <dt>Cause</dt>
@@ -248,11 +244,15 @@ export default function FollowUpTeardown() {
             </div>
             <div>
               <dt>Proof</dt>
-              <dd>Five timed tests: the fault on A, then D, E, B and C passed.</dd>
+              <dd>Five timed tests: the fault shown before the fix, then four passes after it.</dd>
             </div>
           </dl>
           <p className="td-early">
-            Seeing this in your own account? <a href="#offer-1">Send me the workflow for a free fix list</a>.
+            Seeing this in your own account? <a href="#who">Send me the workflow for a free fix list</a>.
+          </p>
+          <p className="td-frame">
+            <b>Sample, not client work.</b>{" "}Lumiere Aesthetic is a made-up clinic I built inside my own GoHighLevel account. I set this workflow up broken
+            on purpose, then audited, fixed and tested it like a client job.
           </p>
         </section>
 
@@ -393,11 +393,13 @@ export default function FollowUpTeardown() {
 
         <section className="v4-in td-sec" aria-labelledby="who">
           <h2 className="wk-h" id="who">
-            Who did this
+            Who did the work
           </h2>
-          <p className="td-p">
-            John Boy Roxas, HighLevel certified. I am in the Philippines (UTC+8) and work part-time, 4 to 6 hours a day, in Australian business hours or US
-            mornings. <a href="/#intro">Watch my 1:21 intro</a>.
+          <p className="td-p td-who">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/intro/face-chip.webp" alt="John Boy Roxas" width={48} height={48} />
+            John Boy Roxas, HighLevel certified. I am in the Philippines (GMT+8) and work part-time, 4 to 6 hours a day, in Australian business hours, UK
+            afternoons or US mornings. <a href="/#intro">Watch my 1:21 intro</a>.
           </p>
         </section>
 

@@ -113,3 +113,7 @@
 .td-page .v4-kicker a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .td-sec .wk-h + .td-time, .td-sec .wk-h + .td-table { border-top: 0; }
 @media (min-width: 861px) { .td-page .wk-head h1 { max-width: 22ch; } }
+.td-who img { float: left; width: 48px; height: 48px; border-radius: 50%; margin: 3px 14px 6px 0; object-fit: cover; border: 1px solid var(--line); }
+.td-who::after { content: ""; display: block; clear: both; }
+.td-early + .td-frame { margin-top: 18px; }
+.td-page .wk-head .td-sum { margin-top: 20px; }
