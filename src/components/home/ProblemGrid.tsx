@@ -16,17 +16,27 @@ const PROBLEM: Record<string, string> = {
   "custom-apps": "GoHighLevel can't do what you need",
 };
 
-/** My own demos and products with a working link (not PDFs or files), counted once by name. */
-export function liveBuildCount(): number {
-  const names = new Set<string>();
-  for (const w of work)
-    for (const p of w.proof)
-      if (p.kind !== "Client work" && p.href && !p.soon && !/\.pdf$|drive\.google\.com/i.test(p.href)) names.add(p.name);
-  return names.size;
+// Demos a visitor can open and use (checked 2026-11-27). A page you only read (the teardown) or a PDF guide is not one.
+// Add a demo here only after it is live and testable; the strip's count is this list's length.
+const LIVE_DEMOS: { name: string; match: RegExp }[] = [
+  { name: "Deskhand", match: /\/demo\/deskhand/ },
+  { name: "Tapline", match: /\/(demo|projects)\/tapline/ },
+  { name: "Lumiere Aesthetic", match: /lumiereaesthetic\.johnboydesign\.com/ },
+  { name: "Coach OS tour", match: /coachos\.johnboydesign\.com\/tour|^\/coach-os/ },
+  { name: "Speed-to-lead quote form", match: /link\.funnelgenie\.io\/widget\/form\// },
+];
+export const liveDemoCount = () => LIVE_DEMOS.length;
+
+function tagFor(w: (typeof work)[number]): string | null {
+  const hrefs = [w.live?.href, ...w.proof.filter((p) => !p.soon).map((p) => p.href)].filter(Boolean) as string[];
+  if (hrefs.some((h) => LIVE_DEMOS.some((d) => d.match.test(h)))) return "Try a demo";
+  if (hrefs.some((h) => /followup-teardown/.test(h))) return "Sample teardown";
+  if (hrefs.some((h) => /\.pdf$/i.test(h))) return "Setup guide";
+  return null;
 }
 
 export default function ProblemGrid() {
-  const live = liveBuildCount();
+  const live = liveDemoCount();
   return (
     <div className="pg">
       <ul className="pg-strip" aria-label="Why hire me">
@@ -35,8 +45,8 @@ export default function ProblemGrid() {
           <span>Workflows, funnels, calendars and the v2 API</span>
         </li>
         <li>
-          <b>{live} live builds</b>
-          <span>You can open and test them, not just read about them</span>
+          <b>{live} live demos</b>
+          <span>Open them and use them, not just read about them</span>
         </li>
         <li>
           <b>Every change written down</b>
@@ -46,8 +56,8 @@ export default function ProblemGrid() {
       <h2 className="pg-h">What&apos;s going wrong in your business?</h2>
       <ul className="pg-grid">
         {work.map((w) => {
-          const hasLive = w.proof.some((p) => p.kind !== "Client work" && p.href && !p.soon && !/\.pdf$|drive\.google\.com/i.test(p.href));
-          const proof = [w.lead.kind, w.lead.name].filter(Boolean).join(" · ");
+          const tag = tagFor(w);
+          const proof = w.lead.kind === "Client work" ? `Built for a client: ${w.lead.name}` : `${w.lead.kind}: ${w.lead.name}`;
           return (
             <li key={w.slug} className="pg-tile">
               <Link href={`/work/${w.slug}`} className="pg-link">
@@ -62,7 +72,7 @@ export default function ProblemGrid() {
                   <span className="pg-what">{w.promise}</span>
                   <span className="pg-proof">
                     <span>{proof}</span>
-                    {hasLive ? <span className="pg-live">Live demo</span> : null}
+                    {tag ? <span className="pg-live">{tag}</span> : null}
                   </span>
                   <span className="pg-cta" aria-hidden="true">
                     See how it works →

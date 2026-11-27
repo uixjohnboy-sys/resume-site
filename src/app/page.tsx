@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
 import HomeBody from "@/components/home/HomeBody";
-import SkillFlow, { type FlowCard } from "@/components/home/SkillFlow";
-import { work } from "@/lib/work";
+import ProblemGrid from "@/components/home/ProblemGrid";
+import "./problem-grid.css";
 
-// One card per kind of work, art made for each (scripts/home-cards, black and white). Each card carries what the old
-// work index row carried: the promise, the strongest real proof with its label, and the link to /work/<slug>.
-const flowCards: FlowCard[] = work.map((w) => ({
-  n: w.n,
-  slug: w.slug,
-  title: w.title,
-  promise: w.promise,
-  art: `/home/cards/${w.slug}.webp`,
-  tag: [w.lead.kind, w.lead.name, w.lead.when].filter(Boolean).join(" · "),
-  line: w.lead.line,
-}));
+// Homepage. Since 2026-11-27 the work section is the problem grid (every kind of work in one look, headed by the buyer's
+// problem; A/B by the hiring manager: grid 81.8 vs cover-flow 79.4, hiring\runs\2026-11-27-ab-home-grid.md), after the
+// live-demo count was made true and client work was labelled apart from fictional demos. The cover-flow
+// (components/home/SkillFlow.tsx) is kept for a rollback: render <SkillFlow cards={...}> as the hero instead.
 
 export const metadata: Metadata = {
   title: { absolute: "GoHighLevel Specialist for Hire, GHL Expert | John Boy Roxas" },
@@ -23,5 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <HomeBody hero={<SkillFlow cards={flowCards} />} />;
+  return <HomeBody hero={<ProblemGrid />} />;
 }
