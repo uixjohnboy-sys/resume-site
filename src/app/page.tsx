@@ -104,8 +104,9 @@ export default function Home() {
               <span>NDA before I see anything</span> · <span>My own user login, never your password</span> · <span>Tested on test contacts, never real client or patient data</span>
             </p>
             {/* Proof of how I work on the first screen (hiring review 2026-11-27). */}
-            <p className="sf-trust sf-proof">
-              Sample work: <a href="/demo/followup-teardown">a GoHighLevel follow-up teardown</a>, the cause found in the logs, fixed and tested.
+            <p className="sf-sample">
+              <span className="sf-sample-k">Sample work</span>
+              <a href="/demo/followup-teardown">A GoHighLevel follow-up that kept emailing people after they booked</a>, traced in the logs, fixed and tested.
             </p>
           </div>
           {/* No buttons under the cards (JB 2026-11-22): Book a call is in the nav, and the intro video is the next section. */}

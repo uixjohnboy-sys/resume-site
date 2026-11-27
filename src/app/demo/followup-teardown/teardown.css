@@ -102,3 +102,14 @@
 /* Recheck 2 (DD): on phones a wide screenshot says it scrolls before the reader has to guess. */
 .td-swipe { display: none; }
 @media (max-width: 860px) { .td-shot.wide .td-swipe { display: inline; } }
+
+/* G5 round 1 (review\TD-G5-v1): Cause / Fix / Proof on the first screen, an early offer link, one rule under labels. */
+.td-sum { margin: 16px 0 0; max-width: var(--measure); display: grid; border-top: 1px solid var(--line); }
+.td-sum > div { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.td-sum dt { font-family: var(--label); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.td-sum dd { margin: 0; font-size: 16px; line-height: 1.5; color: var(--ink); }
+.td-early { margin: 14px 0 0; font-size: 16px; color: var(--ink-2); }
+.td-early a, .td-p a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.td-page .v4-kicker a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.td-sec .wk-h + .td-time, .td-sec .wk-h + .td-table { border-top: 0; }
+@media (min-width: 861px) { .td-page .wk-head h1 { max-width: 22ch; } }

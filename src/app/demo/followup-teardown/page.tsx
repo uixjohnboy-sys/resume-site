@@ -106,14 +106,23 @@ function Offer({ again }: { again?: boolean }) {
   return (
     <section className={`v4-in td-sec td-offer${again ? " again" : ""}`} aria-labelledby={again ? "offer-2" : "offer-1"}>
       <h2 className="wk-h" id={again ? "offer-2" : "offer-1"}>
-        {again ? "Send me a workflow, or book a call" : "Send me one workflow that misbehaves"}
+        {again ? "Send me a workflow, or book a call" : "Send me one workflow that misbehaves. The fix list is free."}
       </h2>
-      {again ? null : (
-        <p className="td-p">
-          Send screenshots of one GoHighLevel workflow that does something it should not: the canvas, its Settings and one execution log. I look for the
-          cause and send you a written fix list like the change list above, free, within 2 business days. I take 3 a week. Screenshots are usually enough; if I need
-          more, I ask for a limited user invite. Never a password. If you want me to make the change and test it too, I quote a fixed price for that one workflow before I start.
-        </p>
+      {again ? (
+        <p className="td-p">One workflow, a written fix list, free, within 2 working days. Never a password.</p>
+      ) : (
+        <>
+          <p className="td-p">
+            Send screenshots of one GoHighLevel workflow that does something it should not: the canvas, its Settings and one execution log. I look for the
+            cause and send you a written fix list like the change list above, free, within 2 working days. I take 3 a week. Screenshots are usually enough; if
+            I need more, I ask for a limited user invite. Never a password. If you want me to make the change and test it too, I quote a fixed price for that
+            one workflow before I start.
+          </p>
+          <p className="td-p">
+            Blur names, emails and phone numbers before you send, or ask and I sign your NDA first. Not sure where the canvas, Settings or execution log are?
+            Book the 15-minute call and I will show you on screen.
+          </p>
+        </>
       )}
       <div className="v4-ctas">
         <MailLink className="v4-btn v4-btn-dark" href={ASK} title="Send me a workflow">
@@ -205,7 +214,7 @@ export default function FollowUpTeardown() {
             <span>Systems and automation</span>
           </Link>
           <nav className="v4-links" aria-label="Sections">
-            <Link href="/work/fixes-and-audits">Fixes and audits</Link>
+            <Link href="/#work">All work</Link>
             <a href="/John-Boy-Roxas-Resume.pdf">CV</a>
           </nav>
           <a className="v4-btn v4-btn-dark v4-nav-cta" href={BOOK}>
@@ -216,22 +225,39 @@ export default function FollowUpTeardown() {
 
       <main className="wk-page td-page">
         <section className="v4-in wk-head">
-          <p className="v4-kicker">Sample teardown · GoHighLevel</p>
+          <p className="v4-kicker">
+            <Link href="/work/fixes-and-audits">Fixes and audits</Link> · Sample teardown
+          </p>
           <h1>Booked, and still getting “still thinking?” emails</h1>
           <p className="v4-lede">
             A demo clinic’s enquiry follow-up kept emailing people after they had booked. Here is how I found the cause, what I changed, and the tests that
             show it stopped.
           </p>
           <p className="td-frame">
-            <b>Sample, not client work.</b> Lumiere Aesthetic is a made-up clinic I built inside my own GoHighLevel account. I set this workflow up broken on
-            purpose, then audited, fixed and tested it like a client job. The story: the clinic moved its bookings to a new calendar, and the follow-up’s goal
-            still watched the old one. Here the new calendar is a test-only copy, so my test bookings could not set off the clinic’s real booking workflows.
-            Wait times were shortened to 3 minutes, so a full run of the follow-up takes about ten minutes. Times are Manila (GMT+8, shown as CST +08:00 in GoHighLevel).
+            <b>Sample, not client work.</b>{" "}Lumiere Aesthetic is a made-up clinic I built inside my own GoHighLevel account. I set this workflow up broken
+            on purpose, then audited, fixed and tested it like a client job.
+          </p>
+          <dl className="td-sum">
+            <div>
+              <dt>Cause</dt>
+              <dd>The “booked” goal watched the old calendar, so it was never met.</dd>
+            </div>
+            <div>
+              <dt>Fix</dt>
+              <dd>Goal pointed at the new calendar; Stop on response turned on.</dd>
+            </div>
+            <div>
+              <dt>Proof</dt>
+              <dd>Five timed tests: the fault on A, then D, E, B and C passed.</dd>
+            </div>
+          </dl>
+          <p className="td-early">
+            Seeing this in your own account? <a href="#offer-1">Send me the workflow for a free fix list</a>.
           </p>
         </section>
 
         <section className="v4-in td-sec">
-          <h2 className="wk-h">The top line</h2>
+          <h2 className="wk-h">The short version</h2>
           <p className="td-p">
             The follow-up has a “booked” goal, but the goal watches the old calendar while bookings now land on the new one. So the goal is never met, and a
             person who books still gets every “still thinking?” email. I pointed the goal at the new calendar and turned on Stop on response. Tested: the next
@@ -254,17 +280,22 @@ export default function FollowUpTeardown() {
             ))}
           </ol>
           <p className="td-p">For a clinic this reads as pushy and careless: the person has already booked.</p>
+          <p className="td-small">
+            How the test was set up: the clinic moved its bookings to a new calendar, and the follow-up’s goal still watched the old one. Here the new calendar
+            is a test-only copy, so my test bookings could not set off the clinic’s real booking workflows. Wait times were shortened to 3 minutes, so a full run
+            takes about 10 minutes. Times are Manila time (GMT+8, shown as CST +08:00 in GoHighLevel).
+          </p>
           <Shot
             src="01-as-found-thread-v2.webp"
             w={725}
             h={525}
             alt="Test contact A's email thread: first email 12:21 PM, nudge 1 12:24 PM, the booking, the confirmation 12:25 PM, then nudge 2 at 12:27 PM and nudge 3 at 12:30 PM (both outlined)."
-            cap="Test contact A’s thread, as found. Booked at 12:25 PM (the “Appointment ... created” line shows the 12:30 PM slot), then two more nudges."
+            cap="Test contact A’s thread, as found. Booked at 12:25 PM (the “Appointment ... created” line shows the 12:30 PM slot), then two more nudges. The sender shows my account name, Johnboydesign: a separate fault I found while testing (see Sender name under What I checked)."
           />
         </section>
 
         <section className="v4-in td-sec">
-          <h2 className="wk-h">The log, not a guess</h2>
+          <h2 className="wk-h">The log: nudge 3 five minutes after booking</h2>
           <p className="td-p">
             Contact A booked at 12:25 PM. The execution log still shows nudge 3 going out at 12:30:46 PM. The “Removed by Goal Action” a second later is not
             the goal being met: A reached the goal step at the end of the sequence, unmet, and its “End this workflow” fallback closed the run.
@@ -279,7 +310,7 @@ export default function FollowUpTeardown() {
         </section>
 
         <section className="v4-in td-sec">
-          <h2 className="wk-h">The cause</h2>
+          <h2 className="wk-h">The cause: the goal watched the old calendar</h2>
           <p className="td-p td-flow-label">The workflow, as found:</p>
           <ol className="td-flow">
             {flow.map((s, i) => (
@@ -309,7 +340,7 @@ export default function FollowUpTeardown() {
 
         <section className="v4-in td-sec">
           <h2 className="wk-h" id="h-changes">
-            Change list
+            What I changed, and how to undo it
           </h2>
           <p className="td-p">Every change, where it is, and how to undo it. Nothing deleted.</p>
           <Table id="h-changes" cols={["What", "Where in GoHighLevel", "Before", "After", "How to undo"]} rows={changes.map((c) => ({ cells: c }))} />
@@ -321,9 +352,10 @@ export default function FollowUpTeardown() {
 
         <section className="v4-in td-sec">
           <h2 className="wk-h" id="h-tests">
-            Five tests, with times
+            Five tests: the fault, then four passes
           </h2>
           <p className="td-result">Result: the fault showed on A as found; D, E, B and C all passed after the fix.</p>
+          <p className="td-small">Letters match my test log, in the order the tests ran.</p>
           <Table
             id="h-tests"
             mark
@@ -359,11 +391,21 @@ export default function FollowUpTeardown() {
           </p>
         </section>
 
+        <section className="v4-in td-sec" aria-labelledby="who">
+          <h2 className="wk-h" id="who">
+            Who did this
+          </h2>
+          <p className="td-p">
+            John Boy Roxas, HighLevel certified. I am in the Philippines (UTC+8) and work part-time, 4 to 6 hours a day, in Australian business hours or US
+            mornings. <a href="/#intro">Watch my 1:21 intro</a>.
+          </p>
+        </section>
+
         <Offer />
 
         <div className="v4-in td-full">
           <p className="v4-kicker">The full write-up</p>
-          <p className="td-p">Everything I checked, the contacts the fix touched, and what a client gets on top.</p>
+          <p className="td-p">Everything I checked, the contacts the fix touched, and what you get when I make the fix.</p>
         </div>
 
         <section className="v4-in td-sec">
@@ -399,7 +441,7 @@ export default function FollowUpTeardown() {
         </section>
 
         <section className="v4-in td-sec">
-          <h2 className="wk-h">What a client also gets</h2>
+          <h2 className="wk-h">What you also get when I make the fix</h2>
           <ul className="td-list">
             <li>
               <b>Needs your decision:</b>

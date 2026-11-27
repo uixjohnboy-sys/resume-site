@@ -384,8 +384,9 @@
     white-space: normal;
   }
 }
-/* Sample-work line under the trust line (hiring review 2026-11-27). */
-.v4 .sf-head .sf-proof { margin-top: 6px; display: block; }
-.v4 .sf-head .sf-proof a { display: inline; }
-.v4 .sf-head .sf-proof a { color: #f4f4f2; text-decoration: underline; text-underline-offset: 3px; }
-.v4 .sf-head .sf-proof a:hover { color: #fff; }
+/* Sample work in the hero (hiring review 2026-11-27; G5 Design m2: its own class, a label like the site's labels,
+   no borrowed card rule). */
+.v4 .sf-head .sf-sample { margin: 14px auto 0; max-width: 760px; font: 400 14px/1.55 var(--text); color: #c9c9c5; }
+.v4 .sf-head .sf-sample-k { display: inline-block; margin-right: 10px; font-family: var(--label); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #a3a39f; border: 1px solid #4a4a47; padding: 1px 6px; vertical-align: 1px; }
+.v4 .sf-head .sf-sample a { color: #f4f4f2; text-decoration: underline; text-underline-offset: 3px; }
+.v4 .sf-head .sf-sample a:hover { color: #fff; }
