@@ -48,3 +48,26 @@
   .v4 .pg-problem { font-size: 19px; }
   .v4 .pg-what { display: none; }
 }
+
+/* "Not on the list?" message tile (JB 2026-11-27), on the light tile */
+.v4 .pg-askbody { align-content: start; gap: 12px; }
+.v4 .pg-ask .pg-problem:focus { outline: none; }
+.v4 .ask-form { display: grid; gap: 8px; }
+.v4 .ask-label { font: 500 13px/1.4 var(--text); color: #2a2a28; }
+.v4 .ask-input { width: 100%; box-sizing: border-box; font: 400 15px/1.45 var(--text); color: #0d0d0c; background: #fff; border: 1px solid #8a8a85; border-radius: 0; padding: 10px 12px; resize: vertical; min-height: 44px; }
+.v4 .ask-input:focus-visible { outline: 2px solid #0d0d0c; outline-offset: 1px; border-color: #0d0d0c; }
+.v4 .ask-input::placeholder { color: #6b6b67; }
+.v4 .ask-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
+.v4 .ask-step { font: 400 11px/1.4 var(--label); letter-spacing: 0.1em; text-transform: uppercase; color: #555552; }
+.v4 .ask-btn { min-height: 44px; padding: 0 18px; border: 0; background: #0d0d0c; color: #f4f4f2; font: 600 14px/1 var(--text); cursor: pointer; }
+.v4 .ask-btn:hover { background: #2a2a28; }
+.v4 .ask-btn:disabled { opacity: 0.55; cursor: progress; }
+.v4 .ask-btn:focus-visible, .v4 .ask-back:focus-visible { outline: 2px solid #0d0d0c; outline-offset: 2px; }
+.v4 .ask-back { min-height: 44px; padding: 0; border: 0; background: none; color: #0d0d0c; font: 500 14px/1 var(--text); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.v4 .ask-note { margin: 2px 0 0; font: 400 13px/1.45 var(--text); color: #44443f; }
+.v4 .ask-done { margin: 0; font: 400 15px/1.5 var(--text); color: #1d1d1b; }
+.v4 .ask-err { margin: 0; font: 500 14px/1.4 var(--text); color: #a3261a; }
+.v4 .ask-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.v4 .pg-askbody { grid-template-rows: none; }
+.v4 .ask-form { align-content: start; grid-auto-rows: max-content; }
+.v4 input.ask-input { height: 44px; padding-top: 0; padding-bottom: 0; }

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { work } from "@/lib/work";
+import AskTile from "./AskTile";
 
 // Homepage experiment (JB 2026-11-27, preview only at /preview/home-grid): the kinds of work as a grid a buyer scans in
 // one look, each tile headed by the buyer's problem in their own words, instead of the cover-flow that shows one card at
@@ -83,15 +84,20 @@ export default function ProblemGrid() {
           );
         })}
         <li className="pg-tile pg-ask">
-          <Link href="/book" className="pg-link">
-            <span className="pg-body">
-              <span className="pg-n">Not on the list?</span>
-              <span className="pg-problem">Tell me the problem. 15 minutes, a straight answer.</span>
-              <span className="pg-cta" aria-hidden="true">
-                Book a 15-min call →
+          {/* The message form shows only once the GoHighLevel webhook is set, so no message lands where nobody sees it. */}
+          {process.env.ASK_GHL_WEBHOOK_URL ? (
+            <AskTile />
+          ) : (
+            <Link href="/book" className="pg-link">
+              <span className="pg-body">
+                <span className="pg-n">Not on the list?</span>
+                <span className="pg-problem">Tell me the problem. 15 minutes, a straight answer.</span>
+                <span className="pg-cta" aria-hidden="true">
+                  Book a 15-min call →
+                </span>
               </span>
-            </span>
-          </Link>
+            </Link>
+          )}
         </li>
       </ul>
     </div>
