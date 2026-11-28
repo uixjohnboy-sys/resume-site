@@ -25,6 +25,7 @@ const LIVE_DEMOS: { name: string; match: RegExp }[] = [
   { name: "Lumiere Aesthetic", match: /lumiereaesthetic\.johnboydesign\.com/ },
   { name: "Coach OS tour", match: /coachos\.johnboydesign\.com\/tour|^\/coach-os/ },
   { name: "Speed-to-lead quote form", match: /link\.funnelgenie\.io\/widget\/form\// },
+  { name: "Kestrel Physio", match: /kestrel\.johnboydesign\.com/ },
 ];
 export const liveDemoCount = () => LIVE_DEMOS.length;
 
@@ -57,7 +58,9 @@ export default function ProblemGrid() {
       <h2 className="pg-h">What&apos;s going wrong in your business?</h2>
       <ul className="pg-grid">
         {work.map((w) => {
-          const tag = tagFor(w);
+          // Hiring review 11-28: next to a client name, "Try a demo" read as if the demo were that client's work.
+          const raw = tagFor(w);
+          const tag = raw === "Try a demo" && w.lead.kind === "Client work" ? "Plus my own demo to try" : raw;
           const proof = w.lead.kind === "Client work" ? `Built for a client: ${w.lead.name}` : `${w.lead.kind}: ${w.lead.name}`;
           return (
             <li key={w.slug} className="pg-tile">

@@ -131,7 +131,7 @@ const KESTREL: DemoDetail = {
 const KESTREL_PROOF: Proof = {
   kind: "My own demo",
   name: "Kestrel Physio",
-  line: "A booking site for a made-up physio clinic: patients find the right visit in two questions, then book it on a live GoHighLevel calendar that sends the confirmation and reminders by email.",
+  line: "A booking site for a made-up physio clinic: patients find the right visit in two questions, then book it on a live GoHighLevel calendar that sends the confirmation and reminders by email. The people photos are licensed stock.",
   href: KESTREL_URL,
   cta: "Open the site",
   card: "/work/demos/kestrel-home-800.webp",
