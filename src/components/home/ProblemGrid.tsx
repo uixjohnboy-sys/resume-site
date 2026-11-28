@@ -19,7 +19,7 @@ const PROBLEM: Record<string, string> = {
 
 // Demos a visitor can open and use (checked 2026-11-27). A page you only read (the teardown) or a PDF guide is not one.
 // Add a demo here only after it is live and testable; the strip's count is this list's length.
-const LIVE_DEMOS: { name: string; match: RegExp }[] = [
+export const LIVE_DEMOS: { name: string; match: RegExp }[] = [
   { name: "Deskhand", match: /\/demo\/deskhand/ },
   { name: "Tapline", match: /\/(demo|projects)\/tapline/ },
   { name: "Lumiere Aesthetic", match: /lumiereaesthetic\.johnboydesign\.com/ },
