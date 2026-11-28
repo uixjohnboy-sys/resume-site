@@ -60,7 +60,8 @@ export default function ProblemGrid() {
         {work.map((w) => {
           // Hiring review 11-28: next to a client name, "Try a demo" read as if the demo were that client's work.
           const raw = tagFor(w);
-          const tag = raw === "Try a demo" && w.lead.kind === "Client work" ? "Plus my own demo to try" : raw;
+          const own: Record<string, string> = { "Try a demo": "Plus my own demo to try", "Sample teardown": "Plus my own sample teardown", "Setup guide": "Plus my own setup guide" };
+          const tag = raw && w.lead.kind === "Client work" ? (own[raw] ?? raw) : raw;
           const proof = w.lead.kind === "Client work" ? `Built for a client: ${w.lead.name}` : `${w.lead.kind}: ${w.lead.name}`;
           return (
             <li key={w.slug} className="pg-tile">
