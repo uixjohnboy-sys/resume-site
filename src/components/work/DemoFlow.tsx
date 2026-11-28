@@ -27,7 +27,7 @@ export default function DemoFlow({ n, title, art, demos }: Props) {
             const a = Math.abs(o);
             const style = {
               transform: `translateX(calc(${o} * var(--df-step))) translateZ(${-a * 160}px) rotateY(${o === 0 ? 0 : o > 0 ? -28 : 28}deg)`,
-              opacity: a > 2 ? 0 : a === 0 ? 1 : a === 1 ? 0.55 : 0.25,
+              opacity: a > 1 ? 0 : a === 0 ? 1 : 0.55,
               zIndex: 10 - a,
             };
             const label = p ? `${p.name}, ${p.kind}` : `${n} ${title}`;
@@ -40,7 +40,8 @@ export default function DemoFlow({ n, title, art, demos }: Props) {
                 onClick={() => setCur(i)}
                 aria-label={label}
                 aria-current={a === 0 ? "true" : undefined}
-                tabIndex={a > 2 ? -1 : 0}
+                tabIndex={a > 1 ? -1 : 0}
+                aria-hidden={a > 1 ? true : undefined}
               >
                 {p ? (
                   <>
@@ -55,6 +56,7 @@ export default function DemoFlow({ n, title, art, demos }: Props) {
                     <span className="df-body">
                       <span className="df-mono">{p.kind}</span>
                       <b>{p.name}</b>
+                      <span className="df-line">{p.line}</span>
                     </span>
                   </>
                 ) : (

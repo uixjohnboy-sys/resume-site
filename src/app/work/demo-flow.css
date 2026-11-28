@@ -123,6 +123,15 @@
   font-size: 24px;
   font-weight: 600;
 }
+.df-line {
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .df-ctrl {
   display: flex;
   justify-content: center;
@@ -138,6 +147,10 @@
   color: var(--ink);
   font-size: 18px;
   cursor: pointer;
+}
+.df-ctrl button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
 }
 .df-ctrl button:disabled {
   opacity: 0.3;
@@ -158,10 +171,60 @@
 }
 
 /* ---------- the open demo ---------- */
+/* Same box as .v4-in (1240 max, 32 px sides), so the left edge does not jump where the older sections start (G3 M3). */
 .df-open {
-  max-width: 1088px;
+  max-width: 1240px;
   margin: 64px auto 0;
-  padding: 0 24px;
+  padding: 0 32px;
+}
+
+/* ---------- the lower half (G3 M3): one width, a matching heading, a clear break, a centred close ---------- */
+.v4-dark .wk-more {
+  margin-top: 120px;
+  padding-top: 72px;
+  text-align: center;
+  position: relative;
+}
+.v4-dark .wk-more::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 32px;
+  right: 32px;
+  border-top: 1px solid var(--line);
+}
+.v4 .wk-more h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.05;
+  margin: 10px auto 0;
+  max-width: 22ch;
+}
+.wk-body.wk-body-one {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 820px;
+}
+.v4-dark .wk-end {
+  text-align: center;
+  padding-top: 110px;
+  padding-bottom: 120px;
+}
+.v4 .wk-end h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(34px, 4.5vw, 48px);
+  margin: 0 0 14px;
+}
+.wk-end > p {
+  color: var(--muted);
+  margin: 0 0 26px;
+  font-size: 17px;
+}
+.wk-end .v4-ctas {
+  justify-content: center;
 }
 .df-head {
   max-width: 760px;
@@ -298,12 +361,12 @@
 .df-drawn {
   position: absolute;
   right: 10px;
-  bottom: 8px;
+  bottom: 6px;
   font-family: var(--label);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #6b6b67;
+  color: #a3a39f;
 }
 .df-mail {
   position: absolute;
@@ -441,6 +504,27 @@
   }
   .df-open {
     padding: 0 16px;
+  }
+  .df-facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .df-facts div {
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .df-facts div:nth-child(2n) {
+    border-right: 0;
+  }
+  .df-facts div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+  .v4-dark .wk-more::before {
+    left: 16px;
+    right: 16px;
+  }
+  .df-line {
+    -webkit-line-clamp: 2;
   }
 }
 @media (prefers-reduced-motion: reduce) {

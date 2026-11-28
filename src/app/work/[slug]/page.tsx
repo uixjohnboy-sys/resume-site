@@ -56,6 +56,8 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
   const others = work.filter((x) => x.slug !== w.slug);
   // Demos with a screenshot go in the cover-flow (JB 2026-11-28); card 1 is this kind of work, art from the old home cards.
   const demos = w.proof.filter((p) => p.card && (SHOW_SOON || !p.soon));
+  // The list below keeps what the flow does not show (client work, guides, videos), so no line appears twice (G3 M3).
+  const rest = w.proof.filter((p) => !p.card && (SHOW_SOON || !p.soon));
 
   return (
     <div className={`v4 v4-dark ${anton.variable} ${host.variable} ${plex.variable}`}>
@@ -92,7 +94,12 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
 
         {demos.length > 0 && <DemoFlow n={w.n} title={w.title} art={`/home/cards/${w.slug}.webp`} demos={demos} />}
 
-        <section className="v4-in wk-body">
+        <section className="v4-in wk-more">
+          <p className="df-mono">More on this kind of work</p>
+          <h2>{rest.some((p) => p.kind === "Client work") ? "What it covers, and the client work behind it" : "What it usually covers"}</h2>
+        </section>
+
+        <section className={`v4-in wk-body${rest.length ? "" : " wk-body-one"}`}>
           <div className="wk-covers">
             <h2 className="wk-h">What this usually covers</h2>
             <ul>
@@ -102,10 +109,11 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
             </ul>
           </div>
 
+          {rest.length > 0 && (
           <div className="wk-list">
-            <h2 className="wk-h">The work</h2>
+            <h2 className="wk-h">{demos.length ? "More of the work" : "The work"}</h2>
             <ol>
-              {w.proof.filter((p) => SHOW_SOON || !p.soon).map((p) => (
+              {rest.map((p) => (
                 <li key={p.name + p.kind} data-rv>
                   <p className="v4-case-tag">
                     {p.kind} · {p.name}
@@ -125,6 +133,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
               ))}
             </ol>
           </div>
+          )}
         </section>
 
         {w.shot && (
@@ -146,14 +155,6 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
               </li>
             ))}
           </ol>
-          <div className="v4-ctas">
-            <a className="v4-btn v4-btn-dark" href={BOOK}>
-              Book a 15-min call
-            </a>
-            <MailLink className="v4-btn v4-btn-line" href={BRIEF_MAIL} title="Send me your brief">
-              Send me your brief
-            </MailLink>
-          </div>
         </section>
 
         <section className="v4-in wk-others">
@@ -170,6 +171,19 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="v4-in wk-end">
+          <h2>Want this for your business?</h2>
+          <p>I build it for your business, with your services and your wording.</p>
+          <div className="v4-ctas">
+            <a className="v4-btn v4-btn-dark" href={BOOK}>
+              Book a 15-min call
+            </a>
+            <MailLink className="v4-btn v4-btn-line" href={BRIEF_MAIL} title="Send me your brief">
+              Send me your brief
+            </MailLink>
+          </div>
         </section>
       </main>
     </div>
