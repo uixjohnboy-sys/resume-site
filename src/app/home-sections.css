@@ -1,6 +1,7 @@
 /* Homepage work section (JB 2026-11-28, v3): the kinds of work as buttons, 4 over 3; the chosen one shows its centred
    display title, the buyer's problem and a row of demo cards ending in "Explore more". Builds on problem-grid.css
    (strip, heading, ask tile). */
+.v4 .hs { margin-top: 56px; }
 .v4 .hs-h { text-align: center; margin-bottom: 6px; }
 .v4 .hs-pick { margin: 0 0 22px; text-align: center; font: 400 15px/1.5 var(--text); color: #a3a39f; }
 
@@ -67,6 +68,7 @@
 }
 @media (max-width: 1100px) { .v4 .hs-row { grid-auto-columns: calc((100% - 32px) / 2.6); } }
 @media (max-width: 700px) {
+  .v4 .hs { margin-top: 40px; }
   .v4 .hs-pick { margin-bottom: 16px; font-size: 14px; }
   .v4 .wt-tabs { gap: 8px; }
   .v4 .wt-tab { flex-basis: calc((100% - 8px) / 2); min-height: 50px; padding: 8px 12px; gap: 8px; }

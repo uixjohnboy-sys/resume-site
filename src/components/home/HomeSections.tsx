@@ -4,7 +4,6 @@ import { work, type Proof } from "@/lib/work";
 import AskTile from "./AskTile";
 import SwipeRow from "./SwipeRow";
 import WorkTabs from "./WorkTabs";
-import { liveDemoCount } from "./ProblemGrid";
 
 // Homepage work section (JB 2026-11-28, v3): the seven kinds of work as buttons (4 over 3, components WorkTabs).
 // The chosen one shows a centred display title, the buyer's problem, a "Built for clients" line and a row of demo
@@ -87,23 +86,9 @@ function Card({ p }: { p: Proof }) {
 }
 
 export default function HomeSections() {
-  const live = liveDemoCount();
+  // The three-box strip (HighLevel certified, live demos, every change written down) was removed by JB on 2026-11-28.
   return (
     <div className="pg hs">
-      <ul className="pg-strip" aria-label="Why hire me">
-        <li>
-          <b>HighLevel certified</b>
-          <span>Workflows, funnels, calendars and the v2 API</span>
-        </li>
-        <li>
-          <b>{live} live demos</b>
-          <span>Open them and use them, not just read about them</span>
-        </li>
-        <li>
-          <b>Every change written down</b>
-          <span>Tested on test contacts, with how to undo it</span>
-        </li>
-      </ul>
       <h2 className="pg-h hs-h">What&apos;s going wrong in your business?</h2>
       <p className="hs-pick">Pick one to see the demos you can try.</p>
 

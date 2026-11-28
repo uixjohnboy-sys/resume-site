@@ -85,11 +85,8 @@ export default function HomeBody({ hero }: { hero: ReactNode }) {
             <p className="sf-trust">
               <span>NDA before I see anything</span> · <span>My own user login, never your password</span> · <span>Tested on test contacts, never real client or patient data</span>
             </p>
-            {/* Proof of how I work on the first screen (hiring review 2026-11-27). */}
-            <p className="sf-sample">
-              <span className="sf-sample-k">Sample work</span>
-              <a href="/demo/followup-teardown">A GoHighLevel follow-up that kept emailing people after they booked</a>, traced in the logs, fixed and tested.
-            </p>
+            {/* The "Sample work" line that sat here (hiring review 2026-11-27) was removed by JB on 2026-11-28; the teardown
+                is still a card under Fixes and audits. */}
           </div>
           {/* No buttons under the cards (JB 2026-11-22): Book a call is in the nav, and the intro video is the next section. */}
           {hero}
