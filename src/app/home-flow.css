@@ -43,6 +43,22 @@
   margin: 0 auto;
   max-width: 640px;
 }
+/* The closer under the lede (JB 2026-11-29): who hands him what, in white so it reads as the last word. */
+.v4 .sf-head .sf-who {
+  margin: 12px auto 0;
+  max-width: 640px;
+  color: #f4f4f2;
+  font: 600 18px/1.4 var(--text);
+}
+@media (max-width: 700px) {
+  .v4 .sf-head .sf-who {
+    font-size: 16px;
+  }
+  /* One sentence per line on a phone, so neither breaks in the middle. */
+  .v4 .sf-head .sf-who span {
+    display: block;
+  }
+}
 
 /* ---------- the stage ---------- */
 .sf {

@@ -11,7 +11,8 @@ import WorkTabs from "./WorkTabs";
 // work has no demo to test, so it is named, not carded. Planned (soon) entries are not shown.
 
 const PROBLEM: Record<string, string> = {
-  "lead-follow-up": "New leads go cold before anyone replies",
+  // The hero line now opens with "Leads go cold when nobody replies", so this panel names the next step of the same pain.
+  "lead-follow-up": "They enquire, then book whoever answers first",
   "ai-agents": "Messages pile up after hours",
   funnels: "Ads get clicks, the page gets no enquiries",
   integrations: "Your tools don't talk to each other",

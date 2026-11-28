@@ -78,7 +78,12 @@ export default function HomeBody({ hero }: { hero: ReactNode }) {
             <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
             <h1 id="hero-h">I build what your CRM can&apos;t.</h1>
             <p className="v4-lede">
-              GoHighLevel workflows, funnels and booking for agencies and small businesses, plus custom apps and AI agents when the CRM runs out. Part-time.
+              Leads go cold when nobody replies. I set up GoHighLevel or fix yours, so new leads get an email reply in seconds and follow-ups that stop when they book. I test it all on test contacts before anything goes live.
+            </p>
+            {/* JB 2026-11-29: the lede picked by three blind reader panels (AU clinic owner, UK agency owner, US trades owner,
+                OnlineJobs.ph employer). "Email" on purpose: the account sends no texts. "Part-time" lives in the top bar. */}
+            <p className="sf-who">
+              <span>Owners hand me the problem.</span> <span>Agencies hand me the build.</span>
             </p>
             {/* Face on the first screen + how client data is handled (hiring review 2026-11-24). */}
             <IntroChip length="1:21" />
