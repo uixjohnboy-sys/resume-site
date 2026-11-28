@@ -136,7 +136,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
           )}
         </section>
 
-        {w.shot && (
+        {w.shot && demos.length === 0 && (
           <section className="v4-in wk-shot" data-rv>
             <Image src={w.shot.src} alt={w.shot.alt} width={w.shot.w} height={w.shot.h} sizes="(max-width: 860px) 100vw, 1176px" />
           </section>
