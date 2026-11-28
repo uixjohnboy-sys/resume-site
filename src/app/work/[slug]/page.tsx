@@ -5,9 +5,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { anton, host, plex } from "../../fonts";
 import Reveal from "@/components/v4/Reveal";
+import DemoFlow from "@/components/work/DemoFlow";
 import { work, workBySlug, SHOW_SOON } from "@/lib/work";
 import "../../v4/v4.css";
 import "../work.css";
+import "../../home-dark.css";
+import "../demo-flow.css";
 
 // One kind of work: what it usually covers, the proof (client work first, demos labelled), and how a job starts. Each
 // page has its own link so an application can point at the one that fits the job post. Public and indexed since
@@ -51,9 +54,11 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
   const w = workBySlug((await params).slug);
   if (!w) notFound();
   const others = work.filter((x) => x.slug !== w.slug);
+  // Demos with a screenshot go in the cover-flow (JB 2026-11-28); card 1 is this kind of work, art from the old home cards.
+  const demos = w.proof.filter((p) => p.card && (SHOW_SOON || !p.soon));
 
   return (
-    <div className={`v4 ${anton.variable} ${host.variable} ${plex.variable}`}>
+    <div className={`v4 v4-dark ${anton.variable} ${host.variable} ${plex.variable}`}>
       <Reveal />
       <header className="v4-nav">
         <div className="v4-nav-in">
@@ -72,7 +77,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
       </header>
 
       <main className="wk-page">
-        <section className="v4-in wk-head">
+        <section className="v4-in wk-head wk-center">
           <p className="v4-kicker">What I build · {w.n}</p>
           <h1>{w.title.replace(/-/g, "‑")}</h1>
           <p className="v4-lede">{w.promise}</p>
@@ -84,6 +89,8 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
             </div>
           )}
         </section>
+
+        {demos.length > 0 && <DemoFlow n={w.n} title={w.title} art={`/home/cards/${w.slug}.webp`} demos={demos} />}
 
         <section className="v4-in wk-body">
           <div className="wk-covers">

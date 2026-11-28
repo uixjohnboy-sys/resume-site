@@ -1,0 +1,450 @@
+/* The category page's cover-flow and open demo (src/components/work/DemoFlow.tsx). Dark page (.v4-dark tokens from
+   home-dark.css): black, white and greys; colour only inside the screenshots. Mockup JB approved 2026-11-28:
+   PortfolioProjects/work-cards/category-mockup/index.html. */
+
+.v4-dark .wk-head.wk-center {
+  text-align: center;
+}
+.v4-dark .wk-head.wk-center h1 {
+  margin-left: auto;
+  margin-right: auto;
+}
+.v4-dark .wk-head.wk-center::after {
+  display: none;
+}
+.v4-dark .wk-head.wk-center {
+  padding-bottom: 8px;
+}
+.v4-dark .wk-head.wk-center .v4-lede {
+  margin-left: auto;
+  margin-right: auto;
+}
+.v4-dark .wk-head.wk-center .v4-ctas {
+  justify-content: center;
+}
+
+.df-mono {
+  font-family: var(--label);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ---------- the flow ---------- */
+.df-flow {
+  --df-step: 300px;
+  --df-w: 400px;
+  --df-h: 470px;
+  position: relative;
+  height: calc(var(--df-h) + 50px);
+  margin: 28px 0 8px;
+  perspective: 1600px;
+  overflow: hidden;
+}
+.df-stage {
+  position: absolute;
+  inset: 0;
+}
+.df-card {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  width: var(--df-w);
+  height: var(--df-h);
+  margin-left: calc(var(--df-w) / -2);
+  padding: 0;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.55s, filter 0.55s;
+}
+.df-card.df-side {
+  filter: grayscale(1);
+}
+.df-card:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+.df-shot {
+  position: relative;
+  display: block;
+  height: 300px;
+  overflow: hidden;
+  background: #000;
+  border-bottom: 1px solid var(--line);
+}
+.df-shot img {
+  width: 100%;
+  height: calc(100% - 22px);
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+.df-cat .df-shot {
+  height: 100%;
+  border: 0;
+}
+.df-art img {
+  height: 100%;
+  object-position: center;
+}
+.df-bar {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  background: #1b1b1b;
+  border-bottom: 1px solid var(--line);
+}
+.df-bar i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3a3a3a;
+}
+.df-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 22px;
+}
+.df-body b {
+  font-size: 24px;
+  font-weight: 600;
+}
+.df-ctrl {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+}
+.df-ctrl button {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid #444;
+  background: transparent;
+  color: var(--ink);
+  font-size: 18px;
+  cursor: pointer;
+}
+.df-ctrl button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.df-dots {
+  display: flex;
+  gap: 8px;
+}
+.df-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #333;
+}
+.df-dots i.on {
+  background: var(--ink);
+}
+
+/* ---------- the open demo ---------- */
+.df-open {
+  max-width: 1088px;
+  margin: 64px auto 0;
+  padding: 0 24px;
+}
+.df-head {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+.v4 .df-head h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(38px, 5vw, 60px);
+  line-height: 1;
+  margin: 12px 0 14px;
+}
+.df-head > p:not(.df-mono) {
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.55;
+  margin: 0 0 24px;
+}
+.df-ctas {
+  justify-content: center;
+}
+.df-hero {
+  margin: 44px 0 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #000;
+}
+.df-hero .df-bar {
+  height: 30px;
+  padding: 0 14px;
+  gap: 7px;
+}
+.df-hero .df-bar i {
+  width: 9px;
+  height: 9px;
+}
+.df-hero .df-bar span {
+  margin-left: 14px;
+  font-family: var(--label);
+  font-size: 12px;
+  color: var(--muted);
+}
+.df-hero img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.df-facts {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 28px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.df-facts div {
+  flex: 1 1 160px;
+  padding: 18px 20px;
+  text-align: center;
+  border-right: 1px solid var(--line);
+}
+.df-facts div:last-child {
+  border-right: 0;
+}
+.df-facts dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 36px;
+  line-height: 1.1;
+}
+.df-built-h {
+  text-align: center;
+  margin: 76px 0 28px;
+}
+.v4 .df-built-h h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(30px, 4vw, 42px);
+  margin: 10px 0 0;
+}
+.df-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.df-grid li {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.df-pic {
+  position: relative;
+  height: 210px;
+  overflow: hidden;
+  background: #0f0f0f;
+  border-bottom: 1px solid var(--line);
+}
+.df-pic > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+.df-txt {
+  padding: 18px 20px 22px;
+}
+.v4 .df-txt h4 {
+  margin: 8px 0 8px;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.df-txt > p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.df-txt b {
+  color: var(--ink);
+  font-weight: 500;
+}
+.df-drawn {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-family: var(--label);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6b6b67;
+}
+.df-mail {
+  position: absolute;
+  inset: 18px 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fbfaf7;
+  color: #222;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 12.5px;
+}
+.df-mail b {
+  font-size: 13px;
+}
+.df-mail > span {
+  color: #666;
+  margin-bottom: 4px;
+}
+.df-mail i {
+  display: block;
+  height: 7px;
+  background: #e6e2da;
+  border-radius: 4px;
+}
+.df-mail em {
+  align-self: flex-start;
+  margin-top: 6px;
+  font-style: normal;
+  background: #9a3f1c;
+  color: #fff;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 11.5px;
+}
+.df-wf {
+  position: absolute;
+  inset: 14px 14px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--label);
+  font-size: 11px;
+  color: #cfcfcb;
+}
+.df-wf > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.df-wf span span {
+  border: 1px solid #3d3d3d;
+  border-radius: 8px;
+  padding: 5px 10px;
+  background: #181818;
+}
+.df-wf em {
+  color: #555;
+  font-style: normal;
+  line-height: 1.3;
+}
+.df-phone {
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  width: 118px;
+  height: 236px;
+  margin-left: -59px;
+  border: 5px solid #2a2a2a;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.df-phone img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.df-owner {
+  margin: 64px 0 0;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.df-owner > div {
+  padding: 34px;
+}
+.v4 .df-owner h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: 34px;
+  margin: 10px 0 12px;
+}
+.df-owner p:not(.df-mono) {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
+.df-owner > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-left: 1px solid var(--line);
+}
+
+@media (max-width: 900px) {
+  .df-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .df-owner {
+    grid-template-columns: 1fr;
+  }
+  .df-owner > img {
+    height: 260px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+@media (max-width: 620px) {
+  .df-flow {
+    --df-step: 230px;
+    --df-w: 280px;
+    --df-h: 400px;
+  }
+  .df-shot {
+    height: 230px;
+  }
+  .df-grid {
+    grid-template-columns: 1fr;
+  }
+  .df-open {
+    padding: 0 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .df-card {
+    transition: none;
+  }
+}
