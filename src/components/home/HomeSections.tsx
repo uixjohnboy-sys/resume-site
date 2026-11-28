@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { work, type Proof, type Work } from "@/lib/work";
+import { work, type Proof } from "@/lib/work";
 import AskTile from "./AskTile";
 import SwipeRow from "./SwipeRow";
 import { liveDemoCount } from "./ProblemGrid";
 
-// Homepage, section by section (JB 2026-11-28): each kind of work gets its own section, headed by the category and the
-// buyer's problem, with a row of cards to swipe: my demos with their screenshots first, then the client work as written
-// in work.ts, then a card to the category page where the full explanation is. Planned (soon) entries are not shown.
+// Homepage, section by section (JB 2026-11-28, v2): each kind of work gets a centred section with the category as a
+// bold display title, the buyer's problem under it, and a row of demo cards to swipe. Every card ends in "Explore more",
+// which opens the page that explains the demo and how to test it. Client work is named under the title (it has no demo
+// to test). Planned (soon) entries are not shown.
 
 const PROBLEM: Record<string, string> = {
   "lead-follow-up": "New leads go cold before anyone replies",
@@ -19,38 +20,49 @@ const PROBLEM: Record<string, string> = {
   "custom-apps": "GoHighLevel can't do what you need",
 };
 
-const external = (h: string) => /^https?:/.test(h);
+// Where "Explore more" goes: the page that explains each demo and says how to test it.
+const KIT = "/guides/speed-to-lead-kit.pdf";
+const LUMIERE_GUIDE = "https://drive.google.com/file/d/1MfN7JlZdr9jzJutqL36mKz29GjWOKWId/view";
+const EXPLORE: Record<string, string> = {
+  "Kestrel Physio": "/projects/kestrel",
+  Deskhand: "/projects/deskhand",
+  Tapline: "/projects/tapline",
+  "Coach OS": "/coach-os",
+  "Follow-up teardown": "/demo/followup-teardown",
+  "Lumiere Aesthetic": LUMIERE_GUIDE,
+  "Speed-to-lead for a trades business": KIT,
+  "Quote form for a trades business": KIT,
+  "Speed-to-lead kit for trades": KIT,
+};
+// Guides that are already the explanation of a card shown beside them.
+const FOLDED = new Set(["How I built Lumiere"]);
 
-function cardLink(w: Work, p: Proof): { href: string; cta: string } {
-  if (p.detail || !p.href) return { href: `/work/${w.slug}`, cta: p.detail ? "See what was built →" : "Read more →" };
-  return { href: p.href, cta: `${p.cta ?? "Open"} →` };
-}
+const external = (h: string) => /^https?:/.test(h) || /\.pdf$/i.test(h);
 
-function Card({ w, p }: { w: Work; p: Proof }) {
-  const { href, cta } = cardLink(w, p);
+function Card({ p }: { p: Proof }) {
+  const href = EXPLORE[p.name] ?? p.href ?? "/book";
   const ext = external(href);
-  const client = p.kind === "Client work";
   const body = (
     <>
-      {p.card ? (
-        <span className="hs-shot">
+      <span className="hs-shot">
+        {p.card ? (
           <Image src={p.card} alt="" width={800} height={500} sizes="(max-width: 700px) 80vw, 320px" />
-        </span>
-      ) : (
-        <span className="hs-quote" aria-hidden="true">
-          {client ? "Client" : "Guide"}
-        </span>
-      )}
+        ) : (
+          <span className="hs-noshot" aria-hidden="true">
+            PDF guide
+          </span>
+        )}
+      </span>
       <span className="hs-cbody">
-        <span className="hs-kind">{client ? "Built for a client" : p.kind}</span>
+        <span className="hs-kind">{p.kind}</span>
         <span className="hs-name">{p.name}</span>
         <span className="hs-line">{p.line}</span>
-        <span className="hs-cta">{cta}</span>
+        <span className="hs-cta">Explore more →</span>
       </span>
     </>
   );
   return (
-    <li className={`hs-card${client ? " hs-card-client" : ""}`}>
+    <li className="hs-card">
       {ext ? (
         <a href={href} className="hs-clink" target="_blank" rel="noopener noreferrer">
           {body}
@@ -82,46 +94,32 @@ export default function HomeSections() {
           <span>Tested on test contacts, with how to undo it</span>
         </li>
       </ul>
-      <h2 className="pg-h">What&apos;s going wrong in your business?</h2>
+      <h2 className="pg-h hs-h">What&apos;s going wrong in your business?</h2>
 
       {work.map((w) => {
         const shown = w.proof.filter((p) => !p.soon);
-        // A demo with a full write-up (Kestrel) leads, then the other demos with screenshots, then the text cards.
+        const clients = [...new Set(shown.filter((p) => p.kind === "Client work").map((p) => p.name))];
         const rank = (p: Proof) => (p.detail ? 0 : p.card ? 1 : 2);
-        const cards = [...shown].sort((a, b) => rank(a) - rank(b));
+        const cards = shown.filter((p) => p.kind !== "Client work" && !FOLDED.has(p.name)).sort((a, b) => rank(a) - rank(b));
         return (
           <section key={w.slug} className="hs-sec" aria-labelledby={`hs-${w.slug}`}>
-            <div className="hs-head">
-              <div className="hs-title">
-                <span className="pg-n">
-                  <span className="pg-num">{w.n}</span>
-                  <span className="pg-cat">{w.title}</span>
-                </span>
-                <h3 id={`hs-${w.slug}`} className="hs-problem">
-                  {PROBLEM[w.slug] ?? w.title}
-                </h3>
-              </div>
-              <div className="hs-side">
-                <p className="hs-promise">{w.promise}</p>
-                <Link href={`/work/${w.slug}`} className="hs-more">
-                  See how it works →
-                </Link>
-              </div>
-            </div>
+            <header className="hs-head">
+              <span className="hs-num">{w.n}</span>
+              <h3 id={`hs-${w.slug}`} className="hs-title">
+                {w.title}
+              </h3>
+              <p className="hs-problem">{PROBLEM[w.slug] ?? w.promise}</p>
+              <p className="hs-promise">{w.promise}</p>
+              {clients.length ? <p className="hs-clients">Built for clients: {clients.join(", ")}</p> : null}
+            </header>
             <SwipeRow label={w.title}>
               {cards.map((p, i) => (
-                <Card key={`${p.name}-${i}`} w={w} p={p} />
+                <Card key={`${p.name}-${i}`} p={p} />
               ))}
-              <li className="hs-card hs-card-all">
-                <Link href={`/work/${w.slug}`} className="hs-clink">
-                  <span className="hs-cbody">
-                    <span className="hs-kind">{w.title}</span>
-                    <span className="hs-name">Everything I build for this, step by step</span>
-                    <span className="hs-cta">Open the page →</span>
-                  </span>
-                </Link>
-              </li>
             </SwipeRow>
+            <p className="hs-all">
+              <Link href={`/work/${w.slug}`}>More on this kind of work →</Link>
+            </p>
           </section>
         );
       })}

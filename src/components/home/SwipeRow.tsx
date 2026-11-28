@@ -30,7 +30,7 @@ export default function SwipeRow({ label, children }: { label: string; children:
 
   return (
     <div className="hs-swipe">
-      <ul ref={row} className="hs-row" aria-label={label}>
+      <ul ref={row} className="hs-row" aria-label={label} data-fit={edge.start && edge.end ? "" : undefined}>
         {children}
       </ul>
       <div className="hs-arrows" hidden={edge.start && edge.end}>
