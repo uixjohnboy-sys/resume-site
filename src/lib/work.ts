@@ -425,6 +425,7 @@ export const work: Work[] = [
         line: "The live Tallowood Roofing build (form, calendar, pipeline and three follow-up workflows) with a one-page guide to set it up in any sub-account.",
         href: "/guides/speed-to-lead-kit.pdf",
         cta: "Read the guide",
+        card: "/work/demos/speed-guide-800.webp",
       },
     ],
   },

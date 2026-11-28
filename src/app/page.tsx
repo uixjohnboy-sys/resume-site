@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import HomeBody from "@/components/home/HomeBody";
-import ProblemGrid from "@/components/home/ProblemGrid";
+import HomeSections from "@/components/home/HomeSections";
 import "./problem-grid.css";
+import "./home-sections.css";
 
-// Homepage. Since 2026-11-27 the work section is the problem grid (every kind of work in one look, headed by the buyer's
-// problem; A/B by the hiring manager: grid 81.8 vs cover-flow 79.4, hiring\runs\2026-11-27-ab-home-grid.md), after the
-// live-demo count was made true and client work was labelled apart from fictional demos. The cover-flow
-// (components/home/SkillFlow.tsx) is kept for a rollback: render <SkillFlow cards={...}> as the hero instead.
+// Homepage. Since 2026-11-28 (JB approved the preview) the work section is section by section: one centred section
+// per kind of work, a swipe row of demo cards, "Explore more" on each card to the page that explains the demo and how
+// to test it. Before that it was the problem grid (components/home/ProblemGrid.tsx, 2026-11-27); render
+// <ProblemGrid /> as the hero instead to roll back. The older cover-flow (components/home/SkillFlow.tsx) is also kept.
 
 export const metadata: Metadata = {
   title: { absolute: "GoHighLevel Specialist for Hire, GHL Expert | John Boy Roxas" },
@@ -16,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <HomeBody hero={<ProblemGrid />} />;
+  return <HomeBody hero={<HomeSections />} />;
 }

@@ -21,20 +21,18 @@ const PROBLEM: Record<string, string> = {
 };
 
 // Where "Explore more" goes: the page that explains each demo and says how to test it.
-const KIT = "/guides/speed-to-lead-kit.pdf";
-const LUMIERE_GUIDE = "https://drive.google.com/file/d/1MfN7JlZdr9jzJutqL36mKz29GjWOKWId/view";
 const EXPLORE: Record<string, string> = {
   "Kestrel Physio": "/projects/kestrel",
   Deskhand: "/projects/deskhand",
   Tapline: "/projects/tapline",
   "Coach OS": "/coach-os",
   "Follow-up teardown": "/demo/followup-teardown",
-  "Lumiere Aesthetic": LUMIERE_GUIDE,
-  "Speed-to-lead for a trades business": KIT,
-  "Quote form for a trades business": KIT,
-  "Speed-to-lead kit for trades": KIT,
+  "Lumiere Aesthetic": "/projects/lumiere",
+  "Speed-to-lead for a trades business": "/projects/speed-to-lead",
+  "Quote form for a trades business": "/projects/speed-to-lead",
+  "Speed-to-lead kit for trades": "/projects/speed-to-lead",
 };
-// Guides that are already the explanation of a card shown beside them.
+// The build walkthrough is linked from the Lumiere page, so it is not a card of its own.
 const FOLDED = new Set(["How I built Lumiere"]);
 
 const external = (h: string) => /^https?:/.test(h) || /\.pdf$/i.test(h);
