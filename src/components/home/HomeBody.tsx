@@ -75,13 +75,18 @@ export default function HomeBody({ hero }: { hero: ReactNode }) {
         {/* ---------- 1. HERO: what I build, as a cover-flow of cards (JB 2026-11-22), black and white ---------- */}
         <section className="sf-hero" id="work" aria-labelledby="hero-h">
           <div className="sf-head">
-            <p className="v4-kicker">GoHighLevel specialist · HighLevel certified</p>
+            {/* No-break spaces: on a phone the label breaks at the dot, not before "certified" alone. */}
+            <p className="v4-kicker">GoHighLevel specialist&nbsp;· HighLevel&nbsp;certified</p>
             <h1 id="hero-h">I build what your CRM can&apos;t.</h1>
             <p className="v4-lede">
-              Leads go cold when nobody replies. I set up GoHighLevel or fix yours, so new leads get an email reply in seconds and follow-ups that stop when they book. I test it all on test contacts before anything goes live.
+              Leads go cold when nobody replies. I&nbsp;set&nbsp;up GoHighLevel or fix yours, so&nbsp;new leads get an email reply in seconds and follow-ups that stop when&nbsp;they&nbsp;book. Nothing goes live until it works on test&nbsp;contacts.
             </p>
             {/* JB 2026-11-29: the lede picked by three blind reader panels (AU clinic owner, UK agency owner, US trades owner,
-                OnlineJobs.ph employer). "Email" on purpose: the account sends no texts. "Part-time" lives in the top bar. */}
+                OnlineJobs.ph employer). "Email" on purpose: the account sends no texts. "Part-time" lives in the top bar.
+                Last sentence (same four readers, blind A/B/C, 11-29): "Nothing goes live until it works on test contacts"
+                picked 4 of 4, 57/80, over "I check it all on test contacts..." 48 and the old "I test it all on test
+                contacts..." 41, which every reader flagged for saying test twice. The &nbsp;s keep "I", "so" and
+                "when they book" from breaking badly on a phone (see home-flow.css). */}
             <p className="sf-who">
               <span>Owners hand me the problem.</span> <span>Agencies hand me the build.</span>
             </p>

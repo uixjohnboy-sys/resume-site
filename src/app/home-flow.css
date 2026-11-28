@@ -42,6 +42,9 @@
   color: #c9c9c5;
   margin: 0 auto;
   max-width: 640px;
+  /* With the no-break spaces in HomeBody (I set up, so new, when they book, the last two words) no line ends on a
+     lone "I" or "so" and the last line is never one word: measured at 1440, 1024, 768, 430, 390, 360 and 320 px. */
+  text-wrap: pretty;
 }
 /* The closer under the lede (JB 2026-11-29): who hands him what, in white so it reads as the last word. */
 .v4 .sf-head .sf-who {
