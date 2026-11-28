@@ -70,7 +70,7 @@ export default function DeskhandProject() {
           </a>
         </div>
         <p className="pj-fine">No sign-up. Fictional business. Nothing is really sent, and your demo resets after 48 hours.</p>
-        <Image className="pj-shot" src="/projects/deskhand/desk.png" alt="Deskhand: the customer's text thread beside the work log and the calendar, with a booking just made" width={2880} height={1800} sizes="(max-width: 1100px) 92vw, 1040px" priority />
+        <Image className="pj-shot" src="/work/demos/deskhand-1440.webp" alt="Deskhand: four customers to pick from, the work log and the two teams' calendar for the week" width={1440} height={900} sizes="(max-width: 1100px) 92vw, 1040px" priority />
       </header>
 
       <section className="pj-sec">
