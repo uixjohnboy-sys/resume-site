@@ -63,7 +63,7 @@ const KESTREL: DemoDetail = {
     ["6", "Pages"],
     ["5", "Live calendars"],
     ["3", "Workflows"],
-    ["2", "Reminders per booking"],
+    ["2", "Reminder times"],
   ],
   pieces: [
     {
@@ -123,7 +123,7 @@ const KESTREL: DemoDetail = {
   ],
   owner: {
     text: "Every page on the live site has an Owner view switch. It shows what each part does behind the scenes and how it's built, so a buyer sees the system, not just the design.",
-    img: "/work/demos/kestrel-first-800.webp",
+    img: "/work/demos/kestrel-owner-800.webp",
     href: KESTREL_URL,
   },
 };
