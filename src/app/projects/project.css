@@ -3,17 +3,24 @@
    only colour; the page stays quiet.
    Type 12/16 14/20 16/24 20/28 24/32 40/48 · spacing 4/8/12/16/24/32/48/72. */
 
+/* Dark since 2026-11-28 (hiring review: the explore pages were white while the homepage is black). Same tokens as the
+   homepage: near-black paper, off-white ink, Anton display title, Host Grotesk body, Plex Mono labels. --black is the
+   "strong" colour (primary button, focus ring), so on the dark page it is the off-white. */
 :root:has(.pj) body {
-  background: #fff;
+  background: #0d0d0c;
 }
 .pj {
-  --ink: #0a0a0a;
-  --ink-2: #404040;
-  --muted: #666666;
-  --line: #e5e5e5;
-  --bg-2: #f5f5f5;
-  --black: #0a0a0a;
-  --black-2: #333333;
+  --ink: #f4f4f2;
+  --ink-2: #c9c9c5;
+  --muted: #a3a39f;
+  --line: #2f2f2c;
+  --bg-2: #151514;
+  --black: #f4f4f2;
+  --black-2: #ffffff;
+  --on-strong: #0d0d0c;
+  --display: var(--font-anton), Impact, "Arial Narrow", sans-serif;
+  --text: var(--font-host), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --label: var(--font-plex), ui-monospace, SFMono-Regular, monospace;
   /* The page's parent is a flex row: without these it grows to fit its widest child on a phone. */
   width: 100%;
   min-width: 0;
@@ -21,10 +28,11 @@
   margin: 0 auto;
   padding: 0 24px 72px;
   color: var(--ink);
-  background: #fff;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #0d0d0c;
+  font-family: var(--text);
   font-size: 16px;
   line-height: 24px;
+  -webkit-font-smoothing: antialiased;
 }
 .pj *,
 .pj *::before {
@@ -58,14 +66,17 @@
 }
 .pj-kicker {
   margin: 0 0 12px;
-  font-size: 14px;
-  line-height: 20px;
+  font: 400 12px/18px var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 .pj-hero h1 {
-  max-width: 760px;
-  font-size: 40px;
-  line-height: 48px;
+  max-width: 860px;
+  font: 400 56px/1 var(--display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 .pj-lead {
   max-width: 680px;
@@ -87,8 +98,8 @@
   border: 1px solid var(--black);
   border-radius: 6px;
   background: var(--black);
-  color: #fff;
-  font-weight: 500;
+  color: var(--on-strong);
+  font-weight: 600;
   font-size: 16px;
   text-decoration: none;
 }
@@ -96,8 +107,8 @@
   background: var(--black-2);
 }
 .pj-btn-quiet {
-  border-color: #8a8a8a;
-  background: #fff;
+  border-color: #5a5a56;
+  background: transparent;
   color: var(--ink);
 }
 .pj-btn-quiet:hover {
@@ -115,7 +126,7 @@
   height: auto;
   border: 1px solid var(--line);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
 }
 .pj-hero .pj-shot {
   margin-top: 32px;
@@ -187,6 +198,7 @@
   padding: 24px;
   border: 1px solid var(--line);
   border-radius: 8px;
+  background: var(--bg-2);
 }
 .pj-card h3 {
   font-size: 16px;
@@ -266,7 +278,8 @@
 .pj-end {
   padding: 48px;
   border-radius: 12px;
-  background: var(--black);
+  border: 1px solid var(--line);
+  background: var(--bg-2);
 }
 .pj-end h2 {
   color: #fff;
@@ -279,7 +292,7 @@
 .pj-end .pj-btn {
   border-color: #fff;
   background: #fff;
-  color: var(--ink);
+  color: var(--on-strong);
 }
 .pj-end .pj-btn:hover {
   background: #e5e5e5;
@@ -301,8 +314,8 @@
     padding: 0 16px 48px;
   }
   .pj-hero h1 {
-    font-size: 32px;
-    line-height: 40px;
+    font-size: 38px;
+    line-height: 1.02;
   }
   .pj-step,
   .pj-step-phone {
@@ -384,7 +397,7 @@
   display: block;
   width: 100%;
   height: auto;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--line);
   border-radius: 6px;
 }
 @media (max-width: 760px) {

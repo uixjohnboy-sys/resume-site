@@ -3,6 +3,7 @@ import MailLink from "@/components/MailLink";
 import Image from "next/image";
 import Link from "next/link";
 import "../project.css";
+import { anton, host, plex } from "@/app/fonts";
 
 // The "Know more" page for Tapline. With no client testimonials yet, the proof is what a
 // visitor can try for themselves and what testing really caught.
@@ -117,7 +118,7 @@ const caught = [
 
 export default function TaplineProject() {
   return (
-    <main className="pj">
+    <main className={`pj ${anton.variable} ${host.variable} ${plex.variable}`}>
       <nav className="pj-nav">
         <Link href="/">John Boy Roxas</Link>
       </nav>
@@ -210,7 +211,7 @@ export default function TaplineProject() {
 
       <section className="pj-sec">
         <h2>Don&apos;t take my word for it</h2>
-        <p className="pj-measure">I don&apos;t have a client testimonial for this one, because it&apos;s a demo I built to show how I work. So here are four things you can check yourself in a few minutes.</p>
+        <p className="pj-measure">Four things you can check yourself in a few minutes.</p>
         <div className="pj-grid">
           {tryIt.map(([t, b]) => (
             <div key={t} className="pj-card">
@@ -277,9 +278,9 @@ export default function TaplineProject() {
             UK version
           </a>
         </div>
-        <p className="pj-end-mail">
+        <div className="pj-end-mail">
           Or email <MailLink href={MAIL} title="Email John Boy">{EMAIL}</MailLink>
-        </p>
+        </div>
       </section>
     </main>
   );

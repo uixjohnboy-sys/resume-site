@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import "../project.css";
+import { anton, host, plex } from "@/app/fonts";
 
 // The "Explore more" page for Kestrel Physio (JB 2026-11-28): what was built, what each part does for the clinic, and
 // how a visitor tests it. Facts come from the build log (PortfolioProjects/funnel-studio/kestrel/GHL-BUILD.md) and the
@@ -44,7 +45,7 @@ const shots: [string, string][] = [
 
 export default function KestrelProject() {
   return (
-    <main className="pj">
+    <main className={`pj ${anton.variable} ${host.variable} ${plex.variable}`}>
       <nav className="pj-nav">
         <Link href="/">John Boy Roxas</Link>
       </nav>
@@ -82,7 +83,7 @@ export default function KestrelProject() {
 
       <section className="pj-sec">
         <h2>How to test it</h2>
-        <p className="pj-measure">There&apos;s no client testimonial, because this is a demo I built to show how I work. Here are four things you can check yourself in a few minutes.</p>
+        <p className="pj-measure">Four things you can check yourself in a few minutes.</p>
         <div className="pj-grid">
           {test.map(([t, b]) => (
             <div key={t} className="pj-card">
