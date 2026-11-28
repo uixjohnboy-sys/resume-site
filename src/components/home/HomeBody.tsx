@@ -82,9 +82,7 @@ export default function HomeBody({ hero }: { hero: ReactNode }) {
             </p>
             {/* Face on the first screen + how client data is handled (hiring review 2026-11-24). */}
             <IntroChip length="1:21" />
-            <p className="sf-trust">
-              <span>NDA before I see anything</span> · <span>My own user login, never your password</span> · <span>Tested on test contacts, never real client or patient data</span>
-            </p>
+            {/* The trust line (NDA, own login, test contacts) was removed by JB on 2026-11-28: he explains it on the call. */}
             {/* The "Sample work" line that sat here (hiring review 2026-11-27) was removed by JB on 2026-11-28; the teardown
                 is still a card under Fixes and audits. */}
           </div>
