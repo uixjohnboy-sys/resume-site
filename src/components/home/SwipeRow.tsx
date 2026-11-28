@@ -13,10 +13,12 @@ export default function SwipeRow({ label, children }: { label: string; children:
     const read = () => setEdge({ start: el.scrollLeft < 8, end: el.scrollLeft + el.clientWidth > el.scrollWidth - 8 });
     read();
     el.addEventListener("scroll", read, { passive: true });
-    window.addEventListener("resize", read);
+    // A row inside a hidden tab measures 0 wide; the observer re-reads it when the tab is shown or the window resizes.
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
     return () => {
       el.removeEventListener("scroll", read);
-      window.removeEventListener("resize", read);
+      ro.disconnect();
     };
   }, []);
 
