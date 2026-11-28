@@ -70,8 +70,10 @@ export default function ProblemGrid() {
                   <Image src={`/home/cards/${w.slug}.webp`} alt="" width={640} height={400} sizes="(max-width: 700px) 96px, 320px" />
                 </span>
                 <span className="pg-body">
+                  {/* JB 11-28: the kind of work stands out as a badge; the buyer's problem stays the headline. */}
                   <span className="pg-n">
-                    {w.n} · {w.title}
+                    <span className="pg-num">{w.n}</span>
+                    <span className="pg-cat">{w.title}</span>
                   </span>
                   <span className="pg-problem">{PROBLEM[w.slug] ?? w.title}</span>
                   <span className="pg-what">{w.promise}</span>
@@ -80,7 +82,7 @@ export default function ProblemGrid() {
                     {tag ? <span className="pg-live">{tag}</span> : null}
                   </span>
                   <span className="pg-cta" aria-hidden="true">
-                    See how it works →
+                    {w.proof.some((p) => p.card && p.href && LIVE_DEMOS.some((d) => d.match.test(p.href as string))) ?"See the demos and how it works →" : "See how it works →"}
                   </span>
                 </span>
               </Link>
